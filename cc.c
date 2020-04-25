@@ -714,8 +714,6 @@ int pack(UCHAR str[], UCHAR bitField[] ) {
 
 struct encodeT encode;
 
-int i;
-
 	encode.str = str;
 	encode.bitField = bitField;
 	encode.iStr = encode.iBit = 0;
@@ -1137,7 +1135,6 @@ int bitCnt, chr, size;
 int doMethods(struct encodeT *encode) {
 
 UINT bits;
-int iStr1;
 
 	if (strlen(encode->str) >= 8 && encode->str[0] == '1' &&
 				(encode->str[1] == '1' || encode->str[1] == '7')) {

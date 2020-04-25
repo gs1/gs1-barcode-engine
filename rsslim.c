@@ -38,7 +38,7 @@ UCHAR linPattern[ELMNTS];
 char primaryStr[14+1];
 char tempStr[28+1];
 
-int i, j;
+int i;
 int rows, ccFlag;
 char *ccStr;
 

@@ -52,7 +52,6 @@ int i, j;
 int rows, ccFlag;
 int segs, lNdx, lNdx1, lMods, lHeight;
 int evenRow, rev;
-int sepCnt;
 int chexSize;
 char *ccStr;
 int rPadl1, rPadcc;

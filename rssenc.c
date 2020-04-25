@@ -145,7 +145,6 @@ int *getRSSwidths(int val, int n, int elements, int maxWidth, int noNarrow)
 static int widths[MAX_K];
 int bar;
 int elmWidth;
-int i;
 int mxwElement;
 int subVal, lessVal;
 int narrowMask = 0;
@@ -329,7 +328,7 @@ void printElmnts(struct sParams *params, struct sPrints *prints) {
 
 #define WHITE 0
 
-int i, j, bits, width, ndx, white;
+int i, bits, width, ndx, white;
 UCHAR xorMsk;
 int undercut;
 

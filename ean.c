@@ -43,7 +43,7 @@ UCHAR sepPat2[5] = { 6,1,EAN13_W-14,1,6 }; // separator pattern 2
 char primaryStr[14+1];
 char tempStr[28+1];
 
-int i, j;
+int i;
 int rows, ccFlag;
 char *ccStr;
 
@@ -264,7 +264,7 @@ UCHAR sepPat2[5] = { 6,1,EAN8_W-14,1,6 }; // separator pattern 2
 char primaryStr[14+1];
 char tempStr[28+1];
 
-int i, j;
+int i;
 int rows, ccFlag;
 char *ccStr;
 int lpadCC;
@@ -489,7 +489,7 @@ UCHAR sepPat2[5] = { 6,1,UPCE_W-14,1,6 }; // separator pattern 2
 char primaryStr[14+1];
 char tempStr[28+1];
 
-int i, j;
+int i;
 int rows, ccFlag;
 char *ccStr;
 

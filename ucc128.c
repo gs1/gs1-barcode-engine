@@ -43,7 +43,7 @@ struct sPrints prints;
 
 UCHAR linPattern[(SYMMAX*6)+3];
 
-int i, j;
+int i;
 int rows, ccFlag, symChars, symWidth, ccLpad, ccRpad;
 char primaryStr[120+1];
 char *ccStr;
@@ -198,7 +198,7 @@ struct sPrints prints;
 
 UCHAR linPattern[(SYMMAX*6)+3];
 
-int i, j;
+int i;
 int ccFlag, symChars, symWidth, ccRpad;
 char primaryStr[120+1];
 char *ccStr;
