@@ -19,6 +19,23 @@
 #define MAX_KEYDATA 120
 #define MAX_LINHT 500 // max UCC/EAN-128 height in X
 
+const char* SYMBOLOGY_NAMES[] =
+{
+	"",  // Spacer
+	"GS1 DataBar",
+	"GS1 DataBar Truncated",
+	"GS1 DataBar Stacked",
+	"GS1 DataBar Stacked Omnidirectional",
+	"GS1 DataBar Limited",
+	"GS1 DataBar Expanded (Stacked)",
+	"UPC-A",
+	"UPC-E",
+	"EAN-13",
+	"EAN-8",
+	"GS1-128 with CC-A or CC-B",
+	"GS1-128 with CC-C"
+};
+
 int combins(int n, int r);
 
 void printElm(int width, int color, int *bits, int * ndx, UCHAR xorMsk);
@@ -876,17 +893,16 @@ int menuVal, i;
 int getSym(struct sParams *params) {
 
 char inpStr[MAX_KEYDATA+1];
+int i;
 
 	while (TRUE) {
 		printf("\nMENU (Release %s):",RELEASE);
 		printf("\n 0)  Exit Program");
-		printf("\n 1)  RSS14                2)  RSS14 Truncated");
-		printf("\n 3)  RSS14 Stacked        4)  RSS14 Stacked Omnidirectional");
-		printf("\n 5)  RSS Limited          6)  RSS Expanded");
-		printf("\n 7)  UPC-A                8)  UPC-E");
-		printf("\n 9)  EAN-13               10) EAN-8");
-		printf("\n 11) UCC/EAN-128 & CC-A/B 12) UCC/EAN-128 & CC-C");
-		printf("\nenter symbology type or 0 to exit ");
+		for (i = 1; i < sNUMSYMS; i += 2) {
+			printf("\n%2d)  %-25s     %2d)  %-25s", 
+				i, SYMBOLOGY_NAMES[i], i + 1, SYMBOLOGY_NAMES[i + 1]);
+		}
+		printf("\n\nEnter symbology type or 0 to exit: ");
 		if (gets(inpStr) == NULL) {
 			printf("PLEASE ENTER 0 THROUGH 12.");
 			continue;

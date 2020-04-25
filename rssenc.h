@@ -37,7 +37,7 @@
 #define MAX_CCB4_ROWS 44	// ccb-4 max rows
 
 enum {
-	sNONE,			//none defined
+	sNONE = 0,	    //none defined
 	sRSS14,			//RSS-14
 	sRSS14T,		//RSS-14 Truncated
 	sRSS14S,		//RSS-14 Stacked
@@ -48,8 +48,9 @@ enum {
 	sUPCE,			//UPC-E
 	sEAN13,			//EAN-13
 	sEAN8,			//EAN-8
-	sUCC128_CCA,//UCC/EAN-128 with CC-A or CC-B
-	sUCC128_CCC,//UCC/EAN-128 with CC-C
+	sUCC128_CCA,	//UCC/EAN-128 with CC-A or CC-B
+	sUCC128_CCC,	//UCC/EAN-128 with CC-C
+	sNUMSYMS,       //Number of symbologies
 };
 
 struct sParams {
