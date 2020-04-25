@@ -1575,7 +1575,7 @@ returns number of bits left to closest 2d symbol,
 int getUnusedBitCnt(int iBit, int *size) {
 
 // max data plus ecc codewords for CC-C
-static eccMaxCW[] = { 40+8, 160+16, 320+32, 863+64, 0 };
+static int eccMaxCW[] = { 40+8, 160+16, 320+32, 863+64, 0 };
 
 int i, byteCnt, cwCnt;
 
