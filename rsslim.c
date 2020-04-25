@@ -60,7 +60,7 @@ char *ccStr;
 		strcat(tempStr, params->dataStr);
 		strcpy(primaryStr, tempStr + strlen(tempStr) - 13);
 
-		if (RSSLimEnc(primaryStr, linPattern, ccFlag)) {
+		if (RSSLimEnc((UCHAR*)primaryStr, linPattern, ccFlag)) {
 			if (errFlag) {
 				printf("\nRSS Limited encoding error occurred.");
 				return;
@@ -89,7 +89,7 @@ char *ccStr;
 		prints.whtFirst = TRUE;
 		prints.reverse = FALSE;
 		if (ccFlag) {
-			if ((rows = CC3enc(ccStr, ccPattern)) > 0) {
+			if ((rows = CC3enc((UCHAR*)ccStr, ccPattern)) > 0) {
 				if (errFlag) {
 					printf("\nerror occurred, exiting.");
 					return;
@@ -352,7 +352,7 @@ int RSSLimEnc(UCHAR string[], UCHAR bars[], int ccFlag) {
 	int iIndex;
 	int *widths;
 
-	data = atof(string);
+	data = atof((char*)string);
 	if (data > 1999999999999.) {
 		return(FALSE); // item number too large
 	}
@@ -371,7 +371,7 @@ int RSSLimEnc(UCHAR string[], UCHAR bars[], int ccFlag) {
 	// get odd elements N and max
 	elementN = (int)oddEvenTbl[iIndex];
 	elementMax = (int)oddEvenTbl[iIndex+1];
-	longNum = value = chrValue / oddEvenTbl[iIndex+4];
+	longNum = value = (int)(chrValue / oddEvenTbl[iIndex+4]);
 
 	// generate and store odd element widths:
 	widths = getRSSwidths(value, elementN, K, elementMax, 1);
@@ -383,7 +383,7 @@ int RSSLimEnc(UCHAR string[], UCHAR bars[], int ccFlag) {
 	}
 
 	// calculate even elements value:
-	value = chrValue - (oddEvenTbl[iIndex+4] * longNum);
+	value = (int)(chrValue - (oddEvenTbl[iIndex+4] * longNum));
 	elementN = (int)oddEvenTbl[iIndex+2];
 	elementMax = (int)oddEvenTbl[iIndex+3];
 
@@ -408,7 +408,7 @@ int RSSLimEnc(UCHAR string[], UCHAR bars[], int ccFlag) {
 	// get odd elements N and max
 	elementN = (int)oddEvenTbl[iIndex];
 	elementMax = (int)oddEvenTbl[iIndex+1];
-	longNum = value = chrValue / oddEvenTbl[iIndex+4];
+	longNum = value = (int)(chrValue / oddEvenTbl[iIndex+4]);
 
 	// generate and store odd element widths:
 	widths = getRSSwidths(value, elementN, K, elementMax, 1);
@@ -419,7 +419,7 @@ int RSSLimEnc(UCHAR string[], UCHAR bars[], int ccFlag) {
 	}
 
 	// calculate even elements value:
-	value = chrValue - (oddEvenTbl[iIndex+4] * longNum);
+	value = (int)(chrValue - (oddEvenTbl[iIndex+4] * longNum));
 	elementN = (int)oddEvenTbl[iIndex+2];
 	elementMax = (int)oddEvenTbl[iIndex+3];
 
@@ -461,11 +461,11 @@ int i, j, k;
 	for (i = k = 0; k <= 4; k += sepPattern[i], i++);
 	if ((i&1)==1) {
 		sepPattern[0] = 4;
-		sepPattern[1] = k-4;
+		sepPattern[1] = (UCHAR)(k-4);
 		j = 2;
 	}
 	else {
-		sepPattern[0] = k;
+		sepPattern[0] = (UCHAR)k;
 		j = 1;
 	}
 	for ( ; i < ELMNTS+4; i++, j++) {
@@ -474,12 +474,12 @@ int i, j, k;
 	for (j--, k = 0; k <= 4; k += sepPattern[j], j--);
 	if ((j&1)==0) {
 		j += 2;
-		sepPattern[j-1] = k-4;
+		sepPattern[j-1] = (UCHAR)(k-4);
 		sepPattern[j] = 4;
 	}
 	else {
 		j++;
-		sepPattern[j] = k;
+		sepPattern[j] = (UCHAR)k;
 	}
 	prntSep.elmCnt = j+1;
 	return(&prntSep);

@@ -75,8 +75,8 @@ int symHt;
 		strcpy(tempStr, "000000000000");
 		strcat(tempStr, params->dataStr);
 		strcpy(primaryStr, tempStr + strlen(tempStr) - 13);
-	
-		if (RSS14enc(primaryStr, linPattern, ccFlag)) {
+
+		if (RSS14enc((UCHAR*)primaryStr, linPattern, ccFlag)) {
 			if (errFlag) {
 				printf("\nRSS14 encoding error occurred.");
 				return;
@@ -101,7 +101,7 @@ int symHt;
 		prints.whtFirst = TRUE;
 		prints.reverse = FALSE;
 		if (ccFlag) {
-			if ((rows = CC4enc(ccStr, ccPattern)) > 0) {
+			if ((rows = CC4enc((UCHAR*)ccStr, ccPattern)) > 0) {
 				if (errFlag) {
 					printf("\nComposite encoding error occurred.");
 					return;
@@ -213,7 +213,7 @@ char *ccStr;
 		strcat(tempStr, params->dataStr);
 		strcpy(primaryStr, tempStr + strlen(tempStr) - 13);
 
-		if (RSS14enc(primaryStr, linPattern, ccFlag)) {
+		if (RSS14enc((UCHAR*)primaryStr, linPattern, ccFlag)) {
 			if (errFlag) {
 				printf("\nRSS14 encoding error occurred.");
 				return;
@@ -236,7 +236,7 @@ char *ccStr;
 		prints.whtFirst = TRUE;
 		prints.reverse = FALSE;
 		if (ccFlag) {
-			if ((rows = CC2enc(ccStr, ccPattern)) > 0) {
+			if ((rows = CC2enc((UCHAR*)ccStr, ccPattern)) > 0) {
 				if (errFlag) {
 					printf("\nerror occurred, exiting.");
 					return;
@@ -416,7 +416,7 @@ char *ccStr;
 		strcat(tempStr, params->dataStr);
 		strcpy(primaryStr, tempStr + strlen(tempStr) - 13);
 
-		if (RSS14enc(primaryStr, linPattern, ccFlag)) {
+		if (RSS14enc((UCHAR*)primaryStr, linPattern, ccFlag)) {
 			if (errFlag) {
 				printf("\nRSS14 encoding error occurred.");
 				return;
@@ -440,7 +440,7 @@ char *ccStr;
 		prints.reverse = FALSE;
 		if (ccFlag) {
 			chexPrnts.rightPad = R_PADR; // pad for composite
-			if ((rows = CC2enc(ccStr, ccPattern)) > 0) {
+			if ((rows = CC2enc((UCHAR*)ccStr, ccPattern)) > 0) {
 				if (errFlag) {
 					printf("\nerror occurred, exiting.");
 					return;
@@ -635,7 +635,7 @@ int i, j, k, lNdx, rNdx, sNdx, lWidth, rWidth, matchWidth;
 			// top and bottom rows are opposite colors here
 			if (matchWidth > 0) {
 				// same to opposite, terminate complimentary element
-				sepPattern[sNdx++] = matchWidth;
+				sepPattern[sNdx++] = (UCHAR)matchWidth;
 				matchWidth = 0;
 			}
 			sepPattern[sNdx++] = 1; // 1X elements separate opposite colors
@@ -657,7 +657,7 @@ int i, j, k, lNdx, rNdx, sNdx, lWidth, rWidth, matchWidth;
 				// same to same, see if colors reversed
 				if (((lNdx - sNdx) & 1) == 1) {
 					// yes, terminate previous color
-					sepPattern[sNdx++] = matchWidth;
+					sepPattern[sNdx++] = (UCHAR)matchWidth;
 					matchWidth = 1;
 				}
 				else {
@@ -673,11 +673,11 @@ int i, j, k, lNdx, rNdx, sNdx, lWidth, rWidth, matchWidth;
 	for (i = k = 0; k <= 4; k += sepPattern[i], i++);
 	if ((i&1)==0) {
 		sepPattern[0] = 4;
-		sepPattern[1] = k-4;
+		sepPattern[1] = (UCHAR)(k-4);
 		j = 2;
 	}
 	else {
-		sepPattern[0] = k;
+		sepPattern[0] = (UCHAR)k;
 		j = 1;
 	}
 	for ( ; i < sNdx+2; i++, j++) {
@@ -686,12 +686,12 @@ int i, j, k, lNdx, rNdx, sNdx, lWidth, rWidth, matchWidth;
 	for (j--, k = 0; k <= 4; k += sepPattern[j], j--);
 	if ((j&1)==0) {
 		j += 2;
-		sepPattern[j-1] = k-4;
+		sepPattern[j-1] = (UCHAR)(k-4);
 		sepPattern[j] = 4;
 	}
 	else {
 		j++;
-		sepPattern[j] = k;
+		sepPattern[j] = (UCHAR)k;
 	}
 	prntSep.elmCnt = j+1;
 	return(&prntSep);
@@ -751,7 +751,7 @@ int RSS14enc(UCHAR string[], UCHAR bars[], int ccFlag) {
 	int iIndex;
 	int *widths;
 
-	data = atof(string);
+	data = atof((char*)string);
 	if (ccFlag) data += 10000000000000.;
 
 	bars[11] = 1; // init fixed patterns
@@ -776,7 +776,7 @@ int RSS14enc(UCHAR string[], UCHAR bars[], int ccFlag) {
 	// get odd elements N and max
 	elementN = tbl164[iIndex];
 	elementMax = tbl164[iIndex+1];
-	longNum = value = semiValue / tbl164[iIndex+4];
+	longNum = value = (int)(semiValue / tbl164[iIndex+4]);
 
 	// generate and store odd element widths:
 	widths = getRSSwidths(value, elementN, K, elementMax, 1);
@@ -788,7 +788,7 @@ int RSS14enc(UCHAR string[], UCHAR bars[], int ccFlag) {
 	}
 
 	// calculate even elements value:
-	value = semiValue - (tbl164[iIndex+4] * longNum);
+	value = (int)(semiValue - (tbl164[iIndex+4] * longNum));
 	elementN = tbl164[iIndex+2];
 	elementMax = tbl164[iIndex+3];
 
@@ -813,7 +813,7 @@ int RSS14enc(UCHAR string[], UCHAR bars[], int ccFlag) {
 	// get even elements N and max
 	elementN = tbl154[iIndex];
 	elementMax = tbl154[iIndex+1];
-	longNum = value = semiValue / tbl154[iIndex+4];
+	longNum = value = (int)(semiValue / tbl154[iIndex+4]);
 
 	// generate and store even element widths of the 2nd char:
 	widths = getRSSwidths(value, elementN, K, elementMax, 1);
@@ -824,7 +824,7 @@ int RSS14enc(UCHAR string[], UCHAR bars[], int ccFlag) {
 	}
 
 	// calculate 2nd char odd elements value:
-	value = semiValue - (tbl154[iIndex+4] * longNum);
+	value = (int)(semiValue - (tbl154[iIndex+4] * longNum));
 	elementN = tbl154[iIndex+2];
 	elementMax = tbl154[iIndex+3];
 
@@ -853,7 +853,7 @@ int RSS14enc(UCHAR string[], UCHAR bars[], int ccFlag) {
 	// get odd elements N and max
 	elementN = tbl164[iIndex];
 	elementMax = tbl164[iIndex+1];
-	longNum = value = semiValue / tbl164[iIndex+4];
+	longNum = value = (int)(semiValue / tbl164[iIndex+4]);
 
 	// generate and store odd element widths:
 	widths = getRSSwidths(value, elementN, K, elementMax, 1);
@@ -864,7 +864,7 @@ int RSS14enc(UCHAR string[], UCHAR bars[], int ccFlag) {
 	}
 
 	// calculate even elements value:
-	value = semiValue - (tbl164[iIndex+4] * longNum);
+	value = (int)(semiValue - (tbl164[iIndex+4] * longNum));
 	elementN = tbl164[iIndex+2];
 	elementMax = tbl164[iIndex+3];
 
@@ -889,7 +889,7 @@ int RSS14enc(UCHAR string[], UCHAR bars[], int ccFlag) {
 	// get even elements N and max
 	elementN = tbl154[iIndex];
 	elementMax = tbl154[iIndex+1];
-	longNum = value = semiValue / tbl154[iIndex+4];
+	longNum = value = (int)(semiValue / tbl154[iIndex+4]);
 
 	// generate and store even element widths of the 4th char:
 	widths = getRSSwidths(value, elementN, K, elementMax, 1);
@@ -900,7 +900,7 @@ int RSS14enc(UCHAR string[], UCHAR bars[], int ccFlag) {
 	}
 
 	// calculate 4th char odd elements value:
-	value = semiValue - (tbl154[iIndex+4] * longNum);
+	value = (int)(semiValue - (tbl154[iIndex+4] * longNum));
 	elementN = tbl154[iIndex+2];
 	elementMax = tbl154[iIndex+3];
 

@@ -56,6 +56,12 @@ int chexSize;
 char *ccStr;
 int rPadl1, rPadcc;
 
+		// Initialise to avoid compiler warnings
+		lNdx = 0;
+		lMods = 0;
+		lHeight = 0;
+		rPadcc = 0;
+
 		ccStr = strchr(params->dataStr, '|');
 		if (ccStr == NULL) ccFlag = FALSE;
 		else {
@@ -70,7 +76,7 @@ int rPadl1, rPadcc;
 		}
 
 		rowWidth = params->segWidth; // save for getUnusedBitCnt
-		if ((segs = RSS14Eenc(params->dataStr, dblPattern, ccFlag)) > 0) {
+		if ((segs = RSS14Eenc((UCHAR*)params->dataStr, dblPattern, ccFlag)) > 0) {
 			if (errFlag) {
 				printf("\nRSS Exp encoding error occurred.");
 				return;
@@ -127,7 +133,7 @@ int rPadl1, rPadcc;
 		}
 		line1 = TRUE; // so first line is not Y undercut
 		if (ccFlag) {
-			if ((rows = CC4enc(ccStr, ccPattern)) > 0) {
+			if ((rows = CC4enc((UCHAR*)ccStr, ccPattern)) > 0) {
 				if (errFlag) {
 					printf("\nComposite encoding error occurred.");
 					return;
@@ -410,6 +416,7 @@ UCHAR bitField[MAX_DBL_SEGS*3];
 
 	linFlag = TRUE;
 	parity = 0;
+	weight = 0;
 
 	if (((i=check2DData(string)) != 0) || ((i=isSymbolSepatator(string)) != 0)) {
 		printf("\nillegal character in RSS Expanded data = '%c'", string[i]);
@@ -430,15 +437,15 @@ UCHAR bitField[MAX_DBL_SEGS*3];
 	// note size is # of data chars, not segments
 	if ((bitField[0]&0x40) == 0x40) {
 		// method 1, insert variable length symbol bit field
-		bitField[0] |= (((size+1)&1)<<5) + ((size > 13)?0x10:0);
+		bitField[0] = (UCHAR)(bitField[0] | ((((size+1)&1)<<5) + ((size > 13)?0x10:0)));
 	}
 	if ((bitField[0]&0x60) == 0) {
 		// method 00, insert variable length symbol bit field
-		bitField[0] |= (((size+1)&1)<<4) + ((size > 13)?8:0);
+		bitField[0] = (UCHAR)(bitField[0] | ((((size+1)&1)<<4) + ((size > 13)?8:0)));
 	}
 	if ((bitField[0]&0x71) == 0x30) {
 		// method 01100/01101, insert variable length symbol bit field
-		bitField[0] |= (((size+1)&1)<<1) + ((size > 13)?1:0);
+		bitField[0] = (UCHAR)(bitField[0] | ((((size+1)&1)<<1) + ((size > 13)?1:0)));
 	}
 	fndrSetNdx = (size - 2) / 2;
 
@@ -574,7 +581,7 @@ int isSymbolSepatator(UCHAR string[]) {
 
 int i;
 
-	for (i = 0; i < (int)strlen(string); i++) {
+	for (i = 0; i < (int)strlen((char*)string); i++) {
 		if (string[i] == '^') {
 			return(i);
 		}

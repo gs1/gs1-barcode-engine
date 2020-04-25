@@ -71,7 +71,7 @@ char *ccStr;
 		}
 		strcat(primaryStr, params->dataStr);
 
-		symChars = enc128(primaryStr, linPattern, (ccFlag) ? 1 : 0);
+		symChars = enc128((UCHAR*)primaryStr, linPattern, (ccFlag) ? 1 : 0);
 #if PRNT
 			printf("\n%s", primaryStr);
 			printf("\n");
@@ -91,7 +91,7 @@ char *ccStr;
 		prints.whtFirst = TRUE;
 		prints.reverse = FALSE;
 		if (ccFlag) {
-			if ((rows = CC4enc(ccStr, ccPattern)) > 0) {
+			if ((rows = CC4enc((UCHAR*)ccStr, ccPattern)) > 0) {
 				if (errFlag) {
 					printf("\nerror occurred, exiting.");
 					return;
@@ -226,7 +226,7 @@ char *ccStr;
 		}
 		strcat(primaryStr, params->dataStr);
 
-		symChars = enc128(primaryStr, linPattern, (ccFlag) ? 2 : 0); // 2 for CCC
+		symChars = enc128((UCHAR*)primaryStr, linPattern, (ccFlag) ? 2 : 0); // 2 for CCC
 #if PRNT
 			printf("\n%s", primaryStr);
 			printf("\n");
@@ -252,7 +252,7 @@ char *ccStr;
 		prints.whtFirst = TRUE;
 		prints.reverse = FALSE;
 		if (ccFlag) {
-			if (CCCenc(ccStr, patCCC)) {
+			if (CCCenc((UCHAR*)ccStr, patCCC)) {
 				if (errFlag) {
 					printf("\nerror occurred, exiting.");
 					return;
@@ -378,7 +378,7 @@ int enc128(UCHAR data[], UCHAR bars[], int link)
 	int symchr[SYMMAX+1];
 	long ckchr;
 
-	for (i = 0; i < (int)strlen(data); i++) {
+	for (i = 0; i < (int)strlen((char*)data); i++) {
 		if (data[i] == '#') {
 			data[i] = 0201; // convert FNC1 to 201 octal for enc128
 		}
@@ -652,24 +652,28 @@ void tbl128(int symchr[], UCHAR bars[])
 		si = bi = 0;
 		bars[bi++] = 10; /* leading qz */
     while ((val = symchr[si++]) != -1) {
-				pattern = sym128[val];
+	pattern = sym128[val];
 
-				/* shift out octal digits in pattern */
-				i = bars[bi + 4] = (UCHAR)pattern % 8;
-        pattern /= 8;
-        i += bars[bi + 3] = (UCHAR)pattern % 8;
-        pattern /= 8;
-        i += bars[bi + 2] = (UCHAR)pattern % 8;
-        pattern /= 8;
-				i += bars[bi + 1] = (UCHAR)pattern % 8;
-        i += bars[bi] = (UCHAR)pattern/8;
+	/* shift out octal digits in pattern */
+	i = bars[bi + 4] = (UCHAR)pattern % 8;
+	pattern /= 8;
+	bars[bi + 3] = (UCHAR)pattern % 8;
+	i = (UCHAR)(i + pattern % 8);
+	pattern /= 8;
+	bars[bi + 2] = (UCHAR)pattern % 8;
+	i = (UCHAR)(i + pattern % 8);
+	pattern /= 8;
+	bars[bi + 1] = (UCHAR)pattern % 8;
+	i = (UCHAR)(i + pattern % 8);
+	bars[bi] = (UCHAR)pattern / 8;
+	i = (UCHAR)(i + pattern / 8);
 
-        /* derive last space to total 11 */
-        bars[bi + 5] = 11 - i;
-        bi += 6;
+	/* derive last space to total 11 */
+	bars[bi + 5] = (UCHAR)(11 - i);
+	bi += 6;
     }
     bars[bi++] = 2;  /* trailing guard bar */
-		bars[bi++] = 10; /* trailing qz */
+	bars[bi++] = 10; /* trailing qz */
     bars[bi] = 0;    /* array terminator */
 		return;
 }

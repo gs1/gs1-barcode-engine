@@ -66,7 +66,7 @@ char *ccStr;
 		strcat(tempStr, "0"); // check digit = 0 for now
 		strcpy(primaryStr, tempStr + strlen(tempStr) - 13);
 	
-		if (EAN13enc(primaryStr, linPattern)) {
+		if (EAN13enc((UCHAR*)primaryStr, linPattern)) {
 			if (errFlag) {
 				printf("\nerror occurred, exiting.");
 				return;
@@ -100,7 +100,7 @@ char *ccStr;
 		sepPrnt.whtFirst = TRUE;
 		sepPrnt.reverse = FALSE;
 		if (ccFlag) {
-			if ((rows = CC4enc(ccStr, ccPattern)) > 0) {
+			if ((rows = CC4enc((UCHAR*)ccStr, ccPattern)) > 0) {
 				if (errFlag) {
 					printf("\nComposite encoding error.");
 					return;
@@ -207,7 +207,7 @@ int i, j, abMask, bars, sNdx, pNdx, abBits;
 	if (j > 0) {
 		j = 10 - j;
 	}
-	str[12] = j + '0';
+	str[12] = (UCHAR)(j + '0');
 
 	sNdx = 1;
 	pNdx = 0;
@@ -290,7 +290,7 @@ int elmntsCC;
 		strcat(tempStr, "0"); // check digit = 0 for now
 		strcpy(primaryStr, tempStr + strlen(tempStr) - 13);
 
-		if (EAN8enc(primaryStr, linPattern)) {
+		if (EAN8enc((UCHAR*)primaryStr, linPattern)) {
 			if (errFlag) {
 				printf("\nerror occurred, exiting.");
 				return;
@@ -327,7 +327,7 @@ int elmntsCC;
 		sepPrnt.whtFirst = TRUE;
 		sepPrnt.reverse = FALSE;
 		if (ccFlag) {
-			if ((rows = CC3enc(ccStr, ccPattern)) > 0) {
+			if ((rows = CC3enc((UCHAR*)ccStr, ccPattern)) > 0) {
 				if (errFlag) {
 					printf("\nComposite encoding error.");
 					return;
@@ -439,7 +439,7 @@ int i, j, bars, sNdx, pNdx;
 	if (j > 0) {
 		j = 10 - j;
 	}
-	str[12] = j + '0';
+	str[12] = (UCHAR)(j + '0');
 
 	sNdx = 5;
 	pNdx = 0;
@@ -512,7 +512,7 @@ char *ccStr;
 		strcat(tempStr, "0"); // check digit = 0 for now
 		strcpy(primaryStr, tempStr + strlen(tempStr) - 13);
 
-		if (UPCEenc(primaryStr, linPattern)) {
+		if (UPCEenc((UCHAR*)primaryStr, linPattern)) {
 			if (errFlag) {
 				printf("\nerror occurred, exiting.");
 				return;
@@ -546,7 +546,7 @@ char *ccStr;
 		sepPrnt.whtFirst = TRUE;
 		sepPrnt.reverse = FALSE;
 		if (ccFlag) {
-			if ((rows = CC2enc(ccStr, ccPattern)) > 0) {
+			if ((rows = CC2enc((UCHAR*)ccStr, ccPattern)) > 0) {
 				if (errFlag) {
 					printf("\nComposite encoding error.");
 					return;
@@ -654,7 +654,7 @@ int i, j, abMask, bars, sNdx, pNdx, abBits;
 	if (j > 0) {
 		j = 10 - j;
 	}
-	str[12] = j + '0';
+	str[12] = (UCHAR)(j + '0');
 
 	for (i = 0; i < 5; i++) {
 		data6[i] = str[i+2];

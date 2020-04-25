@@ -339,7 +339,7 @@ void encCCC(int byteCnt, UCHAR bitField[], UINT codeWords[], UCHAR patCCC[]) {
 int nonEccCwCnt;
 
 	nonEccCwCnt = colCnt*rowCnt-eccCnt;
-	codeWords[0] = nonEccCwCnt;
+	codeWords[0] = (UINT)nonEccCwCnt;
 	codeWords[1] = 920; // insert UCC/EAN flag and byte mode latch
 	codeWords[2] = 
 		(byteCnt % 6 == 0) ? 924 : 901; // 924 iff even multiple of 6
@@ -1081,13 +1081,13 @@ int i;
 	// check next char type
 	if (isupper(encode->str[encode->iStr])) {
 		// alpha
-		putBits(encode->bitField, encode->iBit, 5, encode->str[encode->iStr]-65);
+		putBits(encode->bitField, encode->iBit, 5, (UINT)(encode->str[encode->iStr]-65));
 		encode->iBit += 5;
 		encode->iStr += 1;
 	}
 	else if (isdigit(encode->str[encode->iStr])) {
 		// number
-		putBits(encode->bitField, encode->iBit, 6, encode->str[encode->iStr]+4);
+		putBits(encode->bitField, encode->iBit, 6, (UINT)(encode->str[encode->iStr]+4));
 		encode->iBit += 6;
 		encode->iStr += 1;
 	}
@@ -1136,16 +1136,16 @@ int doMethods(struct encodeT *encode) {
 
 UINT bits;
 
-	if (strlen(encode->str) >= 8 && encode->str[0] == '1' &&
+	if (strlen((char*)encode->str) >= 8 && encode->str[0] == '1' &&
 				(encode->str[1] == '1' || encode->str[1] == '7')) {
 		// method "10"
 		putBits(encode->bitField, 0, 2, 2); // mfg/exp date-lot encodation method bit flag 10
-		bits = ((UINT)(encode->str[2]-'0')*10 +
-				(UINT)(encode->str[3]-'0')) * 384; // YY
-		bits += ((UINT)(encode->str[4]-'0')*10 +
-				(UINT)(encode->str[5]-'0') - 1) * 32; // MM
-		bits += (UINT)(encode->str[6]-'0')*10 +
-				(UINT)(encode->str[7]-'0'); // DD
+		bits = (UINT)(((UINT)(encode->str[2]-'0')*10 +
+				(UINT)(encode->str[3]-'0')) * 384); // YY
+		bits = (UINT)(bits + ((UINT)(encode->str[4]-'0')*10 +
+				(UINT)(encode->str[5]-'0') - 1) * 32); // MM
+		bits = (UINT)(bits + (UINT)(encode->str[6]-'0')*10 +
+				(UINT)(encode->str[7]-'0')); // DD
 		putBits(encode->bitField, 2, 16, bits); // date packed data
 		putBits(encode->bitField, 2+16, 1,
 				(UINT)((encode->str[1] == '1') ? 0 : 1)); // 0/1 bit for AI 11/17
@@ -1202,7 +1202,7 @@ UCHAR chr;
 		encode->diAlpha = encode->str[encode->iStr+4];
 		chr = encode->str[encode->iStr+4];
 		encode->str[encode->iStr+4] = '\0';
-		encode->diNum = atoi(&encode->str[encode->iStr+2]);
+		encode->diNum = atoi((char*)&encode->str[encode->iStr+2]);
 		encode->str[encode->iStr+4] = chr;
 		encode->iStr += 5;
 	}
@@ -1213,7 +1213,7 @@ UCHAR chr;
 		encode->diAlpha = encode->str[encode->iStr+5];
 		chr = encode->str[encode->iStr+5];
 		encode->str[encode->iStr+5] = '\0';
-		encode->diNum = atoi(&encode->str[encode->iStr+2]);
+		encode->diNum = atoi((char*)&encode->str[encode->iStr+2]);
 		encode->str[encode->iStr+5] = chr;
 		encode->iStr += 6;
 	}
@@ -1230,7 +1230,7 @@ static UCHAR alphaTbl[] = "BDHIJKLNPQRSTVWZ"; // strlen must be 16
 		// method "11", look ahead to find best compaction scheme
 		j = 10000; // 10000: initial flag for non-numeric index
 		alLessNu = 0; // upper-case - digit, < -9000 if non-alnu seen
-		for (i = encode->iStr; i < strlen(encode->str); i++) {
+		for (i = encode->iStr; i < (int)strlen((char*)encode->str); i++) {
 			if ((encode->str[i] == FNC1) || (encode->str[i] == SYM_SEP)) {
 				break; // found it
 			}
@@ -1280,7 +1280,7 @@ static UCHAR alphaTbl[] = "BDHIJKLNPQRSTVWZ"; // strlen must be 16
 			encode->iBit += 1;
 		}
 		else { // 10: AI 21 or 11: AI 8004
-			putBits(encode->bitField, encode->iBit, 2, encode->typeAI);
+			putBits(encode->bitField, encode->iBit, 2, (UINT)encode->typeAI);
 			encode->iBit += 2;
 		}
 		for (j = 0; j < 16; j++) {
@@ -1289,17 +1289,17 @@ static UCHAR alphaTbl[] = "BDHIJKLNPQRSTVWZ"; // strlen must be 16
 			}
 		}
 		if (diNum1 < 31 && j < 16) {
-			putBits(encode->bitField, encode->iBit, 5, diNum1); // DI number < 31
+			putBits(encode->bitField, encode->iBit, 5, (UINT)diNum1); // DI number < 31
 			putBits(encode->bitField,
-					encode->iBit+5, 4, j); // DI alpha from alphaTbl
+					encode->iBit+5, 4, (UINT)j); // DI alpha from alphaTbl
 			encode->iBit += 9;
 		}
 		else {
 			putBits(encode->bitField, encode->iBit, 5, 31);
 			putBits(encode->bitField,
-					encode->iBit+5, 10, diNum1); // DI number >= 31
+					encode->iBit+5, 10, (UINT)diNum1); // DI number >= 31
 			putBits(encode->bitField,
-					encode->iBit+15, 5, diAlpha1-65); // or alpha not in table
+					encode->iBit+15, 5, (UINT)(diAlpha1-65)); // or alpha not in table
 			encode->iBit += 20;
 		}
 		encodeAI90(encode);
@@ -1380,15 +1380,15 @@ UINT bits;
 long weight;
 char numStr[10];
 
-	if (strlen(str) >= 26) {
-		strncpy(numStr, &str[20], 6); // possible weight field
+	if (strlen((char*)str) >= 26) {
+		strncpy(numStr, (char*)&str[20], 6); // possible weight field
 		numStr[6] = '\0';
 	}
 	// look for AI 01
-	if (strlen(str)>=16 && str[0]=='0' && str[1]=='1') {
+	if (strlen((char*)str)>=16 && str[0]=='0' && str[1]=='1') {
 
 		// look for fixed length with AI 01[9] + 3103[0-32767]
-		if (str[2]=='9' && (strlen(str)==16+10) &&
+		if (str[2]=='9' && (strlen((char*)str)==16+10) &&
 			str[16]=='3' && str[17]=='1' && str[18]=='0' && str[19]=='3' &&
 			(weight=atol(numStr))<=32767L) {
 			// method 0100, AI's 01 + 3103
@@ -1402,7 +1402,7 @@ char numStr[10];
 		}
 
 		// look for fixed length with AI 01[9] + 3202[0-009999]
-		else if (str[2]=='9' && (strlen(str)==16+10) &&
+		else if (str[2]=='9' && (strlen((char*)str)==16+10) &&
 			str[16]=='3' && str[17]=='2' && str[18]=='0' && str[19]=='2' &&
 			(weight=atol(numStr))<=9999L) {
 			// method 0101, AI's 01 + 3202
@@ -1416,7 +1416,7 @@ char numStr[10];
 		}
 
 		// look for fixed length with AI 01[9] + 3203[0-022767]
-		else if (str[2]=='9' && (strlen(str)==16+10) &&
+		else if (str[2]=='9' && (strlen((char*)str)==16+10) &&
 			str[16]=='3' && str[17]=='2' && str[18]=='0' && str[19]=='3' &&
 			(weight=atol(numStr))<=22767L) {
 			// method 0101, AI's 01 + 3203
@@ -1424,13 +1424,13 @@ char numStr[10];
 			*iBit += 4;
 			*iStr += 3; // skip AI 01 and PI 9
 			cnv12(str, iStr, bitField, iBit); // write PID-12
-			putBits(bitField, *iBit, 15, (UINT)weight+10000); // write weight
+			putBits(bitField, *iBit, 15, (UINT)(weight+10000)); // write weight
 			*iBit += 15;
 			*iStr += 1+10; // skip check digit & jump weight field
 		}
 
 		// look for AI 01[9] + 392[0-3]
-		else if (str[2]=='9' && (strlen(str)>=16+4+1) &&
+		else if (str[2]=='9' && (strlen((char*)str)>=16+4+1) &&
 			str[16]=='3' && str[17]=='9' && str[18]=='2' &&
 			(str[19]>='0' && str[19]<='3')) {
 			// method 01100, AI's 01 + 392x + G.P.
@@ -1444,7 +1444,7 @@ char numStr[10];
 		}
 
 		// look for AI 01[9] + 393[0-3]
-		else if (str[2]=='9' && (strlen(str)>=16+4+3+1) &&
+		else if (str[2]=='9' && (strlen((char*)str)>=16+4+3+1) &&
 			str[16]=='3' && str[17]=='9' && str[18]=='3' &&
 			(str[19]>='0' && str[19]<='3')) {
 			// method 01101, AI's 01 + 393x[NNN] + G.P.
@@ -1455,19 +1455,19 @@ char numStr[10];
 			putBits(bitField, *iBit, 2, (UINT)(str[19]-'0')); // write D.P.
 			*iBit += 2;
 			*iStr += 1+4; // skip check digit & jump price AI
-			strncpy(numStr, &str[20], 3); // ISO country code
+			strncpy(numStr, (char*)&str[20], 3); // ISO country code
 			numStr[3] = '\0';
-			putBits(bitField, *iBit, 10, atoi(numStr)); // write ISO c.c.
+			putBits(bitField, *iBit, 10, (UINT)atoi(numStr)); // write ISO c.c.
 			*iBit += 10;
 			*iStr += 3; // jump ISO country code
 		}
 
 		// look for fixed length with AI 01[9] + 310x/320x[0-099999]
-		else if (str[2]=='9' && (strlen(str)==16+10) &&
+		else if (str[2]=='9' && (strlen((char*)str)==16+10) &&
 			str[16]=='3' && (str[17]=='1' || str[17]=='2') && str[18]=='0' &&
 			(weight=atol(numStr))<=99999L) {
 			// methods 0111000-0111001, AI's 01 + 3x0x no date
-			bits = 0x38+(str[17]-'1');
+			bits = (UINT)(0x38+(str[17]-'1'));
 			putBits(bitField, *iBit, 7, bits); // write method
 			*iBit += 7;
 			*iStr += 3; // skip AI 01 and PI 9
@@ -1482,13 +1482,13 @@ char numStr[10];
 		}
 
 		// look for fixed length + AI 01[9] + 310x/320x[0-099999] + 11/13/15/17
-		else if (str[2]=='9' && strlen(str)==16+10+8 &&
+		else if (str[2]=='9' && strlen((char*)str)==16+10+8 &&
 			str[16]=='3' && (str[17]=='1' || str[17]=='2') && str[18]=='0' &&
 			(weight=atol(numStr))<=99999L &&
 			str[26]=='1' &&
 			(str[27]=='1' || str[27]=='3' || str[27]=='5' || str[27]=='7')) {
 			// methods 0111000-0111111, AI's 01 + 3x0x + 1x
-			bits = 0x38+(str[27]-'1')+(str[17] - '1');
+			bits = (UINT)(0x38+(str[27]-'1')+(str[17] - '1'));
 			putBits(bitField, *iBit, 7, bits); // write method
 			*iBit += 7;
 			*iStr += 3; // skip AI 01 and PI 9
@@ -1523,12 +1523,9 @@ UINT yymmdd(UCHAR str[]) {
 
 UINT val;
 
-	val = ((UINT)(str[0]-'0')*10 +
-					(UINT)(str[1]-'0')) * 384; // YY
-	val += ((UINT)(str[2]-'0')*10 +
-					(UINT)(str[3]-'0') - 1) * 32; // MM
-	val += (UINT)(str[4]-'0')*10 +
-					(UINT)(str[5]-'0'); // DD
+	val = (UINT)(((UINT)(str[0]-'0')*10 + (UINT)(str[1]-'0')) * 384); // YY
+	val = (UINT)(val + ((UINT)(str[2]-'0')*10 + (UINT)(str[3]-'0') - 1) * 32); // MM
+	val = (UINT)(val + (UINT)(str[4]-'0')*10 + (UINT)(str[5]-'0')); // DD
 	return(val);
 }
 
@@ -1648,10 +1645,10 @@ void putBits(UCHAR bitField[], int bitPos, int length, UINT bits) {
 	}
 	for (i = length-1; i >= 0; i--) {
 		if ((bits & 1) != 0) {
-			bitField[(bitPos+i)/8] |= 0x80 >> ((bitPos+i)%8);
+			bitField[(bitPos+i)/8] = (UCHAR)(bitField[(bitPos+i)/8] | (0x80 >> ((bitPos+i)%8)));
 		}
 		else {
-			bitField[(bitPos+i)/8] &= ~(0x80 >> ((bitPos+i)%8));
+			bitField[(bitPos+i)/8] = (UCHAR)(bitField[(bitPos+i)/8] & (~(0x80 >> ((bitPos+i)%8))));
 		}
 		bits >>= 1;
 	}
@@ -1670,13 +1667,15 @@ int cw[7];
 	for (i = 5; i >= 0; i--) {
 		cw[i] = 0;
 	}
-	for (i = 0; i < 7; i++) pwr928[0][i] = cw[i];
+	for (i = 0; i < 7; i++) pwr928[0][i] = (UINT)cw[i];
 	for (j = 1; j < 69; j++) {
 		for (v = 0, i = 6; i >= 1; i--) {
 			v = (2 * cw[i]) + (v / 928);
-			pwr928[j][i] = cw[i] = v % 928;
+			cw[i] = v % 928;
+			pwr928[j][i] = (UINT)(v % 928);
 		}
-		pwr928[j][0] = cw[0] = (2 * cw[0]) + (v / 928);
+		cw[0] = (2 * cw[0]) + (v / 928);
+		pwr928[j][0] = (UINT)((2 * cw[0]) + (v / 928));
 	}
 	return;
 }
@@ -1693,13 +1692,13 @@ int i, j, b, bitCnt, cwNdx, cwCnt, cwLng;
 		for (i = 0; i < bitCnt; i++) {
 			if (getBit(bitString, b+bitCnt-i-1)) {
 				for (j = 0; j < cwCnt; j++) {
-					codeWords[cwNdx+j] += pwr928[i][j+7-cwCnt];
+					codeWords[cwNdx+j] = (UINT)(codeWords[cwNdx+j] + pwr928[i][j+7-cwCnt]);
 				}
 			}
 		}
 		for (i = cwCnt-1; i > 0; i--) {
 			/* add "carries" */
-			codeWords[cwNdx+i-1] += codeWords[cwNdx+i]/928;
+			codeWords[cwNdx+i-1] = (UINT)(codeWords[cwNdx+i-1] + codeWords[cwNdx+i]/928);
 			codeWords[cwNdx+i] %= 928;
 		}
 	}
@@ -1766,12 +1765,12 @@ void genECC(int dsize, int csize, UINT sym[]) {
 	for ( n = 0; n < dsize; n++ ) {
 		t = (sym[dsize] + sym[n]) % 929;
 		for (i = 0; i < csize-1; i++) {
-			sym[dsize+i] = (sym[dsize+i+1] + 929 - gfMul(t, gpa[csize-1 - i])) % 929;
+			sym[dsize+i] = (UINT)(sym[dsize+i+1] + 929 - gfMul(t, gpa[csize-1 - i])) % 929;
 		}
-		sym[dsize+csize-1] = (929 - gfMul(t, gpa[0])) % 929;
+		sym[dsize+csize-1] = (UINT)(929 - gfMul(t, gpa[0])) % 929;
 	}
 	for (i = dsize; i < dsize+csize; i++) {
-		sym[i] = (929 - sym[i]) % 929; 
+		sym[i] = (UINT)(929 - sym[i]) % 929;
 	}
 	return;
 }

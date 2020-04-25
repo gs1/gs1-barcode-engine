@@ -34,6 +34,10 @@ UCHAR ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
 
 int main(int argc, char *argv[]) {
 
+// Silence compiler
+(void)argc;
+(void)argv;
+
 FILE *iFile, *oFile;
 
 struct sParams params;
@@ -58,7 +62,7 @@ int i;
 				printf("\nUNABLE TO OPEN %s FILE\n", params.dataFile);
 				continue;
 			}
-			i = fread(params.dataStr, sizeof(char), MAX_DATA, iFile);
+			i = (int)fread(params.dataStr, sizeof(char), MAX_DATA, iFile);
 			while (i > 0 && params.dataStr[i-1] < 32) i--; // strip trailing CRLF etc.
 			params.dataStr[i] = '\0';
 			fclose(iFile);
@@ -246,9 +250,9 @@ void bmpHeader(long xdim, long ydim, FILE *oFile) {
 	struct b_hdr header = { 0,0,0x3E,0x28,0,0,1,1,
 													0,0,0,0,0,0,0,0xFFFFFF };
 
-	header.width = xdim;
-	header.height = ydim;
-	header.fileLength = 0x3E + (((xdim+31)/32)*4) * ydim; // pad rows to 32-bit boundary
+	header.width = (uint32_t)xdim;
+	header.height = (uint32_t)ydim;
+	header.fileLength = (uint32_t)(0x3E + (((xdim+31)/32)*4) * ydim); // pad rows to 32-bit boundary
 
 	fwrite(&id, sizeof(id), 1, oFile);
 	fwrite(&header, sizeof(header), 1, oFile);
@@ -291,10 +295,10 @@ void tifHeader(long xdim, long ydim, FILE *oFile) {
 	uint32_t xResData[2] = { 120L, 1L }; // 120 = 10mils @ 300 dpi
 	uint32_t yResData[2] = { 120L, 1L }; // 120 = 10mils @ 300 dpi
 
-	width.offset = xdim;
-	height.offset = ydim;
-	stripRows.offset = ydim;
-	stripBytes.offset = ((xdim+7)/8) * ydim;
+	width.offset = (uint32_t)xdim;
+	height.offset = (uint32_t)ydim;
+	stripRows.offset = (uint32_t)ydim;
+	stripBytes.offset = (uint32_t)(((xdim+7)/8) * ydim);
 	xResData[1] = 1L; //reduce to 10 mils
 	yResData[1] = 1L; //reduce to 10 mils
 
@@ -412,8 +416,8 @@ int undercut;
 	// pad last byte's bits
 	if (bits != 1) {
 		while ((bits = (bits<<1) + WHITE) <= 0xff);
-		lineUCut[ndx] = ((line[ndx]^xorMsk)&(bits&0xff))^xorMsk; // Y undercut
-		line[ndx++] = (bits&0xff) ^ xorMsk;
+		lineUCut[ndx] = (UCHAR)(((line[ndx]^xorMsk)&(bits&0xff))^xorMsk); // Y undercut
+		line[ndx++] = (UCHAR)((bits&0xff) ^ xorMsk);
 		if (ndx > MAX_LINE/8 + 1) {
 			printf("\nprint line too long");
 			errFlag = TRUE;
@@ -432,10 +436,10 @@ int undercut;
 	}
 
 	for (i = 0; i < params->Yundercut; i++) {
-		fwrite(lineUCut, sizeof(UCHAR), ndx, params->outfp);
+		fwrite(lineUCut, sizeof(UCHAR), (size_t)ndx, params->outfp);
 	}
 	for ( ; i < prints->height; i++) {
-		fwrite(line, sizeof(UCHAR), ndx, params->outfp);
+		fwrite(line, sizeof(UCHAR), (size_t)ndx, params->outfp);
 	}
 	return;
 }
@@ -447,8 +451,8 @@ int i;
 	for (i = 0; i < width; i++) {
 		*bits = (*bits<<1) + color;
 		if (*bits > 0xff) {
-			lineUCut[*ndx] = ((line[*ndx]^xorMsk)&(*bits&0xff))^xorMsk; // Y undercut
-			line[(*ndx)++] = (*bits&0xff) ^ xorMsk;
+			lineUCut[*ndx] = (UCHAR)(((line[*ndx]^xorMsk)&(*bits&0xff))^xorMsk); // Y undercut
+			line[(*ndx)++] = (UCHAR)((*bits&0xff) ^ xorMsk);
 			if (*ndx >= MAX_LINE/8 + 1) {
 				*ndx = 0;
 				printf("\nprint line too long in graphic line.");
@@ -482,11 +486,11 @@ int i, j, k;
 	for (i = 0, k = 2; k <= 4; k += prints->pattern[i], i++);
 	if ((prints->whtFirst && (i&1)==1) || (!prints->whtFirst && (i&1)==0)) {
 		sepPattern[0] = 4;
-		sepPattern[1] = k-4;
+		sepPattern[1] = (UCHAR)(k-4);
 		j = 2;
 	}
 	else {
-		sepPattern[0] = k;
+		sepPattern[0] = (UCHAR)k;
 		j = 1;
 	}
 	for ( ; i < prints->elmCnt; i++, j++) {
@@ -500,7 +504,7 @@ int i, j, k;
 				j += k-1;
 				if ((k&1) == 0) {
 					i++;
-					sepPattern[j] += prints->pattern[i]; // trailing w for e1, append to next w
+					sepPattern[j] = (UCHAR)(sepPattern[j] + prints->pattern[i]); // trailing w for e1, append to next w
 				}
 				else {
 					i++;
@@ -515,7 +519,7 @@ int i, j, k;
 				j += k-1;
 				if ((k&1) == 0) {
 					i++;
-					sepPattern[j] += prints->pattern[i]; // trailing w for e3, append to next w
+					sepPattern[j] = (UCHAR)(sepPattern[j] + prints->pattern[i]); // trailing w for e3, append to next w
 				}
 				else {
 					i++;
@@ -534,7 +538,7 @@ int i, j, k;
 					j += k-1;
 					if ((k&1) == 0) {
 						i++;
-						sepPattern[j] += prints->pattern[i]; // trailing w for e2, append to next w
+						sepPattern[j] = (UCHAR)(sepPattern[j] + prints->pattern[i]); // trailing w for e2, append to next w
 					}
 					else {
 						i++;
@@ -557,12 +561,12 @@ int i, j, k;
 	for ( ; k <= 4; k += sepPattern[j], j--);
 	if ((j&1)==0) {
 		j += 2;
-		sepPattern[j-1] = k-4;
+		sepPattern[j-1] = (UCHAR)(k-4);
 		sepPattern[j] = 4;
 	}
 	else {
 		j++;
-		sepPattern[j] = k;
+		sepPattern[j] = (UCHAR)k;
 	}
   prntSep.elmCnt = j+1;
 	return(&prntSep);
