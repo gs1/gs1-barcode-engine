@@ -26,6 +26,9 @@
 #define MAX_CCC_ROWS 90	// ccc max rows
 #define MAX_CCC_BYTES 1033 // maximum byte mode capacity for ccc
 
+#define min(X,Y) (((X) < (Y)) ? (X) : (Y))
+#define max(X,Y) (((X) > (Y)) ? (X) : (Y))
+
 struct encodeT {
 	UCHAR *str;
 	int iStr;
