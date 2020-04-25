@@ -12,6 +12,7 @@
 *		000527 modified user interface for keyboard vs. file input source
 ****************************************************************************/
 #include "rssenc.h"
+#include <stdint.h>
 
 #define MAX_PIXMULT 12
 
@@ -223,24 +224,24 @@ int val;
 
 void bmpHeader(long xdim, long ydim, FILE *oFile) {
 
-	char id[2] = {'B','M'};
+	uint8_t id[2] = {'B','M'};
 	struct b_hdr {
-		long fileLength;
-		long const0a;
-		long const3E;
-		long const28;
-		long width;
-		long height;
-		short const1a;
-		short const1b;
-		long const0b;
-		long const0c;
-		long const0d;
-		long const0e;
-		long const0f;
-		long const0g;
-		long const0h;
-		long constFFFFFF;
+		uint32_t fileLength;
+		uint32_t const0a;
+		uint32_t const3E;
+		uint32_t const28;
+		uint32_t width;
+		uint32_t height;
+		uint16_t const1a;
+		uint16_t const1b;
+		uint32_t const0b;
+		uint32_t const0c;
+		uint32_t const0d;
+		uint32_t const0e;
+		uint32_t const0f;
+		uint32_t const0g;
+		uint32_t const0h;
+		uint32_t constFFFFFF;
 	};
 
 	struct b_hdr header = { 0,0,0x3E,0x28,0,0,1,1,
@@ -248,7 +249,7 @@ void bmpHeader(long xdim, long ydim, FILE *oFile) {
 
 	header.width = xdim;
 	header.height = ydim;
-	header.fileLength = 0x3E + (((xdim+31)/32)*4) * ydim; // pad rows to long word boundary
+	header.fileLength = 0x3E + (((xdim+31)/32)*4) * ydim; // pad rows to 32-bit boundary
 
 	fwrite(&id, sizeof(id), 1, oFile);
 	fwrite(&header, sizeof(header), 1, oFile);
@@ -257,16 +258,16 @@ void bmpHeader(long xdim, long ydim, FILE *oFile) {
 void tifHeader(long xdim, long ydim, FILE *oFile) {
 
 	struct t_hdr {
-		char endian[2];
-		short version;
-		long diroff;
+		uint8_t endian[2];
+		uint16_t version;
+		uint32_t diroff;
 	};
 
 	struct t_tag {
-		short tag_type;
-		short num_size;
-		long length;
-		long offset;
+		uint16_t tag_type;
+		uint16_t num_size;
+		uint32_t length;
+		uint32_t offset;
 	};
 
 #define TAG_CNT 14
@@ -287,9 +288,9 @@ void tifHeader(long xdim, long ydim, FILE *oFile) {
 	struct t_tag xRes = { 0x11A, 5, 1L, 8L+2+TAG_CNT*12+4 };
 	struct t_tag yRes = { 0x11B, 5, 1L, 8L+2+TAG_CNT*12+4+8 };
 	struct t_tag resUnit = { 0x128, 3, 1L, 3L }; // centimeters
-	long nextdir = 0L;
-	long xResData[2] = { 120L, 1L }; // 120 = 10mils @ 300 dpi
-	long yResData[2] = { 120L, 1L }; // 120 = 10mils @ 300 dpi
+	uint32_t nextdir = 0L;
+	uint32_t xResData[2] = { 120L, 1L }; // 120 = 10mils @ 300 dpi
+	uint32_t yResData[2] = { 120L, 1L }; // 120 = 10mils @ 300 dpi
 
 	width.offset = xdim;
 	height.offset = ydim;
