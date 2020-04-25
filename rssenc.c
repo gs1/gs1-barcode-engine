@@ -568,6 +568,18 @@ int i, j, k;
 	return(&prntSep);
 }
 
+// Replacement for the deprecated gets(3) function
+static char* gets(char* in) {
+
+char* s;
+
+	s = fgets(in,MAX_KEYDATA+1,stdin);
+	if (s != NULL) {
+		s[strcspn(s, "\r\n")] = 0;
+	}
+	return s;
+}
+
 int userInt(struct sParams *params) {
 
 int inMenu = TRUE;
@@ -652,8 +664,7 @@ int menuVal, i;
 		printf("\n 8) enter separator row height, current value = %d", params->sepHt);
 		printf("\n 9) select another symbology or exit program");
 		printf("\nmenu selection? ");
-		gets(inpStr);
-		if (inpStr == NULL) {
+		if (gets(inpStr) == NULL) {
 			printf("UNKNOWN, PLEASE ENTER 1 THROUGH 9.");
 			continue;
 		}
@@ -661,8 +672,7 @@ int menuVal, i;
 		switch (menuVal) {
 			case 0:
 				printf("\nenter pixels per X (1-%d valid) ",MAX_PIXMULT);
-				gets(inpStr);
-				if (inpStr == NULL) {
+				if (gets(inpStr) == NULL) {
 					printf("UNKNOWN, PLEASE ENTER 1 THROUGH %d.",MAX_PIXMULT);
 					continue;
 				}
@@ -689,8 +699,7 @@ int menuVal, i;
 				if (params->pixMult > 1) {
 					printf("\nenter X pixels to undercut (0 through %d valid) ",
 										params->pixMult-1);
-					gets(inpStr);
-					if (inpStr == NULL) {
+					if (gets(inpStr) == NULL) {
 						printf("UNKNOWN, PLEASE ENTER 0 THROUGH %d.",
 										params->pixMult-1);
 						continue;
@@ -711,8 +720,7 @@ int menuVal, i;
 				if (params->pixMult > 1) {
 					printf("\nenter Y pixels to undercut (0 through %d valid) ",
 										params->pixMult-1);
-					gets(inpStr);
-					if (inpStr == NULL) {
+					if (gets(inpStr) == NULL) {
 						printf("UNKNOWN, PLEASE ENTER 0 THROUGH %d.",
 										params->pixMult-1);
 						continue;
@@ -732,8 +740,7 @@ int menuVal, i;
 			case 3:
 				printf("\nenter %s output file name with extension ",
 							 (params->bmp) ? "BMP":"TIF");
-				gets(inpStr);
-				if (inpStr == NULL) {
+				if (gets(inpStr) == NULL) {
 					printf("UNKNOWN ENTRY.");
 					continue;
 				}
@@ -745,8 +752,7 @@ int menuVal, i;
 				break;
 			case 4:
 				printf("\nenter 0 for Keyboard or 1 for file input ");
-				gets(inpStr);
-				if (inpStr == NULL) {
+				if (gets(inpStr) == NULL) {
 					printf("UNKNOWN, PLEASE ENTER 0 or 1.");
 					continue;
 				}
@@ -760,8 +766,7 @@ int menuVal, i;
 			case 5:
 			 if (params->inputFlag == 0) { // for kbd input
 				printf("\nenter linear|2d data (no more than %d characters) ", MAX_KEYDATA);
-				gets(inpStr);
-				if (inpStr == NULL) {
+				if (gets(inpStr) == NULL) {
 					printf("UNKNOWN ENTRY.");
 					continue;
 				}
@@ -770,8 +775,7 @@ int menuVal, i;
 			 }
 			 else {
 				printf("\nenter data input file name ");
-				gets(inpStr);
-				if (inpStr == NULL) {
+				if (gets(inpStr) == NULL) {
 					printf("UNKNOWN ENTRY.");
 					continue;
 				}
@@ -785,8 +789,7 @@ int menuVal, i;
 			 break;
 			case 6:
 				printf("\nenter 0 for TIF or 1 for BMP output ");
-				gets(inpStr);
-				if (inpStr == NULL) {
+				if (gets(inpStr) == NULL) {
 					printf("UNKNOWN, PLEASE ENTER 0 or 1.");
 					continue;
 				}
@@ -808,8 +811,7 @@ int menuVal, i;
 			case 7:
 			 if (params->sym == sRSSEXP) {
 				printf("\nenter maximum segments per row (even 2 to 22 valid) ");
-				gets(inpStr);
-				if (inpStr == NULL) {
+				if (gets(inpStr) == NULL) {
 					printf("UNKNOWN, PLEASE ENTER 2 THROUGH 22.");
 					continue;
 				}
@@ -826,8 +828,7 @@ int menuVal, i;
 			 }
 			 else if ((params->sym == sUCC128_CCA) || (params->sym == sUCC128_CCC)) {
 				printf("\nenter UCC/EAN-128 height in X (1-%d valid) ",MAX_LINHT);
-				gets(inpStr);
-				if (inpStr == NULL) {
+				if (gets(inpStr) == NULL) {
 					printf("UNKNOWN, PLEASE ENTER 1 THROUGH %d.",MAX_LINHT);
 					continue;
 				}
@@ -845,8 +846,7 @@ int menuVal, i;
 			case 8:
 				printf("\nenter separator row height (%d through %d valid) ",
 										params->pixMult, 2*params->pixMult);
-				gets(inpStr);
-				if (inpStr == NULL) {
+				if (gets(inpStr) == NULL) {
 					printf("UNKNOWN, PLEASE ENTER %d THROUGH %d.",
 									params->pixMult, 2*params->pixMult);
 					continue;
@@ -883,8 +883,7 @@ char inpStr[MAX_KEYDATA+1];
 		printf("\n 9)  EAN-13               10) EAN-8");
 		printf("\n 11) UCC/EAN-128 & CC-A/B 12) UCC/EAN-128 & CC-C");
 		printf("\nenter symbology type or 0 to exit ");
-		gets(inpStr);
-		if (inpStr == NULL) {
+		if (gets(inpStr) == NULL) {
 			printf("PLEASE ENTER 0 THROUGH 12.");
 			continue;
 		}
