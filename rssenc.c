@@ -32,7 +32,7 @@ int line1;
 int linFlag; // tells pack whether linear or cc is being encoded
 UCHAR ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
 
-void main(void) {
+int main(int argc, char *argv[]) {
 
 FILE *iFile, *oFile;
 
@@ -123,7 +123,7 @@ int i;
 			printf("\n%s created.", params.outFile);
 		}
 	}
-	return;
+	return 0;
 }
 
 /**********************************************************************
