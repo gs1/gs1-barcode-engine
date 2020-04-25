@@ -173,7 +173,7 @@ int rPadl1, rPadcc;
 			prints.guards = TRUE;
 			prints.height = params->pixMult*SYM_H;
 			prints.whtFirst = (i/2+1)&1;
-			rev = evenRow ^ (i/2)&1;
+			rev = evenRow ^ ((i/2)&1);
 			if (rev && (((lNdx1-4)%8)&1)) {
 				// can't reverse odd # finders so offset it right by one
 				prints.leftPad = 1;
@@ -217,7 +217,7 @@ int rPadl1, rPadcc;
 			prints.rightPad = 0;
 			for (i -= params->segWidth ; i >= 0; i -= params->segWidth) {
 				j = i + params->segWidth; // last segment number + 1 in this row
-				rev = evenRow ^ (i/2)&1;
+				rev = evenRow ^ ((i/2)&1);
 				prints.pattern = &linPattern[(i/2)*(8+5+8)+(i&1)*8];
 				prints.whtFirst = (i/2+1)&1;
 				prints.reverse = rev;
@@ -293,7 +293,7 @@ int rPadl1, rPadcc;
 			for (i = 0; i < segs-params->segWidth; i += params->segWidth) {
 				j = i + params->segWidth; // last segment number + 1 in this row
 
-				rev = evenRow ^ (i/2)&1;
+				rev = evenRow ^ ((i/2)&1);
 				prints.pattern = &linPattern[(i/2)*(8+5+8)+(i&1)*8];
 				prints.whtFirst = (i/2+1)&1;
 				prints.reverse = rev;
@@ -326,7 +326,7 @@ int rPadl1, rPadcc;
 			prints.elmCnt = lNdx1;
 			prints.pattern = &linPattern[(i/2)*(8+5+8)+(i&1)*8];
 			prints.whtFirst = (i/2+1)&1;
-			rev = evenRow ^ (i/2)&1;
+			rev = evenRow ^ ((i/2)&1);
 			if (rev && (((lNdx1-4)%8)&1)) {
 				// can't reverse odd # finders so offset it right by one
 				prints.leftPad = 1;
