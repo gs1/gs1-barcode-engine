@@ -657,7 +657,7 @@ int menuVal, i;
 		printf("\n # (pound sign): FNC1");
 		printf("\n | (vertical bar): separates primary and secondary data");
 		printf("\n ^ (caret): symbol separator (used to flag ]e1n format in 2D data)");
-		printf("\nMENU (Release %s):",RELEASE);
+		printf("\n\nMENU (Symbology: %s):", SYMBOLOGY_NAMES[params->sym]);
 		printf("\n 0) enter pixels per X, current value = %d", params->pixMult);
 		printf("\n 1) enter X pixels to undercut, current value = %d", params->Xundercut);
 		printf("\n 2) enter Y pixels to undercut, current value = %d", params->Yundercut);
