@@ -436,7 +436,7 @@ int undercut;
 		lineUCut[ndx] = (UCHAR)(((line[ndx]^xorMsk)&(bits&0xff))^xorMsk); // Y undercut
 		line[ndx++] = (UCHAR)((bits&0xff) ^ xorMsk);
 		if (ndx > MAX_LINE/8 + 1) {
-			printf("\nprint line too long");
+			printf("\nPrint line too long");
 			errFlag = TRUE;
 			return;
 		}
@@ -445,7 +445,7 @@ int undercut;
 		while ((ndx & 3) != 0) {
 			line[ndx++] = 0xFF; // pad to long word boundary for .BMP
 			if (ndx >= MAX_LINE/8 + 1) {
-				printf("\nprint line too long");
+				printf("\nPrint line too long");
 				errFlag = TRUE;
 				return;
 			}
@@ -472,7 +472,7 @@ int i;
 			line[(*ndx)++] = (UCHAR)((*bits&0xff) ^ xorMsk);
 			if (*ndx >= MAX_LINE/8 + 1) {
 				*ndx = 0;
-				printf("\nprint line too long in graphic line.");
+				printf("\nPrint line too long in graphic line.");
 				errFlag = TRUE;
 				return;
 			}
@@ -622,84 +622,85 @@ int menuVal, i;
 			case sRSS14S:
 			case sRSS14SO:
 			case sRSSLIM:
-				printf("\n primary data is up to 13 digits, no check digit is input");
-				printf("\n 2D component data starts with 1st AI, only interior FNC1's are needed");
+				printf("\n Primary data is up to 13 digits. Check digit must be omitted.");
+				printf("\n 2D component data starts with 1st AI. Only interior FNC1s are needed.");
 				break;
 			case sRSSEXP:
-				printf("\n RSS Expanded [& 2D component] data starts with 1st AI, only interior FNC1's are needed");
+				printf("\n GS1 DataBar Expanded (& 2D component) data starts with 1st AI. Only interior FNC1s are needed.");
 				printf("\nSpecial data input characters:");
 				break;
 			case sUPCA:
-				printf("\n primary data is up to 11 digits, no check digit is input");
-				printf("\n 2D component data starts with 1st AI, only interior FNC1's are necessary");
+				printf("\n Primary data is up to 11 digits. Check digit must be omitted.");
+				printf("\n 2D component data starts with 1st AI. Only interior FNC1s are necessary.");
 				break;
 			case sUPCE:
-				printf("\n primary data (not zero suppressed) is up to 10 digits, no check digit is input");
-				printf("\n 2D component data starts with 1st AI, only interior FNC1's are necessary");
+				printf("\n Primary data (not zero suppressed) is up to 10 digits. Check digit must be omitted.");
+				printf("\n 2D component data starts with 1st AI. Only interior FNC1s are necessary.");
 				break;
 			case sEAN13:
-				printf("\n primary data is up to 12 digits, no check digit is input");
-				printf("\n 2D component data starts with 1st AI, only interior FNC1's are necessary");
+				printf("\n Primary data is up to 12 digits. Check digit must be omitted.");
+				printf("\n 2D component data starts with 1st AI. Only interior FNC1s are necessary.");
 				break;
 			case sEAN8:
-				printf("\n primary data is up to 7 digits, no check digit is input");
-				printf("\n 2D component data starts with 1st AI, only interior FNC1's are necessary");
+				printf("\n Primary data is up to 7 digits. Check digit must be omitted.");
+				printf("\n 2D component data starts with 1st AI. Only interior FNC1s are necessary.");
 				break;
 			case sUCC128_CCA:
 			case sUCC128_CCC:
-				printf("\n Code 128 data starts with 1st AI, only interior FNC1's are necessary");
-				printf("\n 2D component data starts with 1st AI, only interior FNC1's are necessary");
+				printf("\n Code 128 data starts with 1st AI. Only interior FNC1s are necessary.");
+				printf("\n 2D component data starts with 1st AI. Only interior FNC1s are necessary.");
 				break;
 			default:
 				printf("\nSYMBOL TYPE ERROR.");
 				return(FALSE);
 		}
-		printf("\n # (pound sign): FNC1");
-		printf("\n | (vertical bar): separates primary and secondary data");
-		printf("\n ^ (caret): symbol separator (used to flag ]e1n format in 2D data)");
+		printf("\n Special characters:");
+		printf("\n   # (pound sign):   FNC1");
+		printf("\n   | (vertical bar): Separates primary and secondary data");
+		printf("\n   ^ (caret):        Symbol separator used to flag ]e1n format in 2D data");
 		printf("\n\nMENU (Symbology: %s):", SYMBOLOGY_NAMES[params->sym]);
-		printf("\n 0) enter pixels per X, current value = %d", params->pixMult);
-		printf("\n 1) enter X pixels to undercut, current value = %d", params->Xundercut);
-		printf("\n 2) enter Y pixels to undercut, current value = %d", params->Yundercut);
-		printf("\n 3) enter %s output file name, current name = %s",
+		printf("\n 0) Enter pixels per X. Current value = %d", params->pixMult);
+		printf("\n 1) Enter X pixels to undercut. Current value = %d", params->Xundercut);
+		printf("\n 2) Enter Y pixels to undercut. Current value = %d", params->Yundercut);
+		printf("\n 3) Enter %s output file name. Current name = %s",
 							 (params->bmp) ? "BMP":"TIF", params->outFile);
-		printf("\n 4) select keyboard or file input source, current = %s",
+		printf("\n 4) Select keyboard or file input source. Current = %s",
 							 (params->inputFlag == 0) ? "keyboard":"file");
 		if (params->inputFlag == 0) { // for kbd input
-			printf("\n 5) key enter data input string, %s output file will be created",
+			printf("\n 5) Key enter data input string. %s output file will be created.",
 							 (params->bmp) ? "BMP":"TIF");
 		}
 		else {
-			printf("\n 5) enter data input file name, %s output file will be created",
+			printf("\n 5) Enter data input file name. %s output file will be created.",
 							 (params->bmp) ? "BMP":"TIF");
 		}
-		printf("\n 6) select TIF or BMP format, current = %s",
+		printf("\n 6) Select TIF or BMP format. Current = %s",
 							 (params->bmp) ? "BMP":"TIF");
 		if (params->sym == sRSSEXP) {
-			printf("\n 7) select maximum segments per row, current value = %d", params->segWidth);
+			printf("\n 7) Select maximum segments per row. Current value = %d", params->segWidth);
 		}
 		if ((params->sym == sUCC128_CCA) || (params->sym == sUCC128_CCC)) {
-			printf("\n 7) enter UCC/EAN-128 height in X, current value = %d",
+			printf("\n 7) Enter GS1-128 height in X. Current value = %d",
 								params->linHeight);
 		}
-		printf("\n 8) enter separator row height, current value = %d", params->sepHt);
-		printf("\n 9) select another symbology or exit program");
-		printf("\nmenu selection? ");
+		printf("\n 8) Enter separator row height. Current value = %d", params->sepHt);
+		printf("\n 9) Select another symbology or exit program");
+		printf("\n\nMenu selection: ");
 		if (gets(inpStr) == NULL) {
-			printf("UNKNOWN, PLEASE ENTER 1 THROUGH 9.");
+			printf("UNKNOWN OPTION. PLEASE ENTER 1 THROUGH 9.");
 			continue;
 		}
 		menuVal = atoi(inpStr);
 		switch (menuVal) {
 			case 0:
-				printf("\nenter pixels per X (1-%d valid) ",MAX_PIXMULT);
+				printf("\nEnter pixels per X. 1-%d valid: ",MAX_PIXMULT);
 				if (gets(inpStr) == NULL) {
-					printf("UNKNOWN, PLEASE ENTER 1 THROUGH %d.",MAX_PIXMULT);
+					printf("UNKNOWN. PLEASE ENTER 1 THROUGH %d.",MAX_PIXMULT);
 					continue;
 				}
 				i = atoi(inpStr);
 				if (i < 1 || i > MAX_PIXMULT) {
-					printf("OUT OF RANGE, PLEASE ENTER 1 THROUGH %d.",MAX_PIXMULT);
+					printf("OUT OF RANGE. PLEASE ENTER 1 THROUGH %d.",MAX_PIXMULT);
 					continue;
 				}
 				params->pixMult = i;
@@ -718,16 +719,16 @@ int menuVal, i;
 				break;
 			case 1:
 				if (params->pixMult > 1) {
-					printf("\nenter X pixels to undercut (0 through %d valid) ",
+					printf("\nEnter X pixels to undercut. 0 through %d valid: ",
 										params->pixMult-1);
 					if (gets(inpStr) == NULL) {
-						printf("UNKNOWN, PLEASE ENTER 0 THROUGH %d.",
+						printf("UNKNOWN. PLEASE ENTER 0 THROUGH %d.",
 										params->pixMult-1);
 						continue;
 					}
 					i = atoi(inpStr);
 					if (i < 0 || i > params->pixMult-1) {
-						printf("OUT OF RANGE, PLEASE ENTER 0 THROUGH %d",
+						printf("OUT OF RANGE. PLEASE ENTER 0 THROUGH %d",
 										params->pixMult-1);
 						continue;
 					}
@@ -739,16 +740,16 @@ int menuVal, i;
 				break;
 			case 2:
 				if (params->pixMult > 1) {
-					printf("\nenter Y pixels to undercut (0 through %d valid) ",
+					printf("\nEnter Y pixels to undercut. 0 through %d valid: ",
 										params->pixMult-1);
 					if (gets(inpStr) == NULL) {
-						printf("UNKNOWN, PLEASE ENTER 0 THROUGH %d.",
+						printf("UNKNOWN. PLEASE ENTER 0 THROUGH %d.",
 										params->pixMult-1);
 						continue;
 					}
 					i = atoi(inpStr);
 					if (i < 0 || i > params->pixMult-1) {
-						printf("OUT OF RANGE, PLEASE ENTER 0 THROUGH %d",
+						printf("OUT OF RANGE. PLEASE ENTER 0 THROUGH %d",
 										params->pixMult-1);
 						continue;
 					}
@@ -759,34 +760,34 @@ int menuVal, i;
 				}
 				break;
 			case 3:
-				printf("\nenter %s output file name with extension ",
+				printf("\nEnter %s output file name with extension: ",
 							 (params->bmp) ? "BMP":"TIF");
 				if (gets(inpStr) == NULL) {
 					printf("UNKNOWN ENTRY.");
 					continue;
 				}
 				if (strlen(inpStr) > MAX_FNAME) {
-					printf("NOT ACCEPTED, MUST BE 25 CHARACTERS OR FEWER.");
+					printf("NOT ACCEPTED. MUST BE 25 CHARACTERS OR FEWER.");
 					continue;
 				}
 				strcpy(params->outFile, inpStr);
 				break;
 			case 4:
-				printf("\nenter 0 for Keyboard or 1 for file input ");
+				printf("\nEnter 0 for keyboard or 1 for file input: ");
 				if (gets(inpStr) == NULL) {
-					printf("UNKNOWN, PLEASE ENTER 0 or 1.");
+					printf("UNKNOWN. PLEASE ENTER 0 or 1.");
 					continue;
 				}
 				i = atoi(inpStr);
 				if (!(i == 0 || i == 1)) {
-					printf("OUT OF RANGE, PLEASE ENTER 0 or 1");
+					printf("OUT OF RANGE. PLEASE ENTER 0 or 1");
 					continue;
 				}
 				params->inputFlag = i;
 				break;
 			case 5:
 			 if (params->inputFlag == 0) { // for kbd input
-				printf("\nenter linear|2d data (no more than %d characters) ", MAX_KEYDATA);
+				printf("\nEnter linear|2d data. No more than %d characters: ", MAX_KEYDATA);
 				if (gets(inpStr) == NULL) {
 					printf("UNKNOWN ENTRY.");
 					continue;
@@ -795,13 +796,13 @@ int menuVal, i;
 				inMenu = FALSE;
 			 }
 			 else {
-				printf("\nenter data input file name ");
+				printf("\nEnter data input file name: ");
 				if (gets(inpStr) == NULL) {
 					printf("UNKNOWN ENTRY.");
 					continue;
 				}
 				if (strlen(inpStr) > MAX_FNAME) {
-					printf("NOT ACCEPTED, MUST BE 25 CHARACTERS OR FEWER.");
+					printf("NOT ACCEPTED. MUST BE 25 CHARACTERS OR FEWER.");
 					continue;
 				}
 				strcpy(params->dataFile, inpStr);
@@ -809,14 +810,14 @@ int menuVal, i;
 			 }
 			 break;
 			case 6:
-				printf("\nenter 0 for TIF or 1 for BMP output ");
+				printf("\nEnter 0 for TIF or 1 for BMP output: ");
 				if (gets(inpStr) == NULL) {
-					printf("UNKNOWN, PLEASE ENTER 0 or 1.");
+					printf("UNKNOWN. PLEASE ENTER 0 or 1.");
 					continue;
 				}
 				i = atoi(inpStr);
 				if (!(i == 0 || i == 1)) {
-					printf("OUT OF RANGE, PLEASE ENTER 0 or 1");
+					printf("OUT OF RANGE. PLEASE ENTER 0 or 1");
 					continue;
 				}
 				if (params->bmp != i) {
@@ -831,31 +832,31 @@ int menuVal, i;
 				break;
 			case 7:
 			 if (params->sym == sRSSEXP) {
-				printf("\nenter maximum segments per row (even 2 to 22 valid) ");
+				printf("\nEnter maximum segments per row. Even values 2 to 22 valid: ");
 				if (gets(inpStr) == NULL) {
-					printf("UNKNOWN, PLEASE ENTER 2 THROUGH 22.");
+					printf("UNKNOWN. PLEASE ENTER 2 THROUGH 22.");
 					continue;
 				}
 				i = atoi(inpStr);
 				if (i < 2 || i > 22) {
-					printf("OUT OF RANGE, PLEASE ENTER 2 THROUGH 22.");
+					printf("OUT OF RANGE. PLEASE ENTER 2 THROUGH 22.");
 					continue;
 				}
 				if (i & 1) {
-					printf("ODD NUMBER, PLEASE ENTER AN EVEN NUMBER 2 TO 22.");
+					printf("ODD NUMBER. PLEASE ENTER AN EVEN NUMBER 2 TO 22.");
 					continue;
 				}
 				params->segWidth = i;
 			 }
 			 else if ((params->sym == sUCC128_CCA) || (params->sym == sUCC128_CCC)) {
-				printf("\nenter UCC/EAN-128 height in X (1-%d valid) ",MAX_LINHT);
+				printf("\nEnter UCC/EAN-128 height in X. 1-%d valid: ",MAX_LINHT);
 				if (gets(inpStr) == NULL) {
-					printf("UNKNOWN, PLEASE ENTER 1 THROUGH %d.",MAX_LINHT);
+					printf("UNKNOWN. PLEASE ENTER 1 THROUGH %d.",MAX_LINHT);
 					continue;
 				}
 				i = atoi(inpStr);
 				if (i < 1 || i > MAX_LINHT) {
-					printf("OUT OF RANGE, PLEASE ENTER 1 THROUGH %d.",MAX_LINHT);
+					printf("OUT OF RANGE. PLEASE ENTER 1 THROUGH %d.",MAX_LINHT);
 					continue;
 				}
 				params->linHeight = i;
@@ -865,16 +866,16 @@ int menuVal, i;
 			 }
 			 break;
 			case 8:
-				printf("\nenter separator row height (%d through %d valid) ",
+				printf("\nEnter separator row height %d through %d valid: ",
 										params->pixMult, 2*params->pixMult);
 				if (gets(inpStr) == NULL) {
-					printf("UNKNOWN, PLEASE ENTER %d THROUGH %d.",
+					printf("UNKNOWN. PLEASE ENTER %d THROUGH %d.",
 									params->pixMult, 2*params->pixMult);
 					continue;
 				}
 				i = atoi(inpStr);
 				if (i < params->pixMult || i > 2*params->pixMult) {
-					printf("OUT OF RANGE, PLEASE ENTER %d THROUGH %d",
+					printf("OUT OF RANGE. PLEASE ENTER %d THROUGH %d",
 									params->pixMult, 2*params->pixMult);
 					continue;
 				}
@@ -884,7 +885,7 @@ int menuVal, i;
 				params->sym = sNONE;
 				break;
 			default:
-				printf("OUT OF RANGE, PLEASE ENTER 1 THROUGH 9.");
+				printf("OUT OF RANGE. PLEASE ENTER 1 THROUGH 9.");
 		}
 	}
 	return(retFlag);
@@ -896,7 +897,9 @@ char inpStr[MAX_KEYDATA+1];
 int i;
 
 	while (TRUE) {
-		printf("\nMENU (Release %s):",RELEASE);
+		printf("\nGS1 Encoders (Built " RELEASE "):");
+		printf("\n\nCopyright (c) 2020 GS1 AISBL. License: Apache-2.0");
+		printf("\n\nMAIN MENU:");
 		printf("\n 0)  Exit Program");
 		for (i = 1; i < sNUMSYMS; i += 2) {
 			printf("\n%2d)  %-25s     %2d)  %-25s", 
