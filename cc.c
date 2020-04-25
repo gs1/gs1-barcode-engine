@@ -1378,7 +1378,7 @@ int doLinMethods(UCHAR str[], int *iStr, UCHAR bitField[], int *iBit) {
 
 UINT bits;
 long weight;
-char numStr[10];
+char numStr[10] = { 0 };
 
 	if (strlen((char*)str) >= 26) {
 		strncpy(numStr, (char*)&str[20], 6); // possible weight field
