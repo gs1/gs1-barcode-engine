@@ -238,7 +238,7 @@ char *ccStr;
 		colCnt = ((symChars*11 + 22 - L_PAD - 5)/17) -4;
 		if (colCnt < 1) {
 			errFlag = TRUE;
-			printf("\nUCC-128 too small\n", params->dataFile);
+			printf("\nUCC-128 too small\n");
 			return;
 		}
 		line1 = TRUE; // so first line is not Y undercut

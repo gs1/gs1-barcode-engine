@@ -61,7 +61,7 @@ int rPadl1, rPadcc;
 		if (ccStr == NULL) ccFlag = FALSE;
 		else {
 			if (params->segWidth < 4) {
-				printf("\nComposite must be at least 4 segments wide\n", params->outFile);
+				printf("\nComposite must be at least 4 segments wide\n");
 				errFlag = TRUE;
 				return;
 			}
