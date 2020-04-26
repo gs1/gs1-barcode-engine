@@ -1,3 +1,23 @@
+/**
+ * GS1 barcode encoder application
+ *
+ * @author Copyright (c) 2000-2020 GS1 AISBL.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ *
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 const ULONG barRap[2][52] = {{
  74441,103113,103561,74889,71305,71753,75337,104009,107593,136265,
  139849,111177,82505,78921,78473,107145,135817,135761,135754,107082,
