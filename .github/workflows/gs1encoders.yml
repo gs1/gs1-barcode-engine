@@ -39,7 +39,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Add msbuild to PATH
-      uses: microsoft/setup-msbuild@v1.0.0
+      uses: microsoft/setup-msbuild@v1
     - name: MSVC CI
       working-directory: src
       run: msbuild /p:Configuration=release
@@ -65,7 +65,7 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Add msbuild to PATH
-      uses: microsoft/setup-msbuild@v1.0.0
+      uses: microsoft/setup-msbuild@v1
 
     - name: Windows release build
       working-directory: src
