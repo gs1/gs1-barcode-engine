@@ -23,6 +23,23 @@
 
 #include <stdint.h>
 
+#define CCB2_WIDTH 57		// 2 column cca/b
+#define CCB2_ELMNTS 31		// includes qz's
+
+#define CCA3_WIDTH 74		// 3 column cca
+#define CCA3_ELMNTS 39		// includes qz's
+#define MAX_CCA3_ROWS 8		// cca-3 max rows
+
+#define CCB3_WIDTH 84		// 3 column ccb
+#define CCB3_ELMNTS 45		// includes qz's
+
+#define CCB4_WIDTH 101		// 4 column cca/b
+#define CCB4_ELMNTS 53		// includes qz's
+#define MAX_CCB4_ROWS 44	// ccb-4 max rows
+
+// TODO remove global
+uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
+
 int CC2enc(uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
 int CC3enc(uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
 int CC4enc(uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);

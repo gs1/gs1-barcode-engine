@@ -29,20 +29,6 @@
 #define MAX_FNAME 120
 #define MAX_DATA (75+2361)
 
-#define CCB2_WIDTH 57		// 2 column cca/b
-#define CCB2_ELMNTS 31		// includes qz's
-
-#define CCA3_WIDTH 74		// 3 column cca
-#define CCA3_ELMNTS 39		// includes qz's
-#define MAX_CCA3_ROWS 8		// cca-3 max rows
-
-#define CCB3_WIDTH 84		// 3 column ccb
-#define CCB3_ELMNTS 45		// includes qz's
-
-#define CCB4_WIDTH 101		// 4 column cca/b
-#define CCB4_ELMNTS 53		// includes qz's
-#define MAX_CCB4_ROWS 44	// ccb-4 max rows
-
 
 // globals
 // TODO remove these
@@ -50,7 +36,6 @@ int errFlag;
 int rowWidth;
 int line1;
 int linFlag; // tells pack whether linear or cc is being encoded
-uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
 
 
 enum {
