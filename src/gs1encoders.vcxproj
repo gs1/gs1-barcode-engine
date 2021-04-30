@@ -110,17 +110,19 @@
   <ItemGroup>
     <ClCompile Include="cc.c" />
     <ClCompile Include="ean.c" />
+    <ClCompile Include="enc.c" />
     <ClCompile Include="rss14.c" />
     <ClCompile Include="rssenc.c" />
     <ClCompile Include="rssexp.c" />
     <ClCompile Include="rsslim.c" />
+    <ClCompile Include="rssutil.c" />
     <ClCompile Include="ucc128.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="bardata.h" />
-    <ClInclude Include="barrap.h" />
+    <ClInclude Include="cc.h" />
+    <ClInclude Include="enc.h" />
     <ClInclude Include="release.h" />
-    <ClInclude Include="rssenc.h" />
+    <ClInclude Include="rssutil.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

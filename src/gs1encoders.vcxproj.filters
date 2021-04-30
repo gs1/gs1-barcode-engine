@@ -36,18 +36,24 @@
     <ClCompile Include="ucc128.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="enc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="rssutil.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="bardata.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="barrap.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="release.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="rssenc.h">
+    <ClInclude Include="cc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="enc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="rssutil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
