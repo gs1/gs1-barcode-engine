@@ -47,7 +47,7 @@ extern int errFlag;
 extern int line1;
 extern uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
 
-static int RSS14enc(uint8_t str[], uint8_t pattern[], int ccFlag);
+static bool RSS14enc(uint8_t str[], uint8_t pattern[], int ccFlag);
 static struct sPrints *separator14S(struct sParams *params, struct sPrints *prints);
 
 
@@ -723,7 +723,7 @@ int i, j, k, lNdx, rNdx, sNdx, lWidth, rWidth, matchWidth;
 
 #define K	4
 // call with str = 13-digit primary, no check digit
-static int RSS14enc(uint8_t string[], uint8_t bars[], int ccFlag) {
+static bool RSS14enc(uint8_t string[], uint8_t bars[], int ccFlag) {
 
 #define	PARITYCHRSIZE	9
 #define PARITY_MOD 79

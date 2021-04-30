@@ -235,12 +235,13 @@ int i;
 	return(rows[size]);
 }
 
-int CCCenc(uint8_t str[], uint8_t patCCC[] ) {
 
-uint8_t bitField[MAX_CCC_BYTES];
-uint16_t codeWords[MAX_CCC_CW];
-int byteCnt;
-int i;
+bool CCCenc(uint8_t str[], uint8_t patCCC[] ) {
+
+	uint8_t bitField[MAX_CCC_BYTES];
+	uint16_t codeWords[MAX_CCC_CW];
+	int byteCnt;
+	int i;
 
 	linFlag = -1; // CC-C flag value
 	if ((i=check2DData(str)) != 0) {

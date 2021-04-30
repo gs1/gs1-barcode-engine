@@ -48,8 +48,8 @@ const char* SYMBOLOGY_NAMES[] =
 	"GS1-128 with CC-C"
 };
 
-static int getSym(struct sParams *params);
-static int userInt(struct sParams *params);
+static bool getSym(struct sParams *params);
+static bool userInt(struct sParams *params);
 
 int main(int argc, char *argv[]) {
 
@@ -160,7 +160,7 @@ char* s;
 	return s;
 }
 
-static int userInt(struct sParams *params) {
+static bool userInt(struct sParams *params) {
 
 int inMenu = true;
 int retFlag = true; // return is false if exit program
@@ -450,7 +450,7 @@ int menuVal, i;
 	return(retFlag);
 }
 
-static int getSym(struct sParams *params) {
+static bool getSym(struct sParams *params) {
 
 char inpStr[MAX_KEYDATA+1];
 int i;

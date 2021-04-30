@@ -36,7 +36,7 @@
 
 #define L_PADB 10 // RSS14L left pad for ccb
 
-static int RSSLimEnc(uint8_t str[], uint8_t pattern[], int ccFlag);
+static bool RSSLimEnc(uint8_t str[], uint8_t pattern[], int ccFlag);
 static struct sPrints *separatorLim(struct sParams *params, struct sPrints *prints);
 
 extern int errFlag;
@@ -246,7 +246,7 @@ char *ccStr;
 }
 
 // call with str = 13-digit primary, no check digit
-static int RSSLimEnc(uint8_t string[], uint8_t bars[], int ccFlag) {
+static bool RSSLimEnc(uint8_t string[], uint8_t bars[], int ccFlag) {
 
 #define	N	26
 #define	K	7
