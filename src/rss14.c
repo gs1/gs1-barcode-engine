@@ -22,8 +22,9 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include "rssutil.h"
 #include "enc.h"
+#include "util.h"
+#include "rssutil.h"
 #include "cc.h"
 
 // not including guard bars

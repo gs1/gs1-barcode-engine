@@ -22,6 +22,7 @@
 #include <stdint.h>
 #include <string.h>
 #include "enc.h"
+#include "util.h"
 #include "cc.h"
 
 // includes qz's

@@ -29,15 +29,6 @@
 #define MAX_FNAME 120
 #define MAX_DATA (75+2361)
 
-
-// globals
-// TODO remove these
-int errFlag;
-int rowWidth;
-int line1;
-int linFlag; // tells pack whether linear or cc is being encoded
-
-
 enum {
 	sNONE = 0,	// none defined
 	sRSS14,		// RSS-14
@@ -83,14 +74,7 @@ struct sPrints {
 	uint8_t *pattern;
 };
 
-// subroutine prototypes:
 void encInit();
-void bmpHeader(long xdim, long ydim, FILE *oFile);
-void tifHeader(long xdim, long ydim, FILE *oFile);
-void printElmnts(struct sParams *params, struct sPrints *prints);
-int pack(uint8_t str[], uint8_t bitField[] );
-int check2DData(uint8_t dataStr[]);
-void putBits(uint8_t bitField[], int bitPos, int length, uint16_t bits);
 void RSS14(struct sParams *params);
 void RSS14S(struct sParams *params);
 void RSS14SO(struct sParams *params);

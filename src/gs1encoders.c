@@ -24,6 +24,7 @@
 #include <string.h>
 #include "release.h"
 #include "enc.h"
+#include "util.h"
 
 #define MAX_PIXMULT 12
 

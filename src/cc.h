@@ -45,6 +45,10 @@ int CC3enc(uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
 int CC4enc(uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
 int CCCenc(uint8_t str[], uint8_t pattern[]);
 
+int check2DData(uint8_t dataStr[]);
+int pack(uint8_t str[], uint8_t bitField[] );
+void putBits(uint8_t bitField[], int bitPos, int length, uint16_t bits);
+
 void init928(void);
 void initLogTables(void);
 

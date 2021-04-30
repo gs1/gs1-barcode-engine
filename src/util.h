@@ -18,15 +18,20 @@
  *
  */
 
-#include <stdbool.h>
-#include <stdint.h>
+#ifndef UTIL_H
+#define UTIL_H
 
+#include <stdio.h>
 #include "enc.h"
-#include "cc.h"
 
-#define MAX_LINE 6032 // 10 inches wide at 600 dpi
+// globals
+int errFlag;
+int rowWidth;
+int line1;
+int linFlag; // tells pack whether linear or cc is being encoded
 
-void encInit() {
-	init928();
-	initLogTables();
-}
+void bmpHeader(long xdim, long ydim, FILE *oFile);
+void tifHeader(long xdim, long ydim, FILE *oFile);
+void printElmnts(struct sParams *params, struct sPrints *prints);
+
+#endif /* UTIL_H */
