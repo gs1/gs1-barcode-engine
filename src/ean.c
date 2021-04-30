@@ -37,9 +37,9 @@ extern int errFlag;
 extern int line1;
 extern uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
 
-int EAN13enc(uint8_t str[], uint8_t pattern[] );
-int EAN8enc(uint8_t str[], uint8_t pattern[] );
-int UPCEenc(uint8_t str[], uint8_t pattern[] );
+static int EAN13enc(uint8_t str[], uint8_t pattern[] );
+static int EAN8enc(uint8_t str[], uint8_t pattern[] );
+static int UPCEenc(uint8_t str[], uint8_t pattern[] );
 
 void EAN13(struct sParams *params) {
 
@@ -195,7 +195,7 @@ char *ccStr;
 }
 
 // call with str = 13-digit primary with check digit = 0
-int EAN13enc(uint8_t str[], uint8_t pattern[] ) {
+static int EAN13enc(uint8_t str[], uint8_t pattern[] ) {
 
 static uint16_t upcTblA[10] = {	0x3211, 0x2221, 0x2122, 0x1411, 0x1132,
 				0x1231, 0x1114, 0x1312, 0x1213, 0x3112 };
@@ -430,7 +430,7 @@ int elmntsCC;
 
 
 // call with str = 13-digit primary with check digit = 0
-int EAN8enc(uint8_t str[], uint8_t pattern[] ) {
+static int EAN8enc(uint8_t str[], uint8_t pattern[] ) {
 
 static uint16_t upcTblA[10] = {	0x3211, 0x2221, 0x2122, 0x1411, 0x1132,
 														0x1231, 0x1114, 0x1312, 0x1213, 0x3112 };
@@ -641,7 +641,7 @@ char *ccStr;
 }
 
 // call with str = 13-digit primary with check digit = 0
-int UPCEenc(uint8_t str[], uint8_t pattern[] ) {
+static int UPCEenc(uint8_t str[], uint8_t pattern[] ) {
 
 static uint16_t upcTblA[10] = {	0x3211, 0x2221, 0x2122, 0x1411, 0x1132,
 				0x1231, 0x1114, 0x1312, 0x1213, 0x3112 };

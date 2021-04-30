@@ -34,8 +34,8 @@
 
 #define L_PADB 10 // RSS14L left pad for ccb
 
-int RSSLimEnc(uint8_t str[], uint8_t pattern[], int ccFlag);
-struct sPrints *separatorLim(struct sParams *params, struct sPrints *prints);
+static int RSSLimEnc(uint8_t str[], uint8_t pattern[], int ccFlag);
+static struct sPrints *separatorLim(struct sParams *params, struct sPrints *prints);
 
 extern int errFlag;
 extern int line1;
@@ -55,193 +55,193 @@ int i;
 int rows, ccFlag;
 char *ccStr;
 
-		ccStr = strchr(params->dataStr, '|');
-		if (ccStr == NULL) ccFlag = FALSE;
-		else {
-			ccFlag = TRUE;
-			ccStr[0] = '\0'; // separate primary data
-			ccStr++; // point to secondary data
-		}
+	ccStr = strchr(params->dataStr, '|');
+	if (ccStr == NULL) ccFlag = FALSE;
+	else {
+		ccFlag = TRUE;
+		ccStr[0] = '\0'; // separate primary data
+		ccStr++; // point to secondary data
+	}
 
-		if (strlen(params->dataStr) > 13) {
-			errFlag = TRUE;
-			printf("\nprimary data exceeds 13 digits");
+	if (strlen(params->dataStr) > 13) {
+		errFlag = TRUE;
+		printf("\nprimary data exceeds 13 digits");
+		return;
+	}
+
+	strcpy(tempStr, "000000000000");
+	strcat(tempStr, params->dataStr);
+	strcpy(primaryStr, tempStr + strlen(tempStr) - 13);
+
+	if (RSSLimEnc((uint8_t*)primaryStr, linPattern, ccFlag)) {
+		if (errFlag) {
+			printf("\nRSS Limited encoding error occurred.");
 			return;
 		}
-
-		strcpy(tempStr, "000000000000");
-		strcat(tempStr, params->dataStr);
-		strcpy(primaryStr, tempStr + strlen(tempStr) - 13);
-
-		if (RSSLimEnc((uint8_t*)primaryStr, linPattern, ccFlag)) {
+#if PRNT
+		printf("\n%s", primaryStr);
+		printf("\n");
+		for (i = 0; i < ELMNTS; i++) {
+			printf("%d", linPattern[i]);
+		}
+		printf("\n");
+#endif
+	}
+	else {
+		printf("\nerror occurred, exiting.");
+		return;
+	}
+	line1 = TRUE; // so first line is not Y undercut
+	// init most common RSS Limited row prints values
+	prints.elmCnt = ELMNTS;
+	prints.pattern = linPattern;
+	prints.height = params->pixMult*SYM_H;
+	prints.guards = TRUE;
+	prints.leftPad = 0;
+	prints.rightPad = 0;
+	prints.whtFirst = TRUE;
+	prints.reverse = FALSE;
+	if (ccFlag) {
+		if ((rows = CC3enc((uint8_t*)ccStr, ccPattern)) > 0) {
 			if (errFlag) {
-				printf("\nRSS Limited encoding error occurred.");
+				printf("\nerror occurred, exiting.");
 				return;
 			}
 #if PRNT
-			printf("\n%s", primaryStr);
+			printf("\n%s", ccStr);
 			printf("\n");
-			for (i = 0; i < ELMNTS; i++) {
-				printf("%d", linPattern[i]);
-			}
-			printf("\n");
-#endif
-		}
-		else {
-			printf("\nerror occurred, exiting.");
-			return;
-		}
-		line1 = TRUE; // so first line is not Y undercut
-		// init most common RSS Limited row prints values
-		prints.elmCnt = ELMNTS;
-		prints.pattern = linPattern;
-		prints.height = params->pixMult*SYM_H;
-		prints.guards = TRUE;
-		prints.leftPad = 0;
-		prints.rightPad = 0;
-		prints.whtFirst = TRUE;
-		prints.reverse = FALSE;
-		if (ccFlag) {
-			if ((rows = CC3enc((uint8_t*)ccStr, ccPattern)) > 0) {
-				if (errFlag) {
-					printf("\nerror occurred, exiting.");
-					return;
+			for (i = 0; i < rows; i++) {
+				if (rows <= MAX_CCA3_ROWS) { // CCA composite
+					for (j = 0; j < CCA3_ELMNTS; j++) {
+						printf("%d", ccPattern[i][j]);
+					}
 				}
-#if PRNT
-				printf("\n%s", ccStr);
+				else {
+					for (j = 0; j < CCB3_ELMNTS; j++) {
+						printf("%d", ccPattern[i][j]);
+					}
+				}
 				printf("\n");
-				for (i = 0; i < rows; i++) {
-					if (rows <= MAX_CCA3_ROWS) { // CCA composite
-						for (j = 0; j < CCA3_ELMNTS; j++) {
-							printf("%d", ccPattern[i][j]);
-						}
-					}
-					else {
-						for (j = 0; j < CCB3_ELMNTS; j++) {
-							printf("%d", ccPattern[i][j]);
-						}
-					}
-					printf("\n");
-				}
+			}
 #endif
-			}
+		}
 
-			if (params->bmp) {
-				// note: BMP is bottom to top inverted
-				if (rows <= MAX_CCA3_ROWS) { // CCA composite
-					bmpHeader(params->pixMult*SYM_W,
-							params->pixMult*(rows*2+SYM_H) + params->sepHt, params->outfp);
+		if (params->bmp) {
+			// note: BMP is bottom to top inverted
+			if (rows <= MAX_CCA3_ROWS) { // CCA composite
+				bmpHeader(params->pixMult*SYM_W,
+						params->pixMult*(rows*2+SYM_H) + params->sepHt, params->outfp);
 
-					// RSS Limited row
+				// RSS Limited row
+				printElmnts(params, &prints);
+
+				// RSS Limited CC separator pattern
+				prntCnv = separatorLim(params, &prints);
+				printElmnts(params, prntCnv);
+
+				// 2D composite
+				prints.elmCnt = CCA3_ELMNTS;
+				prints.guards = FALSE;
+				prints.height = params->pixMult*2;
+				for (i = rows-1; i >= 0; i--) {
+					prints.pattern = ccPattern[i];
 					printElmnts(params, &prints);
-
-					// RSS Limited CC separator pattern
-					prntCnv = separatorLim(params, &prints);
-					printElmnts(params, prntCnv);
-
-					// 2D composite
-					prints.elmCnt = CCA3_ELMNTS;
-					prints.guards = FALSE;
-					prints.height = params->pixMult*2;
-					for (i = rows-1; i >= 0; i--) {
-						prints.pattern = ccPattern[i];
-						printElmnts(params, &prints);
-					}
-				}
-				else { // CCB composite, extends beyond RSS14L on left
-					bmpHeader(params->pixMult*(L_PADB+SYM_W),
-							params->pixMult*(rows*2+SYM_H) + params->sepHt, params->outfp);
-
-					// RSS Limited row
-					prints.leftPad = L_PADB;
-					printElmnts(params, &prints);
-
-					// RSS Limited CC separator pattern
-					prntCnv = separatorLim(params, &prints);
-					printElmnts(params, prntCnv);
-
-					// 2D composite
-					prints.elmCnt = CCB3_ELMNTS;
-					prints.guards = FALSE;
-					prints.height = params->pixMult*2;
-					prints.leftPad = 0;
-					for (i = rows-1; i >= 0; i--) {
-						prints.pattern = ccPattern[i];
-						printElmnts(params, &prints);
-					}
 				}
 			}
-			else { // TIF format
-				if (rows <= MAX_CCA3_ROWS) { // CCA composite
-					tifHeader(params->pixMult*SYM_W,
-							params->pixMult*(rows*2+SYM_H) + params->sepHt, params->outfp);
+			else { // CCB composite, extends beyond RSS14L on left
+				bmpHeader(params->pixMult*(L_PADB+SYM_W),
+						params->pixMult*(rows*2+SYM_H) + params->sepHt, params->outfp);
+
+				// RSS Limited row
+				prints.leftPad = L_PADB;
+				printElmnts(params, &prints);
+
+				// RSS Limited CC separator pattern
+				prntCnv = separatorLim(params, &prints);
+				printElmnts(params, prntCnv);
+
+				// 2D composite
+				prints.elmCnt = CCB3_ELMNTS;
+				prints.guards = FALSE;
+				prints.height = params->pixMult*2;
+				prints.leftPad = 0;
+				for (i = rows-1; i >= 0; i--) {
+					prints.pattern = ccPattern[i];
+					printElmnts(params, &prints);
+				}
+			}
+		}
+		else { // TIF format
+			if (rows <= MAX_CCA3_ROWS) { // CCA composite
+				tifHeader(params->pixMult*SYM_W,
+						params->pixMult*(rows*2+SYM_H) + params->sepHt, params->outfp);
 
           // 2D composite
-					prints.elmCnt = CCA3_ELMNTS;
-					prints.guards = FALSE;
-					prints.height = params->pixMult*2;
-					for (i = 0; i < rows; i++) {
-						prints.pattern = ccPattern[i];
-						printElmnts(params, &prints);
-					}
-
-					prints.elmCnt = ELMNTS;
-					prints.pattern = linPattern;
-					prints.height = params->pixMult*SYM_H;
-					prints.guards = TRUE;
-
-					// RSS Limited CC separator pattern
-					prntCnv = separatorLim(params, &prints);
-					printElmnts(params, prntCnv);
-
-					// RSS Limited row
+				prints.elmCnt = CCA3_ELMNTS;
+				prints.guards = FALSE;
+				prints.height = params->pixMult*2;
+				for (i = 0; i < rows; i++) {
+					prints.pattern = ccPattern[i];
 					printElmnts(params, &prints);
 				}
-				else { // CCB composite, extends beyond RSS14L on left
-					tifHeader(params->pixMult*(L_PADB+SYM_W),
-							params->pixMult*(rows*2+SYM_H) + params->sepHt, params->outfp);
 
-					// 2D composite
-					prints.elmCnt = CCB3_ELMNTS;
-					prints.guards = FALSE;
-					prints.height = params->pixMult*2;
-					prints.leftPad = 0;
-					for (i = 0; i < rows; i++) {
-						prints.pattern = ccPattern[i];
-						printElmnts(params, &prints);
-					}
+				prints.elmCnt = ELMNTS;
+				prints.pattern = linPattern;
+				prints.height = params->pixMult*SYM_H;
+				prints.guards = TRUE;
 
-					prints.elmCnt = ELMNTS;
-					prints.pattern = linPattern;
-					prints.height = params->pixMult*SYM_H;
-					prints.guards = TRUE;
-					prints.leftPad = L_PADB;
+				// RSS Limited CC separator pattern
+				prntCnv = separatorLim(params, &prints);
+				printElmnts(params, prntCnv);
 
-					// RSS Limited CC separator pattern
-					prntCnv = separatorLim(params, &prints);
-					printElmnts(params, prntCnv);
+				// RSS Limited row
+				printElmnts(params, &prints);
+			}
+			else { // CCB composite, extends beyond RSS14L on left
+				tifHeader(params->pixMult*(L_PADB+SYM_W),
+						params->pixMult*(rows*2+SYM_H) + params->sepHt, params->outfp);
 
-					// RSS Limited row
+				// 2D composite
+				prints.elmCnt = CCB3_ELMNTS;
+				prints.guards = FALSE;
+				prints.height = params->pixMult*2;
+				prints.leftPad = 0;
+				for (i = 0; i < rows; i++) {
+					prints.pattern = ccPattern[i];
 					printElmnts(params, &prints);
 				}
-			}
-		}
-		else { // primary only
-			if (params->bmp) {
-				bmpHeader(params->pixMult*SYM_W, params->pixMult*SYM_H, params->outfp);
-			}
-			else {
-				tifHeader(params->pixMult*SYM_W, params->pixMult*SYM_H, params->outfp);
-			}
 
-			// RSS Limited row
-			printElmnts(params, &prints);
+				prints.elmCnt = ELMNTS;
+				prints.pattern = linPattern;
+				prints.height = params->pixMult*SYM_H;
+				prints.guards = TRUE;
+				prints.leftPad = L_PADB;
+
+				// RSS Limited CC separator pattern
+				prntCnv = separatorLim(params, &prints);
+				printElmnts(params, prntCnv);
+
+				// RSS Limited row
+				printElmnts(params, &prints);
+			}
 		}
-		return;
+	}
+	else { // primary only
+		if (params->bmp) {
+			bmpHeader(params->pixMult*SYM_W, params->pixMult*SYM_H, params->outfp);
+		}
+		else {
+			tifHeader(params->pixMult*SYM_W, params->pixMult*SYM_H, params->outfp);
+		}
+
+		// RSS Limited row
+		printElmnts(params, &prints);
+	}
+	return;
 }
 
 // call with str = 13-digit primary, no check digit
-int RSSLimEnc(uint8_t string[], uint8_t bars[], int ccFlag) {
+static int RSSLimEnc(uint8_t string[], uint8_t bars[], int ccFlag) {
 
 #define	N	26
 #define	K	7
@@ -370,7 +370,7 @@ int RSSLimEnc(uint8_t string[], uint8_t bars[], int ccFlag) {
 		return(FALSE); // item number too large
 	}
 	if (ccFlag) data += SUPL_VAL;
-	
+
 	// calculate left (high order) symbol half value:
 	chrValue = chrValSave = (long)(data / LEFT_MUL);
 
@@ -455,7 +455,7 @@ int RSSLimEnc(uint8_t string[], uint8_t bars[], int ccFlag) {
 static struct sPrints prntSep;
 static uint8_t sepPattern[SYM_W];
 
-struct sPrints *separatorLim(struct sParams *params, struct sPrints *prints) {
+static struct sPrints *separatorLim(struct sParams *params, struct sPrints *prints) {
 int i, j, k;
 
 	prntSep.leftPad = prints->leftPad;

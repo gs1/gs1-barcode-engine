@@ -27,7 +27,7 @@
 // 2-segments, no guard patterns
 #define ELMNTS 21
 // 2-segment symbol width in modules, no guard patterns
-#define SYM_W		49
+#define SYM_W 49
 // height
 #define SYM_H 34
 // max double segments
@@ -41,11 +41,10 @@ extern int line1;
 extern int linFlag; // tells pack whether linear or cc is being encoded
 extern uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
 
-int RSS14Eenc(uint8_t str[], uint8_t pattern[MAX_DBL_SEGS][ELMNTS], int ccFlag);
-int symCharPat(uint8_t bars[], int symValue, int parity, int weight,
-							 int forwardFlag);
-int getVal12(uint8_t bitString[], int symNdx);
-int isSymbolSepatator(uint8_t string[]);
+static int RSS14Eenc(uint8_t str[], uint8_t pattern[MAX_DBL_SEGS][ELMNTS], int ccFlag);
+static int symCharPat(uint8_t bars[], int symValue, int parity, int weight, int forwardFlag);
+static int getVal12(uint8_t bitString[], int symNdx);
+static int isSymbolSepatator(uint8_t string[]);
 
 
 void RSSExp(struct sParams *params) {
@@ -66,321 +65,321 @@ int chexSize;
 char *ccStr;
 int rPadl1, rPadcc;
 
-		// Initialise to avoid compiler warnings
+	// Initialise to avoid compiler warnings
+	lNdx = 0;
+	lMods = 0;
+	lHeight = 0;
+	rPadcc = 0;
+
+	ccStr = strchr(params->dataStr, '|');
+	if (ccStr == NULL) ccFlag = FALSE;
+	else {
+		if (params->segWidth < 4) {
+			printf("\nComposite must be at least 4 segments wide\n");
+			errFlag = TRUE;
+			return;
+		}
+		ccFlag = TRUE;
+		ccStr[0] = '\0'; // separate primary data
+		ccStr++; // point to secondary data
+	}
+
+	rowWidth = params->segWidth; // save for getUnusedBitCnt
+	if ((segs = RSS14Eenc((uint8_t*)params->dataStr, dblPattern, ccFlag)) > 0) {
+		if (errFlag) {
+			printf("\nRSS Exp encoding error occurred.");
+			return;
+		}
 		lNdx = 0;
-		lMods = 0;
-		lHeight = 0;
-		rPadcc = 0;
+		for (i = 0; i < segs-1; i += 2) {
+			for (j = 0; j < 8+5+8; j++) { // copy double segments
+				linPattern[lNdx++] = dblPattern[i/2][j];
+			}
+		}
+		if (i == segs-1) {
+			for (j = 0; j < 8+5; j++) { // copy last odd segment if one exists
+				linPattern[lNdx++] = dblPattern[i/2][j];
+			}
+		}
+		j = (segs <= params->segWidth) ? segs : params->segWidth;
+		i = (segs+j-1)/j; // number of linear rows
+		lHeight = params->pixMult*i*SYM_H + params->sepHt*(i-1)*3;
+		lNdx = (j/2)*(8+5+8) + (j&1)*(8+5);
+		lMods = 2 + (j/2)*(17+15+17) + (j&1)*(17+15) + 2;
 
-		ccStr = strchr(params->dataStr, '|');
-		if (ccStr == NULL) ccFlag = FALSE;
+		// set up checkered seperator pattern and print structure
+		for (i = 0; i < MAX_DBL_SEGS*SYM_W+2; i++) {
+			chexPattern[i] = 1; // chex = all 1X elements
+		}
+		chexPattern[0] = 5; // except first and last
+		if ((lMods&1) == 0) {
+			chexPattern[lMods-8] = 4;
+			chexSize = lMods-7;
+		}
 		else {
-			if (params->segWidth < 4) {
-				printf("\nComposite must be at least 4 segments wide\n");
-				errFlag = TRUE;
-				return;
-			}
-			ccFlag = TRUE;
-			ccStr[0] = '\0'; // separate primary data
-			ccStr++; // point to secondary data
+			chexPattern[lMods-9] = 5;
+			chexSize = lMods-8;
 		}
+		chexPrnts.elmCnt = chexSize;
+		chexPrnts.pattern = &chexPattern[0];
+		chexPrnts.guards = FALSE;
+		chexPrnts.height = params->sepHt;
+		chexPrnts.whtFirst = TRUE;
+		chexPrnts.leftPad = 0;
+		chexPrnts.rightPad = 0;
+		chexPrnts.reverse = FALSE;
 
-		rowWidth = params->segWidth; // save for getUnusedBitCnt
-		if ((segs = RSS14Eenc((uint8_t*)params->dataStr, dblPattern, ccFlag)) > 0) {
+		rPadcc = lMods - L_PAD - CCB4_WIDTH;
+
+#if PRNT
+		printf("\n%s", params->dataStr);
+		printf("\n");
+		for (i = 0; i < lNdx; i++) {
+			printf("%d", linPattern[i]);
+		}
+		printf("\n");
+#endif
+	}
+	line1 = TRUE; // so first line is not Y undercut
+	if (ccFlag) {
+		if ((rows = CC4enc((uint8_t*)ccStr, ccPattern)) > 0) {
 			if (errFlag) {
-				printf("\nRSS Exp encoding error occurred.");
+				printf("\nComposite encoding error occurred.");
 				return;
 			}
-			lNdx = 0;
-			for (i = 0; i < segs-1; i += 2) {
-				for (j = 0; j < 8+5+8; j++) { // copy double segments
-					linPattern[lNdx++] = dblPattern[i/2][j];
-				}
-			}
-			if (i == segs-1) {
-				for (j = 0; j < 8+5; j++) { // copy last odd segment if one exists
-					linPattern[lNdx++] = dblPattern[i/2][j];
-				}
-			}
-			j = (segs <= params->segWidth) ? segs : params->segWidth;
-			i = (segs+j-1)/j; // number of linear rows
-			lHeight = params->pixMult*i*SYM_H + params->sepHt*(i-1)*3;
-			lNdx = (j/2)*(8+5+8) + (j&1)*(8+5);
-			lMods = 2 + (j/2)*(17+15+17) + (j&1)*(17+15) + 2;
-
-			// set up checkered seperator pattern and print structure
-			for (i = 0; i < MAX_DBL_SEGS*SYM_W+2; i++) {
-				chexPattern[i] = 1; // chex = all 1X elements
-			}
-			chexPattern[0] = 5; // except first and last
-			if ((lMods&1) == 0) {
-				chexPattern[lMods-8] = 4;
-				chexSize = lMods-7;
-			}
-			else {
-				chexPattern[lMods-9] = 5;
-				chexSize = lMods-8;
-			}
-			chexPrnts.elmCnt = chexSize;
-			chexPrnts.pattern = &chexPattern[0];
-			chexPrnts.guards = FALSE;
-			chexPrnts.height = params->sepHt;
-			chexPrnts.whtFirst = TRUE;
-			chexPrnts.leftPad = 0;
-			chexPrnts.rightPad = 0;
-			chexPrnts.reverse = FALSE;
-
-			rPadcc = lMods - L_PAD - CCB4_WIDTH;
-
 #if PRNT
-			printf("\n%s", params->dataStr);
+			printf("\n%s", ccStr);
 			printf("\n");
-			for (i = 0; i < lNdx; i++) {
-				printf("%d", linPattern[i]);
-			}
-			printf("\n");
-#endif
-		}
-		line1 = TRUE; // so first line is not Y undercut
-		if (ccFlag) {
-			if ((rows = CC4enc((uint8_t*)ccStr, ccPattern)) > 0) {
-				if (errFlag) {
-					printf("\nComposite encoding error occurred.");
-					return;
+			for (i = 0; i < rows; i++) {
+				for (j = 0; j < CCB4_ELMNTS; j++) {
+					printf("%d", ccPattern[i][j]);
 				}
-#if PRNT
-				printf("\n%s", ccStr);
 				printf("\n");
-				for (i = 0; i < rows; i++) {
-					for (j = 0; j < CCB4_ELMNTS; j++) {
-						printf("%d", ccPattern[i][j]);
-					}
-					printf("\n");
-				}
+			}
 #endif
-			}
+		}
+	}
+
+	if (params->bmp) { // BMP version
+		// note: BMP is bottom to top inverted
+		if (ccFlag) {
+			bmpHeader(params->pixMult*(lMods),
+					params->pixMult*rows*2 + params->sepHt + lHeight, params->outfp);
+		}
+		else {
+			bmpHeader(params->pixMult*lMods, lHeight, params->outfp);
 		}
 
-		if (params->bmp) { // BMP version
-			// note: BMP is bottom to top inverted
-			if (ccFlag) {
-				bmpHeader(params->pixMult*(lMods),
-								params->pixMult*rows*2 + params->sepHt + lHeight, params->outfp);
-			}
-			else {
-				bmpHeader(params->pixMult*lMods, lHeight, params->outfp);
-			}
+		// print RSS Exp component
+		i = 0;
+		evenRow = FALSE; // start with odd
+		while (segs > i+params->segWidth) {
+			i += params->segWidth;
+			evenRow = !evenRow; // alternate row parity
+		}
 
-			// print RSS Exp component
-			i = 0;
-			evenRow = FALSE; // start with odd
-			while (segs > i+params->segWidth) {
-				i += params->segWidth;
-				evenRow = !evenRow; // alternate row parity
-			}
+		// print last or only RSS Expanded row
+		lNdx1 = ((segs/2)*(8+5+8)+(segs&1)*(8+5)) - ((i/2)*(8+5+8)+(i&1)*8);
+		rPadl1 = lMods - 4 -
+			(((segs/2)*(17+15+17)+(segs&1)*(17+15)) - ((i/2)*(17+15+17)+(i&1)*17));
+		prints.elmCnt = lNdx1;
+		prints.pattern = &linPattern[(i/2)*(8+5+8)+(i&1)*8];
+		prints.guards = TRUE;
+		prints.height = params->pixMult*SYM_H;
+		prints.whtFirst = (i/2+1)&1;
+		rev = evenRow ^ ((i/2)&1);
+		if (rev && (((lNdx1-4)%8)&1)) {
+			// can't reverse odd # finders so offset it right by one
+			prints.leftPad = 1;
+			prints.rightPad = rPadl1-1;
+			prints.reverse = FALSE;
+			// bottom right offset RSS E row
+			printElmnts(params, &prints);
 
-			// print last or only RSS Expanded row
-			lNdx1 = ((segs/2)*(8+5+8)+(segs&1)*(8+5)) - ((i/2)*(8+5+8)+(i&1)*8);
-			rPadl1 = lMods - 4 -
-				(((segs/2)*(17+15+17)+(segs&1)*(17+15)) - ((i/2)*(17+15+17)+(i&1)*17));
-			prints.elmCnt = lNdx1;
-			prints.pattern = &linPattern[(i/2)*(8+5+8)+(i&1)*8];
-			prints.guards = TRUE;
-			prints.height = params->pixMult*SYM_H;
-			prints.whtFirst = (i/2+1)&1;
-			rev = evenRow ^ ((i/2)&1);
-			if (rev && (((lNdx1-4)%8)&1)) {
-				// can't reverse odd # finders so offset it right by one
-				prints.leftPad = 1;
-				prints.rightPad = rPadl1-1;
-				prints.reverse = FALSE;
-				// bottom right offset RSS E row
-				printElmnts(params, &prints);
+			// bottom complement separator
+			prntCnv = cnvSeparator(params, &prints);
+			printElmnts(params, prntCnv);
 
-				// bottom complement separator
+			// chex pattern
+			printElmnts(params, &chexPrnts);
+		}
+		else {
+			// otherwise normal bottom or only RSS E row
+			prints.leftPad = 0;
+			prints.rightPad = rPadl1;
+			prints.reverse = rev;
+
+			// bottom or only RSS row
+			printElmnts(params, &prints);
+
+			if ((i > 0) || (ccFlag)) {
+				// CC or lower complement separator
 				prntCnv = cnvSeparator(params, &prints);
 				printElmnts(params, prntCnv);
+			}
 
+			if (i > 0) {
 				// chex pattern
 				printElmnts(params, &chexPrnts);
 			}
-			else {
-				// otherwise normal bottom or only RSS E row
-				prints.leftPad = 0;
-				prints.rightPad = rPadl1;
-				prints.reverse = rev;
-
-				// bottom or only RSS row
-				printElmnts(params, &prints);
-
-				if ((i > 0) || (ccFlag)) {
-					// CC or lower complement separator
-					prntCnv = cnvSeparator(params, &prints);
-					printElmnts(params, prntCnv);
-				}
-
-				if (i > 0) {
-					// chex pattern
-					printElmnts(params, &chexPrnts);
-				}
-			}
-			evenRow = !evenRow;
-
-			// print any remaining RSS Expanded rows
-			prints.elmCnt = lNdx;
-			prints.leftPad = 0;
-			prints.rightPad = 0;
-			for (i -= params->segWidth ; i >= 0; i -= params->segWidth) {
-				j = i + params->segWidth; // last segment number + 1 in this row
-				rev = evenRow ^ ((i/2)&1);
-				prints.pattern = &linPattern[(i/2)*(8+5+8)+(i&1)*8];
-				prints.whtFirst = (i/2+1)&1;
-				prints.reverse = rev;
-
-				// top complement separator
-				prntCnv = cnvSeparator(params, &prints);
-				printElmnts(params, prntCnv);
-
-				// upper RSS row
-				printElmnts(params, &prints);
-
-				if ((i > 0) || (ccFlag)) {
-					// CC or lower complement separator
-					prntCnv = cnvSeparator(params, &prints);
-					printElmnts(params, prntCnv);
-				}
-
-				if (i > 0) {
-					// chex pattern
-					printElmnts(params, &chexPrnts);
-				}
-				evenRow = !evenRow;
-			}
-
-			if (ccFlag) {
-				// print composite component
-				prints.elmCnt = CCB4_ELMNTS;
-				prints.guards = FALSE;
-				prints.height = params->pixMult*2;
-				prints.leftPad = L_PAD;
-				prints.rightPad = rPadcc;
-				prints.whtFirst = TRUE;
-				prints.reverse = FALSE;
-				for (i = rows-1; i >= 0; i--) {
-					prints.pattern = ccPattern[i];
-					printElmnts(params, &prints);
-				}
-			}
 		}
+		evenRow = !evenRow;
 
-		else { // TIFF version
-			if (ccFlag) {
-				tifHeader(params->pixMult*(lMods),
-						params->pixMult*rows*2 + params->sepHt + lHeight, params->outfp);
-			}
-			else {
-				tifHeader(params->pixMult*lMods, lHeight, params->outfp);
-			}
-
-			if (ccFlag) {
-				// print composite component
-				prints.elmCnt = CCB4_ELMNTS;
-				prints.guards = FALSE;
-				prints.height = params->pixMult*2;
-				prints.leftPad = L_PAD;
-				prints.rightPad = rPadcc;
-				prints.whtFirst = TRUE;
-				prints.reverse = FALSE;
-				for (i = 0; i < rows; i++) {
-					prints.pattern = ccPattern[i];
-					printElmnts(params, &prints);
-				}
-			}
-
-			// print RSS Exp
-			evenRow = FALSE; // start with 1st row
-			prints.elmCnt = lNdx;
-			prints.guards = TRUE;
-			prints.height = params->pixMult*SYM_H;
-			prints.leftPad = 0;
-			prints.rightPad = 0;
-
-			for (i = 0; i < segs-params->segWidth; i += params->segWidth) {
-				j = i + params->segWidth; // last segment number + 1 in this row
-
-				rev = evenRow ^ ((i/2)&1);
-				prints.pattern = &linPattern[(i/2)*(8+5+8)+(i&1)*8];
-				prints.whtFirst = (i/2+1)&1;
-				prints.reverse = rev;
-
-				if (i > 0) {
-					// chex pattern
-					printElmnts(params, &chexPrnts);
-				}
-
-				if ((i > 0) || (ccFlag)) {
-					// CC or lower complement separator
-					prntCnv = cnvSeparator(params, &prints);
-					printElmnts(params, prntCnv);
-				}
-
-				// upper RSS row
-				printElmnts(params, &prints);
-
-				// upper complement separator
-				prntCnv = cnvSeparator(params, &prints);
-				printElmnts(params, prntCnv);
-
-				evenRow = !evenRow;
-			}
-
-			// print last or only RSS Expanded row
-			lNdx1 = ((segs/2)*(8+5+8)+(segs&1)*(8+5)) - ((i/2)*(8+5+8)+(i&1)*8);
-			rPadl1 = lMods - 4 -
-				(((segs/2)*(17+15+17)+(segs&1)*(17+15)) - ((i/2)*(17+15+17)+(i&1)*17));
-			prints.elmCnt = lNdx1;
+		// print any remaining RSS Expanded rows
+		prints.elmCnt = lNdx;
+		prints.leftPad = 0;
+		prints.rightPad = 0;
+		for (i -= params->segWidth ; i >= 0; i -= params->segWidth) {
+			j = i + params->segWidth; // last segment number + 1 in this row
+			rev = evenRow ^ ((i/2)&1);
 			prints.pattern = &linPattern[(i/2)*(8+5+8)+(i&1)*8];
 			prints.whtFirst = (i/2+1)&1;
-			rev = evenRow ^ ((i/2)&1);
-			if (rev && (((lNdx1-4)%8)&1)) {
-				// can't reverse odd # finders so offset it right by one
-				prints.leftPad = 1;
-				prints.rightPad = rPadl1-1;
-				prints.reverse = FALSE;
+			prints.reverse = rev;
 
-				// chex pattern
-				printElmnts(params, &chexPrnts);
+			// top complement separator
+			prntCnv = cnvSeparator(params, &prints);
+			printElmnts(params, prntCnv);
 
-				// bottom complement separator
+			// upper RSS row
+			printElmnts(params, &prints);
+
+			if ((i > 0) || (ccFlag)) {
+				// CC or lower complement separator
 				prntCnv = cnvSeparator(params, &prints);
 				printElmnts(params, prntCnv);
-
-				// bottom right offset RSS E row
-				printElmnts(params, &prints);
 			}
-			else {
-				// otherwise normal row
-				prints.leftPad = 0;
-				prints.rightPad = rPadl1;
-				prints.reverse = rev;
 
-				if (i > 0) {
-					// chex pattern
-					printElmnts(params, &chexPrnts);
-				}
-
-				if ((i > 0) || (ccFlag)) {
-					// CC or lower complement separator
-					prntCnv = cnvSeparator(params, &prints);
-					printElmnts(params, prntCnv);
-				}
-
-				// bottom right offset RSS E row
-				printElmnts(params, &prints);
+			if (i > 0) {
+				// chex pattern
+				printElmnts(params, &chexPrnts);
 			}
 			evenRow = !evenRow;
 		}
-		return;
+
+		if (ccFlag) {
+			// print composite component
+			prints.elmCnt = CCB4_ELMNTS;
+			prints.guards = FALSE;
+			prints.height = params->pixMult*2;
+			prints.leftPad = L_PAD;
+			prints.rightPad = rPadcc;
+			prints.whtFirst = TRUE;
+			prints.reverse = FALSE;
+			for (i = rows-1; i >= 0; i--) {
+				prints.pattern = ccPattern[i];
+				printElmnts(params, &prints);
+			}
+		}
+	}
+
+	else { // TIFF version
+		if (ccFlag) {
+			tifHeader(params->pixMult*(lMods),
+					params->pixMult*rows*2 + params->sepHt + lHeight, params->outfp);
+		}
+		else {
+			tifHeader(params->pixMult*lMods, lHeight, params->outfp);
+		}
+
+		if (ccFlag) {
+			// print composite component
+			prints.elmCnt = CCB4_ELMNTS;
+			prints.guards = FALSE;
+			prints.height = params->pixMult*2;
+			prints.leftPad = L_PAD;
+			prints.rightPad = rPadcc;
+			prints.whtFirst = TRUE;
+			prints.reverse = FALSE;
+			for (i = 0; i < rows; i++) {
+				prints.pattern = ccPattern[i];
+				printElmnts(params, &prints);
+			}
+		}
+
+		// print RSS Exp
+		evenRow = FALSE; // start with 1st row
+		prints.elmCnt = lNdx;
+		prints.guards = TRUE;
+		prints.height = params->pixMult*SYM_H;
+		prints.leftPad = 0;
+		prints.rightPad = 0;
+
+		for (i = 0; i < segs-params->segWidth; i += params->segWidth) {
+			j = i + params->segWidth; // last segment number + 1 in this row
+
+			rev = evenRow ^ ((i/2)&1);
+			prints.pattern = &linPattern[(i/2)*(8+5+8)+(i&1)*8];
+			prints.whtFirst = (i/2+1)&1;
+			prints.reverse = rev;
+
+			if (i > 0) {
+				// chex pattern
+				printElmnts(params, &chexPrnts);
+			}
+
+			if ((i > 0) || (ccFlag)) {
+				// CC or lower complement separator
+				prntCnv = cnvSeparator(params, &prints);
+				printElmnts(params, prntCnv);
+			}
+
+			// upper RSS row
+			printElmnts(params, &prints);
+
+			// upper complement separator
+			prntCnv = cnvSeparator(params, &prints);
+			printElmnts(params, prntCnv);
+
+			evenRow = !evenRow;
+		}
+
+		// print last or only RSS Expanded row
+		lNdx1 = ((segs/2)*(8+5+8)+(segs&1)*(8+5)) - ((i/2)*(8+5+8)+(i&1)*8);
+		rPadl1 = lMods - 4 -
+			(((segs/2)*(17+15+17)+(segs&1)*(17+15)) - ((i/2)*(17+15+17)+(i&1)*17));
+		prints.elmCnt = lNdx1;
+		prints.pattern = &linPattern[(i/2)*(8+5+8)+(i&1)*8];
+		prints.whtFirst = (i/2+1)&1;
+		rev = evenRow ^ ((i/2)&1);
+		if (rev && (((lNdx1-4)%8)&1)) {
+			// can't reverse odd # finders so offset it right by one
+			prints.leftPad = 1;
+			prints.rightPad = rPadl1-1;
+			prints.reverse = FALSE;
+
+			// chex pattern
+			printElmnts(params, &chexPrnts);
+
+			// bottom complement separator
+			prntCnv = cnvSeparator(params, &prints);
+			printElmnts(params, prntCnv);
+
+			// bottom right offset RSS E row
+			printElmnts(params, &prints);
+		}
+		else {
+			// otherwise normal row
+			prints.leftPad = 0;
+			prints.rightPad = rPadl1;
+			prints.reverse = rev;
+
+			if (i > 0) {
+				// chex pattern
+				printElmnts(params, &chexPrnts);
+			}
+
+			if ((i > 0) || (ccFlag)) {
+				// CC or lower complement separator
+				prntCnv = cnvSeparator(params, &prints);
+				printElmnts(params, prntCnv);
+			}
+
+			// bottom right offset RSS E row
+			printElmnts(params, &prints);
+		}
+		evenRow = !evenRow;
+	}
+	return;
 }
 
 
@@ -388,7 +387,7 @@ int rPadl1, rPadcc;
 #define PARITY_PWR 3
 
 // convert AI string to bar widths in dbl segments
-int RSS14Eenc(uint8_t string[], uint8_t bars[MAX_DBL_SEGS][ELMNTS], int ccFlag) {
+static int RSS14Eenc(uint8_t string[], uint8_t bars[MAX_DBL_SEGS][ELMNTS], int ccFlag) {
 
 #define FINDER_SIZE 6
 
@@ -399,8 +398,6 @@ static uint8_t finders[FINDER_SIZE][3] = {
 	{ 3,2,8 },
 	{ 2,6,5 },
 	{ 2,2,9 } };
-
-
 
 static int finderSets[10][11] = {
 	{ 1,	-1,	0,	 0,	0,	 0,	0,	 0,	0,	 0,	0},
@@ -416,7 +413,7 @@ static int finderSets[10][11] = {
 
 // element 1 weighting for characters N determined by adjacent finder
 static int parWts[24] = { 0,1,20,189,193,62,185,113,150,46,76,43,16,109,
-												70,134,148,6,120,79,103,161,55,45 };
+				70,134,148,6,120,79,103,161,55,45 };
 
 int i, j;
 int parity, weight;
@@ -501,16 +498,16 @@ uint8_t bitField[MAX_DBL_SEGS*3];
 // and a symbol char value. Updates the parity *weight. Will fill in
 // the array forward or reverse order for odd or even characters.
 // Returns the updated parity.
-int symCharPat(uint8_t bars[], int symValue, int parity, int weight,
+static int symCharPat(uint8_t bars[], int symValue, int parity, int weight,
 							 int forwardFlag) {
 
 // odd elements N & max, even N & max, odd mul, combos:
 static int tbl174[5*6] = {
 		/* 17,4 */	12,7,	5,2,	4,	348,
-								10,5,	7,4,	20,	1040,
-								8,4,	9,5,	52,	1560,
-								6,3,	11,6,	104,1040,
-								4,1,	13,8,	204,204 };
+				10,5,	7,4,	20,	1040,
+				8,4,	9,5,	52,	1560,
+				6,3,	11,6,	104,1040,
+				4,1,	13,8,	204,204 };
 
 int i, value, saveVal;
 int elementN, elementMax;
@@ -569,7 +566,7 @@ int *widths;
 }
 
 // gets the next 12 bit sym char from bit string
-int getVal12(uint8_t bitString[], int symNdx) {
+static int getVal12(uint8_t bitString[], int symNdx) {
 int val, ndx;
 
 	ndx = symNdx*3/2; // index into bitString
@@ -587,7 +584,7 @@ int val, ndx;
 }
 
 // looks for '^' (symbol separator) in string and returns char index iff found
-int isSymbolSepatator(uint8_t string[]) {
+static int isSymbolSepatator(uint8_t string[]) {
 
 int i;
 

@@ -68,57 +68,57 @@ extern int colCnt; // after set in main, may be decreased by getUnusedBitCnt
 extern int rowCnt; // determined by getUnusedBitCnt
 extern int eccCnt; // determined by getUnusedBitCnt
 
-void encCCA2(int size, uint8_t bitField[], uint16_t codeWords[],
+static void encCCA2(int size, uint8_t bitField[], uint16_t codeWords[],
 		uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
-void encCCB2(int size, uint8_t bitField[], uint16_t codeWords[],
+static void encCCB2(int size, uint8_t bitField[], uint16_t codeWords[],
 		uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
-void encCCA3(int size, uint8_t bitField[], uint16_t codeWords[],
+static void encCCA3(int size, uint8_t bitField[], uint16_t codeWords[],
 		uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
-void encCCB3(int size, uint8_t bitField[], uint16_t codeWords[],
+static void encCCB3(int size, uint8_t bitField[], uint16_t codeWords[],
 		uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
-void encCCA4(int size, uint8_t bitField[], uint16_t codeWords[],
+static void encCCA4(int size, uint8_t bitField[], uint16_t codeWords[],
 		uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
-void encCCB4(int size, uint8_t bitField[], uint16_t codeWords[],
+static void encCCB4(int size, uint8_t bitField[], uint16_t codeWords[],
 		uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
-void encCCC(int byteCnt, uint8_t bitField[], uint16_t codeWords[],
+static void encCCC(int byteCnt, uint8_t bitField[], uint16_t codeWords[],
 		uint8_t patCCC[]);
-void imgCCA2(int size, uint16_t codeWords[],
+static void imgCCA2(int size, uint16_t codeWords[],
 		uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
-void imgCCB2(int size, uint16_t codeWords[],
+static void imgCCB2(int size, uint16_t codeWords[],
 		uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
-void imgCCA3(int size, uint16_t codeWords[],
+static void imgCCA3(int size, uint16_t codeWords[],
 		uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
-void imgCCB3(int size, uint16_t codeWords[],
+static void imgCCB3(int size, uint16_t codeWords[],
 		uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
-void imgCCA4(int size, uint16_t codeWords[],
+static void imgCCA4(int size, uint16_t codeWords[],
 		uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
-void imgCCB4(int size, uint16_t codeWords[],
+static void imgCCB4(int size, uint16_t codeWords[],
 		uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
-void imgCCC(uint16_t codeWords[], uint8_t patCCC[]);
+static void imgCCC(uint16_t codeWords[], uint8_t patCCC[]);
 
-int procNUM(struct encodeT *encode);
-int procALNU(struct encodeT *encode);
-int procISO(struct encodeT *encode);
-int procALPH(struct encodeT *encode);
-int doMethods(struct encodeT *encode);
-int insertPad(struct encodeT *encode);
-int getUnusedBitCnt(int iBit, int *size);
-int testAI90(struct encodeT *encode);
-void procAI90(struct encodeT *encode);
-void encodeAI90(struct encodeT *encode);
-void nextAI(struct encodeT *encode);
-int encode928(uint8_t bitString[], uint16_t codeWords[], int bitLng);
-void encode900(uint8_t byteArr[], uint16_t codeWords[], int byteLng);
-int getBit(uint8_t bitStr[], int bitPos);
+static int procNUM(struct encodeT *encode);
+static int procALNU(struct encodeT *encode);
+static int procISO(struct encodeT *encode);
+static int procALPH(struct encodeT *encode);
+static int doMethods(struct encodeT *encode);
+static int insertPad(struct encodeT *encode);
+static int getUnusedBitCnt(int iBit, int *size);
+static int testAI90(struct encodeT *encode);
+static void procAI90(struct encodeT *encode);
+static void encodeAI90(struct encodeT *encode);
+static void nextAI(struct encodeT *encode);
+static int encode928(uint8_t bitString[], uint16_t codeWords[], int bitLng);
+static void encode900(uint8_t byteArr[], uint16_t codeWords[], int byteLng);
+static int getBit(uint8_t bitStr[], int bitPos);
 
 static void genECC(int dsize, int csize, uint16_t sym[]);
 static void genPoly(int eccSize);
 static int gfMul(int p1, int p2);
 
-int doLinMethods(uint8_t str[], int *iStr, uint8_t bitField[], int *iBit);
-uint16_t yymmdd(uint8_t str[]);
-void cnv13 (uint8_t str[], int *iStr, uint8_t bitField[], int *iBit);
-void cnv12 (uint8_t str[], int *iStr, uint8_t bitField[], int *iBit);
+static int doLinMethods(uint8_t str[], int *iStr, uint8_t bitField[], int *iBit);
+static uint16_t yymmdd(uint8_t str[]);
+static void cnv13 (uint8_t str[], int *iStr, uint8_t bitField[], int *iBit);
+static void cnv12 (uint8_t str[], int *iStr, uint8_t bitField[], int *iBit);
 
 static int *CCSizes; // will point to CCxSizes
 
@@ -258,7 +258,7 @@ int i;
 }
 
 
-void encCCA2(int size, uint8_t bitField[], uint16_t codeWords[],
+static void encCCA2(int size, uint8_t bitField[], uint16_t codeWords[],
 		uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
 
 static int dataCw[7] = { 6,8,9,11,12,14,17 };
@@ -271,7 +271,7 @@ static int eccCw[7] = { 4,4,5,5,6,6,7 };
 	return;
 }
 
-void encCCB2(int size, uint8_t bitField[], uint16_t codeWords[],
+static void encCCB2(int size, uint8_t bitField[], uint16_t codeWords[],
 		uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
 
 static int dataBytes[4] = { 26,32,37,42 };
@@ -287,7 +287,7 @@ static int eccCw[4] = { 10,11,13,15 };
 	return;
 }
 
-void encCCA3(int size, uint8_t bitField[], uint16_t codeWords[],
+static void encCCA3(int size, uint8_t bitField[], uint16_t codeWords[],
 		uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
 
 static int dataCw[5] = { 8,10,12,14,17 };
@@ -299,7 +299,7 @@ static int eccCw[5] = { 4,5,6,7,7 };
 	return;
 }
 
-void encCCB3(int size, uint8_t bitField[], uint16_t codeWords[],
+static void encCCB3(int size, uint8_t bitField[], uint16_t codeWords[],
 		uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
 
 static int dataBytes[6] = { 26,38,52,67,81,96 };
@@ -315,7 +315,7 @@ static int eccCw[6] = { 21,26,32,38,44,50 };
 	return;
 }
 
-void encCCA4(int size, uint8_t bitField[], uint16_t codeWords[],
+static void encCCA4(int size, uint8_t bitField[], uint16_t codeWords[],
 		uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
 
 static int dataCw[5] = { 8,11,14,17,20 };
@@ -327,7 +327,7 @@ static int eccCw[5] = { 4,5,6,7,8 };
 	return;
 }
 
-void encCCB4(int size, uint8_t bitField[], uint16_t codeWords[],
+static void encCCB4(int size, uint8_t bitField[], uint16_t codeWords[],
 		uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
 
 static int dataBytes[8] = { 26,33,44,62,84,105,127,148 };
@@ -343,7 +343,7 @@ static int eccCw[8] = { 16,18,21,26,32,38,44,50 };
 	return;
 }
 
-void encCCC(int byteCnt, uint8_t bitField[], uint16_t codeWords[], uint8_t patCCC[]) {
+static void encCCC(int byteCnt, uint8_t bitField[], uint16_t codeWords[], uint8_t patCCC[]) {
 
 int nonEccCwCnt;
 
@@ -358,9 +358,7 @@ int nonEccCwCnt;
 	return;
 }
 
-
-
-void imgCCA2(int size, uint16_t codeWords[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
+static void imgCCA2(int size, uint16_t codeWords[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
 
 static int rows[7] = { 5,6,7,8,9,10,12 };
 static int raps[7] = { 39,1,32,8,14,43,20 };
@@ -400,7 +398,7 @@ int i, j;
 	return;
 }
 
-void imgCCB2(int size, uint16_t codeWords[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
+static void imgCCB2(int size, uint16_t codeWords[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
 
 static int rows[4] = { 17,20,23,26 };
 static int raps[4] = { 36,19,9,27 };
@@ -441,7 +439,7 @@ int i, j;
 	return;
 }
 
-void imgCCA3(int size, uint16_t codeWords[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
+static void imgCCA3(int size, uint16_t codeWords[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
 
 static int rows[5] = { 4,5,6,7,8 };
 static int raps[5] = { 11,1,5,15,21 };
@@ -486,7 +484,7 @@ int i, j;
 	return;
 }
 
-void imgCCB3(int size, uint16_t codeWords[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
+static void imgCCB3(int size, uint16_t codeWords[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
 
 static int rows[6] = { 15,20,26,32,38,44 };
 static int raps[6] = { 37,1,1,21,15,1 };
@@ -537,7 +535,7 @@ int i, j;
 	return;
 }
 
-void imgCCA4(int size, uint16_t codeWords[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
+static void imgCCA4(int size, uint16_t codeWords[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
 
 static int rows[5] = { 3,4,5,6,7 };
 static int raps[5] = { 40,43,46,34,29 };
@@ -592,7 +590,7 @@ int i, j;
 	return;
 }
 
-void imgCCB4(int size, uint16_t codeWords[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
+static void imgCCB4(int size, uint16_t codeWords[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
 
 static int rows[8] = { 10,12,15,20,26,32,38,44 };
 static int raps[8] = { 15,25,37,1,1,21,15,1 };
@@ -648,7 +646,7 @@ int i, j;
 	return;
 }
 
-void imgCCC(uint16_t codeWords[], uint8_t patCCC[]) {
+static void imgCCC(uint16_t codeWords[], uint8_t patCCC[]) {
 
 static uint8_t leftPtn[9] = { 2,8,1,1,1,1,1,1,3 }; // qz + start
 static uint8_t rightPtn[10] = { 7,1,1,3,1,1,1,2,1,2 }; // stop + qz
@@ -803,7 +801,7 @@ int check2DData(uint8_t dataStr[]) {
 	return(0);
 }
 
-int procNUM(struct encodeT *encode) {
+static int procNUM(struct encodeT *encode) {
 
 int bitCnt, char1, char2, what1, what2, i;
 
@@ -886,7 +884,7 @@ int bitCnt, char1, char2, what1, what2, i;
 	}
 }
 
-int procALNU(struct encodeT *encode) {
+static int procALNU(struct encodeT *encode) {
 
 int chr, i, what, whatN;
 
@@ -967,7 +965,7 @@ int chr, i, what, whatN;
 	return(encode->mode);
 }
 
-int procISO(struct encodeT *encode) {
+static int procISO(struct encodeT *encode) {
 
 int chr, i, what, whatN, numCnt;
 
@@ -1083,7 +1081,7 @@ int chr, i, what, whatN, numCnt;
 	return(encode->mode);
 }
 
-int procALPH(struct encodeT *encode) {
+static int procALPH(struct encodeT *encode) {
 
 int i;
 
@@ -1120,7 +1118,7 @@ int i;
 	return(encode->mode);
 }
 
-int insertPad(struct encodeT *encode) {
+static int insertPad(struct encodeT *encode) {
 
 int bitCnt, chr, size;
 
@@ -1141,7 +1139,7 @@ int bitCnt, chr, size;
 	return(size);
 }
 
-int doMethods(struct encodeT *encode) {
+static int doMethods(struct encodeT *encode) {
 
 uint16_t bits;
 
@@ -1187,7 +1185,7 @@ uint16_t bits;
 	return(encode->mode);
 }
 
-int testAI90(struct encodeT *encode) {
+static int testAI90(struct encodeT *encode) {
 
 uint8_t chr;
 
@@ -1229,7 +1227,7 @@ uint8_t chr;
 	return(encode->diNum >= 0);
 }
 
-void procAI90(struct encodeT *encode) {
+static void procAI90(struct encodeT *encode) {
 
 int i, j, k;
 int alLessNu;
@@ -1321,7 +1319,7 @@ static uint8_t alphaTbl[] = "BDHIJKLNPQRSTVWZ"; // strlen must be 16
 	return;
 }
 
-void encodeAI90(struct encodeT *encode) {
+static void encodeAI90(struct encodeT *encode) {
 
 	while ((encode->str[encode->iStr-1] != FNC1) &&
 					(encode->str[encode->iStr-2] != FNC1) &&
@@ -1363,7 +1361,7 @@ void encodeAI90(struct encodeT *encode) {
 	return;
 }
 
-void nextAI(struct encodeT *encode) {
+static void nextAI(struct encodeT *encode) {
 
 	if (encode->str[encode->iStr+0] == '2' &&
 			encode->str[encode->iStr+1] == '1') {
@@ -1383,7 +1381,7 @@ void nextAI(struct encodeT *encode) {
 	return;
 }
 
-int doLinMethods(uint8_t str[], int *iStr, uint8_t bitField[], int *iBit) {
+static int doLinMethods(uint8_t str[], int *iStr, uint8_t bitField[], int *iBit) {
 
 uint16_t bits;
 long weight;
@@ -1528,7 +1526,7 @@ char numStr[10] = { 0 };
 	return(NUM_MODE);
 }
 
-uint16_t yymmdd(uint8_t str[]) {
+static uint16_t yymmdd(uint8_t str[]) {
 
 uint16_t val;
 
@@ -1539,7 +1537,7 @@ uint16_t val;
 }
 
 // converts 13 digits to 44 bits
-void cnv13 (uint8_t str[], int *iStr, uint8_t bitField[], int *iBit) {
+static void cnv13 (uint8_t str[], int *iStr, uint8_t bitField[], int *iBit) {
 
 int i;
 
@@ -1557,13 +1555,13 @@ int i;
 }
 
 // converts 12 digits to 40 bits
-void cnv12 (uint8_t str[], int *iStr, uint8_t bitField[], int *iBit) {
+static void cnv12 (uint8_t str[], int *iStr, uint8_t bitField[], int *iBit) {
 int i;
 
 	for (i = 0; i < 4 ; i++) {
 		putBits(bitField, *iBit, 10, (uint16_t)((uint16_t)(str[*iStr] - '0')*100 +
-							(str[*iStr+1] - '0')*10 +
-							str[*iStr+2] - '0')); // 10 bit groups bits
+				(str[*iStr+1] - '0')*10 +
+				str[*iStr+2] - '0')); // 10 bit groups bits
 		*iBit += 10;
 		*iStr += 3;
 	}
@@ -1575,7 +1573,7 @@ returns number of bits left to closest 2d symbol,
  or -1 if iBit is larger than largest in type and width
  also returns CCSizes index or data char cnt for RSS14E in *size
 */
-int getUnusedBitCnt(int iBit, int *size) {
+static int getUnusedBitCnt(int iBit, int *size) {
 
 // max data plus ecc codewords for CC-C
 static int eccMaxCW[] = { 40+8, 160+16, 320+32, 863+64, 0 };
@@ -1690,7 +1688,7 @@ int cw[7];
 }
 
 /* converts bit string to base 928 values, codeWords[0] is highest order */
-int encode928(uint8_t bitString[], uint16_t codeWords[], int bitLng) {
+static int encode928(uint8_t bitString[], uint16_t codeWords[], int bitLng) {
 
 int i, j, b, bitCnt, cwNdx, cwCnt, cwLng;
 
@@ -1715,7 +1713,7 @@ int i, j, b, bitCnt, cwNdx, cwCnt, cwLng;
 }
 
 /* converts bytes to base 900 values (codeWords), codeWords[0] is highest order */
-void encode900(uint8_t byteArr[], uint16_t codeWords[], int byteLng) {
+static void encode900(uint8_t byteArr[], uint16_t codeWords[], int byteLng) {
 
 static uint16_t pwrByte[6][5] = { {0,0,0,0,1}, {0,0,0,0,256}, {0,0,0,72,736},
 					{0,0,20,641,316}, {0,5,802,385,796}, {1,608,221,686,376}  };
@@ -1752,7 +1750,7 @@ uint32_t cw, t, carry, cwArr[5];
 
 
 /* gets bit in bitString at bitPos */
-int getBit(uint8_t bitStr[], int bitPos) {
+static int getBit(uint8_t bitStr[], int bitPos) {
 		return(((bitStr[bitPos/8] & (0x80>>(bitPos%8))) == 0) ?	0 : 1);
 }
 

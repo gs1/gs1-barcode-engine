@@ -35,11 +35,11 @@ int colCnt; // after set in main, may be decreased by getUnusedBitCnt
 int rowCnt; // determined by getUnusedBitCnt
 int eccCnt; // determined by getUnusedBitCnt
 
-int enc128(uint8_t data[], uint8_t bars[], int link);
-void cda128(uint8_t data[], int *di, int symchr[], int *si, int *code);
-void cdb128(uint8_t data[], int *di, int symchr[], int *si, int *code);
-void cdc128(uint8_t data[], int *di, int symchr[], int *si, int *code);
-void tbl128(int symchr[], uint8_t bars[]);
+static int enc128(uint8_t data[], uint8_t bars[], int link);
+static void cda128(uint8_t data[], int *di, int symchr[], int *si, int *code);
+static void cdb128(uint8_t data[], int *di, int symchr[], int *si, int *code);
+static void cdc128(uint8_t data[], int *di, int symchr[], int *si, int *code);
+static void tbl128(int symchr[], uint8_t bars[]);
 
 
 extern int errFlag;
@@ -59,147 +59,147 @@ int rows, ccFlag, symChars, symWidth, ccLpad, ccRpad;
 char primaryStr[120+1];
 char *ccStr;
 
-		ccStr = strchr(params->dataStr, '|');
-		if (ccStr == NULL) ccFlag = FALSE;
-		else {
-			ccFlag = TRUE;
-			ccStr[0] = '\0'; // separate primary data
-			ccStr++; // point to secondary data
+	ccStr = strchr(params->dataStr, '|');
+	if (ccStr == NULL) ccFlag = FALSE;
+	else {
+		ccFlag = TRUE;
+		ccStr[0] = '\0'; // separate primary data
+		ccStr++; // point to secondary data
+	}
+
+	if (strlen(params->dataStr) > 48) {
+		errFlag = TRUE;
+		printf("\nprimary data exceeds 48 characters");
+		return;
+	}
+
+	// insert leading FNC1 if not already there
+	if (params->dataStr[0] != '#') {
+		strcpy(primaryStr, "#");
+	}
+	else {
+		primaryStr[0] = '\0';
+	}
+	strcat(primaryStr, params->dataStr);
+
+	symChars = enc128((uint8_t*)primaryStr, linPattern, (ccFlag) ? 1 : 0);
+#if PRNT
+		printf("\n%s", primaryStr);
+		printf("\n");
+		for (i = 0; i < (symChars*6+3); i++) {
+			printf("%d", linPattern[i]);
+		}
+		printf("\n");
+#endif
+	line1 = TRUE; // so first line is not Y undercut
+	// init most likely prints values
+	prints.elmCnt = symChars*6+3;
+	prints.pattern = linPattern;
+	prints.guards = FALSE;
+	prints.height = params->pixMult*params->linHeight;
+	prints.leftPad = 0;
+	prints.rightPad = 0;
+	prints.whtFirst = TRUE;
+	prints.reverse = FALSE;
+	if (ccFlag) {
+		if ((rows = CC4enc((uint8_t*)ccStr, ccPattern)) > 0) {
+			if (errFlag) {
+				printf("\nerror occurred, exiting.");
+				return;
+			}
+#if PRNT
+			printf("\n%s", ccStr);
+			printf("\n");
+			for (i = 0; i < rows; i++) {
+				for (j = 0; j < CCB4_ELMNTS; j++) {
+					printf("%d", ccPattern[i][j]);
+				}
+				printf("\n");
+			}
+#endif
 		}
 
-		if (strlen(params->dataStr) > 48) {
+		if (symChars < 9) {
 			errFlag = TRUE;
-			printf("\nprimary data exceeds 48 characters");
+			printf("\nlinear component too short");
 			return;
 		}
 
-		// insert leading FNC1 if not already there
-		if (params->dataStr[0] != '#') {
-			strcpy(primaryStr, "#");
-		}
-		else {
-			primaryStr[0] = '\0';
-		}
-		strcat(primaryStr, params->dataStr);
+		symWidth = symChars*11+22;
+		ccRpad = 10+2 + ((symChars-9)/2)*11;
+		ccLpad = symWidth - (CCB4_WIDTH + ccRpad);
 
-		symChars = enc128((uint8_t*)primaryStr, linPattern, (ccFlag) ? 1 : 0);
-#if PRNT
-			printf("\n%s", primaryStr);
-			printf("\n");
-			for (i = 0; i < (symChars*6+3); i++) {
-				printf("%d", linPattern[i]);
-			}
-			printf("\n");
-#endif
-		line1 = TRUE; // so first line is not Y undercut
-		// init most likely prints values
-		prints.elmCnt = symChars*6+3;
-		prints.pattern = linPattern;
-		prints.guards = FALSE;
-		prints.height = params->pixMult*params->linHeight;
-		prints.leftPad = 0;
-		prints.rightPad = 0;
-		prints.whtFirst = TRUE;
-		prints.reverse = FALSE;
-		if (ccFlag) {
-			if ((rows = CC4enc((uint8_t*)ccStr, ccPattern)) > 0) {
-				if (errFlag) {
-					printf("\nerror occurred, exiting.");
-					return;
-				}
-#if PRNT
-				printf("\n%s", ccStr);
-				printf("\n");
-				for (i = 0; i < rows; i++) {
-					for (j = 0; j < CCB4_ELMNTS; j++) {
-						printf("%d", ccPattern[i][j]);
-					}
-					printf("\n");
-				}
-#endif
-			}
-
-			if (symChars < 9) {
-				errFlag = TRUE;
-				printf("\nlinear component too short");
-				return;
-			}
-
-			symWidth = symChars*11+22;
-			ccRpad = 10+2 + ((symChars-9)/2)*11;
-			ccLpad = symWidth - (CCB4_WIDTH + ccRpad);
-
-			if (params->bmp) {
-				// note: BMP is bottom to top inverted
-				bmpHeader(params->pixMult*symWidth,
-						params->pixMult*(rows*2+params->linHeight) + params->sepHt,
-							 params->outfp);
-
-				// UCC-128
-				printElmnts(params, &prints);
-
-				// CC separator pattern
-				prints.elmCnt = symChars*6+1;
-				prints.pattern = &linPattern[1];
-				prints.height = params->sepHt;
-				prints.leftPad = 10;
-				prints.rightPad = 10;
-				printElmnts(params, &prints);
-
-				// CC-C
-				prints.elmCnt = CCB4_ELMNTS;
-				prints.height = params->pixMult*2;
-				prints.leftPad = ccLpad;
-				prints.rightPad = ccRpad;
-				for (i = rows-1; i >= 0; i--) {
-					prints.pattern = ccPattern[i];
-					printElmnts(params, &prints);
-				}
-			}
-			else {
-				tifHeader(params->pixMult*symWidth,
-						params->pixMult*(rows*2+params->linHeight) + params->sepHt,
-							 params->outfp);
-
-				// CC-C
-				prints.elmCnt = CCB4_ELMNTS;
-				prints.height = params->pixMult*2;
-				prints.leftPad = ccLpad;
-				prints.rightPad = ccRpad;
-				for (i = 0; i < rows; i++) {
-					prints.pattern = ccPattern[i];
-					printElmnts(params, &prints);
-				}
-
-				// CC separator pattern
-				prints.elmCnt = symChars*6+1;
-				prints.pattern = &linPattern[1];
-				prints.height = params->sepHt;
-				prints.leftPad = 10;
-				prints.rightPad = 10;
-				printElmnts(params, &prints);
-
-				// UCC-128
-				prints.elmCnt = symChars*6+3;
-				prints.pattern = linPattern;
-				prints.height = params->pixMult*params->linHeight;
-				prints.leftPad = 0;
-				prints.rightPad = 0;
-				printElmnts(params, &prints);
-			}
-		}
-		else { // primary only
-			if (params->bmp) {
-				bmpHeader(params->pixMult*(symChars*11+22), params->pixMult*params->linHeight, params->outfp);
-			}
-			else {
-				tifHeader(params->pixMult*(symChars*11+22), params->pixMult*params->linHeight, params->outfp);
-			}
+		if (params->bmp) {
+			// note: BMP is bottom to top inverted
+			bmpHeader(params->pixMult*symWidth,
+					params->pixMult*(rows*2+params->linHeight) + params->sepHt,
+						 params->outfp);
 
 			// UCC-128
 			printElmnts(params, &prints);
+
+			// CC separator pattern
+			prints.elmCnt = symChars*6+1;
+			prints.pattern = &linPattern[1];
+			prints.height = params->sepHt;
+			prints.leftPad = 10;
+			prints.rightPad = 10;
+			printElmnts(params, &prints);
+
+			// CC-C
+			prints.elmCnt = CCB4_ELMNTS;
+			prints.height = params->pixMult*2;
+			prints.leftPad = ccLpad;
+			prints.rightPad = ccRpad;
+			for (i = rows-1; i >= 0; i--) {
+				prints.pattern = ccPattern[i];
+				printElmnts(params, &prints);
+			}
 		}
-		return;
+		else {
+			tifHeader(params->pixMult*symWidth,
+					params->pixMult*(rows*2+params->linHeight) + params->sepHt,
+						 params->outfp);
+
+			// CC-C
+			prints.elmCnt = CCB4_ELMNTS;
+			prints.height = params->pixMult*2;
+			prints.leftPad = ccLpad;
+			prints.rightPad = ccRpad;
+			for (i = 0; i < rows; i++) {
+				prints.pattern = ccPattern[i];
+				printElmnts(params, &prints);
+			}
+
+			// CC separator pattern
+			prints.elmCnt = symChars*6+1;
+			prints.pattern = &linPattern[1];
+			prints.height = params->sepHt;
+			prints.leftPad = 10;
+			prints.rightPad = 10;
+			printElmnts(params, &prints);
+
+			// UCC-128
+			prints.elmCnt = symChars*6+3;
+			prints.pattern = linPattern;
+			prints.height = params->pixMult*params->linHeight;
+			prints.leftPad = 0;
+			prints.rightPad = 0;
+			printElmnts(params, &prints);
+		}
+	}
+	else { // primary only
+		if (params->bmp) {
+			bmpHeader(params->pixMult*(symChars*11+22), params->pixMult*params->linHeight, params->outfp);
+		}
+		else {
+			tifHeader(params->pixMult*(symChars*11+22), params->pixMult*params->linHeight, params->outfp);
+		}
+
+		// UCC-128
+		printElmnts(params, &prints);
+	}
+	return;
 }
 
 
@@ -214,145 +214,145 @@ int ccFlag, symChars, symWidth, ccRpad;
 char primaryStr[120+1];
 char *ccStr;
 
-		ccStr = strchr(params->dataStr, '|');
-		if (ccStr == NULL) ccFlag = FALSE;
-		else {
-			ccFlag = TRUE;
-			ccStr[0] = '\0'; // separate primary data
-			ccStr++; // point to secondary data
-		}
+	ccStr = strchr(params->dataStr, '|');
+	if (ccStr == NULL) ccFlag = FALSE;
+	else {
+		ccFlag = TRUE;
+		ccStr[0] = '\0'; // separate primary data
+		ccStr++; // point to secondary data
+	}
 
-		if (strlen(params->dataStr) > 48) {
-			errFlag = TRUE;
-			printf("\nprimary data exceeds 48 characters");
-			return;
-		}
+	if (strlen(params->dataStr) > 48) {
+		errFlag = TRUE;
+		printf("\nprimary data exceeds 48 characters");
+		return;
+	}
 
-		// insert leading FNC1 if not already there
-		if (params->dataStr[0] != '#') {
-			strcpy(primaryStr, "#");
-		}
-		else {
-			primaryStr[0] = '\0';
-		}
-		strcat(primaryStr, params->dataStr);
+	// insert leading FNC1 if not already there
+	if (params->dataStr[0] != '#') {
+		strcpy(primaryStr, "#");
+	}
+	else {
+		primaryStr[0] = '\0';
+	}
+	strcat(primaryStr, params->dataStr);
 
-		symChars = enc128((uint8_t*)primaryStr, linPattern, (ccFlag) ? 2 : 0); // 2 for CCC
+	symChars = enc128((uint8_t*)primaryStr, linPattern, (ccFlag) ? 2 : 0); // 2 for CCC
 #if PRNT
-			printf("\n%s", primaryStr);
-			printf("\n");
-			for (i = 0; i < (symChars*6+3); i++) {
-				printf("%d", linPattern[i]);
-			}
-			printf("\n");
+		printf("\n%s", primaryStr);
+		printf("\n");
+		for (i = 0; i < (symChars*6+3); i++) {
+			printf("%d", linPattern[i]);
+		}
+		printf("\n");
 #endif
-		colCnt = ((symChars*11 + 22 - L_PAD - 5)/17) -4;
-		if (colCnt < 1) {
-			errFlag = TRUE;
-			printf("\nUCC-128 too small\n");
-			return;
-		}
-		line1 = TRUE; // so first line is not Y undercut
-		// init most likely prints values
-		prints.elmCnt = symChars*6+3;
-		prints.pattern = linPattern;
-		prints.guards = FALSE;
-		prints.height = params->pixMult*params->linHeight;
-		prints.leftPad = 0;
-		prints.rightPad = 0;
-		prints.whtFirst = TRUE;
-		prints.reverse = FALSE;
-		if (ccFlag) {
-			if (CCCenc((uint8_t*)ccStr, patCCC)) {
-				if (errFlag) {
-					printf("\nerror occurred, exiting.");
-					return;
-				}
+	colCnt = ((symChars*11 + 22 - L_PAD - 5)/17) -4;
+	if (colCnt < 1) {
+		errFlag = TRUE;
+		printf("\nUCC-128 too small\n");
+		return;
+	}
+	line1 = TRUE; // so first line is not Y undercut
+	// init most likely prints values
+	prints.elmCnt = symChars*6+3;
+	prints.pattern = linPattern;
+	prints.guards = FALSE;
+	prints.height = params->pixMult*params->linHeight;
+	prints.leftPad = 0;
+	prints.rightPad = 0;
+	prints.whtFirst = TRUE;
+	prints.reverse = FALSE;
+	if (ccFlag) {
+		if (CCCenc((uint8_t*)ccStr, patCCC)) {
+			if (errFlag) {
+				printf("\nerror occurred, exiting.");
+				return;
+			}
 #if PRNT
-				printf("\n%s", ccStr);
+			printf("\n%s", ccStr);
+			printf("\n");
+			for (i = 0; i < rowCnt; i++) {
+				for (j = 0; j < (colCnt+4)*8+3; j++) {
+					printf("%d", patCCC[i*((colCnt+4)*8+3) + j]);
+				}
 				printf("\n");
-				for (i = 0; i < rowCnt; i++) {
-					for (j = 0; j < (colCnt+4)*8+3; j++) {
-						printf("%d", patCCC[i*((colCnt+4)*8+3) + j]);
-					}
-					printf("\n");
-				}
+			}
 #endif
-			}
-
-			symWidth = symChars*11+22;
-			ccRpad = symWidth - L_PAD - ((colCnt+4)*17+5);
-			if (params->bmp) {
-				// note: BMP is bottom to top inverted
-				bmpHeader(params->pixMult*symWidth,
-						params->pixMult*(rowCnt*3+params->linHeight) + params->sepHt,
-							 params->outfp);
-
-				// UCC-128
-				printElmnts(params, &prints);
-
-				// CC separator pattern
-				prints.elmCnt = symChars*6+1;
-				prints.pattern = &linPattern[1];
-				prints.height = params->sepHt;
-				prints.leftPad = 10;
-				prints.rightPad = 10;
-				printElmnts(params, &prints);
-
-				// CC-C
-				prints.elmCnt = (colCnt+4)*8+3;
-				prints.height = params->pixMult*3;
-				prints.leftPad = L_PAD;
-				prints.rightPad = ccRpad;
-				for (i = rowCnt-1; i >= 0; i--) {
-					prints.pattern = &patCCC[i*((colCnt+4)*8+3)];
-					printElmnts(params, &prints);
-				}
-			}
-			else {
-				tifHeader(params->pixMult*symWidth,
-						params->pixMult*(rowCnt*3+params->linHeight) + params->sepHt,
-							 params->outfp);
-
-				// CC-C
-				prints.elmCnt = (colCnt+4)*8+3;
-				prints.height = params->pixMult*3;
-				prints.leftPad = L_PAD;
-				prints.rightPad = ccRpad;
-				for (i = 0; i < rowCnt; i++) {
-					prints.pattern = &patCCC[i*((colCnt+4)*8+3)];
-					printElmnts(params, &prints);
-				}
-
-				// CC separator pattern
-				prints.elmCnt = symChars*6+1;
-				prints.pattern = &linPattern[1];
-				prints.height = params->sepHt;
-				prints.leftPad = 10;
-				prints.rightPad = 10;
-				printElmnts(params, &prints);
-
-				// UCC-128
-				prints.elmCnt = symChars*6+3;
-				prints.pattern = linPattern;
-				prints.height = params->pixMult*params->linHeight;
-				prints.leftPad = 0;
-				prints.rightPad = 0;
-				printElmnts(params, &prints);
-			}
 		}
-		else { // primary only
-			if (params->bmp) {
-				bmpHeader(params->pixMult*(symChars*11+22), params->pixMult*params->linHeight, params->outfp);
-			}
-			else {
-				tifHeader(params->pixMult*(symChars*11+22), params->pixMult*params->linHeight, params->outfp);
-			}
+
+		symWidth = symChars*11+22;
+		ccRpad = symWidth - L_PAD - ((colCnt+4)*17+5);
+		if (params->bmp) {
+			// note: BMP is bottom to top inverted
+			bmpHeader(params->pixMult*symWidth,
+					params->pixMult*(rowCnt*3+params->linHeight) + params->sepHt,
+						 params->outfp);
 
 			// UCC-128
 			printElmnts(params, &prints);
+
+			// CC separator pattern
+			prints.elmCnt = symChars*6+1;
+			prints.pattern = &linPattern[1];
+			prints.height = params->sepHt;
+			prints.leftPad = 10;
+			prints.rightPad = 10;
+			printElmnts(params, &prints);
+
+			// CC-C
+			prints.elmCnt = (colCnt+4)*8+3;
+			prints.height = params->pixMult*3;
+			prints.leftPad = L_PAD;
+			prints.rightPad = ccRpad;
+			for (i = rowCnt-1; i >= 0; i--) {
+				prints.pattern = &patCCC[i*((colCnt+4)*8+3)];
+				printElmnts(params, &prints);
+			}
 		}
-		return;
+		else {
+			tifHeader(params->pixMult*symWidth,
+					params->pixMult*(rowCnt*3+params->linHeight) + params->sepHt,
+						 params->outfp);
+
+			// CC-C
+			prints.elmCnt = (colCnt+4)*8+3;
+			prints.height = params->pixMult*3;
+			prints.leftPad = L_PAD;
+			prints.rightPad = ccRpad;
+			for (i = 0; i < rowCnt; i++) {
+				prints.pattern = &patCCC[i*((colCnt+4)*8+3)];
+				printElmnts(params, &prints);
+			}
+
+			// CC separator pattern
+			prints.elmCnt = symChars*6+1;
+			prints.pattern = &linPattern[1];
+			prints.height = params->sepHt;
+			prints.leftPad = 10;
+			prints.rightPad = 10;
+			printElmnts(params, &prints);
+
+			// UCC-128
+			prints.elmCnt = symChars*6+3;
+			prints.pattern = linPattern;
+			prints.height = params->pixMult*params->linHeight;
+			prints.leftPad = 0;
+			prints.rightPad = 0;
+			printElmnts(params, &prints);
+		}
+	}
+	else { // primary only
+		if (params->bmp) {
+			bmpHeader(params->pixMult*(symChars*11+22), params->pixMult*params->linHeight, params->outfp);
+		}
+		else {
+			tifHeader(params->pixMult*(symChars*11+22), params->pixMult*params->linHeight, params->outfp);
+		}
+
+		// UCC-128
+		printElmnts(params, &prints);
+	}
+	return;
 }
 
 /*
@@ -380,7 +380,7 @@ Function Return:    number of symbol characters
 
 #define ISNUM(A) ((A<072)&&(A>057)) /*true if A is numeric ASCII*/
 
-int enc128(uint8_t data[], uint8_t bars[], int link)
+static int enc128(uint8_t data[], uint8_t bars[], int link)
 {
 	/* convert ASCII data[] into symchr[] values */
 
@@ -442,7 +442,7 @@ int enc128(uint8_t data[], uint8_t bars[], int link)
 		}
 	}
 
-  if (link > 0) {
+	if (link > 0) {
 		// insert trailing Code Set Char flag
 		symchr[si++] = linkChar[code][link-1];
 	}
@@ -480,7 +480,7 @@ si      *int     next index into symchr
 code    *int     starting code: A,B,C = 0,1,2
 */
 
-void cda128(uint8_t data[], int *di, int symchr[], int *si, int *code)
+static void cda128(uint8_t data[], int *di, int symchr[], int *si, int *code)
 {
 	int   c, i;
 
@@ -493,13 +493,13 @@ void cda128(uint8_t data[], int *di, int symchr[], int *si, int *code)
 		*code = 2;
 		symchr[(*si)++] = 99;
 	}
-  else if ((c > 0137) && (c < 0200)) {
-    /* lower case, change to code B */
-    *code = 1;
+	else if ((c > 0137) && (c < 0200)) {
+		/* lower case, change to code B */
+		*code = 1;
 		symchr[(*si)++] = 100;
 	}
 	else { /* process char in code A */
-    if (c < 040) c += 64;       /*cntl char*/
+		if (c < 040) c += 64;       /*cntl char*/
 		else if (c < 0140) c -= 32; /*alphanumeric*/
 		else {
 			if (c == 0200) c = 64;  /*null*/
@@ -507,11 +507,11 @@ void cda128(uint8_t data[], int *di, int symchr[], int *si, int *code)
 			if (c == 0202) c = 97;  /*FNC2*/
 			if (c == 0203) c = 96;  /*FNC3*/
 			if (c == 0204) c = 101; /*FNC4*/
-  	}
+		}
 		symchr[(*si)++] = c;
 		++(*di);
 	}
-  return;
+	return;
 }
 
 /*
@@ -530,7 +530,7 @@ si      *int     next index into symchr
 code    *int     starting code: A,B,C = 0,1,2
 */
 
-void cdb128(uint8_t data[], int *di, int symchr[], int *si, int *code)
+static void cdb128(uint8_t data[], int *di, int symchr[], int *si, int *code)
 {
 	int   c, i;
 
@@ -578,19 +578,19 @@ si      *int     next index into symchr
 code    *int     starting code: A,B,C = 0,1,2
 */
 
-void cdc128(uint8_t data[], int *di, int symchr[], int *si, int *code)
+static void cdc128(uint8_t data[], int *di, int symchr[], int *si, int *code)
 {
-	int   c, i;
+	int c, i;
 
-  c = data[*di];
+	c = data[*di];
 
 	/* check if next 2 chars numeric */
 	if (ISNUM(c) && ISNUM(data[*di+1])) {
-    /* 2 numerics, pack them into 1 */
+		/* 2 numerics, pack them into 1 */
 		symchr[(*si)++] = ((c & 0xF) * 10) + (data[++(*di)] & 0xF);
 		++(*di);
-  }
-  /* else is next a FNC1? */
+	}
+	/* else is next a FNC1? */
 	else if (c == 0201) {
 		symchr[(*si)++] = 102; /* FNC1 */
 		(*di)++;
@@ -628,7 +628,7 @@ bars    int[]    array to be filled with bar & space widths
 return:    none
 */
 
-void tbl128(int symchr[], uint8_t bars[])
+static void tbl128(int symchr[], uint8_t bars[])
 {   /* octal of 1st 5 elements in symbol char */
 	static int sym128[107] ={
 		021222,022212,022222,012122,012132,
@@ -653,39 +653,39 @@ void tbl128(int symchr[], uint8_t bars[])
 		011411,011431,041111,041131,011314,
 		011413,031114,041113,021141,021121,
 		021123,023311
-    };
-    int si, bi, pattern;
-    int val;
-    uint8_t i;
+	};
+	int si, bi, pattern;
+	int val;
+	uint8_t i;
 
-    /* look up symchr[]'s and copy widths into bars[] */
+	/* look up symchr[]'s and copy widths into bars[] */
 
-		si = bi = 0;
-		bars[bi++] = 10; /* leading qz */
-    while ((val = symchr[si++]) != -1) {
-	pattern = sym128[val];
+	si = bi = 0;
+	bars[bi++] = 10; /* leading qz */
+	while ((val = symchr[si++]) != -1) {
+		pattern = sym128[val];
 
-	/* shift out octal digits in pattern */
-	i = bars[bi + 4] = (uint8_t)pattern % 8;
-	pattern /= 8;
-	bars[bi + 3] = (uint8_t)pattern % 8;
-	i = (uint8_t)(i + pattern % 8);
-	pattern /= 8;
-	bars[bi + 2] = (uint8_t)pattern % 8;
-	i = (uint8_t)(i + pattern % 8);
-	pattern /= 8;
-	bars[bi + 1] = (uint8_t)pattern % 8;
-	i = (uint8_t)(i + pattern % 8);
-	bars[bi] = (uint8_t)pattern / 8;
-	i = (uint8_t)(i + pattern / 8);
+		/* shift out octal digits in pattern */
+		i = bars[bi + 4] = (uint8_t)pattern % 8;
+		pattern /= 8;
+		bars[bi + 3] = (uint8_t)pattern % 8;
+		i = (uint8_t)(i + pattern % 8);
+		pattern /= 8;
+		bars[bi + 2] = (uint8_t)pattern % 8;
+		i = (uint8_t)(i + pattern % 8);
+		pattern /= 8;
+		bars[bi + 1] = (uint8_t)pattern % 8;
+		i = (uint8_t)(i + pattern % 8);
+		bars[bi] = (uint8_t)pattern / 8;
+		i = (uint8_t)(i + pattern / 8);
 
-	/* derive last space to total 11 */
-	bars[bi + 5] = (uint8_t)(11 - i);
-	bi += 6;
-    }
-    bars[bi++] = 2;  /* trailing guard bar */
+		/* derive last space to total 11 */
+		bars[bi + 5] = (uint8_t)(11 - i);
+		bi += 6;
+	}
+	bars[bi++] = 2;  /* trailing guard bar */
 	bars[bi++] = 10; /* trailing qz */
-    bars[bi] = 0;    /* array terminator */
-		return;
+	bars[bi] = 0;    /* array terminator */
+	return;
 }
 
