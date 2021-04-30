@@ -30,6 +30,9 @@ int rowWidth;
 int line1;
 int linFlag; // tells pack whether linear or cc is being encoded
 
+#define min(X,Y) (((X) < (Y)) ? (X) : (Y))
+#define max(X,Y) (((X) > (Y)) ? (X) : (Y))
+
 void bmpHeader(long xdim, long ydim, FILE *oFile);
 void tifHeader(long xdim, long ydim, FILE *oFile);
 void printElmnts(struct sParams *params, struct sPrints *prints);

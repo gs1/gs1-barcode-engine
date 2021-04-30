@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include "enc.h"
+#include "util.h"
 #include "cc.h"
 
 #define MAX_CCA2_SIZE 6		// index to 167 in CC2Sizes
@@ -36,9 +37,6 @@
 #define MAX_CCC_CW 863		// ccc max data codewords
 #define MAX_CCC_ROWS 90		// ccc max rows
 #define MAX_CCC_BYTES 1033	// maximum byte mode capacity for ccc
-
-#define min(X,Y) (((X) < (Y)) ? (X) : (Y))
-#define max(X,Y) (((X) > (Y)) ? (X) : (Y))
 
 struct encodeT {
 	uint8_t *str;
