@@ -120,13 +120,16 @@ int symHt;
 				return;
 			}
 #if PRNT
-			printf("\n%s", ccStr);
-			printf("\n");
-			for (i = 0; i < rows; i++) {
-				for (j = 0; j < CCB4_ELMNTS; j++) {
-					printf("%d", ccPattern[i][j]);
-				}
+			{
+				int j;
+				printf("\n%s", ccStr);
 				printf("\n");
+				for (i = 0; i < rows; i++) {
+					for (j = 0; j < CCB4_ELMNTS; j++) {
+						printf("%d", ccPattern[i][j]);
+					}
+					printf("\n");
+				}
 			}
 #endif
 		}
@@ -255,13 +258,16 @@ char *ccStr;
 				return;
 			}
 #if PRNT
-			printf("\n%s", ccStr);
-			printf("\n");
-			for (i = 0; i < rows; i++) {
-				for (j = 0; j < MAX_CCB2_ELMNTS; j++) {
-					printf("%d", ccPattern[i][j]);
-				}
+			{
+				int j;
+				printf("\n%s", ccStr);
 				printf("\n");
+				for (i = 0; i < rows; i++) {
+					for (j = 0; j < CCB2_ELMNTS; j++) {
+						printf("%d", ccPattern[i][j]);
+					}
+					printf("\n");
+				}
 			}
 #endif
 		}
@@ -459,13 +465,16 @@ char *ccStr;
 				return;
 			}
 #if PRNT
-			printf("\n%s", ccStr);
-			printf("\n");
-			for (i = 0; i < rows; i++) {
-				for (j = 0; j < MAX_CCB2_ELMNTS; j++) {
-					printf("%d", ccPattern[i][j]);
-				}
+			{
+				int j;
+				printf("\n%s", ccStr);
 				printf("\n");
+				for (i = 0; i < rows; i++) {
+					for (j = 0; j < CCB2_ELMNTS; j++) {
+						printf("%d", ccPattern[i][j]);
+					}
+					printf("\n");
+				}
 			}
 #endif
 		}

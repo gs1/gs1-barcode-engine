@@ -109,20 +109,23 @@ char *ccStr;
 				return;
 			}
 #if PRNT
-			printf("\n%s", ccStr);
-			printf("\n");
-			for (i = 0; i < rows; i++) {
-				if (rows <= MAX_CCA3_ROWS) { // CCA composite
-					for (j = 0; j < CCA3_ELMNTS; j++) {
-						printf("%d", ccPattern[i][j]);
-					}
-				}
-				else {
-					for (j = 0; j < CCB3_ELMNTS; j++) {
-						printf("%d", ccPattern[i][j]);
-					}
-				}
+			{
+				int j;
+				printf("\n%s", ccStr);
 				printf("\n");
+				for (i = 0; i < rows; i++) {
+					if (rows <= MAX_CCA3_ROWS) { // CCA composite
+						for (j = 0; j < CCA3_ELMNTS; j++) {
+							printf("%d", ccPattern[i][j]);
+						}
+					}
+					else {
+						for (j = 0; j < CCB3_ELMNTS; j++) {
+							printf("%d", ccPattern[i][j]);
+						}
+					}
+					printf("\n");
+				}
 			}
 #endif
 		}

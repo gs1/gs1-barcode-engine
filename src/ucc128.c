@@ -109,13 +109,16 @@ char *ccStr;
 				return;
 			}
 #if PRNT
-			printf("\n%s", ccStr);
-			printf("\n");
-			for (i = 0; i < rows; i++) {
-				for (j = 0; j < CCB4_ELMNTS; j++) {
-					printf("%d", ccPattern[i][j]);
-				}
+			{
+				int j;
+				printf("\n%s", ccStr);
 				printf("\n");
+				for (i = 0; i < rows; i++) {
+					for (j = 0; j < CCB4_ELMNTS; j++) {
+						printf("%d", ccPattern[i][j]);
+					}
+					printf("\n");
+				}
 			}
 #endif
 		}
@@ -270,13 +273,16 @@ char *ccStr;
 				return;
 			}
 #if PRNT
-			printf("\n%s", ccStr);
-			printf("\n");
-			for (i = 0; i < rowCnt; i++) {
-				for (j = 0; j < (colCnt+4)*8+3; j++) {
-					printf("%d", patCCC[i*((colCnt+4)*8+3) + j]);
-				}
+			{
+				int j;
+				printf("\n%s", ccStr);
 				printf("\n");
+				for (i = 0; i < rowCnt; i++) {
+					for (j = 0; j < (colCnt+4)*8+3; j++) {
+						printf("%d", patCCC[i*((colCnt+4)*8+3) + j]);
+					}
+					printf("\n");
+				}
 			}
 #endif
 		}
