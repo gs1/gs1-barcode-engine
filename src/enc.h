@@ -74,7 +74,6 @@ struct sPrints {
 	uint8_t *pattern;
 };
 
-void encInit();
 void RSS14(struct sParams *params);
 void RSS14S(struct sParams *params);
 void RSS14SO(struct sParams *params);

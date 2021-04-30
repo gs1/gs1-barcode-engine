@@ -49,9 +49,6 @@ int check2DData(uint8_t dataStr[]);
 int pack(uint8_t str[], uint8_t bitField[] );
 void putBits(uint8_t bitField[], int bitPos, int length, uint16_t bits);
 
-void init928(void);
-void initLogTables(void);
-
 const uint32_t barData[3][929];
 const uint32_t barRap[2][52];
 

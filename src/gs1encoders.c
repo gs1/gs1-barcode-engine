@@ -62,7 +62,6 @@ FILE *iFile, *oFile;
 struct sParams params;
 int i;
 
-	encInit();
 	params.pixMult = 1; // init params
 	params.Xundercut = 0;
 	params.Yundercut = 0;
