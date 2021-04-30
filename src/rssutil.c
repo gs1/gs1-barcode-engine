@@ -25,6 +25,7 @@
 
 static int combins(int n, int r);
 
+
 /**********************************************************************
 * getRSSwidths
 * routine to generate widths for RSS elements for a given value.
@@ -41,12 +42,12 @@ static int combins(int n, int r);
 
 int *getRSSwidths(int val, int n, int elements, int maxWidth, int noNarrow)
 {
-static int widths[MAX_K];
-int bar;
-int elmWidth;
-int mxwElement;
-int subVal, lessVal;
-int narrowMask = 0;
+	static int widths[MAX_K];
+	int bar;
+	int elmWidth;
+	int mxwElement;
+	int subVal, lessVal;
+	int narrowMask = 0;
 
 	for (bar = 0; bar < elements-1; bar++)
 	{
@@ -89,16 +90,16 @@ int narrowMask = 0;
 	return(widths);
 }
 
+
 #define MAX_SEP_ELMNTS (11*21+4) // for 22 segment RSS Exp
 
 static struct sPrints prntSep;
 static uint8_t sepPattern[MAX_SEP_ELMNTS];
 
-
 // copies pattern for separator adding 9 narrow elements inside each finder
 struct sPrints *cnvSeparator(struct sParams *params, struct sPrints *prints)
-	{
-int i, j, k;
+{
+	int i, j, k;
 
 	prntSep.leftPad = prints->leftPad;
 	prntSep.rightPad = prints->rightPad;
@@ -106,7 +107,7 @@ int i, j, k;
 	prntSep.pattern = sepPattern;
 	prntSep.height = params->sepHt;
 	prntSep.whtFirst = true;
-  prntSep.guards = false;
+	prntSep.guards = false;
 	for (i = 0, k = 2; k <= 4; k += prints->pattern[i], i++);
 	if ((prints->whtFirst && (i&1)==1) || (!prints->whtFirst && (i&1)==0)) {
 		sepPattern[0] = 4;
@@ -192,18 +193,21 @@ int i, j, k;
 		j++;
 		sepPattern[j] = (uint8_t)k;
 	}
-  prntSep.elmCnt = j+1;
+	prntSep.elmCnt = j+1;
 	return(&prntSep);
 }
 
 
-/* combins(n,r): returns the number of Combinations of r selected from n:
-*		Combinations = n! /( n-r! * r!) */
+/*
+ * combins(n,r): returns the number of Combinations of r selected from n:
+ *		Combinations = n! /( n-r! * r!)
+ *
+ */
 static int combins(int n, int r) {
 
-int i, j;
-int maxDenom, minDenom;
-int val;
+	int i, j;
+	int maxDenom, minDenom;
+	int val;
 
 	if (n-r > r) {
 		minDenom = r;

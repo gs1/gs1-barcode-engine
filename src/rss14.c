@@ -53,18 +53,18 @@ static struct sPrints *separator14S(struct sParams *params, struct sPrints *prin
 
 void RSS14(struct sParams *params) {
 
-struct sPrints prints;
-struct sPrints *prntCnv;
+	struct sPrints prints;
+	struct sPrints *prntCnv;
 
-uint8_t linPattern[ELMNTS];
+	uint8_t linPattern[ELMNTS];
 
-char primaryStr[14+1];
-char tempStr[28+1];
+	char primaryStr[14+1];
+	char tempStr[28+1];
 
-int i;
-int rows, ccFlag;
-char *ccStr;
-int symHt;
+	int i;
+	int rows, ccFlag;
+	char *ccStr;
+	int symHt;
 
 	if (params->sym == sRSS14) {
 		symHt = SYM_H;
@@ -198,19 +198,20 @@ int symHt;
 	return;
 }
 
+
 void RSS14S(struct sParams *params) {
 
-struct sPrints prints;
-struct sPrints *prntCnv;
+	struct sPrints prints;
+	struct sPrints *prntCnv;
 
-uint8_t linPattern[ELMNTS];
+	uint8_t linPattern[ELMNTS];
 
-char primaryStr[14+1];
-char tempStr[28+1];
+	char primaryStr[14+1];
+	char tempStr[28+1];
 
-int i;
-int rows, ccFlag;
-char *ccStr;
+	int i;
+	int rows, ccFlag;
+	char *ccStr;
 
 	ccStr = strchr(params->dataStr, '|');
 	if (ccStr == NULL) ccFlag = false;
@@ -390,21 +391,22 @@ char *ccStr;
 	return;
 }
 
+
 void RSS14SO(struct sParams *params) {
 
-struct sPrints prints;
-struct sPrints chexPrnts;
-struct sPrints *prntCnv;
+	struct sPrints prints;
+	struct sPrints chexPrnts;
+	struct sPrints *prntCnv;
 
-uint8_t linPattern[ELMNTS];
-uint8_t chexPattern[SYM_W/2+2];
+	uint8_t linPattern[ELMNTS];
+	uint8_t chexPattern[SYM_W/2+2];
 
-char primaryStr[14+1];
-char tempStr[28+1];
+	char primaryStr[14+1];
+	char tempStr[28+1];
 
-int i;
-int rows, ccFlag;
-char *ccStr;
+	int i;
+	int rows, ccFlag;
+	char *ccStr;
 
 	for (i = 0; i < SYM_W/2+2; i++) chexPattern[i] = 1; // chex = all 1X elements
 	chexPattern[0] = 5; // wide space on left
@@ -629,7 +631,8 @@ static uint8_t sepPattern[SYM_W/2+2];
 
 // RSS14 Stacked row separator pattern routine
 static struct sPrints *separator14S(struct sParams *params, struct sPrints *prints) {
-int i, j, k, lNdx, rNdx, sNdx, lWidth, rWidth, matchWidth;
+
+	int i, j, k, lNdx, rNdx, sNdx, lWidth, rWidth, matchWidth;
 
 	prntSep.leftPad = prints->leftPad;
 	prntSep.rightPad = prints->rightPad;

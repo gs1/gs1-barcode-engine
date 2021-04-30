@@ -25,6 +25,7 @@
 #include "util.h"
 
 #define MAX_LINE 6032 // 10 inches wide at 600 dpi
+
 static uint8_t line[MAX_LINE/8 + 1];
 static uint8_t lineUCut[MAX_LINE/8 + 1];
 
@@ -130,13 +131,13 @@ void tifHeader(long xdim, long ydim, FILE *oFile) {
 }
 
 
-void printElmnts(struct sParams *params, struct sPrints *prints) {
-
 #define WHITE 0
 
-int i, bits, width, ndx, white;
-uint8_t xorMsk;
-int undercut;
+void printElmnts(struct sParams *params, struct sPrints *prints) {
+
+	int i, bits, width, ndx, white;
+	uint8_t xorMsk;
+	int undercut;
 
 	bits = 1;
 	ndx = 0;
@@ -187,27 +188,27 @@ int undercut;
 
 	// process any trailing odd numbered element with no undercut
 	if (i < prints->elmCnt) {
-	 if (prints->guards) { // print last element plus guard pattern
-		if (prints->reverse) {
-			width = (int)prints->pattern[0]*params->pixMult + undercut;
-		}
-		else {
-			width = (int)prints->pattern[i]*params->pixMult + undercut;
-		}
-		printElm(width, white , &bits, &ndx, xorMsk);
+		if (prints->guards) { // print last element plus guard pattern
+			if (prints->reverse) {
+				width = (int)prints->pattern[0]*params->pixMult + undercut;
+			}
+			else {
+				width = (int)prints->pattern[i]*params->pixMult + undercut;
+			}
+			printElm(width, white , &bits, &ndx, xorMsk);
 
-		printElm(params->pixMult - undercut, (white^1) , &bits, &ndx, xorMsk);
-		printElm(params->pixMult, white , &bits, &ndx, xorMsk); // last- no undercut
-	 }
-	 else { // no guard, print last odd without undercut
-		if (prints->reverse) {
-			width = (int)prints->pattern[0]*params->pixMult;
+			printElm(params->pixMult - undercut, (white^1) , &bits, &ndx, xorMsk);
+			printElm(params->pixMult, white , &bits, &ndx, xorMsk); // last- no undercut
 		}
-		else {
-			width = (int)prints->pattern[i]*params->pixMult;
+		else { // no guard, print last odd without undercut
+			if (prints->reverse) {
+				width = (int)prints->pattern[0]*params->pixMult;
+			}
+			else {
+				width = (int)prints->pattern[i]*params->pixMult;
+			}
+			printElm(width, white , &bits, &ndx, xorMsk);
 		}
-		printElm(width, white , &bits, &ndx, xorMsk);
-	 }
 	}
 	else if (prints->guards) { // even number, just print guard pattern
 		printElm(params->pixMult + undercut, white , &bits, &ndx, xorMsk);
@@ -248,7 +249,7 @@ int undercut;
 
 static void printElm(int width, int color, int *bits, int *ndx, uint8_t xorMsk) {
 
-int i;
+	int i;
 
 	for (i = 0; i < width; i++) {
 		*bits = (*bits<<1) + color;

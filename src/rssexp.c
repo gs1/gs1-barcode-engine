@@ -51,21 +51,21 @@ static int isSymbolSepatator(uint8_t string[]);
 
 void RSSExp(struct sParams *params) {
 
-struct sPrints prints;
-struct sPrints chexPrnts;
-struct sPrints *prntCnv;
+	struct sPrints prints;
+	struct sPrints chexPrnts;
+	struct sPrints *prntCnv;
 
-uint8_t linPattern[MAX_DBL_SEGS*ELMNTS+4];
-uint8_t chexPattern[MAX_DBL_SEGS*SYM_W+2];
-uint8_t dblPattern[MAX_DBL_SEGS][ELMNTS];
+	uint8_t linPattern[MAX_DBL_SEGS*ELMNTS+4];
+	uint8_t chexPattern[MAX_DBL_SEGS*SYM_W+2];
+	uint8_t dblPattern[MAX_DBL_SEGS][ELMNTS];
 
-int i, j;
-int rows, ccFlag;
-int segs, lNdx, lNdx1, lMods, lHeight;
-int evenRow, rev;
-int chexSize;
-char *ccStr;
-int rPadl1, rPadcc;
+	int i, j;
+	int rows, ccFlag;
+	int segs, lNdx, lNdx1, lMods, lHeight;
+	int evenRow, rev;
+	int chexSize;
+	char *ccStr;
+	int rPadl1, rPadcc;
 
 	// Initialise to avoid compiler warnings
 	lNdx = 0;
@@ -391,7 +391,7 @@ int rPadl1, rPadcc;
 // convert AI string to bar widths in dbl segments
 static int RSS14Eenc(uint8_t string[], uint8_t bars[MAX_DBL_SEGS][ELMNTS], int ccFlag) {
 
-#define FINDER_SIZE 6
+	#define FINDER_SIZE 6
 
 	static const uint8_t finders[FINDER_SIZE][3] = {
 		{ 1,8,4 },
@@ -417,11 +417,11 @@ static int RSS14Eenc(uint8_t string[], uint8_t bars[MAX_DBL_SEGS][ELMNTS], int c
 	static const int parWts[24] = { 0,1,20,189,193,62,185,113,150,46,76,43,16,109,
 					70,134,148,6,120,79,103,161,55,45 };
 
-int i, j;
-int parity, weight;
-int symValue;
-int size, fndrNdx, fndrSetNdx;
-uint8_t bitField[MAX_DBL_SEGS*3];
+	int i, j;
+	int parity, weight;
+	int symValue;
+	int size, fndrNdx, fndrSetNdx;
+	uint8_t bitField[MAX_DBL_SEGS*3];
 
 	linFlag = true;
 	parity = 0;
@@ -511,11 +511,11 @@ static int symCharPat(uint8_t bars[], int symValue, int parity, int weight,
 					6,3,	11,6,	104,1040,
 					4,1,	13,8,	204,204 };
 
-int i, value, saveVal;
-int elementN, elementMax;
-int wgtOdd, wgtEven;
-int iIndex;
-int *widths;
+	int i, value, saveVal;
+	int elementN, elementMax;
+	int wgtOdd, wgtEven;
+	int iIndex;
+	int *widths;
 
 	wgtOdd = weight;
 	wgtEven = (weight * 3) % PARITY_MOD;
@@ -569,7 +569,7 @@ int *widths;
 
 // gets the next 12 bit sym char from bit string
 static int getVal12(uint8_t bitString[], int symNdx) {
-int val, ndx;
+	int val, ndx;
 
 	ndx = symNdx*3/2; // index into bitString
 	if (symNdx & 1) {
@@ -587,8 +587,7 @@ int val, ndx;
 
 // looks for '^' (symbol separator) in string and returns char index iff found
 static int isSymbolSepatator(uint8_t string[]) {
-
-int i;
+	int i;
 
 	for (i = 0; i < (int)strlen((char*)string); i++) {
 		if (string[i] == '^') {

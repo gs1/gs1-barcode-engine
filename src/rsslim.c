@@ -27,14 +27,10 @@
 #include "rssutil.h"
 #include "cc.h"
 
-// not including guard bars
-#define ELMNTS (46-4)
-// symbol width in modules including any quiet zones:
-#define SYM_W		74
-// total pixel ht of RSS14L
-#define SYM_H	10
-
-#define L_PADB 10 // RSS14L left pad for ccb
+#define ELMNTS	(46-4)	// not including guard bars
+#define SYM_W	74	// symbol width in modules including any quiet zones
+#define SYM_H	10	// total pixel ht of RSS14L
+#define L_PADB 10	// RSS14L left pad for ccb
 
 static bool RSSLimEnc(uint8_t str[], uint8_t pattern[], int ccFlag);
 static struct sPrints *separatorLim(struct sParams *params, struct sPrints *prints);
@@ -45,17 +41,17 @@ extern uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
 
 void RSSLim(struct sParams *params) {
 
-struct sPrints prints;
-struct sPrints *prntCnv;
+	struct sPrints prints;
+	struct sPrints *prntCnv;
 
-uint8_t linPattern[ELMNTS];
+	uint8_t linPattern[ELMNTS];
 
-char primaryStr[14+1];
-char tempStr[28+1];
+	char primaryStr[14+1];
+	char tempStr[28+1];
 
-int i;
-int rows, ccFlag;
-char *ccStr;
+	int i;
+	int rows, ccFlag;
+	char *ccStr;
 
 	ccStr = strchr(params->dataStr, '|');
 	if (ccStr == NULL) ccFlag = false;
@@ -245,16 +241,17 @@ char *ccStr;
 	return;
 }
 
+
+#define	N	26
+#define	K	7
+#define PARITY_MOD 89
+#define SUPL_VAL 2015133531096.
+
+// left char multiplier
+#define LEFT_MUL 2013571.
+
 // call with str = 13-digit primary, no check digit
 static bool RSSLimEnc(uint8_t string[], uint8_t bars[], int ccFlag) {
-
-	#define	N	26
-	#define	K	7
-	#define PARITY_MOD 89
-	#define SUPL_VAL 2015133531096.
-
-	// left char multiplier
-	#define LEFT_MUL 2013571.
 
 	// stores odd element N & max, even N & max, odd mul, combos
 	static const long oddEvenTbl[1*7*6] = { /* 26,7 */
@@ -457,11 +454,13 @@ static bool RSSLimEnc(uint8_t string[], uint8_t bars[], int ccFlag) {
 	return(true);
 }
 
+
 static struct sPrints prntSep;
 static uint8_t sepPattern[SYM_W];
 
 static struct sPrints *separatorLim(struct sParams *params, struct sPrints *prints) {
-int i, j, k;
+
+	int i, j, k;
 
 	prntSep.leftPad = prints->leftPad;
 	prntSep.rightPad = prints->rightPad;
