@@ -24,9 +24,6 @@
     <ClCompile Include="rss14.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="rssenc.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="rssexp.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -36,10 +33,13 @@
     <ClCompile Include="ucc128.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="enc.c">
+    <ClCompile Include="rssutil.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="rssutil.c">
+    <ClCompile Include="gs1encoders.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="util.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -54,6 +54,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="rssutil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="util.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
