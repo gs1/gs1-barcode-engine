@@ -31,7 +31,7 @@
 #define MAX_KEYDATA 120
 #define MAX_LINHT 500 // max UCC/EAN-128 height in X
 
-const char* SYMBOLOGY_NAMES[] =
+static const char* SYMBOLOGY_NAMES[] =
 {
 	"",  // Spacer
 	"GS1 DataBar",

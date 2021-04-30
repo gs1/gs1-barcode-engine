@@ -119,17 +119,20 @@ static uint16_t yymmdd(uint8_t str[]);
 static void cnv13 (uint8_t str[], int *iStr, uint8_t bitField[], int *iBit);
 static void cnv12 (uint8_t str[], int *iStr, uint8_t bitField[], int *iBit);
 
+static const uint32_t barData[3][929];
+static const uint32_t barRap[2][52];
 
-static int *CCSizes; // will point to CCxSizes
+
+static const int *CCSizes; // will point to CCxSizes
 
 
-static int CC2Sizes[] = {	59,78,88,108,118,138,167,	// cca sizes
+static const int CC2Sizes[] = {	59,78,88,108,118,138,167,	// cca sizes
 				208,256,296,336,		// ccb sizes
 				0 };
 
 int CC2enc(uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS] ) {
 
-	static int rows[11] = { 5,6,7,8,9,10,12,  17,20,23,26 }; // 7 CCA & 4 CCB row counts
+	static const int rows[11] = { 5,6,7,8,9,10,12,  17,20,23,26 }; // 7 CCA & 4 CCB row counts
 
 	uint8_t bitField[MAX_BYTES];
 	uint16_t codeWords[MAX_CW];
@@ -162,13 +165,13 @@ int CC2enc(uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS] ) {
 }
 
 
-static int CC3Sizes[] = {	78,98,118,138,167,		// cca sizes
+static const int CC3Sizes[] = {	78,98,118,138,167,		// cca sizes
 				208,304,416,536,648,768,	// ccb sizes
 				0 };
 
 int CC3enc(uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS] ) {
 
-	static int rows[11] = { 4,5,6,7,8,  15,20,26,32,38,44 }; // 5 CCA & 6 CCB row counts
+	static const int rows[11] = { 4,5,6,7,8,  15,20,26,32,38,44 }; // 5 CCA & 6 CCB row counts
 
 	uint8_t bitField[MAX_BYTES];
 	uint16_t codeWords[MAX_CW];
@@ -201,13 +204,13 @@ int CC3enc(uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS] ) {
 }
 
 
-static int CC4Sizes[] = {	78,108,138,167,197, // cca sizes
+static const int CC4Sizes[] = {	78,108,138,167,197, // cca sizes
 				208,264,352,496,672,840,1016,1184, // ccb sizes
 				0 };
 
 int CC4enc(uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS] ) {
 
-	static int rows[13] = { 3,4,5,6,7,  10,12,15,20,26,32,38,44 }; // 5 CCA & 8 CCB row counts
+	static const int rows[13] = { 3,4,5,6,7,  10,12,15,20,26,32,38,44 }; // 5 CCA & 8 CCB row counts
 
 	uint8_t bitField[MAX_BYTES];
 	uint16_t codeWords[MAX_CW];
@@ -265,8 +268,8 @@ bool CCCenc(uint8_t str[], uint8_t patCCC[] ) {
 static void encCCA2(int size, uint8_t bitField[], uint16_t codeWords[],
 		uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
 
-	static int dataCw[7] = { 6,8,9,11,12,14,17 };
-	static int eccCw[7] = { 4,4,5,5,6,6,7 };
+	static const int dataCw[7] = { 6,8,9,11,12,14,17 };
+	static const int eccCw[7] = { 4,4,5,5,6,6,7 };
 
 	encode928(bitField, codeWords, CC2Sizes[size]);
 
@@ -279,9 +282,9 @@ static void encCCA2(int size, uint8_t bitField[], uint16_t codeWords[],
 static void encCCB2(int size, uint8_t bitField[], uint16_t codeWords[],
 		uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
 
-	static int dataBytes[4] = { 26,32,37,42 };
-	static int dataCw[4] = { 24,29,33,37 };
-	static int eccCw[4] = { 10,11,13,15 };
+	static const int dataBytes[4] = { 26,32,37,42 };
+	static const int dataCw[4] = { 24,29,33,37 };
+	static const int eccCw[4] = { 10,11,13,15 };
 
 	codeWords[0] = 920; // insert UCC/EAN flag and byte mode latch
 	codeWords[1] =
@@ -296,8 +299,8 @@ static void encCCB2(int size, uint8_t bitField[], uint16_t codeWords[],
 static void encCCA3(int size, uint8_t bitField[], uint16_t codeWords[],
 		uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
 
-	static int dataCw[5] = { 8,10,12,14,17 };
-	static int eccCw[5] = { 4,5,6,7,7 };
+	static const int dataCw[5] = { 8,10,12,14,17 };
+	static const int eccCw[5] = { 4,5,6,7,7 };
 
 	encode928(bitField, codeWords, CC3Sizes[size]);
 	genECC(dataCw[size], eccCw[size], codeWords);
@@ -309,9 +312,9 @@ static void encCCA3(int size, uint8_t bitField[], uint16_t codeWords[],
 static void encCCB3(int size, uint8_t bitField[], uint16_t codeWords[],
 		uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
 
-	static int dataBytes[6] = { 26,38,52,67,81,96 };
-	static int dataCw[6] = { 24,34,46,58,70,82 };
-	static int eccCw[6] = { 21,26,32,38,44,50 };
+	static const int dataBytes[6] = { 26,38,52,67,81,96 };
+	static const int dataCw[6] = { 24,34,46,58,70,82 };
+	static const int eccCw[6] = { 21,26,32,38,44,50 };
 
 	codeWords[0] = 920; // insert UCC/EAN flag and byte mode latch
 	codeWords[1] =
@@ -326,8 +329,8 @@ static void encCCB3(int size, uint8_t bitField[], uint16_t codeWords[],
 static void encCCA4(int size, uint8_t bitField[], uint16_t codeWords[],
 		uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
 
-	static int dataCw[5] = { 8,11,14,17,20 };
-	static int eccCw[5] = { 4,5,6,7,8 };
+	static const int dataCw[5] = { 8,11,14,17,20 };
+	static const int eccCw[5] = { 4,5,6,7,8 };
 
 	encode928(bitField, codeWords, CC4Sizes[size]);
 	genECC(dataCw[size], eccCw[size], codeWords);
@@ -339,9 +342,9 @@ static void encCCA4(int size, uint8_t bitField[], uint16_t codeWords[],
 static void encCCB4(int size, uint8_t bitField[], uint16_t codeWords[],
 		uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
 
-	static int dataBytes[8] = { 26,33,44,62,84,105,127,148 };
-	static int dataCw[8] = { 24,30,39,54,72,90,108,126 };
-	static int eccCw[8] = { 16,18,21,26,32,38,44,50 };
+	static const int dataBytes[8] = { 26,33,44,62,84,105,127,148 };
+	static const int dataCw[8] = { 24,30,39,54,72,90,108,126 };
+	static const int eccCw[8] = { 16,18,21,26,32,38,44,50 };
 
 	codeWords[0] = 920; // insert UCC/EAN flag and byte mode latch
 	codeWords[1] =
@@ -371,8 +374,8 @@ static void encCCC(int byteCnt, uint8_t bitField[], uint16_t codeWords[], uint8_
 
 static void imgCCA2(int size, uint16_t codeWords[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
 
-	static int rows[7] = { 5,6,7,8,9,10,12 };
-	static int raps[7] = { 39,1,32,8,14,43,20 };
+	static const int rows[7] = { 5,6,7,8,9,10,12 };
+	static const int raps[7] = { 39,1,32,8,14,43,20 };
 
 	uint32_t bars;
 	int rowCnt, rapL;
@@ -412,9 +415,9 @@ static void imgCCA2(int size, uint16_t codeWords[], uint8_t pattern[MAX_CCB4_ROW
 
 static void imgCCB2(int size, uint16_t codeWords[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
 
-	static int rows[4] = { 17,20,23,26 };
-	static int raps[4] = { 36,19,9,27 };
-	static int rotate[4] = { 0,0,8,8 };
+	static const int rows[4] = { 17,20,23,26 };
+	static const int raps[4] = { 36,19,9,27 };
+	static const int rotate[4] = { 0,0,8,8 };
 
 	uint32_t bars;
 	int rowCnt, rapL;
@@ -453,8 +456,8 @@ static void imgCCB2(int size, uint16_t codeWords[], uint8_t pattern[MAX_CCB4_ROW
 
 static void imgCCA3(int size, uint16_t codeWords[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
 
-	static int rows[5] = { 4,5,6,7,8 };
-	static int raps[5] = { 11,1,5,15,21 };
+	static const int rows[5] = { 4,5,6,7,8 };
+	static const int raps[5] = { 11,1,5,15,21 };
 
 	uint32_t bars;
 	int rowCnt, rapL;
@@ -499,9 +502,9 @@ static void imgCCA3(int size, uint16_t codeWords[], uint8_t pattern[MAX_CCB4_ROW
 
 static void imgCCB3(int size, uint16_t codeWords[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
 
-	static int rows[6] = { 15,20,26,32,38,44 };
-	static int raps[6] = { 37,1,1,21,15,1 };
-	static int rotate[6] = { 0,16,8,8,16,24 };
+	static const int rows[6] = { 15,20,26,32,38,44 };
+	static const int raps[6] = { 37,1,1,21,15,1 };
+	static const int rotate[6] = { 0,16,8,8,16,24 };
 
 	uint32_t bars;
 	int rowCnt, rapL;
@@ -551,8 +554,8 @@ static void imgCCB3(int size, uint16_t codeWords[], uint8_t pattern[MAX_CCB4_ROW
 
 static void imgCCA4(int size, uint16_t codeWords[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
 
-	static int rows[5] = { 3,4,5,6,7 };
-	static int raps[5] = { 40,43,46,34,29 };
+	static const int rows[5] = { 3,4,5,6,7 };
+	static const int raps[5] = { 40,43,46,34,29 };
 
 	uint32_t bars;
 	int rowCnt, rapL;
@@ -607,9 +610,9 @@ static void imgCCA4(int size, uint16_t codeWords[], uint8_t pattern[MAX_CCB4_ROW
 
 static void imgCCB4(int size, uint16_t codeWords[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
 
-	static int rows[8] = { 10,12,15,20,26,32,38,44 };
-	static int raps[8] = { 15,25,37,1,1,21,15,1 };
-	static int rotate[8] = { 0,0,0,16,8,8,16,24 };
+	static const int rows[8] = { 10,12,15,20,26,32,38,44 };
+	static const int raps[8] = { 15,25,37,1,1,21,15,1 };
+	static const int rotate[8] = { 0,0,0,16,8,8,16,24 };
 
 	uint32_t bars;
 	int rowCnt, rapL;
@@ -664,8 +667,8 @@ static void imgCCB4(int size, uint16_t codeWords[], uint8_t pattern[MAX_CCB4_ROW
 
 static void imgCCC(uint16_t codeWords[], uint8_t patCCC[]) {
 
-	static uint8_t leftPtn[9] = { 2,8,1,1,1,1,1,1,3 }; // qz + start
-	static uint8_t rightPtn[10] = { 7,1,1,3,1,1,1,2,1,2 }; // stop + qz
+	static const uint8_t leftPtn[9] = { 2,8,1,1,1,1,1,1,3 }; // qz + start
+	static const uint8_t rightPtn[10] = { 7,1,1,3,1,1,1,2,1,2 }; // stop + qz
 
 	int leftRowBase[3]; // right row is (left index+2) mod 3
 
@@ -784,7 +787,7 @@ int pack(uint8_t str[], uint8_t bitField[]) {
 }
 
 
-const uint8_t iswhat[256] = { /* byte look up table with IS_XXX bits */
+static const uint8_t iswhat[256] = { /* byte look up table with IS_XXX bits */
 	/* 32 control characters: */
 		0x80,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -1259,7 +1262,7 @@ static void procAI90(struct encodeT *encode) {
 	int i, j, k;
 	int alLessNu;
 	int diNum1, diAlpha1;
-	static uint8_t alphaTbl[] = "BDHIJKLNPQRSTVWZ"; // strlen must be 16
+	static const uint8_t alphaTbl[] = "BDHIJKLNPQRSTVWZ"; // strlen must be 16
 
 	// method "11", look ahead to find best compaction scheme
 	j = 10000; // 10000: initial flag for non-numeric index
@@ -1569,7 +1572,7 @@ static uint16_t yymmdd(uint8_t str[]) {
 
 
 // converts 13 digits to 44 bits
-static void cnv13 (uint8_t str[], int *iStr, uint8_t bitField[], int *iBit) {
+static void cnv13(uint8_t str[], int *iStr, uint8_t bitField[], int *iBit) {
 
 	int i;
 
@@ -1588,7 +1591,7 @@ static void cnv13 (uint8_t str[], int *iStr, uint8_t bitField[], int *iBit) {
 
 
 // converts 12 digits to 40 bits
-static void cnv12 (uint8_t str[], int *iStr, uint8_t bitField[], int *iBit) {
+static void cnv12(uint8_t str[], int *iStr, uint8_t bitField[], int *iBit) {
 	int i;
 
 	for (i = 0; i < 4 ; i++) {
@@ -1610,7 +1613,7 @@ returns number of bits left to closest 2d symbol,
 static int getUnusedBitCnt(int iBit, int *size) {
 
 	// max data plus ecc codewords for CC-C
-	static int eccMaxCW[] = { 40+8, 160+16, 320+32, 863+64, 0 };
+	static const int eccMaxCW[] = { 40+8, 160+16, 320+32, 863+64, 0 };
 
 	int i, byteCnt, cwCnt;
 
@@ -1698,7 +1701,7 @@ void putBits(uint8_t bitField[], int bitPos, int length, uint16_t bits) {
 }
 
 
-const uint16_t pwr928[69][7];
+static const uint16_t pwr928[69][7];
 
 /* converts bit string to base 928 values, codeWords[0] is highest order */
 static int encode928(uint8_t bitString[], uint16_t codeWords[], int bitLng) {
@@ -1729,7 +1732,7 @@ static int encode928(uint8_t bitString[], uint16_t codeWords[], int bitLng) {
 /* converts bytes to base 900 values (codeWords), codeWords[0] is highest order */
 static void encode900(uint8_t byteArr[], uint16_t codeWords[], int byteLng) {
 
-	static uint16_t pwrByte[6][5] = { {0,0,0,0,1}, {0,0,0,0,256}, {0,0,0,72,736},
+	static const uint16_t pwrByte[6][5] = { {0,0,0,0,1}, {0,0,0,0,256}, {0,0,0,72,736},
 					{0,0,20,641,316}, {0,5,802,385,796}, {1,608,221,686,376}  };
 
 	int i, j, bCnt, cwNdx;
@@ -1769,9 +1772,9 @@ static int getBit(uint8_t bitStr[], int bitPos) {
 
 
 /* GF(929) log and antilog tables: */
-const int gfPwr[928];
-const int gfLog[929];
-int gpa[512];
+static const int gfPwr[928];
+static const int gfLog[929];
+static int gpa[512];
 
 static void genECC(int dsize, int csize, uint16_t sym[]) {
 	int i, n, t;
@@ -1818,7 +1821,7 @@ static int gfMul(int a,int b) {
 }
 
 
-const uint32_t barData[3][929] = {{
+static const uint32_t barData[3][929] = {{
  6591070,8688228,10785386,6591133,8688291,10785449,4494038,6591196,4494101,2397006,
  4494164,2397069,4494430,6591588,8688746,4494493,6591651,8688809,2397398,4494556,
  2397461,2397790,4494948,6592106,2397853,4495011,6592169,2397916,4495074,2398308,
@@ -2100,7 +2103,7 @@ const uint32_t barData[3][929] = {{
  3777105,3544145,5411402,5411465,3547722,3314762,3547785,3314825,7279177}};
 
 
-const uint32_t barRap[2][52] = {{
+static const uint32_t barRap[2][52] = {{
  74441,103113,103561,74889,71305,71753,75337,104009,107593,136265,
  139849,111177,82505,78921,78473,107145,135817,135761,135754,107082,
  103498,103050,103057,103001,102994,102987,74315,74322,74329,74385,
@@ -2115,7 +2118,7 @@ const uint32_t barRap[2][52] = {{
  37978,37985,}};
 
 
-const uint16_t pwr928[69][7] = {
+static const uint16_t pwr928[69][7] = {
   {0,0,0,0,0,0,1},
   {0,0,0,0,0,0,2},
   {0,0,0,0,0,0,4},
@@ -2188,7 +2191,7 @@ const uint16_t pwr928[69][7] = {
 };
 
 
-const int gfLog[929] = { 0,0,810,1,692,876,811,505,574,2,758,142,693,857,387,
+static const int gfLog[929] = { 0,0,810,1,692,876,811,505,574,2,758,142,693,857,387,
  877,456,721,812,728,640,506,24,872,575,824,739,3,269,126,759,169,338,143,603,
  453,694,332,610,858,522,443,388,697,834,878,754,430,457,82,706,722,621,12,
  813,90,151,729,8,421,641,902,51,507,220,805,25,543,485,873,335,418,576,711,
@@ -2238,7 +2241,7 @@ const int gfLog[929] = { 0,0,810,1,692,876,811,505,574,2,758,142,693,857,387,
  257,920,413,851,393,229,606,294,466,110,41,347,412,228,465,346,464 };
 
 
-const int gfPwr[928] = { 1,3,9,27,81,243,729,329,58,174,522,637,53,159,477,502,
+static const int gfPwr[928] = { 1,3,9,27,81,243,729,329,58,174,522,637,53,159,477,502,
  577,802,548,715,287,861,725,317,22,66,198,594,853,701,245,735,347,112,336,79,
  237,711,275,825,617,922,908,866,740,362,157,471,484,523,640,62,186,558,745,
  377,202,606,889,809,569,778,476,499,568,775,467,472,487,532,667,143,429,358,

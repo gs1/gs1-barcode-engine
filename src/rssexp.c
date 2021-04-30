@@ -393,29 +393,29 @@ static int RSS14Eenc(uint8_t string[], uint8_t bars[MAX_DBL_SEGS][ELMNTS], int c
 
 #define FINDER_SIZE 6
 
-static uint8_t finders[FINDER_SIZE][3] = {
-	{ 1,8,4 },
-	{ 3,6,4 },
-	{ 3,4,6 },
-	{ 3,2,8 },
-	{ 2,6,5 },
-	{ 2,2,9 } };
+	static const uint8_t finders[FINDER_SIZE][3] = {
+		{ 1,8,4 },
+		{ 3,6,4 },
+		{ 3,4,6 },
+		{ 3,2,8 },
+		{ 2,6,5 },
+		{ 2,2,9 } };
 
-static int finderSets[10][11] = {
-	{ 1,	-1,	0,	 0,	0,	 0,	0,	 0,	0,	 0,	0},
-	{ 1,	-2,	2,	 0,	0,	 0,	0,	 0,	0,	 0,	0},
-	{ 1,	-3,	2,	-4,	0,	 0,	0,	 0,	0,	 0,	0},
-	{ 1,	-5,	2,	-4,	3,	 0,	0,	 0,	0,	 0,	0},
-	{ 1,	-5,	2,	-4,	4,	-6,	0,	 0,	0,	 0,	0},
-	{ 1,	-5,	2,	-4,	5,	-6,	6,	 0,	0,	 0,	0},
-	{ 1,	-1,	2,	-2,	3,	-3,	4,	-4,	0,	 0,	0},
-	{ 1,	-1,	2,	-2,	3,	-3,	4,	-5,	5,	 0,	0},
-	{ 1,	-1,	2,	-2,	3,	-3,	4,	-5,	6,	-6,	0},
-	{ 1,	-1,	2,	-2,	3,	-4,	4,	-5,	5,	-6,	6} };
+	static const int finderSets[10][11] = {
+		{ 1,	-1,	0,	 0,	0,	 0,	0,	 0,	0,	 0,	0},
+		{ 1,	-2,	2,	 0,	0,	 0,	0,	 0,	0,	 0,	0},
+		{ 1,	-3,	2,	-4,	0,	 0,	0,	 0,	0,	 0,	0},
+		{ 1,	-5,	2,	-4,	3,	 0,	0,	 0,	0,	 0,	0},
+		{ 1,	-5,	2,	-4,	4,	-6,	0,	 0,	0,	 0,	0},
+		{ 1,	-5,	2,	-4,	5,	-6,	6,	 0,	0,	 0,	0},
+		{ 1,	-1,	2,	-2,	3,	-3,	4,	-4,	0,	 0,	0},
+		{ 1,	-1,	2,	-2,	3,	-3,	4,	-5,	5,	 0,	0},
+		{ 1,	-1,	2,	-2,	3,	-3,	4,	-5,	6,	-6,	0},
+		{ 1,	-1,	2,	-2,	3,	-4,	4,	-5,	5,	-6,	6} };
 
-// element 1 weighting for characters N determined by adjacent finder
-static int parWts[24] = { 0,1,20,189,193,62,185,113,150,46,76,43,16,109,
-				70,134,148,6,120,79,103,161,55,45 };
+	// element 1 weighting for characters N determined by adjacent finder
+	static const int parWts[24] = { 0,1,20,189,193,62,185,113,150,46,76,43,16,109,
+					70,134,148,6,120,79,103,161,55,45 };
 
 int i, j;
 int parity, weight;
@@ -503,13 +503,13 @@ uint8_t bitField[MAX_DBL_SEGS*3];
 static int symCharPat(uint8_t bars[], int symValue, int parity, int weight,
 							 int forwardFlag) {
 
-// odd elements N & max, even N & max, odd mul, combos:
-static int tbl174[5*6] = {
-		/* 17,4 */	12,7,	5,2,	4,	348,
-				10,5,	7,4,	20,	1040,
-				8,4,	9,5,	52,	1560,
-				6,3,	11,6,	104,1040,
-				4,1,	13,8,	204,204 };
+	// odd elements N & max, even N & max, odd mul, combos:
+	static const int tbl174[5*6] = {
+			/* 17,4 */	12,7,	5,2,	4,	348,
+					10,5,	7,4,	20,	1040,
+					8,4,	9,5,	52,	1560,
+					6,3,	11,6,	104,1040,
+					4,1,	13,8,	204,204 };
 
 int i, value, saveVal;
 int elementN, elementMax;

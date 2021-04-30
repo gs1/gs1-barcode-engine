@@ -201,14 +201,14 @@ void EAN13(struct sParams *params) {
 // call with str = 13-digit primary with check digit = 0
 static bool EAN13enc(uint8_t str[], uint8_t pattern[] ) {
 
-	static uint16_t upcTblA[10] = {	0x3211, 0x2221, 0x2122, 0x1411, 0x1132,
+	static const uint16_t upcTblA[10] = {	0x3211, 0x2221, 0x2122, 0x1411, 0x1132,
 					0x1231, 0x1114, 0x1312, 0x1213, 0x3112 };
-	static uint16_t upcTblB[10] = {	0x1123, 0x1222, 0x2212, 0x1141, 0x2311,
+	static const uint16_t upcTblB[10] = {	0x1123, 0x1222, 0x2212, 0x1141, 0x2311,
 					0x1321, 0x4111, 0x2131, 0x3121, 0x2113 };
-	static uint16_t abArr[10] = { 0 /*0x07*/,0x0B,0x0D,0x0E,0x13,0x19,0x1C,0x15,0x16,0x1A };
-	static uint8_t lGuard[4] = { 7,1,1,1 };
-	static uint8_t center[5] = { 1,1,1,1,1 };
-	static uint8_t rGuard[4] = { 1,1,1,7 };
+	static const uint16_t abArr[10] = { 0 /*0x07*/,0x0B,0x0D,0x0E,0x13,0x19,0x1C,0x15,0x16,0x1A };
+	static const uint8_t lGuard[4] = { 7,1,1,1 };
+	static const uint8_t center[5] = { 1,1,1,1,1 };
+	static const uint8_t rGuard[4] = { 1,1,1,7 };
 
 	int i, j, abMask, bars, sNdx, pNdx, abBits;
 
@@ -436,11 +436,11 @@ void EAN8(struct sParams *params) {
 // call with str = 8-digit primary with check digit = 0
 static bool EAN8enc(uint8_t str[], uint8_t pattern[] ) {
 
-	static uint16_t upcTblA[10] = {	0x3211, 0x2221, 0x2122, 0x1411, 0x1132,
+	static const uint16_t upcTblA[10] = {	0x3211, 0x2221, 0x2122, 0x1411, 0x1132,
 					0x1231, 0x1114, 0x1312, 0x1213, 0x3112 };
-	static uint8_t lGuard[4] = { 7,1,1,1 };
-	static uint8_t center[5] = { 1,1,1,1,1 };
-	static uint8_t rGuard[4] = { 1,1,1,7 };
+	static const uint8_t lGuard[4] = { 7,1,1,1 };
+	static const uint8_t center[5] = { 1,1,1,1,1 };
+	static const uint8_t rGuard[4] = { 1,1,1,7 };
 
 	int i, j, bars, sNdx, pNdx;
 
@@ -648,13 +648,13 @@ void UPCE(struct sParams *params) {
 // call with str = 13-digit primary with check digit = 0
 static bool UPCEenc(uint8_t str[], uint8_t pattern[] ) {
 
-	static uint16_t upcTblA[10] = {	0x3211, 0x2221, 0x2122, 0x1411, 0x1132,
+	static const uint16_t upcTblA[10] = {	0x3211, 0x2221, 0x2122, 0x1411, 0x1132,
 					0x1231, 0x1114, 0x1312, 0x1213, 0x3112 };
-	static uint16_t upcTblB[10] = {	0x1123, 0x1222, 0x2212, 0x1141, 0x2311,
+	static const uint16_t upcTblB[10] = {	0x1123, 0x1222, 0x2212, 0x1141, 0x2311,
 					0x1321, 0x4111, 0x2131, 0x3121, 0x2113 };
-	static uint16_t abArr[10] = { 0x07,0x0B,0x0D,0x0E,0x13,0x19,0x1C,0x15,0x16,0x1A };
-	static uint8_t lGuard[4] = { 7,1,1,1 };
-	static uint8_t rGuard[7] = { 1,1,1,1,1,1,7 };
+	static const uint16_t abArr[10] = { 0x07,0x0B,0x0D,0x0E,0x13,0x19,0x1C,0x15,0x16,0x1A };
+	static const uint8_t lGuard[4] = { 7,1,1,1 };
+	static const uint8_t rGuard[7] = { 1,1,1,1,1,1,7 };
 
 	uint8_t data6[6+1];
 

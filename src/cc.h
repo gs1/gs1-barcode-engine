@@ -37,7 +37,6 @@
 #define CCB4_ELMNTS 53		// includes qz's
 #define MAX_CCB4_ROWS 44	// ccb-4 max rows
 
-// TODO remove global
 uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
 
 int CC2enc(uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
@@ -48,8 +47,5 @@ bool CCCenc(uint8_t str[], uint8_t pattern[]);
 int check2DData(uint8_t dataStr[]);
 int pack(uint8_t str[], uint8_t bitField[] );
 void putBits(uint8_t bitField[], int bitPos, int length, uint16_t bits);
-
-const uint32_t barData[3][929];
-const uint32_t barRap[2][52];
 
 #endif /* CC_H */

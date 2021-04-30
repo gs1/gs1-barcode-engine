@@ -50,7 +50,7 @@ extern int errFlag;
 extern int line1;
 extern uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
 
-uint8_t patCCC[MAX_PAT];
+static uint8_t patCCC[MAX_PAT];
 
 
 void U128A(struct sParams *params) {
@@ -396,7 +396,7 @@ static int enc128(uint8_t data[], uint8_t bars[], int link)
 {
 	/* convert ASCII data[] into symchr[] values */
 
-	static int linkChar[3][2] = { { 100,99 }, { 99,101 }, { 101,100 } };
+	static const int linkChar[3][2] = { { 100,99 }, { 99,101 }, { 101,100 } };
 	int si, di, i, code;
 	int symchr[SYMMAX+1];
 	long ckchr;
@@ -635,8 +635,10 @@ static void cdc128(uint8_t data[], int *di, int symchr[], int *si, int *code)
  *
  */
 static void tbl128(int symchr[], uint8_t bars[])
-{   /* octal of 1st 5 elements in symbol char */
-	static int sym128[107] ={
+{
+
+	/* octal of 1st 5 elements in symbol char */
+	static const int sym128[107] ={
 		021222,022212,022222,012122,012132,
 		013122,012221,012231,013221,022121,
 		022131,023121,011223,012213,012223,
@@ -665,7 +667,6 @@ static void tbl128(int symchr[], uint8_t bars[])
 	uint8_t i;
 
 	/* look up symchr[]'s and copy widths into bars[] */
-
 	si = bi = 0;
 	bars[bi++] = 10; /* leading qz */
 	while ((val = symchr[si++]) != -1) {

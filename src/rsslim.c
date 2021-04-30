@@ -257,7 +257,7 @@ static bool RSSLimEnc(uint8_t string[], uint8_t bars[], int ccFlag) {
 	#define LEFT_MUL 2013571.
 
 	// stores odd element N & max, even N & max, odd mul, combos
-	static long oddEvenTbl[1*7*6] = { /* 26,7 */
+	static const long oddEvenTbl[1*7*6] = { /* 26,7 */
 								17,6,	9,3,	28,		183064,
 								13,5,	13,4,	728,	637000,
 								9,3,	17,6,	6454,	180712,
@@ -266,7 +266,7 @@ static bool RSSLimEnc(uint8_t string[], uint8_t bars[], int ccFlag) {
 								19,8,	7,1,	1,		17094,
 								7,1,	19,8,	16632,16632 };
 
-	static uint8_t parityPattern[PARITY_MOD * 14] = {
+	static const uint8_t parityPattern[PARITY_MOD * 14] = {
 		 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 3, 1, 1,
 		 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 2, 1, 1,
 		 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 3, 1, 1, 1,
@@ -358,8 +358,8 @@ static bool RSSLimEnc(uint8_t string[], uint8_t bars[], int ccFlag) {
 		 2, 1, 1, 1, 1, 1, 1, 1, 2, 2, 1, 2, 1, 1,
 	 };
 
-	static int leftWeights[2*K] = {1,3,9,27,81,65,17,51,64,14,42,37,22,66};
-	static int rightWeights[2*K] = {20,60,2,6,18,54,73,41,34,13,39,28,84,74};
+	static const int leftWeights[2*K] = {1,3,9,27,81,65,17,51,64,14,42,37,22,66};
+	static const int rightWeights[2*K] = {20,60,2,6,18,54,73,41,34,13,39,28,84,74};
 
 	double data;
 

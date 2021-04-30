@@ -732,21 +732,21 @@ static bool RSS14enc(uint8_t string[], uint8_t bars[], int ccFlag) {
 	#define	SEMI_MUL	1597
 
 	// stores even elements N & max, odd N & max, even mul, combos
-	static int tbl154[4*6] = {
+	static const int tbl154[4*6] = {
 		/* 15,4 */	10,7,	5,2,	4,	336,
 				8,5,	7,4,	20,	700,
 				6,3,	9,6,	48,	480,
 				4,1,	11,8,	81,	81 };
 
 	// stores odd elements N & max, even N & max, odd mul, combos
-	static int tbl164[5*6] = {
+	static const int tbl164[5*6] = {
 		/* 16,4 */	12,8,	4,1,	1,	161,
 				10,6,	6,3,	10,	800,
 				8,4,	8,5,	34,	1054,
 				6,3,	10,6,	70,	700,
 				4,1,	12,8,	126,126 };
 
-	static uint8_t leftParity[PARITYCHRSIZE * 3] = {
+	static const uint8_t leftParity[PARITYCHRSIZE * 3] = {
 		3,8,2,
 		3,5,5,
 		3,3,7,
@@ -757,9 +757,9 @@ static bool RSS14enc(uint8_t string[], uint8_t bars[], int ccFlag) {
 		1,5,7,
 		1,3,9 };
 
-	static int leftWeights[4*K] = {
+	static const int leftWeights[4*K] = {
 		1,3,9,27,2,6,18,54,4,12,36,29,8,24,72,58 };
-	static int rightWeights[4*K] = {
+	static const int rightWeights[4*K] = {
 		16,48,65,37,32,17,51,74,64,34,23,69,49,68,46,59 };
 
 	double data;
