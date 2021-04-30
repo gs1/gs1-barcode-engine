@@ -18,6 +18,7 @@
  *
  */
 
+#include <stdbool.h>
 #include <stdint.h>
 #include "rssutil.h"
 
@@ -103,8 +104,8 @@ int i, j, k;
 	prntSep.reverse = prints->reverse;
 	prntSep.pattern = sepPattern;
 	prntSep.height = params->sepHt;
-	prntSep.whtFirst = TRUE;
-  prntSep.guards = FALSE;
+	prntSep.whtFirst = true;
+  prntSep.guards = false;
 	for (i = 0, k = 2; k <= 4; k += prints->pattern[i], i++);
 	if ((prints->whtFirst && (i&1)==1) || (!prints->whtFirst && (i&1)==0)) {
 		sepPattern[0] = 4;

@@ -26,9 +26,6 @@
 
 #define PRNT 0 // prints symbol data if 1
 
-#define	TRUE	1
-#define	FALSE	0
-
 #define MAX_FNAME 120
 #define MAX_DATA (75+2361)
 
@@ -81,7 +78,7 @@ struct sParams {
 	int Yundercut;		// Y pixels to undercut
 	int sepHt;		// separator row height
 	int segWidth;
-	int bmp;		// TRUE is BMP else TIF file output
+	int bmp;		// true is BMP else TIF file output
 	int linHeight;		// height of UCC/EAN-128 in X
 	FILE *outfp;
 	char dataFile[MAX_FNAME+1];

@@ -19,6 +19,7 @@
  */
 
 #include <string.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include "enc.h"
@@ -56,15 +57,15 @@ int rows, ccFlag;
 char *ccStr;
 
 	ccStr = strchr(params->dataStr, '|');
-	if (ccStr == NULL) ccFlag = FALSE;
+	if (ccStr == NULL) ccFlag = false;
 	else {
-		ccFlag = TRUE;
+		ccFlag = true;
 		ccStr[0] = '\0'; // separate primary data
 		ccStr++; // point to secondary data
 	}
 
 	if (strlen(params->dataStr) > 13) {
-		errFlag = TRUE;
+		errFlag = true;
 		printf("\nprimary data exceeds 13 digits");
 		return;
 	}
@@ -91,16 +92,16 @@ char *ccStr;
 		printf("\nerror occurred, exiting.");
 		return;
 	}
-	line1 = TRUE; // so first line is not Y undercut
+	line1 = true; // so first line is not Y undercut
 	// init most common RSS Limited row prints values
 	prints.elmCnt = ELMNTS;
 	prints.pattern = linPattern;
 	prints.height = params->pixMult*SYM_H;
-	prints.guards = TRUE;
+	prints.guards = true;
 	prints.leftPad = 0;
 	prints.rightPad = 0;
-	prints.whtFirst = TRUE;
-	prints.reverse = FALSE;
+	prints.whtFirst = true;
+	prints.reverse = false;
 	if (ccFlag) {
 		if ((rows = CC3enc((uint8_t*)ccStr, ccPattern)) > 0) {
 			if (errFlag) {
@@ -141,7 +142,7 @@ char *ccStr;
 
 				// 2D composite
 				prints.elmCnt = CCA3_ELMNTS;
-				prints.guards = FALSE;
+				prints.guards = false;
 				prints.height = params->pixMult*2;
 				for (i = rows-1; i >= 0; i--) {
 					prints.pattern = ccPattern[i];
@@ -162,7 +163,7 @@ char *ccStr;
 
 				// 2D composite
 				prints.elmCnt = CCB3_ELMNTS;
-				prints.guards = FALSE;
+				prints.guards = false;
 				prints.height = params->pixMult*2;
 				prints.leftPad = 0;
 				for (i = rows-1; i >= 0; i--) {
@@ -178,7 +179,7 @@ char *ccStr;
 
           // 2D composite
 				prints.elmCnt = CCA3_ELMNTS;
-				prints.guards = FALSE;
+				prints.guards = false;
 				prints.height = params->pixMult*2;
 				for (i = 0; i < rows; i++) {
 					prints.pattern = ccPattern[i];
@@ -188,7 +189,7 @@ char *ccStr;
 				prints.elmCnt = ELMNTS;
 				prints.pattern = linPattern;
 				prints.height = params->pixMult*SYM_H;
-				prints.guards = TRUE;
+				prints.guards = true;
 
 				// RSS Limited CC separator pattern
 				prntCnv = separatorLim(params, &prints);
@@ -203,7 +204,7 @@ char *ccStr;
 
 				// 2D composite
 				prints.elmCnt = CCB3_ELMNTS;
-				prints.guards = FALSE;
+				prints.guards = false;
 				prints.height = params->pixMult*2;
 				prints.leftPad = 0;
 				for (i = 0; i < rows; i++) {
@@ -214,7 +215,7 @@ char *ccStr;
 				prints.elmCnt = ELMNTS;
 				prints.pattern = linPattern;
 				prints.height = params->pixMult*SYM_H;
-				prints.guards = TRUE;
+				prints.guards = true;
 				prints.leftPad = L_PADB;
 
 				// RSS Limited CC separator pattern
@@ -367,7 +368,7 @@ static int RSSLimEnc(uint8_t string[], uint8_t bars[], int ccFlag) {
 
 	data = atof((char*)string);
 	if (data > 1999999999999.) {
-		return(FALSE); // item number too large
+		return(false); // item number too large
 	}
 	if (ccFlag) data += SUPL_VAL;
 
@@ -449,7 +450,7 @@ static int RSSLimEnc(uint8_t string[], uint8_t bars[], int ccFlag) {
 		bars[14 + i] =
 					parityPattern[(parity * 14) + i];
 	}
-	return(TRUE);
+	return(true);
 }
 
 static struct sPrints prntSep;
@@ -463,8 +464,8 @@ int i, j, k;
 	prntSep.reverse = prints->reverse;
 	prntSep.pattern = sepPattern;
 	prntSep.height = params->sepHt;
-	prntSep.whtFirst = TRUE;
-	prntSep.guards = FALSE;
+	prntSep.whtFirst = true;
+	prntSep.guards = false;
 
 	sepPattern[0] = sepPattern[1] = 1;
 	sepPattern[ELMNTS+2] = sepPattern[ELMNTS+3] = 1;

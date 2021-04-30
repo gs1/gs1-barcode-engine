@@ -18,6 +18,7 @@
  *
  */
 
+#include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
 #include "enc.h"
@@ -58,15 +59,15 @@ int rows, ccFlag;
 char *ccStr;
 
 	ccStr = strchr(params->dataStr, '|');
-	if (ccStr == NULL) ccFlag = FALSE;
+	if (ccStr == NULL) ccFlag = false;
 	else {
-		ccFlag = TRUE;
+		ccFlag = true;
 		ccStr[0] = '\0'; // separate primary data
 		ccStr++; // point to secondary data
 	}
 
 	if (strlen(params->dataStr) > 12) {
-		errFlag = TRUE;
+		errFlag = true;
 		printf("\nprimary data exceeds 12 digits");
 		return;
 	}
@@ -90,25 +91,25 @@ char *ccStr;
 		printf("\n");
 #endif
 	}
-	line1 = TRUE; // so first line is not Y undercut
+	line1 = true; // so first line is not Y undercut
 	// init most likely prints values
 	prints.elmCnt = EAN13_ELMNTS;
 	prints.pattern = linPattern;
-	prints.guards = FALSE;
+	prints.guards = false;
 	prints.height = params->pixMult*EAN13_H;
 	prints.leftPad = 0;
 	prints.rightPad = 0;
-	prints.whtFirst = TRUE;
-	prints.reverse = FALSE;
+	prints.whtFirst = true;
+	prints.reverse = false;
 	// init most likely separator values
 	sepPrnt.elmCnt = 5;
 	sepPrnt.pattern = sepPat1;
-	sepPrnt.guards = FALSE;
+	sepPrnt.guards = false;
 	sepPrnt.height = params->pixMult*2;
 	sepPrnt.leftPad = 0;
 	sepPrnt.rightPad = 0;
-	sepPrnt.whtFirst = TRUE;
-	sepPrnt.reverse = FALSE;
+	sepPrnt.whtFirst = true;
+	sepPrnt.reverse = false;
 	if (ccFlag) {
 		if ((rows = CC4enc((uint8_t*)ccStr, ccPattern)) > 0) {
 			if (errFlag) {
@@ -248,7 +249,7 @@ int i, j, abMask, bars, sNdx, pNdx, abBits;
 	for (i = 0; i < 4; i++) {
 		pattern[pNdx++] = rGuard[i];
 	}
-	return(TRUE);
+	return(true);
 }
 
 // includes qz's
@@ -282,15 +283,15 @@ int lpadEAN;
 int elmntsCC;
 
 	ccStr = strchr(params->dataStr, '|');
-	if (ccStr == NULL) ccFlag = FALSE;
+	if (ccStr == NULL) ccFlag = false;
 	else {
-		ccFlag = TRUE;
+		ccFlag = true;
 		ccStr[0] = '\0'; // separate primary data
 		ccStr++; // point to secondary data
 	}
 
 	if (strlen(params->dataStr) > 12) {
-		errFlag = TRUE;
+		errFlag = true;
 		printf("\nprimary data exceeds 12 digits");
 		return;
 	}
@@ -314,28 +315,28 @@ int elmntsCC;
 		printf("\n");
 #endif
 	}
-	line1 = TRUE; // so first line is not Y undercut
+	line1 = true; // so first line is not Y undercut
 	// init most likely prints values
 	lpadEAN = 0;
 	lpadCC = EAN8_L_PAD;
 	elmntsCC = CCA3_ELMNTS;
 	prints.elmCnt = EAN8_ELMNTS;
 	prints.pattern = linPattern;
-	prints.guards = FALSE;
+	prints.guards = false;
 	prints.height = params->pixMult*EAN8_H;
 	prints.leftPad = 0;
 	prints.rightPad = 0;
-	prints.whtFirst = TRUE;
-	prints.reverse = FALSE;
+	prints.whtFirst = true;
+	prints.reverse = false;
 	// init most likely separator values
 	sepPrnt.elmCnt = 5;
 	sepPrnt.pattern = sepPat1;
-	sepPrnt.guards = FALSE;
+	sepPrnt.guards = false;
 	sepPrnt.height = params->pixMult*2;
 	sepPrnt.leftPad = 0;
 	sepPrnt.rightPad = 0;
-	sepPrnt.whtFirst = TRUE;
-	sepPrnt.reverse = FALSE;
+	sepPrnt.whtFirst = true;
+	sepPrnt.reverse = false;
 	if (ccFlag) {
 		if ((rows = CC3enc((uint8_t*)ccStr, ccPattern)) > 0) {
 			if (errFlag) {
@@ -474,7 +475,7 @@ int i, j, bars, sNdx, pNdx;
 	for (i = 0; i < 4; i++) {
 		pattern[pNdx++] = rGuard[i];
 	}
-	return(TRUE);
+	return(true);
 }
 
 // includes qz's
@@ -504,15 +505,15 @@ int rows, ccFlag;
 char *ccStr;
 
 	ccStr = strchr(params->dataStr, '|');
-	if (ccStr == NULL) ccFlag = FALSE;
+	if (ccStr == NULL) ccFlag = false;
 	else {
-		ccFlag = TRUE;
+		ccFlag = true;
 		ccStr[0] = '\0'; // separate primary data
 		ccStr++; // point to secondary data
 	}
 
 	if (strlen(params->dataStr) > 12) {
-		errFlag = TRUE;
+		errFlag = true;
 		printf("\nprimary data exceeds 12 digits");
 		return;
 	}
@@ -536,25 +537,25 @@ char *ccStr;
 		printf("\n");
 #endif
 	}
-	line1 = TRUE; // so first line is not Y undercut
+	line1 = true; // so first line is not Y undercut
 	// init most likely prints values
 	prints.elmCnt = UPCE_ELMNTS;
 	prints.pattern = linPattern;
-	prints.guards = FALSE;
+	prints.guards = false;
 	prints.height = params->pixMult*UPCE_H;
 	prints.leftPad = 0;
 	prints.rightPad = 0;
-	prints.whtFirst = TRUE;
-	prints.reverse = FALSE;
+	prints.whtFirst = true;
+	prints.reverse = false;
 	// init most likely separator values
 	sepPrnt.elmCnt = 5;
 	sepPrnt.pattern = sepPat1;
-	sepPrnt.guards = FALSE;
+	sepPrnt.guards = false;
 	sepPrnt.height = params->pixMult*2;
 	sepPrnt.leftPad = 0;
 	sepPrnt.rightPad = 0;
-	sepPrnt.whtFirst = TRUE;
-	sepPrnt.reverse = FALSE;
+	sepPrnt.whtFirst = true;
+	sepPrnt.reverse = false;
 	if (ccFlag) {
 		if ((rows = CC2enc((uint8_t*)ccStr, ccPattern)) > 0) {
 			if (errFlag) {
@@ -697,8 +698,8 @@ int i, j, abMask, bars, sNdx, pNdx, abBits;
 	}
 	else {
 		printf("\nData cannot be converted to UPC-E");
-		errFlag = TRUE;
-		return(FALSE);
+		errFlag = true;
+		return(false);
 	}
 
 	data6[6] = '\0';
@@ -724,5 +725,5 @@ int i, j, abMask, bars, sNdx, pNdx, abBits;
 	for (i = 0; i < 7; i++) {
 		pattern[pNdx++] = rGuard[i];
 	}
-	return(TRUE);
+	return(true);
 }

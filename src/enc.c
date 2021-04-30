@@ -18,6 +18,7 @@
  *
  */
 
+#include <stdbool.h>
 #include <stdint.h>
 
 #include "enc.h"
@@ -161,7 +162,7 @@ int undercut;
 		for (i = 0; i < MAX_LINE/8; i++) {
 			line[i] = xorMsk;
 		}
-		line1 = FALSE;
+		line1 = false;
 	}
 	// fill left pad worth of WHITE
 	printElm(prints->leftPad*params->pixMult, WHITE , &bits, &ndx, xorMsk);
@@ -226,7 +227,7 @@ int undercut;
 		line[ndx++] = (uint8_t)((bits&0xff) ^ xorMsk);
 		if (ndx > MAX_LINE/8 + 1) {
 			printf("\nPrint line too long");
-			errFlag = TRUE;
+			errFlag = true;
 			return;
 		}
 	}
@@ -235,7 +236,7 @@ int undercut;
 			line[ndx++] = 0xFF; // pad to long word boundary for .BMP
 			if (ndx >= MAX_LINE/8 + 1) {
 				printf("\nPrint line too long");
-				errFlag = TRUE;
+				errFlag = true;
 				return;
 			}
 		}
@@ -262,7 +263,7 @@ int i;
 			if (*ndx >= MAX_LINE/8 + 1) {
 				*ndx = 0;
 				printf("\nPrint line too long in graphic line.");
-				errFlag = TRUE;
+				errFlag = true;
 				return;
 			}
 			*bits = 1;

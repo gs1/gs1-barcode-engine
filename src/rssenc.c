@@ -18,6 +18,7 @@
  *
  */
 
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -65,14 +66,14 @@ int i;
 	params.Xundercut = 0;
 	params.Yundercut = 0;
 	params.sepHt = 1;
-	params.bmp = FALSE;
+	params.bmp = false;
 	params.segWidth = 22;
 	params.linHeight = 25;
 	strcpy(params.outFile, "out.tif");
 	params.sym = sNONE;
 	params.inputFlag = 0; // for kbd input
 	while (userInt(&params)) {
-		errFlag = FALSE;
+		errFlag = false;
 		if (params.inputFlag == 1) {
 			if((iFile = fopen(params.dataFile, "r")) == NULL) {
 				printf("\nUNABLE TO OPEN %s FILE\n", params.dataFile);
@@ -135,7 +136,7 @@ int i;
 
 			default:
 				printf("\nILLEGAL SYMBOLOGY TYPE %d", params.sym);
-				errFlag = TRUE;
+				errFlag = true;
 		}
 
 		fclose(oFile);
@@ -161,8 +162,8 @@ char* s;
 
 static int userInt(struct sParams *params) {
 
-int inMenu = TRUE;
-int retFlag = TRUE; // return is FALSE if exit program
+int inMenu = true;
+int retFlag = true; // return is false if exit program
 char inpStr[MAX_KEYDATA+1];
 int menuVal, i;
 
@@ -170,7 +171,7 @@ int menuVal, i;
 		if (params->sym == sNONE) {
 			if (!getSym(params)) {
 				printf("DONE.\n");
-				return(FALSE);
+				return(false);
 			}
 		}
 		printf("\n\nData input string or file format:");
@@ -210,7 +211,7 @@ int menuVal, i;
 				break;
 			default:
 				printf("\nSYMBOL TYPE ERROR.");
-				return(FALSE);
+				return(false);
 		}
 		printf("\n Special characters:");
 		printf("\n   # (pound sign):   FNC1");
@@ -351,7 +352,7 @@ int menuVal, i;
 					continue;
 				}
 				strcpy(params->dataStr, inpStr);
-				inMenu = FALSE;
+				inMenu = false;
 			 }
 			 else {
 				printf("\nEnter data input file name: ");
@@ -364,7 +365,7 @@ int menuVal, i;
 					continue;
 				}
 				strcpy(params->dataFile, inpStr);
-				inMenu = FALSE;
+				inMenu = false;
 			 }
 			 break;
 			case 6:
@@ -454,7 +455,7 @@ static int getSym(struct sParams *params) {
 char inpStr[MAX_KEYDATA+1];
 int i;
 
-	while (TRUE) {
+	while (true) {
 		printf("\nGS1 Encoders (Built " RELEASE "):");
 		printf("\n\nCopyright (c) 2020 GS1 AISBL. License: Apache-2.0");
 		printf("\n\nMAIN MENU:");
@@ -470,12 +471,12 @@ int i;
 		}
 		params->sym = atoi(inpStr);
 		if (params->sym == 0) {
-			return(FALSE);
+			return(false);
 		}
 		if (params->sym > 12) {
 			printf("PLEASE ENTER 0 THROUGH 12.");
 			continue;
 		}
-		return(TRUE);
+		return(true);
 	}
 }

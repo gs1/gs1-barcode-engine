@@ -19,6 +19,7 @@
  */
 
 #include <string.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include "enc.h"
 #include "rssutil.h"
@@ -72,14 +73,14 @@ int rPadl1, rPadcc;
 	rPadcc = 0;
 
 	ccStr = strchr(params->dataStr, '|');
-	if (ccStr == NULL) ccFlag = FALSE;
+	if (ccStr == NULL) ccFlag = false;
 	else {
 		if (params->segWidth < 4) {
 			printf("\nComposite must be at least 4 segments wide\n");
-			errFlag = TRUE;
+			errFlag = true;
 			return;
 		}
-		ccFlag = TRUE;
+		ccFlag = true;
 		ccStr[0] = '\0'; // separate primary data
 		ccStr++; // point to secondary data
 	}
@@ -122,12 +123,12 @@ int rPadl1, rPadcc;
 		}
 		chexPrnts.elmCnt = chexSize;
 		chexPrnts.pattern = &chexPattern[0];
-		chexPrnts.guards = FALSE;
+		chexPrnts.guards = false;
 		chexPrnts.height = params->sepHt;
-		chexPrnts.whtFirst = TRUE;
+		chexPrnts.whtFirst = true;
 		chexPrnts.leftPad = 0;
 		chexPrnts.rightPad = 0;
-		chexPrnts.reverse = FALSE;
+		chexPrnts.reverse = false;
 
 		rPadcc = lMods - L_PAD - CCB4_WIDTH;
 
@@ -140,7 +141,7 @@ int rPadl1, rPadcc;
 		printf("\n");
 #endif
 	}
-	line1 = TRUE; // so first line is not Y undercut
+	line1 = true; // so first line is not Y undercut
 	if (ccFlag) {
 		if ((rows = CC4enc((uint8_t*)ccStr, ccPattern)) > 0) {
 			if (errFlag) {
@@ -172,7 +173,7 @@ int rPadl1, rPadcc;
 
 		// print RSS Exp component
 		i = 0;
-		evenRow = FALSE; // start with odd
+		evenRow = false; // start with odd
 		while (segs > i+params->segWidth) {
 			i += params->segWidth;
 			evenRow = !evenRow; // alternate row parity
@@ -184,7 +185,7 @@ int rPadl1, rPadcc;
 			(((segs/2)*(17+15+17)+(segs&1)*(17+15)) - ((i/2)*(17+15+17)+(i&1)*17));
 		prints.elmCnt = lNdx1;
 		prints.pattern = &linPattern[(i/2)*(8+5+8)+(i&1)*8];
-		prints.guards = TRUE;
+		prints.guards = true;
 		prints.height = params->pixMult*SYM_H;
 		prints.whtFirst = (i/2+1)&1;
 		rev = evenRow ^ ((i/2)&1);
@@ -192,7 +193,7 @@ int rPadl1, rPadcc;
 			// can't reverse odd # finders so offset it right by one
 			prints.leftPad = 1;
 			prints.rightPad = rPadl1-1;
-			prints.reverse = FALSE;
+			prints.reverse = false;
 			// bottom right offset RSS E row
 			printElmnts(params, &prints);
 
@@ -259,12 +260,12 @@ int rPadl1, rPadcc;
 		if (ccFlag) {
 			// print composite component
 			prints.elmCnt = CCB4_ELMNTS;
-			prints.guards = FALSE;
+			prints.guards = false;
 			prints.height = params->pixMult*2;
 			prints.leftPad = L_PAD;
 			prints.rightPad = rPadcc;
-			prints.whtFirst = TRUE;
-			prints.reverse = FALSE;
+			prints.whtFirst = true;
+			prints.reverse = false;
 			for (i = rows-1; i >= 0; i--) {
 				prints.pattern = ccPattern[i];
 				printElmnts(params, &prints);
@@ -284,12 +285,12 @@ int rPadl1, rPadcc;
 		if (ccFlag) {
 			// print composite component
 			prints.elmCnt = CCB4_ELMNTS;
-			prints.guards = FALSE;
+			prints.guards = false;
 			prints.height = params->pixMult*2;
 			prints.leftPad = L_PAD;
 			prints.rightPad = rPadcc;
-			prints.whtFirst = TRUE;
-			prints.reverse = FALSE;
+			prints.whtFirst = true;
+			prints.reverse = false;
 			for (i = 0; i < rows; i++) {
 				prints.pattern = ccPattern[i];
 				printElmnts(params, &prints);
@@ -297,9 +298,9 @@ int rPadl1, rPadcc;
 		}
 
 		// print RSS Exp
-		evenRow = FALSE; // start with 1st row
+		evenRow = false; // start with 1st row
 		prints.elmCnt = lNdx;
-		prints.guards = TRUE;
+		prints.guards = true;
 		prints.height = params->pixMult*SYM_H;
 		prints.leftPad = 0;
 		prints.rightPad = 0;
@@ -345,7 +346,7 @@ int rPadl1, rPadcc;
 			// can't reverse odd # finders so offset it right by one
 			prints.leftPad = 1;
 			prints.rightPad = rPadl1-1;
-			prints.reverse = FALSE;
+			prints.reverse = false;
 
 			// chex pattern
 			printElmnts(params, &chexPrnts);
@@ -421,13 +422,13 @@ int symValue;
 int size, fndrNdx, fndrSetNdx;
 uint8_t bitField[MAX_DBL_SEGS*3];
 
-	linFlag = TRUE;
+	linFlag = true;
 	parity = 0;
 	weight = 0;
 
 	if (((i=check2DData(string)) != 0) || ((i=isSymbolSepatator(string)) != 0)) {
 		printf("\nillegal character in RSS Expanded data = '%c'", string[i]);
-		errFlag = TRUE;
+		errFlag = true;
 		return(0);
 	}
 #if PRNT
@@ -437,7 +438,7 @@ uint8_t bitField[MAX_DBL_SEGS*3];
 	size = pack(string, bitField);
 	if (size < 0) {
 		printf("\ndata error");
-		errFlag = TRUE;
+		errFlag = true;
 		return(0);
 	}
 
@@ -463,7 +464,7 @@ uint8_t bitField[MAX_DBL_SEGS*3];
 		if (i > 0) {
 			weight = parWts[2*(j-2)];
 			symValue = getVal12(bitField, i*2-1);
-			parity = symCharPat(&bars[i][0], symValue, parity, weight, TRUE);
+			parity = symCharPat(&bars[i][0], symValue, parity, weight, true);
 		}
 		// fill finder for dbl segment
 		if (fndrNdx < 0) { // reversed finder
@@ -484,11 +485,11 @@ uint8_t bitField[MAX_DBL_SEGS*3];
 		if (size > i*2) {
 			weight = parWts[2*(j-2)+1];
 			symValue = getVal12(bitField, i*2);
-			parity = symCharPat(&bars[i][8+5], symValue, parity, weight, FALSE);
+			parity = symCharPat(&bars[i][8+5], symValue, parity, weight, false);
 		}
 	}
 	// fill in first parity char
-	symCharPat(bars[0], (size-3)*PARITY_MOD + parity, 0, weight, TRUE);
+	symCharPat(bars[0], (size-3)*PARITY_MOD + parity, 0, weight, true);
 	return(size+1);
 }
 

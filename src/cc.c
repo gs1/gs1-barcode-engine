@@ -20,6 +20,7 @@
 
 #include <ctype.h>
 #include <string.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include "enc.h"
@@ -139,7 +140,7 @@ int i;
 	CCSizes = CC2Sizes;
 	if ((i=check2DData(str)) != 0) {
 		printf("\nillegal character in 2D data = '%c'", str[i]);
-		errFlag = TRUE;
+		errFlag = true;
 		return(0);
 	}
 #if PRNT
@@ -148,7 +149,7 @@ int i;
 	size = pack(str, bitField);
 	if (size < 0 || CC2Sizes[size] == 0) {
 		printf("\ndata error");
-		errFlag = TRUE;
+		errFlag = true;
 		return(0);
 	}
 	if (size <= MAX_CCA2_SIZE) {
@@ -177,7 +178,7 @@ int i;
 	CCSizes = CC3Sizes;
 	if ((i=check2DData(str)) != 0) {
 		printf("\nillegal character in 2D data = '%c'", str[i]);
-		errFlag = TRUE;
+		errFlag = true;
 		return(0);
 	}
 #if PRNT
@@ -186,7 +187,7 @@ int i;
 	size = pack(str, bitField);
 	if (size < 0 || CC3Sizes[size] == 0) {
 		printf("\ndata error");
-		errFlag = TRUE;
+		errFlag = true;
 		return(0);
 	}
 	if (size <= MAX_CCA3_SIZE) {
@@ -215,7 +216,7 @@ int i;
 	CCSizes = CC4Sizes;
 	if ((i=check2DData(str)) != 0) {
 		printf("\nillegal character in 2D data = '%c'", str[i]);
-		errFlag = TRUE;
+		errFlag = true;
 		return(0);
 	}
 #if PRNT
@@ -224,7 +225,7 @@ int i;
 	size = pack(str, bitField);
 	if (size < 0 || CC4Sizes[size] == 0) {
 		printf("\ndata error");
-		errFlag = TRUE;
+		errFlag = true;
 		return(0);
 	}
 	if (size <= MAX_CCA4_SIZE) {
@@ -246,15 +247,15 @@ int i;
 	linFlag = -1; // CC-C flag value
 	if ((i=check2DData(str)) != 0) {
 		printf("illegal character '%c'\n", str[i]);
-		return(FALSE);
+		return(false);
 	}
 	printf("%s\n", str);
 	if((byteCnt = pack(str, bitField)) < 0) {
 		printf("data error\n");
-		return(FALSE);
+		return(false);
 	}
 	encCCC(byteCnt, bitField, codeWords, patCCC);
-	return(TRUE);
+	return(true);
 }
 
 
@@ -749,12 +750,12 @@ struct encodeT encode;
 		}
 		default: {
 			printf("\nmode error");
-			errFlag = TRUE;
+			errFlag = true;
 			return(-1);
 		} } /* end of case */
 	}
 	if (linFlag == -1) { // CC-C
-		if (!insertPad(&encode)) { // will return FALSE if error
+		if (!insertPad(&encode)) { // will return false if error
 			printf("symbol too big\n");
 			return(-1);
 		}
@@ -1354,7 +1355,7 @@ static void encodeAI90(struct encodeT *encode) {
 		}
 		default: {
 			printf("\nmode error");
-			errFlag = TRUE;
+			errFlag = true;
 			return;
 		} } /* end of case */
 	}
@@ -1601,7 +1602,7 @@ int i, byteCnt, cwCnt;
 		}
 	}
 	else if (linFlag == -1) { // CC-C
-		*size = FALSE; // size used as error flag for CC-C
+		*size = false; // size used as error flag for CC-C
 		// calculate cwCnt from # of bits
 		byteCnt = (iBit+7)/8;
 		i = byteCnt/6;
@@ -1630,7 +1631,7 @@ int i, byteCnt, cwCnt;
 		}
 		cwCnt = colCnt*rowCnt - 1 - 2 - eccCnt;
 		byteCnt = (cwCnt/5)*6 + cwCnt%5;
-		*size = TRUE;
+		*size = true;
 		return(byteCnt*8 - iBit);
 	}
 	return(-1);
@@ -1647,7 +1648,7 @@ void putBits(uint8_t bitField[], int bitPos, int length, uint16_t bits) {
 	}
 	if ((bitPos+length > maxBytes*8) || (length > 16)) {
 		printf("\nputBits error, %d, %d\n", bitPos, length);
-		errFlag = TRUE;
+		errFlag = true;
 		return;
 	}
 	for (i = length-1; i >= 0; i--) {

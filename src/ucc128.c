@@ -19,6 +19,7 @@
  */
 
 #include <string.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include "enc.h"
 #include "cc.h"
@@ -60,15 +61,15 @@ char primaryStr[120+1];
 char *ccStr;
 
 	ccStr = strchr(params->dataStr, '|');
-	if (ccStr == NULL) ccFlag = FALSE;
+	if (ccStr == NULL) ccFlag = false;
 	else {
-		ccFlag = TRUE;
+		ccFlag = true;
 		ccStr[0] = '\0'; // separate primary data
 		ccStr++; // point to secondary data
 	}
 
 	if (strlen(params->dataStr) > 48) {
-		errFlag = TRUE;
+		errFlag = true;
 		printf("\nprimary data exceeds 48 characters");
 		return;
 	}
@@ -91,16 +92,16 @@ char *ccStr;
 		}
 		printf("\n");
 #endif
-	line1 = TRUE; // so first line is not Y undercut
+	line1 = true; // so first line is not Y undercut
 	// init most likely prints values
 	prints.elmCnt = symChars*6+3;
 	prints.pattern = linPattern;
-	prints.guards = FALSE;
+	prints.guards = false;
 	prints.height = params->pixMult*params->linHeight;
 	prints.leftPad = 0;
 	prints.rightPad = 0;
-	prints.whtFirst = TRUE;
-	prints.reverse = FALSE;
+	prints.whtFirst = true;
+	prints.reverse = false;
 	if (ccFlag) {
 		if ((rows = CC4enc((uint8_t*)ccStr, ccPattern)) > 0) {
 			if (errFlag) {
@@ -120,7 +121,7 @@ char *ccStr;
 		}
 
 		if (symChars < 9) {
-			errFlag = TRUE;
+			errFlag = true;
 			printf("\nlinear component too short");
 			return;
 		}
@@ -215,15 +216,15 @@ char primaryStr[120+1];
 char *ccStr;
 
 	ccStr = strchr(params->dataStr, '|');
-	if (ccStr == NULL) ccFlag = FALSE;
+	if (ccStr == NULL) ccFlag = false;
 	else {
-		ccFlag = TRUE;
+		ccFlag = true;
 		ccStr[0] = '\0'; // separate primary data
 		ccStr++; // point to secondary data
 	}
 
 	if (strlen(params->dataStr) > 48) {
-		errFlag = TRUE;
+		errFlag = true;
 		printf("\nprimary data exceeds 48 characters");
 		return;
 	}
@@ -248,20 +249,20 @@ char *ccStr;
 #endif
 	colCnt = ((symChars*11 + 22 - L_PAD - 5)/17) -4;
 	if (colCnt < 1) {
-		errFlag = TRUE;
+		errFlag = true;
 		printf("\nUCC-128 too small\n");
 		return;
 	}
-	line1 = TRUE; // so first line is not Y undercut
+	line1 = true; // so first line is not Y undercut
 	// init most likely prints values
 	prints.elmCnt = symChars*6+3;
 	prints.pattern = linPattern;
-	prints.guards = FALSE;
+	prints.guards = false;
 	prints.height = params->pixMult*params->linHeight;
 	prints.leftPad = 0;
 	prints.rightPad = 0;
-	prints.whtFirst = TRUE;
-	prints.reverse = FALSE;
+	prints.whtFirst = true;
+	prints.reverse = false;
 	if (ccFlag) {
 		if (CCCenc((uint8_t*)ccStr, patCCC)) {
 			if (errFlag) {
