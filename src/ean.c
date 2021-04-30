@@ -25,16 +25,6 @@
 #include "util.h"
 #include "cc.h"
 
-// includes qz's
-#define EAN13_ELMNTS 61
-// includes 7X quiet zones:
-#define EAN13_W	109
-// total ht in x:
-#define EAN13_H	74
-
-#define EAN13_L_PAD 3 // EAN-13 7-X qz - CCA-2 3 offset
-#define EAN13_R_PAD 5 // EAN-13 WIDTH - MAX_WIDTH - EAN13_L_PAD
-
 extern int errFlag;
 extern int line1;
 extern uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
@@ -44,21 +34,29 @@ static bool EAN13enc(uint8_t str[], uint8_t pattern[]);
 static bool EAN8enc(uint8_t str[], uint8_t pattern[]);
 static bool UPCEenc(uint8_t str[], uint8_t pattern[]);
 
+
+#define EAN13_ELMNTS	61	// includes qz's
+#define EAN13_W		109 	// includes 7X quiet zones
+#define EAN13_H		74	// total ht in x
+
+#define EAN13_L_PAD 3		// EAN-13 7-X qz - CCA-2 3 offset
+#define EAN13_R_PAD 5		// EAN-13 WIDTH - MAX_WIDTH - EAN13_L_PAD
+
 void EAN13(struct sParams *params) {
 
-struct sPrints prints;
-struct sPrints sepPrnt;
+	struct sPrints prints;
+	struct sPrints sepPrnt;
 
-uint8_t linPattern[EAN13_ELMNTS];
-uint8_t sepPat1[5] = { 7,1,EAN13_W-16,1,7 }; // separator pattern 1
-uint8_t sepPat2[5] = { 6,1,EAN13_W-14,1,6 }; // separator pattern 2
+	uint8_t linPattern[EAN13_ELMNTS];
+	uint8_t sepPat1[5] = { 7,1,EAN13_W-16,1,7 }; // separator pattern 1
+	uint8_t sepPat2[5] = { 6,1,EAN13_W-14,1,6 }; // separator pattern 2
 
-char primaryStr[14+1];
-char tempStr[28+1];
+	char primaryStr[14+1];
+	char tempStr[28+1];
 
-int i;
-int rows, ccFlag;
-char *ccStr;
+	int i;
+	int rows, ccFlag;
+	char *ccStr;
 
 	ccStr = strchr(params->dataStr, '|');
 	if (ccStr == NULL) ccFlag = false;
@@ -203,16 +201,16 @@ char *ccStr;
 // call with str = 13-digit primary with check digit = 0
 static bool EAN13enc(uint8_t str[], uint8_t pattern[] ) {
 
-static uint16_t upcTblA[10] = {	0x3211, 0x2221, 0x2122, 0x1411, 0x1132,
-				0x1231, 0x1114, 0x1312, 0x1213, 0x3112 };
-static uint16_t upcTblB[10] = {	0x1123, 0x1222, 0x2212, 0x1141, 0x2311,
-				0x1321, 0x4111, 0x2131, 0x3121, 0x2113 };
-static uint16_t abArr[10] = { 0 /*0x07*/,0x0B,0x0D,0x0E,0x13,0x19,0x1C,0x15,0x16,0x1A };
-static uint8_t lGuard[4] = { 7,1,1,1 };
-static uint8_t center[5] = { 1,1,1,1,1 };
-static uint8_t rGuard[4] = { 1,1,1,7 };
+	static uint16_t upcTblA[10] = {	0x3211, 0x2221, 0x2122, 0x1411, 0x1132,
+					0x1231, 0x1114, 0x1312, 0x1213, 0x3112 };
+	static uint16_t upcTblB[10] = {	0x1123, 0x1222, 0x2212, 0x1141, 0x2311,
+					0x1321, 0x4111, 0x2131, 0x3121, 0x2113 };
+	static uint16_t abArr[10] = { 0 /*0x07*/,0x0B,0x0D,0x0E,0x13,0x19,0x1C,0x15,0x16,0x1A };
+	static uint8_t lGuard[4] = { 7,1,1,1 };
+	static uint8_t center[5] = { 1,1,1,1,1 };
+	static uint8_t rGuard[4] = { 1,1,1,7 };
 
-int i, j, abMask, bars, sNdx, pNdx, abBits;
+	int i, j, abMask, bars, sNdx, pNdx, abBits;
 
 	// calculate UPC parity
 	for (j = 0, i = 0; i < 12; i += 2) {
@@ -257,35 +255,33 @@ int i, j, abMask, bars, sNdx, pNdx, abBits;
 	return(true);
 }
 
-// includes qz's
-#define EAN8_ELMNTS 45
-// includes 7X quiet zones:
-#define EAN8_W	81
-// total ht in x:
-#define EAN8_H	60
 
-#define EAN8_L_PAD 2 // EAN-8 7-X qz - CCA-2 offset
-#define EAN8_R_PAD 5 // EAN-8 WIDTH - MAX_WIDTH of cca - EAN8_L_PAD
-#define EAN8_L_PADB 8 // EAN-8 left pad for ccb
+#define EAN8_ELMNTS	45	// includes qz's
+#define EAN8_W		81	// includes 7X quiet zones
+#define EAN8_H		60	// total ht in x
+
+#define EAN8_L_PAD	2	// EAN-8 7-X qz - CCA-2 offset
+#define EAN8_R_PAD	5	// EAN-8 WIDTH - MAX_WIDTH of cca - EAN8_L_PAD
+#define EAN8_L_PADB	8	// EAN-8 left pad for ccb
 
 void EAN8(struct sParams *params) {
 
-struct sPrints prints;
-struct sPrints sepPrnt;
+	struct sPrints prints;
+	struct sPrints sepPrnt;
 
-uint8_t linPattern[EAN8_ELMNTS];
-uint8_t sepPat1[5] = { 7,1,EAN8_W-16,1,7 }; // separator pattern 1
-uint8_t sepPat2[5] = { 6,1,EAN8_W-14,1,6 }; // separator pattern 2
+	uint8_t linPattern[EAN8_ELMNTS];
+	uint8_t sepPat1[5] = { 7,1,EAN8_W-16,1,7 }; // separator pattern 1
+	uint8_t sepPat2[5] = { 6,1,EAN8_W-14,1,6 }; // separator pattern 2
 
-char primaryStr[14+1];
-char tempStr[28+1];
+	char primaryStr[14+1];
+	char tempStr[28+1];
 
-int i;
-int rows, ccFlag;
-char *ccStr;
-int lpadCC;
-int lpadEAN;
-int elmntsCC;
+	int i;
+	int rows, ccFlag;
+	char *ccStr;
+	int lpadCC;
+	int lpadEAN;
+	int elmntsCC;
 
 	ccStr = strchr(params->dataStr, '|');
 	if (ccStr == NULL) ccFlag = false;
@@ -440,14 +436,13 @@ int elmntsCC;
 // call with str = 8-digit primary with check digit = 0
 static bool EAN8enc(uint8_t str[], uint8_t pattern[] ) {
 
+	static uint16_t upcTblA[10] = {	0x3211, 0x2221, 0x2122, 0x1411, 0x1132,
+					0x1231, 0x1114, 0x1312, 0x1213, 0x3112 };
+	static uint8_t lGuard[4] = { 7,1,1,1 };
+	static uint8_t center[5] = { 1,1,1,1,1 };
+	static uint8_t rGuard[4] = { 1,1,1,7 };
 
-static uint16_t upcTblA[10] = {	0x3211, 0x2221, 0x2122, 0x1411, 0x1132,
-														0x1231, 0x1114, 0x1312, 0x1213, 0x3112 };
-static uint8_t lGuard[4] = { 7,1,1,1 };
-static uint8_t center[5] = { 1,1,1,1,1 };
-static uint8_t rGuard[4] = { 1,1,1,7 };
-
-int i, j, bars, sNdx, pNdx;
+	int i, j, bars, sNdx, pNdx;
 
 	// calculate UPC parity
 	for (j = 0, i = 0; i < 12; i += 2) {
@@ -486,31 +481,29 @@ int i, j, bars, sNdx, pNdx;
 	return(true);
 }
 
-// includes qz's
-#define UPCE_ELMNTS 35
-// includes 7X quiet zones:
-#define UPCE_W	65
-// total ht in x:
-#define UPCE_H	74
 
-#define UPCE_L_PAD 3 // UPC-E 7X qz - 4X
-#define UPCE_R_PAD 5 // UPCE_W - MAX_WIDTH - UPCE_L_PAD
+#define UPCE_ELMNTS	35	// includes qz's
+#define UPCE_W		65	// includes 7X quiet zones
+#define UPCE_H		74	// total ht in x
+
+#define UPCE_L_PAD	3	// UPC-E 7X qz - 4X
+#define UPCE_R_PAD	5	// UPCE_W - MAX_WIDTH - UPCE_L_PAD
 
 void UPCE(struct sParams *params) {
 
-struct sPrints prints;
-struct sPrints sepPrnt;
+	struct sPrints prints;
+	struct sPrints sepPrnt;
 
-uint8_t linPattern[UPCE_ELMNTS];
-uint8_t sepPat1[5] = { 7,1,UPCE_W-16,1,7 }; // separator pattern 1
-uint8_t sepPat2[5] = { 6,1,UPCE_W-14,1,6 }; // separator pattern 2
+	uint8_t linPattern[UPCE_ELMNTS];
+	uint8_t sepPat1[5] = { 7,1,UPCE_W-16,1,7 }; // separator pattern 1
+	uint8_t sepPat2[5] = { 6,1,UPCE_W-14,1,6 }; // separator pattern 2
 
-char primaryStr[14+1];
-char tempStr[28+1];
+	char primaryStr[14+1];
+	char tempStr[28+1];
 
-int i;
-int rows, ccFlag;
-char *ccStr;
+	int i;
+	int rows, ccFlag;
+	char *ccStr;
 
 	ccStr = strchr(params->dataStr, '|');
 	if (ccStr == NULL) ccFlag = false;
@@ -655,17 +648,17 @@ char *ccStr;
 // call with str = 13-digit primary with check digit = 0
 static bool UPCEenc(uint8_t str[], uint8_t pattern[] ) {
 
-static uint16_t upcTblA[10] = {	0x3211, 0x2221, 0x2122, 0x1411, 0x1132,
-				0x1231, 0x1114, 0x1312, 0x1213, 0x3112 };
-static uint16_t upcTblB[10] = {	0x1123, 0x1222, 0x2212, 0x1141, 0x2311,
-				0x1321, 0x4111, 0x2131, 0x3121, 0x2113 };
-static uint16_t abArr[10] = { 0x07,0x0B,0x0D,0x0E,0x13,0x19,0x1C,0x15,0x16,0x1A };
-static uint8_t lGuard[4] = { 7,1,1,1 };
-static uint8_t rGuard[7] = { 1,1,1,1,1,1,7 };
+	static uint16_t upcTblA[10] = {	0x3211, 0x2221, 0x2122, 0x1411, 0x1132,
+					0x1231, 0x1114, 0x1312, 0x1213, 0x3112 };
+	static uint16_t upcTblB[10] = {	0x1123, 0x1222, 0x2212, 0x1141, 0x2311,
+					0x1321, 0x4111, 0x2131, 0x3121, 0x2113 };
+	static uint16_t abArr[10] = { 0x07,0x0B,0x0D,0x0E,0x13,0x19,0x1C,0x15,0x16,0x1A };
+	static uint8_t lGuard[4] = { 7,1,1,1 };
+	static uint8_t rGuard[7] = { 1,1,1,1,1,1,7 };
 
-uint8_t data6[6+1];
+	uint8_t data6[6+1];
 
-int i, j, abMask, bars, sNdx, pNdx, abBits;
+	int i, j, abMask, bars, sNdx, pNdx, abBits;
 
 	// calculate UPC parity
 	for (j = 0, i = 0; i < 12; i += 2) {

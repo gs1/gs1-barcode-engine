@@ -25,17 +25,19 @@
 #include "util.h"
 #include "cc.h"
 
-#define SYMMAX 45  /* UCC/EAN-128 40 symbol chars + strt,FNC1,link,chk & stop max */
-#define MAX_LINHT 500 // max UCC/EAN-128 height in X
+#define SYMMAX		45	// UCC/EAN-128 40 symbol chars + strt,FNC1,link,chk & stop max
+#define MAX_LINHT	500	// max UCC/EAN-128 height in X
+#define MAX_PAT		10574	// 928*8 + 90*(4*8 + 3) for max codewords and 90 rows
+#define L_PAD		(10-9)	// CCC starts -9X from 1st start bar
 
-#define MAX_PAT 10574 // 928*8 + 90*(4*8 + 3) for max codewords and 90 rows
+#define ISNUM(A) ((A<072)&&(A>057)) /* true if A is numeric ASCII */
 
-#define L_PAD (10-9) // CCC starts -9X from 1st start bar
 
 // globals used by CC-C:
 int colCnt; // after set in main, may be decreased by getUnusedBitCnt
 int rowCnt; // determined by getUnusedBitCnt
 int eccCnt; // determined by getUnusedBitCnt
+
 
 static int enc128(uint8_t data[], uint8_t bars[], int link);
 static void cda128(uint8_t data[], int *di, int symchr[], int *si, int *code);
@@ -50,16 +52,17 @@ extern uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
 
 uint8_t patCCC[MAX_PAT];
 
+
 void U128A(struct sParams *params) {
 
-struct sPrints prints;
+	struct sPrints prints;
 
-uint8_t linPattern[(SYMMAX*6)+3];
+	uint8_t linPattern[(SYMMAX*6)+3];
 
-int i;
-int rows, ccFlag, symChars, symWidth, ccLpad, ccRpad;
-char primaryStr[120+1];
-char *ccStr;
+	int i;
+	int rows, ccFlag, symChars, symWidth, ccLpad, ccRpad;
+	char primaryStr[120+1];
+	char *ccStr;
 
 	ccStr = strchr(params->dataStr, '|');
 	if (ccStr == NULL) ccFlag = false;
@@ -85,14 +88,16 @@ char *ccStr;
 	strcat(primaryStr, params->dataStr);
 
 	symChars = enc128((uint8_t*)primaryStr, linPattern, (ccFlag) ? 1 : 0);
+
 #if PRNT
-		printf("\n%s", primaryStr);
-		printf("\n");
-		for (i = 0; i < (symChars*6+3); i++) {
-			printf("%d", linPattern[i]);
-		}
-		printf("\n");
+	printf("\n%s", primaryStr);
+	printf("\n");
+	for (i = 0; i < (symChars*6+3); i++) {
+		printf("%d", linPattern[i]);
+	}
+	printf("\n");
 #endif
+
 	line1 = true; // so first line is not Y undercut
 	// init most likely prints values
 	prints.elmCnt = symChars*6+3;
@@ -210,14 +215,14 @@ char *ccStr;
 
 void U128C(struct sParams *params) {
 
-struct sPrints prints;
+	struct sPrints prints;
 
-uint8_t linPattern[(SYMMAX*6)+3];
+	uint8_t linPattern[(SYMMAX*6)+3];
 
-int i;
-int ccFlag, symChars, symWidth, ccRpad;
-char primaryStr[120+1];
-char *ccStr;
+	int i;
+	int ccFlag, symChars, symWidth, ccRpad;
+	char primaryStr[120+1];
+	char *ccStr;
 
 	ccStr = strchr(params->dataStr, '|');
 	if (ccStr == NULL) ccFlag = false;
@@ -243,14 +248,16 @@ char *ccStr;
 	strcat(primaryStr, params->dataStr);
 
 	symChars = enc128((uint8_t*)primaryStr, linPattern, (ccFlag) ? 2 : 0); // 2 for CCC
+
 #if PRNT
-		printf("\n%s", primaryStr);
-		printf("\n");
-		for (i = 0; i < (symChars*6+3); i++) {
-			printf("%d", linPattern[i]);
-		}
-		printf("\n");
+	printf("\n%s", primaryStr);
+	printf("\n");
+	for (i = 0; i < (symChars*6+3); i++) {
+		printf("%d", linPattern[i]);
+	}
+	printf("\n");
 #endif
+
 	colCnt = ((symChars*11 + 22 - L_PAD - 5)/17) -4;
 	if (colCnt < 1) {
 		errFlag = true;
@@ -363,31 +370,28 @@ char *ccStr;
 	return;
 }
 
+
 /*
-ENC128.C
-
-enc128 converts the data string into a Code 128 symbol
-represented in an array of bar and space widths.
-
-Subroutines used:
-
-cda128    converts data to a symbol character in code set A.
-cdb128    converts data to a symbol character in code set B.
-cdc128    converts data to a symbol character in code set C.
-tbl128    performs translation from symbol characters to
-			bar/space widths.
-
-Calling Parameters:
-
-data    uchar[]  string of ASCII data to be encoded with 0200 for
-				 NUL and 0201-0204 for FNC1-FNC4
-bars    int[]    array of bar/space widths to be filled, 0 term.
-
-Function Return:    number of symbol characters
-*/
-
-#define ISNUM(A) ((A<072)&&(A>057)) /*true if A is numeric ASCII*/
-
+ * enc128 converts the data string into a Code 128 symbol
+ * represented in an array of bar and space widths.
+ *
+ * Subroutines used:
+ *
+ * cda128    converts data to a symbol character in code set A.
+ * cdb128    converts data to a symbol character in code set B.
+ * cdc128    converts data to a symbol character in code set C.
+ * tbl128    performs translation from symbol characters to
+ *			bar/space widths.
+ *
+ * Calling Parameters:
+ *
+ * data    uchar[]  string of ASCII data to be encoded with 0200 for
+ *				 NUL and 0201-0204 for FNC1-FNC4
+ * bars    int[]    array of bar/space widths to be filled, 0 term.
+ *
+ * Function Return:    number of symbol characters
+ *
+ */
 static int enc128(uint8_t data[], uint8_t bars[], int link)
 {
 	/* convert ASCII data[] into symchr[] values */
@@ -472,22 +476,21 @@ static int enc128(uint8_t data[], uint8_t bars[], int link)
 	return(si);
 }
 
+
 /*
-CDA128.C
-
-cda128 converts data into a symbol character in code set A.
-
-
-Calling Parameters:
-
-data    uchar[]  string of ASCII data to be encoded with 0200 for
-				 NUL and 0201-0204 for FNC1-FNC4
-di      *char    next index into data
-symchr  int[]    array of symbol character values to be filled.
-si      *int     next index into symchr
-code    *int     starting code: A,B,C = 0,1,2
-*/
-
+ * cda128 converts data into a symbol character in code set A.
+ *
+ *
+ * Calling Parameters:
+ *
+ * data    uchar[]  string of ASCII data to be encoded with 0200 for
+ *				 NUL and 0201-0204 for FNC1-FNC4
+ * di      *char    next index into data
+ * symchr  int[]    array of symbol character values to be filled.
+ * si      *int     next index into symchr
+ * code    *int     starting code: A,B,C = 0,1,2
+ *
+ */
 static void cda128(uint8_t data[], int *di, int symchr[], int *si, int *code)
 {
 	int   c, i;
@@ -522,22 +525,20 @@ static void cda128(uint8_t data[], int *di, int symchr[], int *si, int *code)
 	return;
 }
 
+
 /*
-CDB128.C
-
-cdb128 converts data into a symbol character in code set B.
-
-
-Calling Parameters:
-
-data    uchar[]  string of ASCII data to be encoded with 0200 for
-				 NUL and 0201-0204 for FNC1-FNC4
-di      *char    next index into data
-symchr  int[]    array of symbol character values to be filled.
-si      *int     next index into symchr
-code    *int     starting code: A,B,C = 0,1,2
-*/
-
+ * cdb128 converts data into a symbol character in code set B.
+ *
+ * Calling Parameters:
+ *
+ * data    uchar[]  string of ASCII data to be encoded with 0200 for
+ *				 NUL and 0201-0204 for FNC1-FNC4
+ * di      *char    next index into data
+ * symchr  int[]    array of symbol character values to be filled.
+ * si      *int     next index into symchr
+ * code    *int     starting code: A,B,C = 0,1,2
+ *
+ */
 static void cdb128(uint8_t data[], int *di, int symchr[], int *si, int *code)
 {
 	int   c, i;
@@ -571,21 +572,19 @@ static void cdb128(uint8_t data[], int *di, int symchr[], int *si, int *code)
 }
 
 /*
-CDC128.C
-
-cdc128 converts data into a symbol character in code set C.
-
-
-Calling Parameters:
-
-data    uchar[]  string of ASCII data to be encoded with 0200 for
-				 NUL and 0201-0204 for FNC1-FNC4
-di      *char    next index into data
-symchr  int[]    array of symbol character values to be filled.
-si      *int     next index into symchr
-code    *int     starting code: A,B,C = 0,1,2
-*/
-
+ * cdc128 converts data into a symbol character in code set C.
+ *
+ *
+ * Calling Parameters:
+ *
+ * data    uchar[]  string of ASCII data to be encoded with 0200 for
+ *				 NUL and 0201-0204 for FNC1-FNC4
+ * di      *char    next index into data
+ * symchr  int[]    array of symbol character values to be filled.
+ * si      *int     next index into symchr
+ * code    *int     starting code: A,B,C = 0,1,2
+ *
+ */
 static void cdc128(uint8_t data[], int *di, int symchr[], int *si, int *code)
 {
 	int c, i;
@@ -622,20 +621,19 @@ static void cdc128(uint8_t data[], int *di, int symchr[], int *si, int *code)
 	return;
 }
 
+
 /*
-TBL128.C
-
-tbl128 converts an array of Code 128 symbol values to an array of
-bar and space widths which represent that symbol.
-
-calling arguments:
-
-symchr  int[]    array of code 128 symbol values, -1 terminator
-bars    int[]    array to be filled with bar & space widths
-
-return:    none
-*/
-
+ * tbl128 converts an array of Code 128 symbol values to an array of
+ * bar and space widths which represent that symbol.
+ *
+ * Calling Parameters:
+ *
+ * symchr  int[]    array of code 128 symbol values, -1 terminator
+ * bars    int[]    array to be filled with bar & space widths
+ *
+ * return:    none
+ *
+ */
 static void tbl128(int symchr[], uint8_t bars[])
 {   /* octal of 1st 5 elements in symbol char */
 	static int sym128[107] ={
@@ -696,4 +694,3 @@ static void tbl128(int symchr[], uint8_t bars[])
 	bars[bi] = 0;    /* array terminator */
 	return;
 }
-

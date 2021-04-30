@@ -53,14 +53,14 @@ static bool userInt(struct sParams *params);
 
 int main(int argc, char *argv[]) {
 
-// Silence compiler
-(void)argc;
-(void)argv;
+	// Silence compiler
+	(void)argc;
+	(void)argv;
 
-FILE *iFile, *oFile;
+	FILE *iFile, *oFile;
 
-struct sParams params;
-int i;
+	struct sParams params;
+	int i;
 
 	params.pixMult = 1; // init params
 	params.Xundercut = 0;
@@ -151,7 +151,7 @@ int i;
 // Replacement for the deprecated gets(3) function
 static char* gets(char* in) {
 
-char* s;
+	char* s;
 
 	s = fgets(in,MAX_KEYDATA+1,stdin);
 	if (s != NULL) {
@@ -162,10 +162,10 @@ char* s;
 
 static bool userInt(struct sParams *params) {
 
-int inMenu = true;
-int retFlag = true; // return is false if exit program
-char inpStr[MAX_KEYDATA+1];
-int menuVal, i;
+	int inMenu = true;
+	int retFlag = true; // return is false if exit program
+	char inpStr[MAX_KEYDATA+1];
+	int menuVal, i;
 
 	while (inMenu) {
 		if (params->sym == sNONE) {
@@ -452,8 +452,8 @@ int menuVal, i;
 
 static bool getSym(struct sParams *params) {
 
-char inpStr[MAX_KEYDATA+1];
-int i;
+	char inpStr[MAX_KEYDATA+1];
+	int i;
 
 	while (true) {
 		printf("\nGS1 Encoders (Built " RELEASE "):");

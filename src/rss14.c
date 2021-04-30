@@ -624,9 +624,6 @@ char *ccStr;
 }
 
 
-
-
-
 static struct sPrints prntSep;
 static uint8_t sepPattern[SYM_W/2+2];
 
@@ -725,14 +722,14 @@ int i, j, k, lNdx, rNdx, sNdx, lWidth, rWidth, matchWidth;
 // call with str = 13-digit primary, no check digit
 static bool RSS14enc(uint8_t string[], uint8_t bars[], int ccFlag) {
 
-#define	PARITYCHRSIZE	9
-#define PARITY_MOD 79
+	#define	PARITYCHRSIZE	9
+	#define PARITY_MOD 79
 
-// left char multiplier
-#define LEFT_MUL 4537077.
+	// left char multiplier
+	#define LEFT_MUL 4537077.
 
-// outside semi-char multipliers
-#define	SEMI_MUL	1597
+	// outside semi-char multipliers
+	#define	SEMI_MUL	1597
 
 	// stores even elements N & max, odd N & max, even mul, combos
 	static int tbl154[4*6] = {

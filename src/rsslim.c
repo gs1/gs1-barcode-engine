@@ -248,13 +248,13 @@ char *ccStr;
 // call with str = 13-digit primary, no check digit
 static bool RSSLimEnc(uint8_t string[], uint8_t bars[], int ccFlag) {
 
-#define	N	26
-#define	K	7
-#define PARITY_MOD 89
-#define SUPL_VAL 2015133531096.
+	#define	N	26
+	#define	K	7
+	#define PARITY_MOD 89
+	#define SUPL_VAL 2015133531096.
 
-// left char multiplier
-#define LEFT_MUL 2013571.
+	// left char multiplier
+	#define LEFT_MUL 2013571.
 
 	// stores odd element N & max, even N & max, odd mul, combos
 	static long oddEvenTbl[1*7*6] = { /* 26,7 */
