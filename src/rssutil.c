@@ -90,7 +90,7 @@ int narrowMask = 0;
 #define MAX_SEP_ELMNTS (11*21+4) // for 22 segment RSS Exp
 
 static struct sPrints prntSep;
-static UCHAR sepPattern[MAX_SEP_ELMNTS];
+static uint8_t sepPattern[MAX_SEP_ELMNTS];
 
 
 // copies pattern for separator adding 9 narrow elements inside each finder
@@ -108,11 +108,11 @@ int i, j, k;
 	for (i = 0, k = 2; k <= 4; k += prints->pattern[i], i++);
 	if ((prints->whtFirst && (i&1)==1) || (!prints->whtFirst && (i&1)==0)) {
 		sepPattern[0] = 4;
-		sepPattern[1] = (UCHAR)(k-4);
+		sepPattern[1] = (uint8_t)(k-4);
 		j = 2;
 	}
 	else {
-		sepPattern[0] = (UCHAR)k;
+		sepPattern[0] = (uint8_t)k;
 		j = 1;
 	}
 	for ( ; i < prints->elmCnt; i++, j++) {
@@ -126,7 +126,7 @@ int i, j, k;
 				j += k-1;
 				if ((k&1) == 0) {
 					i++;
-					sepPattern[j] = (UCHAR)(sepPattern[j] + prints->pattern[i]); // trailing w for e1, append to next w
+					sepPattern[j] = (uint8_t)(sepPattern[j] + prints->pattern[i]); // trailing w for e1, append to next w
 				}
 				else {
 					i++;
@@ -141,7 +141,7 @@ int i, j, k;
 				j += k-1;
 				if ((k&1) == 0) {
 					i++;
-					sepPattern[j] = (UCHAR)(sepPattern[j] + prints->pattern[i]); // trailing w for e3, append to next w
+					sepPattern[j] = (uint8_t)(sepPattern[j] + prints->pattern[i]); // trailing w for e3, append to next w
 				}
 				else {
 					i++;
@@ -160,7 +160,7 @@ int i, j, k;
 					j += k-1;
 					if ((k&1) == 0) {
 						i++;
-						sepPattern[j] = (UCHAR)(sepPattern[j] + prints->pattern[i]); // trailing w for e2, append to next w
+						sepPattern[j] = (uint8_t)(sepPattern[j] + prints->pattern[i]); // trailing w for e2, append to next w
 					}
 					else {
 						i++;
@@ -183,12 +183,12 @@ int i, j, k;
 	for ( ; k <= 4; k += sepPattern[j], j--);
 	if ((j&1)==0) {
 		j += 2;
-		sepPattern[j-1] = (UCHAR)(k-4);
+		sepPattern[j-1] = (uint8_t)(k-4);
 		sepPattern[j] = 4;
 	}
 	else {
 		j++;
-		sepPattern[j] = (UCHAR)k;
+		sepPattern[j] = (uint8_t)k;
 	}
   prntSep.elmCnt = j+1;
 	return(&prntSep);

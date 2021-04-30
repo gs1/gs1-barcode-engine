@@ -21,16 +21,13 @@
 #ifndef ENC_H
 #define ENC_H
 
-#define PRNT 0 // prints symbol data if 1
-
 #include <stdio.h>
+#include <stdint.h>
+
+#define PRNT 0 // prints symbol data if 1
 
 #define	TRUE	1
 #define	FALSE	0
-
-#define UCHAR	unsigned char
-#define UINT	unsigned short
-#define ULONG	unsigned long
 
 #define MAX_FNAME 120
 #define MAX_DATA (75+2361)
@@ -56,7 +53,7 @@ int errFlag;
 int rowWidth;
 int line1;
 int linFlag; // tells pack whether linear or cc is being encoded
-UCHAR ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
+uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
 
 
 enum {
@@ -101,7 +98,7 @@ struct sPrints {
 	int height;
 	int whtFirst;
 	int reverse;
-	UCHAR *pattern;
+	uint8_t *pattern;
 };
 
 // subroutine prototypes:
@@ -109,9 +106,9 @@ void encInit();
 void bmpHeader(long xdim, long ydim, FILE *oFile);
 void tifHeader(long xdim, long ydim, FILE *oFile);
 void printElmnts(struct sParams *params, struct sPrints *prints);
-int pack(UCHAR str[], UCHAR bitField[] );
-int check2DData(UCHAR dataStr[]);
-void putBits(UCHAR bitField[], int bitPos, int length, UINT bits);
+int pack(uint8_t str[], uint8_t bitField[] );
+int check2DData(uint8_t dataStr[]);
+void putBits(uint8_t bitField[], int bitPos, int length, uint16_t bits);
 void RSS14(struct sParams *params);
 void RSS14S(struct sParams *params);
 void RSS14SO(struct sParams *params);

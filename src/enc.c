@@ -24,10 +24,10 @@
 #include "cc.h"
 
 #define MAX_LINE 6032 // 10 inches wide at 600 dpi
-static UCHAR line[MAX_LINE/8 + 1];
-static UCHAR lineUCut[MAX_LINE/8 + 1];
+static uint8_t line[MAX_LINE/8 + 1];
+static uint8_t lineUCut[MAX_LINE/8 + 1];
 
-static void printElm(int width, int color, int *bits, int *ndx, UCHAR xorMsk);
+static void printElm(int width, int color, int *bits, int *ndx, uint8_t xorMsk);
 
 void encInit() {
 	init928();
@@ -139,7 +139,7 @@ void printElmnts(struct sParams *params, struct sPrints *prints) {
 #define WHITE 0
 
 int i, bits, width, ndx, white;
-UCHAR xorMsk;
+uint8_t xorMsk;
 int undercut;
 
 	bits = 1;
@@ -222,8 +222,8 @@ int undercut;
 	// pad last byte's bits
 	if (bits != 1) {
 		while ((bits = (bits<<1) + WHITE) <= 0xff);
-		lineUCut[ndx] = (UCHAR)(((line[ndx]^xorMsk)&(bits&0xff))^xorMsk); // Y undercut
-		line[ndx++] = (UCHAR)((bits&0xff) ^ xorMsk);
+		lineUCut[ndx] = (uint8_t)(((line[ndx]^xorMsk)&(bits&0xff))^xorMsk); // Y undercut
+		line[ndx++] = (uint8_t)((bits&0xff) ^ xorMsk);
 		if (ndx > MAX_LINE/8 + 1) {
 			printf("\nPrint line too long");
 			errFlag = TRUE;
@@ -242,23 +242,23 @@ int undercut;
 	}
 
 	for (i = 0; i < params->Yundercut; i++) {
-		fwrite(lineUCut, sizeof(UCHAR), (size_t)ndx, params->outfp);
+		fwrite(lineUCut, sizeof(uint8_t), (size_t)ndx, params->outfp);
 	}
 	for ( ; i < prints->height; i++) {
-		fwrite(line, sizeof(UCHAR), (size_t)ndx, params->outfp);
+		fwrite(line, sizeof(uint8_t), (size_t)ndx, params->outfp);
 	}
 	return;
 }
 
-static void printElm(int width, int color, int *bits, int *ndx, UCHAR xorMsk) {
+static void printElm(int width, int color, int *bits, int *ndx, uint8_t xorMsk) {
 
 int i;
 
 	for (i = 0; i < width; i++) {
 		*bits = (*bits<<1) + color;
 		if (*bits > 0xff) {
-			lineUCut[*ndx] = (UCHAR)(((line[*ndx]^xorMsk)&(*bits&0xff))^xorMsk); // Y undercut
-			line[(*ndx)++] = (UCHAR)((*bits&0xff) ^ xorMsk);
+			lineUCut[*ndx] = (uint8_t)(((line[*ndx]^xorMsk)&(*bits&0xff))^xorMsk); // Y undercut
+			line[(*ndx)++] = (uint8_t)((*bits&0xff) ^ xorMsk);
 			if (*ndx >= MAX_LINE/8 + 1) {
 				*ndx = 0;
 				printf("\nPrint line too long in graphic line.");

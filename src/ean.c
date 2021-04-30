@@ -18,6 +18,7 @@
  *
  */
 
+#include <stdint.h>
 #include <string.h>
 #include "enc.h"
 #include "cc.h"
@@ -34,20 +35,20 @@
 
 extern int errFlag;
 extern int line1;
-extern UCHAR ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
+extern uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
 
-int EAN13enc(UCHAR str[], UCHAR pattern[] );
-int EAN8enc(UCHAR str[], UCHAR pattern[] );
-int UPCEenc(UCHAR str[], UCHAR pattern[] );
+int EAN13enc(uint8_t str[], uint8_t pattern[] );
+int EAN8enc(uint8_t str[], uint8_t pattern[] );
+int UPCEenc(uint8_t str[], uint8_t pattern[] );
 
 void EAN13(struct sParams *params) {
 
 struct sPrints prints;
 struct sPrints sepPrnt;
 
-UCHAR linPattern[EAN13_ELMNTS];
-UCHAR sepPat1[5] = { 7,1,EAN13_W-16,1,7 }; // separator pattern 1
-UCHAR sepPat2[5] = { 6,1,EAN13_W-14,1,6 }; // separator pattern 2
+uint8_t linPattern[EAN13_ELMNTS];
+uint8_t sepPat1[5] = { 7,1,EAN13_W-16,1,7 }; // separator pattern 1
+uint8_t sepPat2[5] = { 6,1,EAN13_W-14,1,6 }; // separator pattern 2
 
 char primaryStr[14+1];
 char tempStr[28+1];
@@ -75,7 +76,7 @@ char *ccStr;
 	strcat(tempStr, "0"); // check digit = 0 for now
 	strcpy(primaryStr, tempStr + strlen(tempStr) - 13);
 
-	if (EAN13enc((UCHAR*)primaryStr, linPattern)) {
+	if (EAN13enc((uint8_t*)primaryStr, linPattern)) {
 		if (errFlag) {
 			printf("\nerror occurred, exiting.");
 			return;
@@ -109,7 +110,7 @@ char *ccStr;
 	sepPrnt.whtFirst = TRUE;
 	sepPrnt.reverse = FALSE;
 	if (ccFlag) {
-		if ((rows = CC4enc((UCHAR*)ccStr, ccPattern)) > 0) {
+		if ((rows = CC4enc((uint8_t*)ccStr, ccPattern)) > 0) {
 			if (errFlag) {
 				printf("\nComposite encoding error.");
 				return;
@@ -194,16 +195,16 @@ char *ccStr;
 }
 
 // call with str = 13-digit primary with check digit = 0
-int EAN13enc(UCHAR str[], UCHAR pattern[] ) {
+int EAN13enc(uint8_t str[], uint8_t pattern[] ) {
 
-static UINT upcTblA[10] = {	0x3211, 0x2221, 0x2122, 0x1411, 0x1132,
+static uint16_t upcTblA[10] = {	0x3211, 0x2221, 0x2122, 0x1411, 0x1132,
 				0x1231, 0x1114, 0x1312, 0x1213, 0x3112 };
-static UINT upcTblB[10] = {	0x1123, 0x1222, 0x2212, 0x1141, 0x2311,
+static uint16_t upcTblB[10] = {	0x1123, 0x1222, 0x2212, 0x1141, 0x2311,
 				0x1321, 0x4111, 0x2131, 0x3121, 0x2113 };
-static UINT abArr[10] = { 0 /*0x07*/,0x0B,0x0D,0x0E,0x13,0x19,0x1C,0x15,0x16,0x1A };
-static UCHAR lGuard[4] = { 7,1,1,1 };
-static UCHAR center[5] = { 1,1,1,1,1 };
-static UCHAR rGuard[4] = { 1,1,1,7 };
+static uint16_t abArr[10] = { 0 /*0x07*/,0x0B,0x0D,0x0E,0x13,0x19,0x1C,0x15,0x16,0x1A };
+static uint8_t lGuard[4] = { 7,1,1,1 };
+static uint8_t center[5] = { 1,1,1,1,1 };
+static uint8_t rGuard[4] = { 1,1,1,7 };
 
 int i, j, abMask, bars, sNdx, pNdx, abBits;
 
@@ -216,7 +217,7 @@ int i, j, abMask, bars, sNdx, pNdx, abBits;
 	if (j > 0) {
 		j = 10 - j;
 	}
-	str[12] = (UCHAR)(j + '0');
+	str[12] = (uint8_t)(j + '0');
 
 	sNdx = 1;
 	pNdx = 0;
@@ -266,9 +267,9 @@ void EAN8(struct sParams *params) {
 struct sPrints prints;
 struct sPrints sepPrnt;
 
-UCHAR linPattern[EAN8_ELMNTS];
-UCHAR sepPat1[5] = { 7,1,EAN8_W-16,1,7 }; // separator pattern 1
-UCHAR sepPat2[5] = { 6,1,EAN8_W-14,1,6 }; // separator pattern 2
+uint8_t linPattern[EAN8_ELMNTS];
+uint8_t sepPat1[5] = { 7,1,EAN8_W-16,1,7 }; // separator pattern 1
+uint8_t sepPat2[5] = { 6,1,EAN8_W-14,1,6 }; // separator pattern 2
 
 char primaryStr[14+1];
 char tempStr[28+1];
@@ -299,7 +300,7 @@ int elmntsCC;
 	strcat(tempStr, "0"); // check digit = 0 for now
 	strcpy(primaryStr, tempStr + strlen(tempStr) - 13);
 
-	if (EAN8enc((UCHAR*)primaryStr, linPattern)) {
+	if (EAN8enc((uint8_t*)primaryStr, linPattern)) {
 		if (errFlag) {
 			printf("\nerror occurred, exiting.");
 			return;
@@ -336,7 +337,7 @@ int elmntsCC;
 	sepPrnt.whtFirst = TRUE;
 	sepPrnt.reverse = FALSE;
 	if (ccFlag) {
-		if ((rows = CC3enc((UCHAR*)ccStr, ccPattern)) > 0) {
+		if ((rows = CC3enc((uint8_t*)ccStr, ccPattern)) > 0) {
 			if (errFlag) {
 				printf("\nComposite encoding error.");
 				return;
@@ -429,13 +430,13 @@ int elmntsCC;
 
 
 // call with str = 13-digit primary with check digit = 0
-int EAN8enc(UCHAR str[], UCHAR pattern[] ) {
+int EAN8enc(uint8_t str[], uint8_t pattern[] ) {
 
-static UINT upcTblA[10] = {	0x3211, 0x2221, 0x2122, 0x1411, 0x1132,
+static uint16_t upcTblA[10] = {	0x3211, 0x2221, 0x2122, 0x1411, 0x1132,
 														0x1231, 0x1114, 0x1312, 0x1213, 0x3112 };
-static UCHAR lGuard[4] = { 7,1,1,1 };
-static UCHAR center[5] = { 1,1,1,1,1 };
-static UCHAR rGuard[4] = { 1,1,1,7 };
+static uint8_t lGuard[4] = { 7,1,1,1 };
+static uint8_t center[5] = { 1,1,1,1,1 };
+static uint8_t rGuard[4] = { 1,1,1,7 };
 
 int i, j, bars, sNdx, pNdx;
 
@@ -448,7 +449,7 @@ int i, j, bars, sNdx, pNdx;
 	if (j > 0) {
 		j = 10 - j;
 	}
-	str[12] = (UCHAR)(j + '0');
+	str[12] = (uint8_t)(j + '0');
 
 	sNdx = 5;
 	pNdx = 0;
@@ -491,9 +492,9 @@ void UPCE(struct sParams *params) {
 struct sPrints prints;
 struct sPrints sepPrnt;
 
-UCHAR linPattern[UPCE_ELMNTS];
-UCHAR sepPat1[5] = { 7,1,UPCE_W-16,1,7 }; // separator pattern 1
-UCHAR sepPat2[5] = { 6,1,UPCE_W-14,1,6 }; // separator pattern 2
+uint8_t linPattern[UPCE_ELMNTS];
+uint8_t sepPat1[5] = { 7,1,UPCE_W-16,1,7 }; // separator pattern 1
+uint8_t sepPat2[5] = { 6,1,UPCE_W-14,1,6 }; // separator pattern 2
 
 char primaryStr[14+1];
 char tempStr[28+1];
@@ -521,7 +522,7 @@ char *ccStr;
 	strcat(tempStr, "0"); // check digit = 0 for now
 	strcpy(primaryStr, tempStr + strlen(tempStr) - 13);
 
-	if (UPCEenc((UCHAR*)primaryStr, linPattern)) {
+	if (UPCEenc((uint8_t*)primaryStr, linPattern)) {
 		if (errFlag) {
 			printf("\nerror occurred, exiting.");
 			return;
@@ -555,7 +556,7 @@ char *ccStr;
 	sepPrnt.whtFirst = TRUE;
 	sepPrnt.reverse = FALSE;
 	if (ccFlag) {
-		if ((rows = CC2enc((UCHAR*)ccStr, ccPattern)) > 0) {
+		if ((rows = CC2enc((uint8_t*)ccStr, ccPattern)) > 0) {
 			if (errFlag) {
 				printf("\nComposite encoding error.");
 				return;
@@ -640,17 +641,17 @@ char *ccStr;
 }
 
 // call with str = 13-digit primary with check digit = 0
-int UPCEenc(UCHAR str[], UCHAR pattern[] ) {
+int UPCEenc(uint8_t str[], uint8_t pattern[] ) {
 
-static UINT upcTblA[10] = {	0x3211, 0x2221, 0x2122, 0x1411, 0x1132,
+static uint16_t upcTblA[10] = {	0x3211, 0x2221, 0x2122, 0x1411, 0x1132,
 				0x1231, 0x1114, 0x1312, 0x1213, 0x3112 };
-static UINT upcTblB[10] = {	0x1123, 0x1222, 0x2212, 0x1141, 0x2311,
+static uint16_t upcTblB[10] = {	0x1123, 0x1222, 0x2212, 0x1141, 0x2311,
 				0x1321, 0x4111, 0x2131, 0x3121, 0x2113 };
-static UINT abArr[10] = { 0x07,0x0B,0x0D,0x0E,0x13,0x19,0x1C,0x15,0x16,0x1A };
-static UCHAR lGuard[4] = { 7,1,1,1 };
-static UCHAR rGuard[7] = { 1,1,1,1,1,1,7 };
+static uint16_t abArr[10] = { 0x07,0x0B,0x0D,0x0E,0x13,0x19,0x1C,0x15,0x16,0x1A };
+static uint8_t lGuard[4] = { 7,1,1,1 };
+static uint8_t rGuard[7] = { 1,1,1,1,1,1,7 };
 
-UCHAR data6[6+1];
+uint8_t data6[6+1];
 
 int i, j, abMask, bars, sNdx, pNdx, abBits;
 
@@ -663,7 +664,7 @@ int i, j, abMask, bars, sNdx, pNdx, abBits;
 	if (j > 0) {
 		j = 10 - j;
 	}
-	str[12] = (UCHAR)(j + '0');
+	str[12] = (uint8_t)(j + '0');
 
 	for (i = 0; i < 5; i++) {
 		data6[i] = str[i+2];

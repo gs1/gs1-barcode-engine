@@ -21,14 +21,16 @@
 #ifndef CC_H
 #define CC_H
 
-int CC2enc(UCHAR str[], UCHAR pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
-int CC3enc(UCHAR str[], UCHAR pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
-int CC4enc(UCHAR str[], UCHAR pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
-int CCCenc(UCHAR str[], UCHAR pattern[]);
+#include <stdint.h>
+
+int CC2enc(uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
+int CC3enc(uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
+int CC4enc(uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
+int CCCenc(uint8_t str[], uint8_t pattern[]);
 void init928(void);
 void initLogTables(void);
 
-const ULONG barData[3][929];
-const ULONG barRap[2][52];
+const uint32_t barData[3][929];
+const uint32_t barRap[2][52];
 
 #endif /* CC_H */

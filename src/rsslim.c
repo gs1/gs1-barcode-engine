@@ -19,6 +19,7 @@
  */
 
 #include <string.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include "enc.h"
 #include "rssutil.h"
@@ -33,19 +34,19 @@
 
 #define L_PADB 10 // RSS14L left pad for ccb
 
-int RSSLimEnc(UCHAR str[], UCHAR pattern[], int ccFlag);
+int RSSLimEnc(uint8_t str[], uint8_t pattern[], int ccFlag);
 struct sPrints *separatorLim(struct sParams *params, struct sPrints *prints);
 
 extern int errFlag;
 extern int line1;
-extern UCHAR ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
+extern uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
 
 void RSSLim(struct sParams *params) {
 
 struct sPrints prints;
 struct sPrints *prntCnv;
 
-UCHAR linPattern[ELMNTS];
+uint8_t linPattern[ELMNTS];
 
 char primaryStr[14+1];
 char tempStr[28+1];
@@ -72,7 +73,7 @@ char *ccStr;
 		strcat(tempStr, params->dataStr);
 		strcpy(primaryStr, tempStr + strlen(tempStr) - 13);
 
-		if (RSSLimEnc((UCHAR*)primaryStr, linPattern, ccFlag)) {
+		if (RSSLimEnc((uint8_t*)primaryStr, linPattern, ccFlag)) {
 			if (errFlag) {
 				printf("\nRSS Limited encoding error occurred.");
 				return;
@@ -101,7 +102,7 @@ char *ccStr;
 		prints.whtFirst = TRUE;
 		prints.reverse = FALSE;
 		if (ccFlag) {
-			if ((rows = CC3enc((UCHAR*)ccStr, ccPattern)) > 0) {
+			if ((rows = CC3enc((uint8_t*)ccStr, ccPattern)) > 0) {
 				if (errFlag) {
 					printf("\nerror occurred, exiting.");
 					return;
@@ -240,7 +241,7 @@ char *ccStr;
 }
 
 // call with str = 13-digit primary, no check digit
-int RSSLimEnc(UCHAR string[], UCHAR bars[], int ccFlag) {
+int RSSLimEnc(uint8_t string[], uint8_t bars[], int ccFlag) {
 
 #define	N	26
 #define	K	7
@@ -260,7 +261,7 @@ int RSSLimEnc(UCHAR string[], UCHAR bars[], int ccFlag) {
 								19,8,	7,1,	1,		17094,
 								7,1,	19,8,	16632,16632 };
 
-	static UCHAR parityPattern[PARITY_MOD * 14] = {
+	static uint8_t parityPattern[PARITY_MOD * 14] = {
 		 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 3, 1, 1,
 		 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 2, 1, 1,
 		 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 3, 1, 1, 1,
@@ -389,7 +390,7 @@ int RSSLimEnc(UCHAR string[], UCHAR bars[], int ccFlag) {
 	widths = getRSSwidths(value, elementN, K, elementMax, 1);
 	parity = 0l;
 	for (i = 0; i < K; i++) {
-		bars[(i*2)] = (UCHAR)widths[i];
+		bars[(i*2)] = (uint8_t)widths[i];
 		parity += leftWeights[i * 2] * widths[i];
 		parity = parity % PARITY_MOD;
 	}
@@ -402,7 +403,7 @@ int RSSLimEnc(UCHAR string[], UCHAR bars[], int ccFlag) {
 	// generate and store even element widths:
 	widths = getRSSwidths(value, elementN, K, elementMax, 0);
 	for (i = 0; i < K; i++) {
-		bars[(i*2)+1] = (UCHAR)widths[i];
+		bars[(i*2)+1] = (uint8_t)widths[i];
 		parity += leftWeights[(i * 2) + 1] * widths[i];
 		parity = parity % PARITY_MOD;
 	}
@@ -425,7 +426,7 @@ int RSSLimEnc(UCHAR string[], UCHAR bars[], int ccFlag) {
 	// generate and store odd element widths:
 	widths = getRSSwidths(value, elementN, K, elementMax, 1);
 	for (i = 0; i < K; i++) {
-		bars[(i*2)+28] = (UCHAR)widths[i];
+		bars[(i*2)+28] = (uint8_t)widths[i];
 		parity += rightWeights[i * 2] * widths[i];
 		parity = parity % PARITY_MOD;
 	}
@@ -438,7 +439,7 @@ int RSSLimEnc(UCHAR string[], UCHAR bars[], int ccFlag) {
 	// generate and store even element widths:
 	widths = getRSSwidths(value, elementN, K, elementMax, 0);
 	for (i = 0; i < K; i++) {
-		bars[(i*2)+1+28] = (UCHAR)widths[i];
+		bars[(i*2)+1+28] = (uint8_t)widths[i];
 		parity += rightWeights[(i * 2) + 1] * widths[i];
 		parity = parity % PARITY_MOD;
 	}
@@ -452,7 +453,7 @@ int RSSLimEnc(UCHAR string[], UCHAR bars[], int ccFlag) {
 }
 
 static struct sPrints prntSep;
-static UCHAR sepPattern[SYM_W];
+static uint8_t sepPattern[SYM_W];
 
 struct sPrints *separatorLim(struct sParams *params, struct sPrints *prints) {
 int i, j, k;
@@ -473,11 +474,11 @@ int i, j, k;
 	for (i = k = 0; k <= 4; k += sepPattern[i], i++);
 	if ((i&1)==1) {
 		sepPattern[0] = 4;
-		sepPattern[1] = (UCHAR)(k-4);
+		sepPattern[1] = (uint8_t)(k-4);
 		j = 2;
 	}
 	else {
-		sepPattern[0] = (UCHAR)k;
+		sepPattern[0] = (uint8_t)k;
 		j = 1;
 	}
 	for ( ; i < ELMNTS+4; i++, j++) {
@@ -486,12 +487,12 @@ int i, j, k;
 	for (j--, k = 0; k <= 4; k += sepPattern[j], j--);
 	if ((j&1)==0) {
 		j += 2;
-		sepPattern[j-1] = (UCHAR)(k-4);
+		sepPattern[j-1] = (uint8_t)(k-4);
 		sepPattern[j] = 4;
 	}
 	else {
 		j++;
-		sepPattern[j] = (UCHAR)k;
+		sepPattern[j] = (uint8_t)k;
 	}
 	prntSep.elmCnt = j+1;
 	return(&prntSep);

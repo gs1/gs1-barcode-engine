@@ -19,6 +19,7 @@
  */
 
 #include <string.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include "rssutil.h"
 #include "enc.h"
@@ -42,9 +43,9 @@
 
 extern int errFlag;
 extern int line1;
-extern UCHAR ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
+extern uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
 
-int RSS14enc(UCHAR str[], UCHAR pattern[], int ccFlag);
+int RSS14enc(uint8_t str[], uint8_t pattern[], int ccFlag);
 struct sPrints *separator14S(struct sParams *params, struct sPrints *prints);
 
 
@@ -53,7 +54,7 @@ void RSS14(struct sParams *params) {
 struct sPrints prints;
 struct sPrints *prntCnv;
 
-UCHAR linPattern[ELMNTS];
+uint8_t linPattern[ELMNTS];
 
 char primaryStr[14+1];
 char tempStr[28+1];
@@ -88,7 +89,7 @@ int symHt;
 		strcat(tempStr, params->dataStr);
 		strcpy(primaryStr, tempStr + strlen(tempStr) - 13);
 
-		if (RSS14enc((UCHAR*)primaryStr, linPattern, ccFlag)) {
+		if (RSS14enc((uint8_t*)primaryStr, linPattern, ccFlag)) {
 			if (errFlag) {
 				printf("\nRSS14 encoding error occurred.");
 				return;
@@ -113,7 +114,7 @@ int symHt;
 		prints.whtFirst = TRUE;
 		prints.reverse = FALSE;
 		if (ccFlag) {
-			if ((rows = CC4enc((UCHAR*)ccStr, ccPattern)) > 0) {
+			if ((rows = CC4enc((uint8_t*)ccStr, ccPattern)) > 0) {
 				if (errFlag) {
 					printf("\nComposite encoding error occurred.");
 					return;
@@ -198,7 +199,7 @@ void RSS14S(struct sParams *params) {
 struct sPrints prints;
 struct sPrints *prntCnv;
 
-UCHAR linPattern[ELMNTS];
+uint8_t linPattern[ELMNTS];
 
 char primaryStr[14+1];
 char tempStr[28+1];
@@ -225,7 +226,7 @@ char *ccStr;
 		strcat(tempStr, params->dataStr);
 		strcpy(primaryStr, tempStr + strlen(tempStr) - 13);
 
-		if (RSS14enc((UCHAR*)primaryStr, linPattern, ccFlag)) {
+		if (RSS14enc((uint8_t*)primaryStr, linPattern, ccFlag)) {
 			if (errFlag) {
 				printf("\nRSS14 encoding error occurred.");
 				return;
@@ -248,7 +249,7 @@ char *ccStr;
 		prints.whtFirst = TRUE;
 		prints.reverse = FALSE;
 		if (ccFlag) {
-			if ((rows = CC2enc((UCHAR*)ccStr, ccPattern)) > 0) {
+			if ((rows = CC2enc((uint8_t*)ccStr, ccPattern)) > 0) {
 				if (errFlag) {
 					printf("\nerror occurred, exiting.");
 					return;
@@ -388,8 +389,8 @@ struct sPrints prints;
 struct sPrints chexPrnts;
 struct sPrints *prntCnv;
 
-UCHAR linPattern[ELMNTS];
-UCHAR chexPattern[SYM_W/2+2];
+uint8_t linPattern[ELMNTS];
+uint8_t chexPattern[SYM_W/2+2];
 
 char primaryStr[14+1];
 char tempStr[28+1];
@@ -428,7 +429,7 @@ char *ccStr;
 		strcat(tempStr, params->dataStr);
 		strcpy(primaryStr, tempStr + strlen(tempStr) - 13);
 
-		if (RSS14enc((UCHAR*)primaryStr, linPattern, ccFlag)) {
+		if (RSS14enc((uint8_t*)primaryStr, linPattern, ccFlag)) {
 			if (errFlag) {
 				printf("\nRSS14 encoding error occurred.");
 				return;
@@ -452,7 +453,7 @@ char *ccStr;
 		prints.reverse = FALSE;
 		if (ccFlag) {
 			chexPrnts.rightPad = R_PADR; // pad for composite
-			if ((rows = CC2enc((UCHAR*)ccStr, ccPattern)) > 0) {
+			if ((rows = CC2enc((uint8_t*)ccStr, ccPattern)) > 0) {
 				if (errFlag) {
 					printf("\nerror occurred, exiting.");
 					return;
@@ -617,7 +618,7 @@ char *ccStr;
 
 
 static struct sPrints prntSep;
-static UCHAR sepPattern[SYM_W/2+2];
+static uint8_t sepPattern[SYM_W/2+2];
 
 // RSS14 Stacked row separator pattern routine
 struct sPrints *separator14S(struct sParams *params, struct sPrints *prints) {
@@ -647,7 +648,7 @@ int i, j, k, lNdx, rNdx, sNdx, lWidth, rWidth, matchWidth;
 			// top and bottom rows are opposite colors here
 			if (matchWidth > 0) {
 				// same to opposite, terminate complimentary element
-				sepPattern[sNdx++] = (UCHAR)matchWidth;
+				sepPattern[sNdx++] = (uint8_t)matchWidth;
 				matchWidth = 0;
 			}
 			sepPattern[sNdx++] = 1; // 1X elements separate opposite colors
@@ -669,7 +670,7 @@ int i, j, k, lNdx, rNdx, sNdx, lWidth, rWidth, matchWidth;
 				// same to same, see if colors reversed
 				if (((lNdx - sNdx) & 1) == 1) {
 					// yes, terminate previous color
-					sepPattern[sNdx++] = (UCHAR)matchWidth;
+					sepPattern[sNdx++] = (uint8_t)matchWidth;
 					matchWidth = 1;
 				}
 				else {
@@ -685,11 +686,11 @@ int i, j, k, lNdx, rNdx, sNdx, lWidth, rWidth, matchWidth;
 	for (i = k = 0; k <= 4; k += sepPattern[i], i++);
 	if ((i&1)==0) {
 		sepPattern[0] = 4;
-		sepPattern[1] = (UCHAR)(k-4);
+		sepPattern[1] = (uint8_t)(k-4);
 		j = 2;
 	}
 	else {
-		sepPattern[0] = (UCHAR)k;
+		sepPattern[0] = (uint8_t)k;
 		j = 1;
 	}
 	for ( ; i < sNdx+2; i++, j++) {
@@ -698,12 +699,12 @@ int i, j, k, lNdx, rNdx, sNdx, lWidth, rWidth, matchWidth;
 	for (j--, k = 0; k <= 4; k += sepPattern[j], j--);
 	if ((j&1)==0) {
 		j += 2;
-		sepPattern[j-1] = (UCHAR)(k-4);
+		sepPattern[j-1] = (uint8_t)(k-4);
 		sepPattern[j] = 4;
 	}
 	else {
 		j++;
-		sepPattern[j] = (UCHAR)k;
+		sepPattern[j] = (uint8_t)k;
 	}
 	prntSep.elmCnt = j+1;
 	return(&prntSep);
@@ -712,7 +713,7 @@ int i, j, k, lNdx, rNdx, sNdx, lWidth, rWidth, matchWidth;
 
 #define K	4
 // call with str = 13-digit primary, no check digit
-int RSS14enc(UCHAR string[], UCHAR bars[], int ccFlag) {
+int RSS14enc(uint8_t string[], uint8_t bars[], int ccFlag) {
 
 #define	PARITYCHRSIZE	9
 #define PARITY_MOD 79
@@ -738,7 +739,7 @@ int RSS14enc(UCHAR string[], UCHAR bars[], int ccFlag) {
 								6,3,	10,6,	70,	700,
 								4,1,	12,8,	126,126 };
 
-	static UCHAR leftParity[PARITYCHRSIZE * 3] = {
+	static uint8_t leftParity[PARITYCHRSIZE * 3] = {
 		3,8,2,
 		3,5,5,
 		3,3,7,
@@ -794,7 +795,7 @@ int RSS14enc(UCHAR string[], UCHAR bars[], int ccFlag) {
 	widths = getRSSwidths(value, elementN, K, elementMax, 1);
 	parity = 0l;
 	for (i = 0; i < K; i++) {
-		bars[(i * 2)] = (UCHAR)widths[i];
+		bars[(i * 2)] = (uint8_t)widths[i];
 		parity += leftWeights[i * 2] * widths[i];
 		parity = parity % PARITY_MOD;
 	}
@@ -807,7 +808,7 @@ int RSS14enc(UCHAR string[], UCHAR bars[], int ccFlag) {
 	// generate and store even element widths:
 	widths = getRSSwidths(value, elementN, K, elementMax, 0);
 	for (i = 0; i < K; i++) {
-		bars[1 + (i * 2)] = (UCHAR)widths[i];
+		bars[1 + (i * 2)] = (uint8_t)widths[i];
 		parity += leftWeights[(i * 2) + 1] * widths[i];
 		parity = parity % PARITY_MOD;
 	}
@@ -830,7 +831,7 @@ int RSS14enc(UCHAR string[], UCHAR bars[], int ccFlag) {
 	// generate and store even element widths of the 2nd char:
 	widths = getRSSwidths(value, elementN, K, elementMax, 1);
 	for (i = 0; i < K; i++) {
-		bars[19 - (i * 2)] = (UCHAR)widths[i];
+		bars[19 - (i * 2)] = (uint8_t)widths[i];
 		parity += leftWeights[(i * 2)+1+8] * widths[i];
 		parity = parity % PARITY_MOD;
 	}
@@ -843,7 +844,7 @@ int RSS14enc(UCHAR string[], UCHAR bars[], int ccFlag) {
 	// generate and store odd element widths:
 	widths = getRSSwidths(value, elementN, K, elementMax, 0);
 	for (i = 0; i < K; i++) {
-		bars[20 - (i * 2)] = (UCHAR)widths[i];
+		bars[20 - (i * 2)] = (uint8_t)widths[i];
 		parity += leftWeights[(i * 2)+8] * widths[i];
 		parity = parity % PARITY_MOD;
 	}
@@ -870,7 +871,7 @@ int RSS14enc(UCHAR string[], UCHAR bars[], int ccFlag) {
 	// generate and store odd element widths:
 	widths = getRSSwidths(value, elementN, K, elementMax, 1);
 	for (i = 0; i < K; i++) {
-		bars[41 - (i * 2)] = (UCHAR)widths[i];
+		bars[41 - (i * 2)] = (uint8_t)widths[i];
 		parity += rightWeights[i * 2] * widths[i];
 		parity = parity % PARITY_MOD;
 	}
@@ -883,7 +884,7 @@ int RSS14enc(UCHAR string[], UCHAR bars[], int ccFlag) {
 	// generate and store even element widths:
 	widths = getRSSwidths(value, elementN, K, elementMax, 0);
 	for (i = 0; i < K; i++) {
-		bars[40 - (i * 2)] = (UCHAR)widths[i];
+		bars[40 - (i * 2)] = (uint8_t)widths[i];
 		parity += rightWeights[(i * 2) + 1] * widths[i];
 		parity = parity % PARITY_MOD;
 	}
@@ -906,7 +907,7 @@ int RSS14enc(UCHAR string[], UCHAR bars[], int ccFlag) {
 	// generate and store even element widths of the 4th char:
 	widths = getRSSwidths(value, elementN, K, elementMax, 1);
 	for (i = 0; i < K; i++) {
-		bars[22 + (i * 2)] = (UCHAR)widths[i];
+		bars[22 + (i * 2)] = (uint8_t)widths[i];
 		parity += rightWeights[(i * 2)+1+8] * widths[i];
 		parity = parity % PARITY_MOD;
 	}
@@ -919,7 +920,7 @@ int RSS14enc(UCHAR string[], UCHAR bars[], int ccFlag) {
 	// generate and store odd element widths:
 	widths = getRSSwidths(value, elementN, K, elementMax, 0);
 	for (i = 0; i < K; i++) {
-		bars[21 + (i * 2)] = (UCHAR)widths[i];
+		bars[21 + (i * 2)] = (uint8_t)widths[i];
 		parity += rightWeights[(i * 2)+8] * widths[i];
 		parity = parity % PARITY_MOD;
 	}

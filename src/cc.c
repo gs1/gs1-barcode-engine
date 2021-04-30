@@ -21,6 +21,7 @@
 #include <ctype.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include "enc.h"
 #include "cc.h"
 
@@ -39,9 +40,9 @@
 #define max(X,Y) (((X) > (Y)) ? (X) : (Y))
 
 struct encodeT {
-	UCHAR *str;
+	uint8_t *str;
 	int iStr;
-	UCHAR *bitField;
+	uint8_t *bitField;
 	int iBit;
 	int mode;
 	int typeAI;
@@ -60,40 +61,40 @@ extern int errFlag;
 extern int rowWidth;
 extern int line1;
 extern int linFlag; // tells pack whether linear, cc-a/b or cc-c is being encoded
-extern UCHAR ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
+extern uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
 
 // CC-C external variables
 extern int colCnt; // after set in main, may be decreased by getUnusedBitCnt
 extern int rowCnt; // determined by getUnusedBitCnt
 extern int eccCnt; // determined by getUnusedBitCnt
 
-void encCCA2(int size, UCHAR bitField[], UINT codeWords[],
-		UCHAR pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
-void encCCB2(int size, UCHAR bitField[], UINT codeWords[],
-		UCHAR pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
-void encCCA3(int size, UCHAR bitField[], UINT codeWords[],
-		UCHAR pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
-void encCCB3(int size, UCHAR bitField[], UINT codeWords[],
-		UCHAR pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
-void encCCA4(int size, UCHAR bitField[], UINT codeWords[],
-		UCHAR pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
-void encCCB4(int size, UCHAR bitField[], UINT codeWords[],
-		UCHAR pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
-void encCCC(int byteCnt, UCHAR bitField[], UINT codeWords[],
-		UCHAR patCCC[]);
-void imgCCA2(int size, UINT codeWords[],
-		UCHAR pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
-void imgCCB2(int size, UINT codeWords[],
-		UCHAR pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
-void imgCCA3(int size, UINT codeWords[],
-		UCHAR pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
-void imgCCB3(int size, UINT codeWords[],
-		UCHAR pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
-void imgCCA4(int size, UINT codeWords[],
-		UCHAR pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
-void imgCCB4(int size, UINT codeWords[],
-		UCHAR pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
-void imgCCC(UINT codeWords[], UCHAR patCCC[]);
+void encCCA2(int size, uint8_t bitField[], uint16_t codeWords[],
+		uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
+void encCCB2(int size, uint8_t bitField[], uint16_t codeWords[],
+		uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
+void encCCA3(int size, uint8_t bitField[], uint16_t codeWords[],
+		uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
+void encCCB3(int size, uint8_t bitField[], uint16_t codeWords[],
+		uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
+void encCCA4(int size, uint8_t bitField[], uint16_t codeWords[],
+		uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
+void encCCB4(int size, uint8_t bitField[], uint16_t codeWords[],
+		uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
+void encCCC(int byteCnt, uint8_t bitField[], uint16_t codeWords[],
+		uint8_t patCCC[]);
+void imgCCA2(int size, uint16_t codeWords[],
+		uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
+void imgCCB2(int size, uint16_t codeWords[],
+		uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
+void imgCCA3(int size, uint16_t codeWords[],
+		uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
+void imgCCB3(int size, uint16_t codeWords[],
+		uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
+void imgCCA4(int size, uint16_t codeWords[],
+		uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
+void imgCCB4(int size, uint16_t codeWords[],
+		uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
+void imgCCC(uint16_t codeWords[], uint8_t patCCC[]);
 
 int procNUM(struct encodeT *encode);
 int procALNU(struct encodeT *encode);
@@ -106,18 +107,18 @@ int testAI90(struct encodeT *encode);
 void procAI90(struct encodeT *encode);
 void encodeAI90(struct encodeT *encode);
 void nextAI(struct encodeT *encode);
-int encode928(UCHAR bitString[], UINT codeWords[], int bitLng);
-void encode900(UCHAR byteArr[], UINT codeWords[], int byteLng);
-int getBit(UCHAR bitStr[], int bitPos);
+int encode928(uint8_t bitString[], uint16_t codeWords[], int bitLng);
+void encode900(uint8_t byteArr[], uint16_t codeWords[], int byteLng);
+int getBit(uint8_t bitStr[], int bitPos);
 
-static void genECC(int dsize, int csize, UINT sym[]);
+static void genECC(int dsize, int csize, uint16_t sym[]);
 static void genPoly(int eccSize);
 static int gfMul(int p1, int p2);
 
-int doLinMethods(UCHAR str[], int *iStr, UCHAR bitField[], int *iBit);
-UINT yymmdd(UCHAR str[]);
-void cnv13 (UCHAR str[], int *iStr, UCHAR bitField[], int *iBit);
-void cnv12 (UCHAR str[], int *iStr, UCHAR bitField[], int *iBit);
+int doLinMethods(uint8_t str[], int *iStr, uint8_t bitField[], int *iBit);
+uint16_t yymmdd(uint8_t str[]);
+void cnv13 (uint8_t str[], int *iStr, uint8_t bitField[], int *iBit);
+void cnv12 (uint8_t str[], int *iStr, uint8_t bitField[], int *iBit);
 
 static int *CCSizes; // will point to CCxSizes
 
@@ -125,12 +126,12 @@ static int CC2Sizes[] = {	59,78,88,108,118,138,167,	// cca sizes
 				208,256,296,336,		// ccb sizes
 				0 };
 
-int CC2enc(UCHAR str[], UCHAR pattern[MAX_CCB4_ROWS][CCB4_ELMNTS] ) {
+int CC2enc(uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS] ) {
 
 static int rows[11] = { 5,6,7,8,9,10,12,  17,20,23,26 }; // 7 CCA & 4 CCB row counts
 
-UCHAR bitField[MAX_BYTES];
-UINT codeWords[MAX_CW];
+uint8_t bitField[MAX_BYTES];
+uint16_t codeWords[MAX_CW];
 int size;
 int i;
 
@@ -163,12 +164,12 @@ int CC3Sizes[] = {	78,98,118,138,167,		// cca sizes
 			208,304,416,536,648,768,	// ccb sizes
 			0 };
 
-int CC3enc(UCHAR str[], UCHAR pattern[MAX_CCB4_ROWS][CCB4_ELMNTS] ) {
+int CC3enc(uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS] ) {
 
 static int rows[11] = { 4,5,6,7,8,  15,20,26,32,38,44 }; // 5 CCA & 6 CCB row counts
 
-UCHAR bitField[MAX_BYTES];
-UINT codeWords[MAX_CW];
+uint8_t bitField[MAX_BYTES];
+uint16_t codeWords[MAX_CW];
 int size;
 int i;
 
@@ -201,12 +202,12 @@ static int CC4Sizes[] = {	78,108,138,167,197, // cca sizes
 				208,264,352,496,672,840,1016,1184, // ccb sizes
 				0 };
 
-int CC4enc(UCHAR str[], UCHAR pattern[MAX_CCB4_ROWS][CCB4_ELMNTS] ) {
+int CC4enc(uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS] ) {
 
 static int rows[13] = { 3,4,5,6,7,  10,12,15,20,26,32,38,44 }; // 5 CCA & 8 CCB row counts
 
-UCHAR bitField[MAX_BYTES];
-UINT codeWords[MAX_CW];
+uint8_t bitField[MAX_BYTES];
+uint16_t codeWords[MAX_CW];
 int size;
 int i;
 
@@ -235,10 +236,10 @@ int i;
 	return(rows[size]);
 }
 
-int CCCenc(UCHAR str[], UCHAR patCCC[] ) {
+int CCCenc(uint8_t str[], uint8_t patCCC[] ) {
 
-UCHAR bitField[MAX_CCC_BYTES];
-UINT codeWords[MAX_CCC_CW];
+uint8_t bitField[MAX_CCC_BYTES];
+uint16_t codeWords[MAX_CCC_CW];
 int byteCnt;
 int i;
 
@@ -257,8 +258,8 @@ int i;
 }
 
 
-void encCCA2(int size, UCHAR bitField[], UINT codeWords[],
-		UCHAR pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
+void encCCA2(int size, uint8_t bitField[], uint16_t codeWords[],
+		uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
 
 static int dataCw[7] = { 6,8,9,11,12,14,17 };
 static int eccCw[7] = { 4,4,5,5,6,6,7 };
@@ -270,8 +271,8 @@ static int eccCw[7] = { 4,4,5,5,6,6,7 };
 	return;
 }
 
-void encCCB2(int size, UCHAR bitField[], UINT codeWords[],
-		UCHAR pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
+void encCCB2(int size, uint8_t bitField[], uint16_t codeWords[],
+		uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
 
 static int dataBytes[4] = { 26,32,37,42 };
 static int dataCw[4] = { 24,29,33,37 };
@@ -286,8 +287,8 @@ static int eccCw[4] = { 10,11,13,15 };
 	return;
 }
 
-void encCCA3(int size, UCHAR bitField[], UINT codeWords[],
-		UCHAR pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
+void encCCA3(int size, uint8_t bitField[], uint16_t codeWords[],
+		uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
 
 static int dataCw[5] = { 8,10,12,14,17 };
 static int eccCw[5] = { 4,5,6,7,7 };
@@ -298,8 +299,8 @@ static int eccCw[5] = { 4,5,6,7,7 };
 	return;
 }
 
-void encCCB3(int size, UCHAR bitField[], UINT codeWords[],
-		UCHAR pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
+void encCCB3(int size, uint8_t bitField[], uint16_t codeWords[],
+		uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
 
 static int dataBytes[6] = { 26,38,52,67,81,96 };
 static int dataCw[6] = { 24,34,46,58,70,82 };
@@ -314,8 +315,8 @@ static int eccCw[6] = { 21,26,32,38,44,50 };
 	return;
 }
 
-void encCCA4(int size, UCHAR bitField[], UINT codeWords[],
-		UCHAR pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
+void encCCA4(int size, uint8_t bitField[], uint16_t codeWords[],
+		uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
 
 static int dataCw[5] = { 8,11,14,17,20 };
 static int eccCw[5] = { 4,5,6,7,8 };
@@ -326,8 +327,8 @@ static int eccCw[5] = { 4,5,6,7,8 };
 	return;
 }
 
-void encCCB4(int size, UCHAR bitField[], UINT codeWords[],
-		UCHAR pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
+void encCCB4(int size, uint8_t bitField[], uint16_t codeWords[],
+		uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
 
 static int dataBytes[8] = { 26,33,44,62,84,105,127,148 };
 static int dataCw[8] = { 24,30,39,54,72,90,108,126 };
@@ -342,12 +343,12 @@ static int eccCw[8] = { 16,18,21,26,32,38,44,50 };
 	return;
 }
 
-void encCCC(int byteCnt, UCHAR bitField[], UINT codeWords[], UCHAR patCCC[]) {
+void encCCC(int byteCnt, uint8_t bitField[], uint16_t codeWords[], uint8_t patCCC[]) {
 
 int nonEccCwCnt;
 
 	nonEccCwCnt = colCnt*rowCnt-eccCnt;
-	codeWords[0] = (UINT)nonEccCwCnt;
+	codeWords[0] = (uint16_t)nonEccCwCnt;
 	codeWords[1] = 920; // insert UCC/EAN flag and byte mode latch
 	codeWords[2] =
 		(byteCnt % 6 == 0) ? 924 : 901; // 924 iff even multiple of 6
@@ -359,12 +360,12 @@ int nonEccCwCnt;
 
 
 
-void imgCCA2(int size, UINT codeWords[], UCHAR pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
+void imgCCA2(int size, uint16_t codeWords[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
 
 static int rows[7] = { 5,6,7,8,9,10,12 };
 static int raps[7] = { 39,1,32,8,14,43,20 };
 
-ULONG bars;
+uint32_t bars;
 int rowCnt, rapL;
 int i, j;
 
@@ -375,22 +376,22 @@ int i, j;
 		bars = barRap[0][rapL]; // left rap
 		for (j = 0; j < 6; j++) {
 			// get 6 3-bit widths left to right:
-			pattern[i][1+j] = (UCHAR)(bars >> ((5-j)*3)) & 7;
+			pattern[i][1+j] = (uint8_t)(bars >> ((5-j)*3)) & 7;
 		}
 		bars = barData[rapL%3][codeWords[i*2]]; // data1 in row's cluster
 		for (j = 0; j < 8; j++) {
 			// get 8 3-bit widths left to right:
-			pattern[i][1+6+j] = (UCHAR)(bars >> ((7-j)*3)) & 7;
+			pattern[i][1+6+j] = (uint8_t)(bars >> ((7-j)*3)) & 7;
 		}
 		bars = barData[rapL%3][codeWords[i*2+1]]; // data2 in row's cluster
 		for (j = 0; j < 8; j++) {
 			// get 8 3-bit widths left to right:
-			pattern[i][1+6+8+j] = (UCHAR)(bars >> ((7-j)*3)) & 7;
+			pattern[i][1+6+8+j] = (uint8_t)(bars >> ((7-j)*3)) & 7;
 		}
 		bars = barRap[0][(rapL+32)%52]; // right rap (rotation 32)
 		for (j = 0; j < 6; j++) {
 			// get 6 3-bit widths left to right:
-			pattern[i][1+6+8+8+j] = (UCHAR)(bars >> ((5-j)*3)) & 7;
+			pattern[i][1+6+8+8+j] = (uint8_t)(bars >> ((5-j)*3)) & 7;
 		}
 		pattern[i][1+6+8+8+6] = 1; // right guard
 		pattern[i][1+6+8+8+6+1] = 1; // qz
@@ -399,13 +400,13 @@ int i, j;
 	return;
 }
 
-void imgCCB2(int size, UINT codeWords[], UCHAR pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
+void imgCCB2(int size, uint16_t codeWords[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
 
 static int rows[4] = { 17,20,23,26 };
 static int raps[4] = { 36,19,9,27 };
 static int rotate[4] = { 0,0,8,8 };
 
-ULONG bars;
+uint32_t bars;
 int rowCnt, rapL;
 int i, j;
 
@@ -416,22 +417,22 @@ int i, j;
 		bars = barRap[0][rapL]; // left rap
 		for (j = 0; j < 6; j++) {
 			// get 6 3-bit widths left to right:
-			pattern[i][1+j] = (UCHAR)(bars >> ((5-j)*3)) & 7;
+			pattern[i][1+j] = (uint8_t)(bars >> ((5-j)*3)) & 7;
 		}
 		bars = barData[rapL%3][codeWords[i*2]]; // data1 in row's cluster
 		for (j = 0; j < 8; j++) {
 			// get 8 3-bit widths left to right:
-			pattern[i][1+6+j] = (UCHAR)(bars >> ((7-j)*3)) & 7;
+			pattern[i][1+6+j] = (uint8_t)(bars >> ((7-j)*3)) & 7;
 		}
 		bars = barData[rapL%3][codeWords[i*2+1]]; // data2 in row's cluster
 		for (j = 0; j < 8; j++) {
 			// get 8 3-bit widths left to right:
-			pattern[i][1+6+8+j] = (UCHAR)(bars >> ((7-j)*3)) & 7;
+			pattern[i][1+6+8+j] = (uint8_t)(bars >> ((7-j)*3)) & 7;
 		}
 		bars = barRap[0][(rapL+rotate[size])%52]; // right rap (rotation 0 or 8)
 		for (j = 0; j < 6; j++) {
 			// get 6 3-bit widths left to right:
-			pattern[i][1+6+8+8+j] = (UCHAR)(bars >> ((5-j)*3)) & 7;
+			pattern[i][1+6+8+8+j] = (uint8_t)(bars >> ((5-j)*3)) & 7;
 		}
 		pattern[i][1+6+8+8+6] = 1; // right guard
 		pattern[i][1+6+8+8+6+1] = 1; // qz
@@ -440,12 +441,12 @@ int i, j;
 	return;
 }
 
-void imgCCA3(int size, UINT codeWords[], UCHAR pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
+void imgCCA3(int size, uint16_t codeWords[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
 
 static int rows[5] = { 4,5,6,7,8 };
 static int raps[5] = { 11,1,5,15,21 };
 
-ULONG bars;
+uint32_t bars;
 int rowCnt, rapL;
 int i, j;
 
@@ -456,27 +457,27 @@ int i, j;
 		bars = barData[rapL%3][codeWords[i*3]]; // data1 in row's cluster
 		for (j = 0; j < 8; j++) {
 			// get 8 3-bit widths left to right:
-			pattern[i][1  +j] = (UCHAR)(bars >> ((7-j)*3)) & 7;
+			pattern[i][1  +j] = (uint8_t)(bars >> ((7-j)*3)) & 7;
 		}
 		bars = barRap[1][(rapL+32)%52]; // center rap (rotation 32)
 		for (j = 0; j < 6; j++) {
 			// get 6 3-bit widths left to right:
-			pattern[i][1  +8+j] = (UCHAR)(bars >> ((5-j)*3)) & 7;
+			pattern[i][1  +8+j] = (uint8_t)(bars >> ((5-j)*3)) & 7;
 		}
 		bars = barData[rapL%3][codeWords[i*3+1]]; // data2 in row's cluster
 		for (j = 0; j < 8; j++) {
 			// get 8 3-bit widths left to right:
-			pattern[i][1  +8+6+j] = (UCHAR)(bars >> ((7-j)*3)) & 7;
+			pattern[i][1  +8+6+j] = (uint8_t)(bars >> ((7-j)*3)) & 7;
 		}
 		bars = barData[rapL%3][codeWords[i*3+2]]; // data3 in row's cluster
 		for (j = 0; j < 8; j++) {
 			// get 8 3-bit widths left to right:
-			pattern[i][1  +8+6+8+j] = (UCHAR)(bars >> ((7-j)*3)) & 7;
+			pattern[i][1  +8+6+8+j] = (uint8_t)(bars >> ((7-j)*3)) & 7;
 		}
 		bars = barRap[0][(rapL+32+32)%52]; // right rap (rotation 64)
 		for (j = 0; j < 6; j++) {
 			// get 6 3-bit widths left to right:
-			pattern[i][1  +8+6+8+8+j] = (UCHAR)(bars >> ((5-j)*3)) & 7;
+			pattern[i][1  +8+6+8+8+j] = (uint8_t)(bars >> ((5-j)*3)) & 7;
 		}
 		pattern[i][1  +8+6+8+8+6] = 1; // right guard
 		pattern[i][1  +8+6+8+8+6+1] = 1; // qz
@@ -485,13 +486,13 @@ int i, j;
 	return;
 }
 
-void imgCCB3(int size, UINT codeWords[], UCHAR pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
+void imgCCB3(int size, uint16_t codeWords[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
 
 static int rows[6] = { 15,20,26,32,38,44 };
 static int raps[6] = { 37,1,1,21,15,1 };
 static int rotate[6] = { 0,16,8,8,16,24 };
 
-ULONG bars;
+uint32_t bars;
 int rowCnt, rapL;
 int i, j;
 
@@ -502,32 +503,32 @@ int i, j;
 		bars = barRap[0][rapL]; // left rap
 		for (j = 0; j < 6; j++) {
 			// get 6 3-bit widths left to right:
-			pattern[i][1+j] = (UCHAR)(bars >> ((5-j)*3)) & 7;
+			pattern[i][1+j] = (uint8_t)(bars >> ((5-j)*3)) & 7;
 		}
 		bars = barData[rapL%3][codeWords[i*3]]; // data1 in row's cluster
 		for (j = 0; j < 8; j++) {
 			// get 8 3-bit widths left to right:
-			pattern[i][1+6+j] = (UCHAR)(bars >> ((7-j)*3)) & 7;
+			pattern[i][1+6+j] = (uint8_t)(bars >> ((7-j)*3)) & 7;
 		}
 		bars = barRap[1][(rapL+rotate[size])%52]; // center rap (rotation 0,8,16, or 24)
 		for (j = 0; j < 6; j++) {
 			// get 6 3-bit widths left to right:
-			pattern[i][1+6+8+j] = (UCHAR)(bars >> ((5-j)*3)) & 7;
+			pattern[i][1+6+8+j] = (uint8_t)(bars >> ((5-j)*3)) & 7;
 		}
 		bars = barData[rapL%3][codeWords[i*3+1]]; // data2 in row's cluster
 		for (j = 0; j < 8; j++) {
 			// get 8 3-bit widths left to right:
-			pattern[i][1+6+8+6+j] = (UCHAR)(bars >> ((7-j)*3)) & 7;
+			pattern[i][1+6+8+6+j] = (uint8_t)(bars >> ((7-j)*3)) & 7;
 		}
 		bars = barData[rapL%3][codeWords[i*3+2]]; // data3 in row's cluster
 		for (j = 0; j < 8; j++) {
 			// get 8 3-bit widths left to right:
-			pattern[i][1+6+8+6+8+j] = (UCHAR)(bars >> ((7-j)*3)) & 7;
+			pattern[i][1+6+8+6+8+j] = (uint8_t)(bars >> ((7-j)*3)) & 7;
 		}
 		bars = barRap[0][(rapL+rotate[size]*2)%52]; // right rap (double rotation)
 		for (j = 0; j < 6; j++) {
 			// get 6 3-bit widths left to right:
-			pattern[i][1+6+8+6+8+8+j] = (UCHAR)(bars >> ((5-j)*3)) & 7;
+			pattern[i][1+6+8+6+8+8+j] = (uint8_t)(bars >> ((5-j)*3)) & 7;
 		}
 		pattern[i][1+6+8+6+8+8+6] = 1; // right guard
 		pattern[i][1+6+8+6+8+8+6+1] = 1; // qz
@@ -536,12 +537,12 @@ int i, j;
 	return;
 }
 
-void imgCCA4(int size, UINT codeWords[], UCHAR pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
+void imgCCA4(int size, uint16_t codeWords[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
 
 static int rows[5] = { 3,4,5,6,7 };
 static int raps[5] = { 40,43,46,34,29 };
 
-ULONG bars;
+uint32_t bars;
 int rowCnt, rapL;
 int i, j;
 
@@ -552,37 +553,37 @@ int i, j;
 		bars = barRap[0][rapL]; // left rap
 		for (j = 0; j < 6; j++) {
 			// get 6 3-bit widths left to right:
-			pattern[i][1+j] = (UCHAR)(bars >> ((5-j)*3)) & 7;
+			pattern[i][1+j] = (uint8_t)(bars >> ((5-j)*3)) & 7;
 		}
 		bars = barData[rapL%3][codeWords[i*4]]; // data1 in row's cluster
 		for (j = 0; j < 8; j++) {
 			// get 8 3-bit widths left to right:
-			pattern[i][1+6+j] = (UCHAR)(bars >> ((7-j)*3)) & 7;
+			pattern[i][1+6+j] = (uint8_t)(bars >> ((7-j)*3)) & 7;
 		}
 		bars = barData[rapL%3][codeWords[i*4+1]]; // data1 in row's cluster
 		for (j = 0; j < 8; j++) {
 			// get 8 3-bit widths left to right:
-			pattern[i][1+6+8+j] = (UCHAR)(bars >> ((7-j)*3)) & 7;
+			pattern[i][1+6+8+j] = (uint8_t)(bars >> ((7-j)*3)) & 7;
 		}
 		bars = barRap[1][(rapL+32)%52]; // center rap (rotation 32)
 		for (j = 0; j < 6; j++) {
 			// get 6 3-bit widths left to right:
-			pattern[i][1+6+8+8+j] = (UCHAR)(bars >> ((5-j)*3)) & 7;
+			pattern[i][1+6+8+8+j] = (uint8_t)(bars >> ((5-j)*3)) & 7;
 		}
 		bars = barData[rapL%3][codeWords[i*4+2]]; // data2 in row's cluster
 		for (j = 0; j < 8; j++) {
 			// get 8 3-bit widths left to right:
-			pattern[i][1+6+8+8+6+j] = (UCHAR)(bars >> ((7-j)*3)) & 7;
+			pattern[i][1+6+8+8+6+j] = (uint8_t)(bars >> ((7-j)*3)) & 7;
 		}
 		bars = barData[rapL%3][codeWords[i*4+3]]; // data3 in row's cluster
 		for (j = 0; j < 8; j++) {
 			// get 8 3-bit widths left to right:
-			pattern[i][1+6+8+8+6+8+j] = (UCHAR)(bars >> ((7-j)*3)) & 7;
+			pattern[i][1+6+8+8+6+8+j] = (uint8_t)(bars >> ((7-j)*3)) & 7;
 		}
 		bars = barRap[0][(rapL+32+32)%52]; // right rap (double rotation)
 		for (j = 0; j < 6; j++) {
 			// get 6 3-bit widths left to right:
-			pattern[i][1+6+8+8+6+8+8+j] = (UCHAR)(bars >> ((5-j)*3)) & 7;
+			pattern[i][1+6+8+8+6+8+8+j] = (uint8_t)(bars >> ((5-j)*3)) & 7;
 		}
 		pattern[i][1+6+8+8+6+8+8+6] = 1; // right guard
 		pattern[i][1+6+8+8+6+8+8+6+1] = 1; // qz
@@ -591,13 +592,13 @@ int i, j;
 	return;
 }
 
-void imgCCB4(int size, UINT codeWords[], UCHAR pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
+void imgCCB4(int size, uint16_t codeWords[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
 
 static int rows[8] = { 10,12,15,20,26,32,38,44 };
 static int raps[8] = { 15,25,37,1,1,21,15,1 };
 static int rotate[8] = { 0,0,0,16,8,8,16,24 };
 
-ULONG bars;
+uint32_t bars;
 int rowCnt, rapL;
 int i, j;
 
@@ -608,37 +609,37 @@ int i, j;
 		bars = barRap[0][rapL]; // left rap
 		for (j = 0; j < 6; j++) {
 			// get 6 3-bit widths left to right:
-			pattern[i][1+j] = (UCHAR)(bars >> ((5-j)*3)) & 7;
+			pattern[i][1+j] = (uint8_t)(bars >> ((5-j)*3)) & 7;
 		}
 		bars = barData[rapL%3][codeWords[i*4]]; // data1 in row's cluster
 		for (j = 0; j < 8; j++) {
 			// get 8 3-bit widths left to right:
-			pattern[i][1+6+j] = (UCHAR)(bars >> ((7-j)*3)) & 7;
+			pattern[i][1+6+j] = (uint8_t)(bars >> ((7-j)*3)) & 7;
 		}
 		bars = barData[rapL%3][codeWords[i*4+1]]; // data1 in row's cluster
 		for (j = 0; j < 8; j++) {
 			// get 8 3-bit widths left to right:
-			pattern[i][1+6+8+j] = (UCHAR)(bars >> ((7-j)*3)) & 7;
+			pattern[i][1+6+8+j] = (uint8_t)(bars >> ((7-j)*3)) & 7;
 		}
 		bars = barRap[1][(rapL+rotate[size])%52]; // center rap (rotation 0,8,16, or 24)
 		for (j = 0; j < 6; j++) {
 			// get 6 3-bit widths left to right:
-			pattern[i][1+6+8+8+j] = (UCHAR)(bars >> ((5-j)*3)) & 7;
+			pattern[i][1+6+8+8+j] = (uint8_t)(bars >> ((5-j)*3)) & 7;
 		}
 		bars = barData[rapL%3][codeWords[i*4+2]]; // data2 in row's cluster
 		for (j = 0; j < 8; j++) {
 			// get 8 3-bit widths left to right:
-			pattern[i][1+6+8+8+6+j] = (UCHAR)(bars >> ((7-j)*3)) & 7;
+			pattern[i][1+6+8+8+6+j] = (uint8_t)(bars >> ((7-j)*3)) & 7;
 		}
 		bars = barData[rapL%3][codeWords[i*4+3]]; // data3 in row's cluster
 		for (j = 0; j < 8; j++) {
 			// get 8 3-bit widths left to right:
-			pattern[i][1+6+8+8+6+8+j] = (UCHAR)(bars >> ((7-j)*3)) & 7;
+			pattern[i][1+6+8+8+6+8+j] = (uint8_t)(bars >> ((7-j)*3)) & 7;
 		}
 		bars = barRap[0][(rapL+rotate[size]*2)%52]; // right rap (double rotation)
 		for (j = 0; j < 6; j++) {
 			// get 6 3-bit widths left to right:
-			pattern[i][1+6+8+8+6+8+8+j] = (UCHAR)(bars >> ((5-j)*3)) & 7;
+			pattern[i][1+6+8+8+6+8+8+j] = (uint8_t)(bars >> ((5-j)*3)) & 7;
 		}
 		pattern[i][1+6+8+8+6+8+8+6] = 1; // right guard
 		pattern[i][1+6+8+8+6+8+8+6+1] = 1; // qz
@@ -647,14 +648,14 @@ int i, j;
 	return;
 }
 
-void imgCCC(UINT codeWords[], UCHAR patCCC[]) {
+void imgCCC(uint16_t codeWords[], uint8_t patCCC[]) {
 
-static UCHAR leftPtn[9] = { 2,8,1,1,1,1,1,1,3 }; // qz + start
-static UCHAR rightPtn[10] = { 7,1,1,3,1,1,1,2,1,2 }; // stop + qz
+static uint8_t leftPtn[9] = { 2,8,1,1,1,1,1,1,3 }; // qz + start
+static uint8_t rightPtn[10] = { 7,1,1,3,1,1,1,2,1,2 }; // stop + qz
 
 int leftRowBase[3]; // right row is (left index+2) mod 3
 
-ULONG bars;
+uint32_t bars;
 int cluster, errLvl, rowFactor;
 int cwNdx, row, bar, offset, col;
 int i;
@@ -676,14 +677,14 @@ int i;
 		bars = barData[cluster][rowFactor + leftRowBase[cluster]]; // left R.I.
 		for (bar = 0; bar < 8; bar++) {
 			// get 8 3-bit widths left to right:
-			patCCC[row*((colCnt+4)*8+3) + bar+offset] = (UCHAR)(bars >> ((7-bar)*3)) & 7;
+			patCCC[row*((colCnt+4)*8+3) + bar+offset] = (uint8_t)(bars >> ((7-bar)*3)) & 7;
 		}
 		offset += bar;
 		for (col = 0; col < colCnt; col++) {
 			bars = barData[cluster][codeWords[cwNdx++]]; // codeword
 			for (bar = 0; bar < 8; bar++) {
 				// get 8 3-bit widths left to right:
-				patCCC[row*((colCnt+4)*8+3) + bar+offset] = (UCHAR)(bars >> ((7-bar)*3)) & 7;
+				patCCC[row*((colCnt+4)*8+3) + bar+offset] = (uint8_t)(bars >> ((7-bar)*3)) & 7;
 			}
 			offset += bar;
 		}
@@ -691,7 +692,7 @@ int i;
 		bars = barData[cluster][rowFactor + leftRowBase[(cluster+2)%3]]; // right R.I.
 		for (bar = 0; bar < 8; bar++) {
 			// get 8 3-bit widths left to right:
-			patCCC[row*((colCnt+4)*8+3) + bar+offset] = (UCHAR)(bars >> ((7-bar)*3)) & 7;
+			patCCC[row*((colCnt+4)*8+3) + bar+offset] = (uint8_t)(bars >> ((7-bar)*3)) & 7;
 		}
 		offset += bar;
 		// left qz and start
@@ -718,7 +719,7 @@ int i;
 #define	IS_ISO		0x8
 #define	IS_FINI		0x80
 
-int pack(UCHAR str[], UCHAR bitField[] ) {
+int pack(uint8_t str[], uint8_t bitField[] ) {
 
 struct encodeT encode;
 
@@ -766,7 +767,7 @@ struct encodeT encode;
 	}
 }
 
-UCHAR iswhat[256] = { /* byte look up table with IS_XXX bits */
+uint8_t iswhat[256] = { /* byte look up table with IS_XXX bits */
 	/* 32 control characters: */
 		0x80,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -791,7 +792,7 @@ UCHAR iswhat[256] = { /* byte look up table with IS_XXX bits */
 		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 };
 
-int check2DData(UCHAR dataStr[]) {
+int check2DData(uint8_t dataStr[]) {
 	int i;
 
 	for (i = 0; iswhat[dataStr[i]] != 0x80; i++) {
@@ -834,7 +835,7 @@ int bitCnt, char1, char2, what1, what2, i;
 		bitCnt = getUnusedBitCnt(encode->iBit, &i);
 		if ((bitCnt >= 4) && (bitCnt < 7)) {
 			// less than 7 bits, encode a bcd+1
-			putBits(encode->bitField, encode->iBit, 4, (UINT)(char1+1 -(int)'0'));
+			putBits(encode->bitField, encode->iBit, 4, (uint16_t)(char1+1 -(int)'0'));
 			bitCnt -= 4;
 			if (bitCnt > 0) {
 				// 0 or 00 final pad
@@ -844,7 +845,7 @@ int bitCnt, char1, char2, what1, what2, i;
 		}
 		else {
 			// encode as digit & FNC1
-			putBits(encode->bitField, encode->iBit, 7, (UINT)(((char1-(int)'0') * 11) + 10 + 8));
+			putBits(encode->bitField, encode->iBit, 7, (uint16_t)(((char1-(int)'0') * 11) + 10 + 8));
 			encode->iBit += 7;
 			bitCnt -= 7;
 			if ((bitCnt > 4) || (bitCnt < 0)) {
@@ -879,7 +880,7 @@ int bitCnt, char1, char2, what1, what2, i;
 		else {
 			char2 -= (int)'0';
 		}
-		putBits(encode->bitField, encode->iBit, 7, (UINT)((char1 * 11) + char2 + 8));
+		putBits(encode->bitField, encode->iBit, 7, (uint16_t)((char1 * 11) + char2 + 8));
 		encode->iBit += 7;
 		return(NUM_MODE);
 	}
@@ -939,7 +940,7 @@ int chr, i, what, whatN;
 		else {
 			chr = chr - (int)'0' + 5;
 		}
-		putBits(encode->bitField, encode->iBit, 5, (UINT)chr);
+		putBits(encode->bitField, encode->iBit, 5, (uint16_t)chr);
 		encode->iBit += 5;
 	}
 	else {
@@ -960,7 +961,7 @@ int chr, i, what, whatN;
 			// *
 			chr = 0x1A;
 		}
-		putBits(encode->bitField, encode->iBit, 6, (UINT)(chr + 0x20));
+		putBits(encode->bitField, encode->iBit, 6, (uint16_t)(chr + 0x20));
 		encode->iBit += 6;
 	}
 	return(encode->mode);
@@ -1041,19 +1042,19 @@ int chr, i, what, whatN, numCnt;
 		else {
 			chr = chr - (int)'0' + 5;
 		}
-		putBits(encode->bitField, encode->iBit, 5, (UINT)chr);
+		putBits(encode->bitField, encode->iBit, 5, (uint16_t)chr);
 		encode->iBit += 5;
 	}
 	else if ((chr >= (int)'A') && (chr <= (int)'Z')) {
 		// A-Z
 		chr = chr - (int)'A' + 0x40;
-		putBits(encode->bitField, encode->iBit, 7, (UINT)chr);
+		putBits(encode->bitField, encode->iBit, 7, (uint16_t)chr);
 		encode->iBit += 7;
 	}
 	else if ((chr >= (int)'a') && (chr <= (int)'z')) {
 		// a-z
 		chr = chr - (int)'a' + 0x5A;
-		putBits(encode->bitField, encode->iBit, 7, (UINT)chr);
+		putBits(encode->bitField, encode->iBit, 7, (uint16_t)chr);
 		encode->iBit += 7;
 	}
 	else {
@@ -1076,7 +1077,7 @@ int chr, i, what, whatN, numCnt;
 		else {
 			chr = chr - 33 + 0xE8; // !-"
 		}
-		putBits(encode->bitField, encode->iBit, 8, (UINT)chr);
+		putBits(encode->bitField, encode->iBit, 8, (uint16_t)chr);
 		encode->iBit += 8;
 	}
 	return(encode->mode);
@@ -1089,13 +1090,13 @@ int i;
 	// check next char type
 	if (isupper(encode->str[encode->iStr])) {
 		// alpha
-		putBits(encode->bitField, encode->iBit, 5, (UINT)(encode->str[encode->iStr]-65));
+		putBits(encode->bitField, encode->iBit, 5, (uint16_t)(encode->str[encode->iStr]-65));
 		encode->iBit += 5;
 		encode->iStr += 1;
 	}
 	else if (isdigit(encode->str[encode->iStr])) {
 		// number
-		putBits(encode->bitField, encode->iBit, 6, (UINT)(encode->str[encode->iStr]+4));
+		putBits(encode->bitField, encode->iBit, 6, (uint16_t)(encode->str[encode->iStr]+4));
 		encode->iBit += 6;
 		encode->iStr += 1;
 	}
@@ -1134,7 +1135,7 @@ int bitCnt, chr, size;
 	}
 	if (bitCnt > 0) {
 		chr = 4 >> (5-bitCnt);
-		putBits(encode->bitField, encode->iBit, bitCnt, (UINT)chr);
+		putBits(encode->bitField, encode->iBit, bitCnt, (uint16_t)chr);
 		encode->iBit += bitCnt;
 	}
 	return(size);
@@ -1142,21 +1143,21 @@ int bitCnt, chr, size;
 
 int doMethods(struct encodeT *encode) {
 
-UINT bits;
+uint16_t bits;
 
 	if (strlen((char*)encode->str) >= 8 && encode->str[0] == '1' &&
 				(encode->str[1] == '1' || encode->str[1] == '7')) {
 		// method "10"
 		putBits(encode->bitField, 0, 2, 2); // mfg/exp date-lot encodation method bit flag 10
-		bits = (UINT)(((UINT)(encode->str[2]-'0')*10 +
-				(UINT)(encode->str[3]-'0')) * 384); // YY
-		bits = (UINT)(bits + ((UINT)(encode->str[4]-'0')*10 +
-				(UINT)(encode->str[5]-'0') - 1) * 32); // MM
-		bits = (UINT)(bits + (UINT)(encode->str[6]-'0')*10 +
-				(UINT)(encode->str[7]-'0')); // DD
+		bits = (uint16_t)(((uint16_t)(encode->str[2]-'0')*10 +
+				(uint16_t)(encode->str[3]-'0')) * 384); // YY
+		bits = (uint16_t)(bits + ((uint16_t)(encode->str[4]-'0')*10 +
+				(uint16_t)(encode->str[5]-'0') - 1) * 32); // MM
+		bits = (uint16_t)(bits + (uint16_t)(encode->str[6]-'0')*10 +
+				(uint16_t)(encode->str[7]-'0')); // DD
 		putBits(encode->bitField, 2, 16, bits); // date packed data
 		putBits(encode->bitField, 2+16, 1,
-				(UINT)((encode->str[1] == '1') ? 0 : 1)); // 0/1 bit for AI 11/17
+				(uint16_t)((encode->str[1] == '1') ? 0 : 1)); // 0/1 bit for AI 11/17
 		if (encode->str[8] == '1' && encode->str[9] == '0' &&
 				encode->str[10] != '#') {
 			encode->iStr = 2+6+2; // lot data follows
@@ -1188,7 +1189,7 @@ UINT bits;
 
 int testAI90(struct encodeT *encode) {
 
-UCHAR chr;
+uint8_t chr;
 
 	// possible method "11"
 	// get DI number - diNum, DI alpha - diAlpha, and start of data - ndx
@@ -1233,7 +1234,7 @@ void procAI90(struct encodeT *encode) {
 int i, j, k;
 int alLessNu;
 int diNum1, diAlpha1;
-static UCHAR alphaTbl[] = "BDHIJKLNPQRSTVWZ"; // strlen must be 16
+static uint8_t alphaTbl[] = "BDHIJKLNPQRSTVWZ"; // strlen must be 16
 
 		// method "11", look ahead to find best compaction scheme
 		j = 10000; // 10000: initial flag for non-numeric index
@@ -1288,7 +1289,7 @@ static UCHAR alphaTbl[] = "BDHIJKLNPQRSTVWZ"; // strlen must be 16
 			encode->iBit += 1;
 		}
 		else { // 10: AI 21 or 11: AI 8004
-			putBits(encode->bitField, encode->iBit, 2, (UINT)encode->typeAI);
+			putBits(encode->bitField, encode->iBit, 2, (uint16_t)encode->typeAI);
 			encode->iBit += 2;
 		}
 		for (j = 0; j < 16; j++) {
@@ -1297,17 +1298,17 @@ static UCHAR alphaTbl[] = "BDHIJKLNPQRSTVWZ"; // strlen must be 16
 			}
 		}
 		if (diNum1 < 31 && j < 16) {
-			putBits(encode->bitField, encode->iBit, 5, (UINT)diNum1); // DI number < 31
+			putBits(encode->bitField, encode->iBit, 5, (uint16_t)diNum1); // DI number < 31
 			putBits(encode->bitField,
-					encode->iBit+5, 4, (UINT)j); // DI alpha from alphaTbl
+					encode->iBit+5, 4, (uint16_t)j); // DI alpha from alphaTbl
 			encode->iBit += 9;
 		}
 		else {
 			putBits(encode->bitField, encode->iBit, 5, 31);
 			putBits(encode->bitField,
-					encode->iBit+5, 10, (UINT)diNum1); // DI number >= 31
+					encode->iBit+5, 10, (uint16_t)diNum1); // DI number >= 31
 			putBits(encode->bitField,
-					encode->iBit+15, 5, (UINT)(diAlpha1-65)); // or alpha not in table
+					encode->iBit+15, 5, (uint16_t)(diAlpha1-65)); // or alpha not in table
 			encode->iBit += 20;
 		}
 		encodeAI90(encode);
@@ -1382,9 +1383,9 @@ void nextAI(struct encodeT *encode) {
 	return;
 }
 
-int doLinMethods(UCHAR str[], int *iStr, UCHAR bitField[], int *iBit) {
+int doLinMethods(uint8_t str[], int *iStr, uint8_t bitField[], int *iBit) {
 
-UINT bits;
+uint16_t bits;
 long weight;
 char numStr[10] = { 0 };
 
@@ -1404,7 +1405,7 @@ char numStr[10] = { 0 };
 			*iBit += 4;
 			*iStr += 3; // skip AI 01 and PI 9
 			cnv12(str, iStr, bitField, iBit); // write PID-12
-			putBits(bitField, *iBit, 15, (UINT)weight); // write weight
+			putBits(bitField, *iBit, 15, (uint16_t)weight); // write weight
 			*iBit += 15;
 			*iStr += 1+10; // skip check digit & jump weight field
 		}
@@ -1418,7 +1419,7 @@ char numStr[10] = { 0 };
 			*iBit += 4;
 			*iStr += 3; // skip AI 01 and PI 9
 			cnv12(str, iStr, bitField, iBit); // write PID-12
-			putBits(bitField, *iBit, 15, (UINT)weight); // write weight
+			putBits(bitField, *iBit, 15, (uint16_t)weight); // write weight
 			*iBit += 15;
 			*iStr += 1+10; // skip check digit & jump weight field
 		}
@@ -1432,7 +1433,7 @@ char numStr[10] = { 0 };
 			*iBit += 4;
 			*iStr += 3; // skip AI 01 and PI 9
 			cnv12(str, iStr, bitField, iBit); // write PID-12
-			putBits(bitField, *iBit, 15, (UINT)(weight+10000)); // write weight
+			putBits(bitField, *iBit, 15, (uint16_t)(weight+10000)); // write weight
 			*iBit += 15;
 			*iStr += 1+10; // skip check digit & jump weight field
 		}
@@ -1446,7 +1447,7 @@ char numStr[10] = { 0 };
 			*iBit += 5+2;
 			*iStr += 3; // skip AI 01 and PI 9
 			cnv12(str, iStr, bitField, iBit); // write PID-12
-			putBits(bitField, *iBit, 2, (UINT)(str[19]-'0')); // write D.P.
+			putBits(bitField, *iBit, 2, (uint16_t)(str[19]-'0')); // write D.P.
 			*iBit += 2;
 			*iStr += 1+4; // skip check digit & jump price AI
 		}
@@ -1460,12 +1461,12 @@ char numStr[10] = { 0 };
 			*iBit += 5+2;
 			*iStr += 3; // skip AI 01 and PI 9
 			cnv12(str, iStr, bitField, iBit); // write PID-12
-			putBits(bitField, *iBit, 2, (UINT)(str[19]-'0')); // write D.P.
+			putBits(bitField, *iBit, 2, (uint16_t)(str[19]-'0')); // write D.P.
 			*iBit += 2;
 			*iStr += 1+4; // skip check digit & jump price AI
 			strncpy(numStr, (char*)&str[20], 3); // ISO country code
 			numStr[3] = '\0';
-			putBits(bitField, *iBit, 10, (UINT)atoi(numStr)); // write ISO c.c.
+			putBits(bitField, *iBit, 10, (uint16_t)atoi(numStr)); // write ISO c.c.
 			*iBit += 10;
 			*iStr += 3; // jump ISO country code
 		}
@@ -1475,17 +1476,17 @@ char numStr[10] = { 0 };
 			str[16]=='3' && (str[17]=='1' || str[17]=='2') && str[18]=='0' &&
 			(weight=atol(numStr))<=99999L) {
 			// methods 0111000-0111001, AI's 01 + 3x0x no date
-			bits = (UINT)(0x38+(str[17]-'1'));
+			bits = (uint16_t)(0x38+(str[17]-'1'));
 			putBits(bitField, *iBit, 7, bits); // write method
 			*iBit += 7;
 			*iStr += 3; // skip AI 01 and PI 9
 			cnv12(str, iStr, bitField, iBit); // write PID-12
 			weight = weight + ((long)(str[19] - '0') * 100000L); // decimal digit
-			putBits(bitField, *iBit, 4, (UINT)(weight>>16)); // write weight
-			putBits(bitField, *iBit+4, 16, (UINT)(weight&0xFFFF));
+			putBits(bitField, *iBit, 4, (uint16_t)(weight>>16)); // write weight
+			putBits(bitField, *iBit+4, 16, (uint16_t)(weight&0xFFFF));
 			*iBit += 20;
 			*iStr += 1+10; // jump check digit and weight field
-			putBits(bitField, *iBit, 16, (UINT)38400); // write no date
+			putBits(bitField, *iBit, 16, (uint16_t)38400); // write no date
 			*iBit += 16;
 		}
 
@@ -1496,14 +1497,14 @@ char numStr[10] = { 0 };
 			str[26]=='1' &&
 			(str[27]=='1' || str[27]=='3' || str[27]=='5' || str[27]=='7')) {
 			// methods 0111000-0111111, AI's 01 + 3x0x + 1x
-			bits = (UINT)(0x38+(str[27]-'1')+(str[17] - '1'));
+			bits = (uint16_t)(0x38+(str[27]-'1')+(str[17] - '1'));
 			putBits(bitField, *iBit, 7, bits); // write method
 			*iBit += 7;
 			*iStr += 3; // skip AI 01 and PI 9
 			cnv12(str, iStr, bitField, iBit); // write PID-12
 			weight = weight + ((long)(str[19] - '0') * 100000L); // decimal digit
-			putBits(bitField, *iBit, 4, (UINT)(weight>>16)); // write weight
-			putBits(bitField, *iBit+4, 16, (UINT)(weight&0xFFFF));
+			putBits(bitField, *iBit, 4, (uint16_t)(weight>>16)); // write weight
+			putBits(bitField, *iBit+4, 16, (uint16_t)(weight&0xFFFF));
 			*iBit += 20;
 			*iStr += 11; // jump check digit & weight field
 			putBits(bitField, *iBit, 16, yymmdd(&str[*iStr+2])); // write date
@@ -1527,26 +1528,26 @@ char numStr[10] = { 0 };
 	return(NUM_MODE);
 }
 
-UINT yymmdd(UCHAR str[]) {
+uint16_t yymmdd(uint8_t str[]) {
 
-UINT val;
+uint16_t val;
 
-	val = (UINT)(((UINT)(str[0]-'0')*10 + (UINT)(str[1]-'0')) * 384); // YY
-	val = (UINT)(val + ((UINT)(str[2]-'0')*10 + (UINT)(str[3]-'0') - 1) * 32); // MM
-	val = (UINT)(val + (UINT)(str[4]-'0')*10 + (UINT)(str[5]-'0')); // DD
+	val = (uint16_t)(((uint16_t)(str[0]-'0')*10 + (uint16_t)(str[1]-'0')) * 384); // YY
+	val = (uint16_t)(val + ((uint16_t)(str[2]-'0')*10 + (uint16_t)(str[3]-'0') - 1) * 32); // MM
+	val = (uint16_t)(val + (uint16_t)(str[4]-'0')*10 + (uint16_t)(str[5]-'0')); // DD
 	return(val);
 }
 
 // converts 13 digits to 44 bits
-void cnv13 (UCHAR str[], int *iStr, UCHAR bitField[], int *iBit) {
+void cnv13 (uint8_t str[], int *iStr, uint8_t bitField[], int *iBit) {
 
 int i;
 
-	putBits(bitField, *iBit, 4, (UINT)(str[*iStr] - '0')); // high order 4 bits
+	putBits(bitField, *iBit, 4, (uint16_t)(str[*iStr] - '0')); // high order 4 bits
 	*iBit += 4;
 	*iStr += 1;
 	for (i = 0; i < 4 ; i++) {
-		putBits(bitField, *iBit, 10, (UINT)((UINT)(str[*iStr] - '0')*100 +
+		putBits(bitField, *iBit, 10, (uint16_t)((uint16_t)(str[*iStr] - '0')*100 +
 							(str[*iStr+1] - '0')*10 +
 							str[*iStr+2] - '0')); // 10 bit groups bits
 		*iBit += 10;
@@ -1556,11 +1557,11 @@ int i;
 }
 
 // converts 12 digits to 40 bits
-void cnv12 (UCHAR str[], int *iStr, UCHAR bitField[], int *iBit) {
+void cnv12 (uint8_t str[], int *iStr, uint8_t bitField[], int *iBit) {
 int i;
 
 	for (i = 0; i < 4 ; i++) {
-		putBits(bitField, *iBit, 10, (UINT)((UINT)(str[*iStr] - '0')*100 +
+		putBits(bitField, *iBit, 10, (uint16_t)((uint16_t)(str[*iStr] - '0')*100 +
 							(str[*iStr+1] - '0')*10 +
 							str[*iStr+2] - '0')); // 10 bit groups bits
 		*iBit += 10;
@@ -1637,7 +1638,7 @@ int i, byteCnt, cwCnt;
 	return(-1);
 }
 
-void putBits(UCHAR bitField[], int bitPos, int length, UINT bits) {
+void putBits(uint8_t bitField[], int bitPos, int length, uint16_t bits) {
 	int i, maxBytes;
 
 	if (linFlag == -1) {
@@ -1653,17 +1654,17 @@ void putBits(UCHAR bitField[], int bitPos, int length, UINT bits) {
 	}
 	for (i = length-1; i >= 0; i--) {
 		if ((bits & 1) != 0) {
-			bitField[(bitPos+i)/8] = (UCHAR)(bitField[(bitPos+i)/8] | (0x80 >> ((bitPos+i)%8)));
+			bitField[(bitPos+i)/8] = (uint8_t)(bitField[(bitPos+i)/8] | (0x80 >> ((bitPos+i)%8)));
 		}
 		else {
-			bitField[(bitPos+i)/8] = (UCHAR)(bitField[(bitPos+i)/8] & (~(0x80 >> ((bitPos+i)%8))));
+			bitField[(bitPos+i)/8] = (uint8_t)(bitField[(bitPos+i)/8] & (~(0x80 >> ((bitPos+i)%8))));
 		}
 		bits >>= 1;
 	}
 	return;
 }
 
-static UINT pwr928[69][7];
+static uint16_t pwr928[69][7];
 
 /* initialize pwr928 encoding table */
 void init928(void) {
@@ -1675,21 +1676,21 @@ int cw[7];
 	for (i = 5; i >= 0; i--) {
 		cw[i] = 0;
 	}
-	for (i = 0; i < 7; i++) pwr928[0][i] = (UINT)cw[i];
+	for (i = 0; i < 7; i++) pwr928[0][i] = (uint16_t)cw[i];
 	for (j = 1; j < 69; j++) {
 		for (v = 0, i = 6; i >= 1; i--) {
 			v = (2 * cw[i]) + (v / 928);
 			cw[i] = v % 928;
-			pwr928[j][i] = (UINT)(v % 928);
+			pwr928[j][i] = (uint16_t)(v % 928);
 		}
 		cw[0] = (2 * cw[0]) + (v / 928);
-		pwr928[j][0] = (UINT)((2 * cw[0]) + (v / 928));
+		pwr928[j][0] = (uint16_t)((2 * cw[0]) + (v / 928));
 	}
 	return;
 }
 
 /* converts bit string to base 928 values, codeWords[0] is highest order */
-int encode928(UCHAR bitString[], UINT codeWords[], int bitLng) {
+int encode928(uint8_t bitString[], uint16_t codeWords[], int bitLng) {
 
 int i, j, b, bitCnt, cwNdx, cwCnt, cwLng;
 
@@ -1700,13 +1701,13 @@ int i, j, b, bitCnt, cwNdx, cwCnt, cwLng;
 		for (i = 0; i < bitCnt; i++) {
 			if (getBit(bitString, b+bitCnt-i-1)) {
 				for (j = 0; j < cwCnt; j++) {
-					codeWords[cwNdx+j] = (UINT)(codeWords[cwNdx+j] + pwr928[i][j+7-cwCnt]);
+					codeWords[cwNdx+j] = (uint16_t)(codeWords[cwNdx+j] + pwr928[i][j+7-cwCnt]);
 				}
 			}
 		}
 		for (i = cwCnt-1; i > 0; i--) {
 			/* add "carries" */
-			codeWords[cwNdx+i-1] = (UINT)(codeWords[cwNdx+i-1] + codeWords[cwNdx+i]/928);
+			codeWords[cwNdx+i-1] = (uint16_t)(codeWords[cwNdx+i-1] + codeWords[cwNdx+i]/928);
 			codeWords[cwNdx+i] %= 928;
 		}
 	}
@@ -1714,31 +1715,31 @@ int i, j, b, bitCnt, cwNdx, cwCnt, cwLng;
 }
 
 /* converts bytes to base 900 values (codeWords), codeWords[0] is highest order */
-void encode900(UCHAR byteArr[], UINT codeWords[], int byteLng) {
+void encode900(uint8_t byteArr[], uint16_t codeWords[], int byteLng) {
 
-static UINT pwrByte[6][5] = { {0,0,0,0,1}, {0,0,0,0,256}, {0,0,0,72,736},
+static uint16_t pwrByte[6][5] = { {0,0,0,0,1}, {0,0,0,0,256}, {0,0,0,72,736},
 					{0,0,20,641,316}, {0,5,802,385,796}, {1,608,221,686,376}  };
 
 int i, j, bCnt, cwNdx;
-ULONG cw, t, carry, cwArr[5];
+uint32_t cw, t, carry, cwArr[5];
 
 	for (cwNdx = bCnt = 0; bCnt < byteLng-5; cwNdx += 5, bCnt += 6) {
 		// init cwArr to 6th byte
 		for (i = 0; i < 4; i++) cwArr[i] = 0L;
-		cwArr[4] = (ULONG)byteArr[bCnt + 5];
+		cwArr[4] = (uint32_t)byteArr[bCnt + 5];
 		for (i = 4; i >= 0; i--) {
 	  	// add in 5th thru 1st bytes multilpied by pwrByte subarry
-			cw = (ULONG)byteArr[bCnt + i];
+			cw = (uint32_t)byteArr[bCnt + i];
 			carry = 0L;
 			for (j = 4; j >= 0; j--) {
-				t = cwArr[j] + cw * (ULONG)pwrByte[5-i][j] + carry;
+				t = cwArr[j] + cw * (uint32_t)pwrByte[5-i][j] + carry;
 				carry = t / 900L;
 				cwArr[j] = t % 900L;
 			}
 		}
 		// transfer 5 cwArr packed data to codeWords
 		for (i = 0; i < 5; i++) {
-			codeWords[cwNdx + i] = (UINT)cwArr[i];
+			codeWords[cwNdx + i] = (uint16_t)cwArr[i];
 		}
 	}
 	// transfer 5 or less remaining cwArr to codeWords as is
@@ -1751,7 +1752,7 @@ ULONG cw, t, carry, cwArr[5];
 
 
 /* gets bit in bitString at bitPos */
-int getBit(UCHAR bitStr[], int bitPos) {
+int getBit(uint8_t bitStr[], int bitPos) {
 		return(((bitStr[bitPos/8] & (0x80>>(bitPos%8))) == 0) ?	0 : 1);
 }
 
@@ -1760,7 +1761,7 @@ int gfPwr[928];
 int gfLog[929];
 int gpa[512];
 
-static void genECC(int dsize, int csize, UINT sym[]) {
+static void genECC(int dsize, int csize, uint16_t sym[]) {
 	int i, n, t;
 
 	genPoly(csize);
@@ -1773,12 +1774,12 @@ static void genECC(int dsize, int csize, UINT sym[]) {
 	for ( n = 0; n < dsize; n++ ) {
 		t = (sym[dsize] + sym[n]) % 929;
 		for (i = 0; i < csize-1; i++) {
-			sym[dsize+i] = (UINT)(sym[dsize+i+1] + 929 - gfMul(t, gpa[csize-1 - i])) % 929;
+			sym[dsize+i] = (uint16_t)(sym[dsize+i+1] + 929 - gfMul(t, gpa[csize-1 - i])) % 929;
 		}
-		sym[dsize+csize-1] = (UINT)(929 - gfMul(t, gpa[0])) % 929;
+		sym[dsize+csize-1] = (uint16_t)(929 - gfMul(t, gpa[0])) % 929;
 	}
 	for (i = dsize; i < dsize+csize; i++) {
-		sym[i] = (UINT)(929 - sym[i]) % 929;
+		sym[i] = (uint16_t)(929 - sym[i]) % 929;
 	}
 	return;
 }
@@ -1817,7 +1818,7 @@ void initLogTables(void) {
 	return;
 }
 
-const ULONG barData[3][929] = {{
+const uint32_t barData[3][929] = {{
  6591070,8688228,10785386,6591133,8688291,10785449,4494038,6591196,4494101,2397006,
  4494164,2397069,4494430,6591588,8688746,4494493,6591651,8688809,2397398,4494556,
  2397461,2397790,4494948,6592106,2397853,4495011,6592169,2397916,4495074,2398308,
@@ -2098,7 +2099,7 @@ const ULONG barData[3][929] = {{
  4924489,3293769,3060809,2827849,3773010,3773073,3543627,5640785,3543690,3543753,
  3777105,3544145,5411402,5411465,3547722,3314762,3547785,3314825,7279177}};
 
-const ULONG barRap[2][52] = {{
+const uint32_t barRap[2][52] = {{
  74441,103113,103561,74889,71305,71753,75337,104009,107593,136265,
  139849,111177,82505,78921,78473,107145,135817,135761,135754,107082,
  103498,103050,103057,103001,102994,102987,74315,74322,74329,74385,

@@ -19,6 +19,7 @@
  */
 
 #include <string.h>
+#include <stdint.h>
 #include "enc.h"
 #include "rssutil.h"
 #include "cc.h"
@@ -38,13 +39,13 @@ extern int errFlag;
 extern int rowWidth;
 extern int line1;
 extern int linFlag; // tells pack whether linear or cc is being encoded
-extern UCHAR ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
+extern uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
 
-int RSS14Eenc(UCHAR str[], UCHAR pattern[MAX_DBL_SEGS][ELMNTS], int ccFlag);
-int symCharPat(UCHAR bars[], int symValue, int parity, int weight,
+int RSS14Eenc(uint8_t str[], uint8_t pattern[MAX_DBL_SEGS][ELMNTS], int ccFlag);
+int symCharPat(uint8_t bars[], int symValue, int parity, int weight,
 							 int forwardFlag);
-int getVal12(UCHAR bitString[], int symNdx);
-int isSymbolSepatator(UCHAR string[]);
+int getVal12(uint8_t bitString[], int symNdx);
+int isSymbolSepatator(uint8_t string[]);
 
 
 void RSSExp(struct sParams *params) {
@@ -53,9 +54,9 @@ struct sPrints prints;
 struct sPrints chexPrnts;
 struct sPrints *prntCnv;
 
-UCHAR linPattern[MAX_DBL_SEGS*ELMNTS+4];
-UCHAR chexPattern[MAX_DBL_SEGS*SYM_W+2];
-UCHAR dblPattern[MAX_DBL_SEGS][ELMNTS];
+uint8_t linPattern[MAX_DBL_SEGS*ELMNTS+4];
+uint8_t chexPattern[MAX_DBL_SEGS*SYM_W+2];
+uint8_t dblPattern[MAX_DBL_SEGS][ELMNTS];
 
 int i, j;
 int rows, ccFlag;
@@ -85,7 +86,7 @@ int rPadl1, rPadcc;
 		}
 
 		rowWidth = params->segWidth; // save for getUnusedBitCnt
-		if ((segs = RSS14Eenc((UCHAR*)params->dataStr, dblPattern, ccFlag)) > 0) {
+		if ((segs = RSS14Eenc((uint8_t*)params->dataStr, dblPattern, ccFlag)) > 0) {
 			if (errFlag) {
 				printf("\nRSS Exp encoding error occurred.");
 				return;
@@ -142,7 +143,7 @@ int rPadl1, rPadcc;
 		}
 		line1 = TRUE; // so first line is not Y undercut
 		if (ccFlag) {
-			if ((rows = CC4enc((UCHAR*)ccStr, ccPattern)) > 0) {
+			if ((rows = CC4enc((uint8_t*)ccStr, ccPattern)) > 0) {
 				if (errFlag) {
 					printf("\nComposite encoding error occurred.");
 					return;
@@ -387,11 +388,11 @@ int rPadl1, rPadcc;
 #define PARITY_PWR 3
 
 // convert AI string to bar widths in dbl segments
-int RSS14Eenc(UCHAR string[], UCHAR bars[MAX_DBL_SEGS][ELMNTS], int ccFlag) {
+int RSS14Eenc(uint8_t string[], uint8_t bars[MAX_DBL_SEGS][ELMNTS], int ccFlag) {
 
 #define FINDER_SIZE 6
 
-static UCHAR finders[FINDER_SIZE][3] = {
+static uint8_t finders[FINDER_SIZE][3] = {
 	{ 1,8,4 },
 	{ 3,6,4 },
 	{ 3,4,6 },
@@ -421,7 +422,7 @@ int i, j;
 int parity, weight;
 int symValue;
 int size, fndrNdx, fndrSetNdx;
-UCHAR bitField[MAX_DBL_SEGS*3];
+uint8_t bitField[MAX_DBL_SEGS*3];
 
 	linFlag = TRUE;
 	parity = 0;
@@ -435,7 +436,7 @@ UCHAR bitField[MAX_DBL_SEGS*3];
 #if PRNT
 	printf("%s\n", string);
 #endif
-	putBits(bitField, 0, 1, (UINT)ccFlag); // 2D linkage bit
+	putBits(bitField, 0, 1, (uint16_t)ccFlag); // 2D linkage bit
 	size = pack(string, bitField);
 	if (size < 0) {
 		printf("\ndata error");
@@ -446,15 +447,15 @@ UCHAR bitField[MAX_DBL_SEGS*3];
 	// note size is # of data chars, not segments
 	if ((bitField[0]&0x40) == 0x40) {
 		// method 1, insert variable length symbol bit field
-		bitField[0] = (UCHAR)(bitField[0] | ((((size+1)&1)<<5) + ((size > 13)?0x10:0)));
+		bitField[0] = (uint8_t)(bitField[0] | ((((size+1)&1)<<5) + ((size > 13)?0x10:0)));
 	}
 	if ((bitField[0]&0x60) == 0) {
 		// method 00, insert variable length symbol bit field
-		bitField[0] = (UCHAR)(bitField[0] | ((((size+1)&1)<<4) + ((size > 13)?8:0)));
+		bitField[0] = (uint8_t)(bitField[0] | ((((size+1)&1)<<4) + ((size > 13)?8:0)));
 	}
 	if ((bitField[0]&0x71) == 0x30) {
 		// method 01100/01101, insert variable length symbol bit field
-		bitField[0] = (UCHAR)(bitField[0] | ((((size+1)&1)<<1) + ((size > 13)?1:0)));
+		bitField[0] = (uint8_t)(bitField[0] | ((((size+1)&1)<<1) + ((size > 13)?1:0)));
 	}
 	fndrSetNdx = (size - 2) / 2;
 
@@ -500,7 +501,7 @@ UCHAR bitField[MAX_DBL_SEGS*3];
 // and a symbol char value. Updates the parity *weight. Will fill in
 // the array forward or reverse order for odd or even characters.
 // Returns the updated parity.
-int symCharPat(UCHAR bars[], int symValue, int parity, int weight,
+int symCharPat(uint8_t bars[], int symValue, int parity, int weight,
 							 int forwardFlag) {
 
 // odd elements N & max, even N & max, odd mul, combos:
@@ -536,10 +537,10 @@ int *widths;
 	widths = getRSSwidths(value, elementN, K, elementMax, 0);
 	for (i = 0; i < 4; i++) {
 		if (forwardFlag) {
-			bars[i*2] = (UCHAR)widths[i]; // store in 0,2,4,6
+			bars[i*2] = (uint8_t)widths[i]; // store in 0,2,4,6
 		}
 		else {
-			bars[7 - i*2] = (UCHAR)widths[i]; // else in 7,5,3,1
+			bars[7 - i*2] = (uint8_t)widths[i]; // else in 7,5,3,1
 		}
 		parity += wgtOdd * widths[i];
 		parity = parity % PARITY_MOD;
@@ -555,10 +556,10 @@ int *widths;
 	widths = getRSSwidths(value, elementN, K, elementMax, 1);
 	for (i = 0; i < 4; i++) {
 		if (forwardFlag) {
-			bars[1 + i*2] = (UCHAR)widths[i]; // store in 1,3,5,7
+			bars[1 + i*2] = (uint8_t)widths[i]; // store in 1,3,5,7
 		}
 		else {
-			bars[6 - i*2] = (UCHAR)widths[i]; // else in 6,4,2,0
+			bars[6 - i*2] = (uint8_t)widths[i]; // else in 6,4,2,0
 		}
 		parity += wgtEven * widths[i];
 		parity = parity % PARITY_MOD;
@@ -568,7 +569,7 @@ int *widths;
 }
 
 // gets the next 12 bit sym char from bit string
-int getVal12(UCHAR bitString[], int symNdx) {
+int getVal12(uint8_t bitString[], int symNdx) {
 int val, ndx;
 
 	ndx = symNdx*3/2; // index into bitString
@@ -586,7 +587,7 @@ int val, ndx;
 }
 
 // looks for '^' (symbol separator) in string and returns char index iff found
-int isSymbolSepatator(UCHAR string[]) {
+int isSymbolSepatator(uint8_t string[]) {
 
 int i;
 

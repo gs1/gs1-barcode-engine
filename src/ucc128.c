@@ -19,6 +19,7 @@
  */
 
 #include <string.h>
+#include <stdint.h>
 #include "enc.h"
 #include "cc.h"
 
@@ -34,24 +35,24 @@ int colCnt; // after set in main, may be decreased by getUnusedBitCnt
 int rowCnt; // determined by getUnusedBitCnt
 int eccCnt; // determined by getUnusedBitCnt
 
-int enc128(UCHAR data[], UCHAR bars[], int link);
-void cda128(UCHAR data[], int *di, int symchr[], int *si, int *code);
-void cdb128(UCHAR data[], int *di, int symchr[], int *si, int *code);
-void cdc128(UCHAR data[], int *di, int symchr[], int *si, int *code);
-void tbl128(int symchr[], UCHAR bars[]);
+int enc128(uint8_t data[], uint8_t bars[], int link);
+void cda128(uint8_t data[], int *di, int symchr[], int *si, int *code);
+void cdb128(uint8_t data[], int *di, int symchr[], int *si, int *code);
+void cdc128(uint8_t data[], int *di, int symchr[], int *si, int *code);
+void tbl128(int symchr[], uint8_t bars[]);
 
 
 extern int errFlag;
 extern int line1;
-extern UCHAR ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
+extern uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
 
-UCHAR patCCC[MAX_PAT];
+uint8_t patCCC[MAX_PAT];
 
 void U128A(struct sParams *params) {
 
 struct sPrints prints;
 
-UCHAR linPattern[(SYMMAX*6)+3];
+uint8_t linPattern[(SYMMAX*6)+3];
 
 int i;
 int rows, ccFlag, symChars, symWidth, ccLpad, ccRpad;
@@ -81,7 +82,7 @@ char *ccStr;
 		}
 		strcat(primaryStr, params->dataStr);
 
-		symChars = enc128((UCHAR*)primaryStr, linPattern, (ccFlag) ? 1 : 0);
+		symChars = enc128((uint8_t*)primaryStr, linPattern, (ccFlag) ? 1 : 0);
 #if PRNT
 			printf("\n%s", primaryStr);
 			printf("\n");
@@ -101,7 +102,7 @@ char *ccStr;
 		prints.whtFirst = TRUE;
 		prints.reverse = FALSE;
 		if (ccFlag) {
-			if ((rows = CC4enc((UCHAR*)ccStr, ccPattern)) > 0) {
+			if ((rows = CC4enc((uint8_t*)ccStr, ccPattern)) > 0) {
 				if (errFlag) {
 					printf("\nerror occurred, exiting.");
 					return;
@@ -206,7 +207,7 @@ void U128C(struct sParams *params) {
 
 struct sPrints prints;
 
-UCHAR linPattern[(SYMMAX*6)+3];
+uint8_t linPattern[(SYMMAX*6)+3];
 
 int i;
 int ccFlag, symChars, symWidth, ccRpad;
@@ -236,7 +237,7 @@ char *ccStr;
 		}
 		strcat(primaryStr, params->dataStr);
 
-		symChars = enc128((UCHAR*)primaryStr, linPattern, (ccFlag) ? 2 : 0); // 2 for CCC
+		symChars = enc128((uint8_t*)primaryStr, linPattern, (ccFlag) ? 2 : 0); // 2 for CCC
 #if PRNT
 			printf("\n%s", primaryStr);
 			printf("\n");
@@ -262,7 +263,7 @@ char *ccStr;
 		prints.whtFirst = TRUE;
 		prints.reverse = FALSE;
 		if (ccFlag) {
-			if (CCCenc((UCHAR*)ccStr, patCCC)) {
+			if (CCCenc((uint8_t*)ccStr, patCCC)) {
 				if (errFlag) {
 					printf("\nerror occurred, exiting.");
 					return;
@@ -379,7 +380,7 @@ Function Return:    number of symbol characters
 
 #define ISNUM(A) ((A<072)&&(A>057)) /*true if A is numeric ASCII*/
 
-int enc128(UCHAR data[], UCHAR bars[], int link)
+int enc128(uint8_t data[], uint8_t bars[], int link)
 {
 	/* convert ASCII data[] into symchr[] values */
 
@@ -479,7 +480,7 @@ si      *int     next index into symchr
 code    *int     starting code: A,B,C = 0,1,2
 */
 
-void cda128(UCHAR data[], int *di, int symchr[], int *si, int *code)
+void cda128(uint8_t data[], int *di, int symchr[], int *si, int *code)
 {
 	int   c, i;
 
@@ -529,7 +530,7 @@ si      *int     next index into symchr
 code    *int     starting code: A,B,C = 0,1,2
 */
 
-void cdb128(UCHAR data[], int *di, int symchr[], int *si, int *code)
+void cdb128(uint8_t data[], int *di, int symchr[], int *si, int *code)
 {
 	int   c, i;
 
@@ -577,7 +578,7 @@ si      *int     next index into symchr
 code    *int     starting code: A,B,C = 0,1,2
 */
 
-void cdc128(UCHAR data[], int *di, int symchr[], int *si, int *code)
+void cdc128(uint8_t data[], int *di, int symchr[], int *si, int *code)
 {
 	int   c, i;
 
@@ -627,7 +628,7 @@ bars    int[]    array to be filled with bar & space widths
 return:    none
 */
 
-void tbl128(int symchr[], UCHAR bars[])
+void tbl128(int symchr[], uint8_t bars[])
 {   /* octal of 1st 5 elements in symbol char */
 	static int sym128[107] ={
 		021222,022212,022222,012122,012132,
@@ -655,7 +656,7 @@ void tbl128(int symchr[], UCHAR bars[])
     };
     int si, bi, pattern;
     int val;
-    UCHAR i;
+    uint8_t i;
 
     /* look up symchr[]'s and copy widths into bars[] */
 
@@ -665,21 +666,21 @@ void tbl128(int symchr[], UCHAR bars[])
 	pattern = sym128[val];
 
 	/* shift out octal digits in pattern */
-	i = bars[bi + 4] = (UCHAR)pattern % 8;
+	i = bars[bi + 4] = (uint8_t)pattern % 8;
 	pattern /= 8;
-	bars[bi + 3] = (UCHAR)pattern % 8;
-	i = (UCHAR)(i + pattern % 8);
+	bars[bi + 3] = (uint8_t)pattern % 8;
+	i = (uint8_t)(i + pattern % 8);
 	pattern /= 8;
-	bars[bi + 2] = (UCHAR)pattern % 8;
-	i = (UCHAR)(i + pattern % 8);
+	bars[bi + 2] = (uint8_t)pattern % 8;
+	i = (uint8_t)(i + pattern % 8);
 	pattern /= 8;
-	bars[bi + 1] = (UCHAR)pattern % 8;
-	i = (UCHAR)(i + pattern % 8);
-	bars[bi] = (UCHAR)pattern / 8;
-	i = (UCHAR)(i + pattern / 8);
+	bars[bi + 1] = (uint8_t)pattern % 8;
+	i = (uint8_t)(i + pattern % 8);
+	bars[bi] = (uint8_t)pattern / 8;
+	i = (uint8_t)(i + pattern / 8);
 
 	/* derive last space to total 11 */
-	bars[bi + 5] = (UCHAR)(11 - i);
+	bars[bi + 5] = (uint8_t)(11 - i);
 	bi += 6;
     }
     bars[bi++] = 2;  /* trailing guard bar */
