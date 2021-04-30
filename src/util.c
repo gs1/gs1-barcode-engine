@@ -21,8 +21,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "enc.h"
 #include "util.h"
-//#include "cc.h"
 
 #define MAX_LINE 6032 // 10 inches wide at 600 dpi
 static uint8_t line[MAX_LINE/8 + 1];

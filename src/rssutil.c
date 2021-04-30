@@ -20,6 +20,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include "enc.h"
 #include "rssutil.h"
 
 static int combins(int n, int r);
