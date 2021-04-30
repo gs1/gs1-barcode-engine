@@ -18,7 +18,10 @@
  *
  */
 
-#include "rssenc.h"
+#include <string.h>
+#include "enc.h"
+#include "rssutil.h"
+#include "cc.h"
 
 // 2-segments, no guard patterns
 #define ELMNTS 21

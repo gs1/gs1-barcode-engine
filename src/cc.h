@@ -18,9 +18,17 @@
  *
  */
 
-#ifndef RELEASE_H
-#define RELEASE_H
+#ifndef CC_H
+#define CC_H
 
-#define RELEASE __DATE__
+int CC2enc(UCHAR str[], UCHAR pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
+int CC3enc(UCHAR str[], UCHAR pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
+int CC4enc(UCHAR str[], UCHAR pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
+int CCCenc(UCHAR str[], UCHAR pattern[]);
+void init928(void);
+void initLogTables(void);
 
-#endif /* RELEASE_H */
+const ULONG barData[3][929];
+const ULONG barRap[2][52];
+
+#endif /* CC_H */

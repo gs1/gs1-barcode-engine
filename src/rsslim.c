@@ -18,7 +18,11 @@
  *
  */
 
-#include "rssenc.h"
+#include <string.h>
+#include <stdlib.h>
+#include "enc.h"
+#include "rssutil.h"
+#include "cc.h"
 
 // not including guard bars
 #define ELMNTS (46-4)

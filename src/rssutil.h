@@ -18,9 +18,12 @@
  *
  */
 
-#ifndef RELEASE_H
-#define RELEASE_H
+#ifndef RSSUTIL_H
+#define RSSUTIL_H
 
-#define RELEASE __DATE__
+#include "enc.h"
 
-#endif /* RELEASE_H */
+int *getRSSwidths(int val, int n, int elements, int maxWidth, int noNarrow);
+struct sPrints *cnvSeparator(struct sParams *params, struct sPrints *prints);
+
+#endif /* RSSUTIL_H */

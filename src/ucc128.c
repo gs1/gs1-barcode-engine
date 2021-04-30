@@ -18,7 +18,9 @@
  *
  */
 
-#include "rssenc.h"
+#include <string.h>
+#include "enc.h"
+#include "cc.h"
 
 #define SYMMAX 45  /* UCC/EAN-128 40 symbol chars + strt,FNC1,link,chk & stop max */
 #define MAX_LINHT 500 // max UCC/EAN-128 height in X
@@ -63,7 +65,7 @@ char *ccStr;
 			ccStr[0] = '\0'; // separate primary data
 			ccStr++; // point to secondary data
 		}
-		
+
 		if (strlen(params->dataStr) > 48) {
 			errFlag = TRUE;
 			printf("\nprimary data exceeds 48 characters");
@@ -218,7 +220,7 @@ char *ccStr;
 			ccStr[0] = '\0'; // separate primary data
 			ccStr++; // point to secondary data
 		}
-		
+
 		if (strlen(params->dataStr) > 48) {
 			errFlag = TRUE;
 			printf("\nprimary data exceeds 48 characters");
@@ -438,12 +440,12 @@ int enc128(UCHAR data[], UCHAR bars[], int link)
 				break;
 		}
 	}
-  
+
   if (link > 0) {
 		// insert trailing Code Set Char flag
 		symchr[si++] = linkChar[code][link-1];
 	}
-	
+
 	/* calculate check char */
 
 	i = 0;
