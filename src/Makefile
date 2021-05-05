@@ -1,6 +1,6 @@
 BIN = gs1encoders-linux.bin
 
-CFLAGS = -g -O2 -D_FORTIFY_SOURCE=2 -Wall -Wextra -Wconversion -Wformat -Wformat-security -pedantic
+CFLAGS = -g -O2 -D_FORTIFY_SOURCE=2 -Wall -Wextra -Wconversion -Wformat -Wformat-security -pedantic -Werror
 LDFLAGS = -Wl,--as-needed -Wl,-z,relro -Wl,-z,now
 
 SRCS = $(wildcard *.c)
