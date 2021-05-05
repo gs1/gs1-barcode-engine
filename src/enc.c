@@ -22,6 +22,7 @@
 #include <stdint.h>
 
 #include "enc.h"
+#include "rss14.h"
 
 
 bool encode(struct sParams *params) {

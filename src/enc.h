@@ -75,16 +75,13 @@ struct sPrints {
 	uint8_t *pattern;
 };
 
-void RSS14(struct sParams *params);
-void RSS14S(struct sParams *params);
-void RSS14SO(struct sParams *params);
-void RSSLim(struct sParams *params);
-void RSSExp(struct sParams *params);
-void EAN13(struct sParams *params);
-void EAN8(struct sParams *params);
-void UPCE(struct sParams *params);
-void U128A(struct sParams *params);
-void U128C(struct sParams *params);
+
+#include "rss14.h"
+#include "rsslim.h"
+#include "rssexp.h"
+#include "ean.h"
+#include "ucc128.h"
+
 
 bool encode(struct sParams *params);
 
