@@ -22,7 +22,7 @@
 #define UTIL_H
 
 #include <stdio.h>
-#include "enc.h"
+#include "enc-private.h"
 
 #define min(X,Y) (((X) < (Y)) ? (X) : (Y))
 #define max(X,Y) (((X) > (Y)) ? (X) : (Y))

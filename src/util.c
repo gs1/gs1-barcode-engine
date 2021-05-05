@@ -21,7 +21,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "enc.h"
+#include "enc-private.h"
 #include "util.h"
 
 #define MAX_LINE 6032 // 10 inches wide at 600 dpi

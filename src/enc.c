@@ -21,9 +21,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "enc.h"
-#include "rss14.h"
-
+#include "enc-private.h"
 
 bool encode(struct sParams *params) {
 

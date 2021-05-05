@@ -24,8 +24,6 @@
 #include <stdio.h>
 #include <stdint.h>
 
-#define PRNT 0 // prints symbol data if 1
-
 #define MAX_FNAME 120
 #define MAX_DATA (75+2361)
 
@@ -63,33 +61,6 @@ struct sParams {
 	char *errMsg;
 };
 
-
-struct sPrints {
-	int elmCnt;
-	int leftPad;
-	int rightPad;
-	int guards;
-	int height;
-	int whtFirst;
-	int reverse;
-	uint8_t *pattern;
-};
-
-
-#include "rss14.h"
-#include "rsslim.h"
-#include "rssexp.h"
-#include "ean.h"
-#include "ucc128.h"
-
-
 bool encode(struct sParams *params);
-
-// globals
-int errFlag;
-char* errMsg;
-int rowWidth;
-int line1;
-int linFlag; // tells pack whether linear or cc is being encoded
 
 #endif /* ENC_H */

@@ -18,12 +18,35 @@
  *
  */
 
-#ifndef RSSUTIL_H
-#define RSSUTIL_H
+#ifndef ENC_PRIVATE_H
+#define ENC_PRIVATE_H
 
-#include "enc-private.h"
+#include <stdint.h>
+#include "enc.h"
+#include "rss14.h"
+#include "rsslim.h"
+#include "rssexp.h"
+#include "ean.h"
+#include "ucc128.h"
 
-int *getRSSwidths(int val, int n, int elements, int maxWidth, int noNarrow);
-struct sPrints *cnvSeparator(struct sParams *params, struct sPrints *prints);
+#define PRNT 0 // prints symbol data if 1
 
-#endif /* RSSUTIL_H */
+struct sPrints {
+	int elmCnt;
+	int leftPad;
+	int rightPad;
+	int guards;
+	int height;
+	int whtFirst;
+	int reverse;
+	uint8_t *pattern;
+};
+
+// globals
+int errFlag;
+char* errMsg;
+int rowWidth;
+int line1;
+int linFlag; // tells pack whether linear or cc is being encoded
+
+#endif /* ENC_PRIVATE_H */

@@ -403,7 +403,7 @@ int main(int argc, char *argv[]) {
 
 	while (userInt(&params)) {
 		if (!encode(&params)) {
-			if (params.errMsg[0] != '\0') printf("\nERROR: %s\n", errMsg);
+			if (params.errMsg[0] != '\0') printf("\nERROR: %s\n", params.errMsg);
 			else printf("\nAn error occurred\n");
 			continue;
 		}

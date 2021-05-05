@@ -21,7 +21,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include "enc.h"
+#include "enc-private.h"
 #include "util.h"
 #include "rssutil.h"
 #include "cc.h"
