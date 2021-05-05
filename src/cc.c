@@ -142,7 +142,7 @@ int CC2enc(uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS] ) {
 	linFlag = 0;
 	CCSizes = CC2Sizes;
 	if ((i=check2DData(str)) != 0) {
-		printf("\nillegal character in 2D data = '%c'", str[i]);
+		sprintf(errMsg, "illegal character in 2D data = '%c'", str[i]);
 		errFlag = true;
 		return(0);
 	}
@@ -151,7 +151,7 @@ int CC2enc(uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS] ) {
 #endif
 	size = pack(str, bitField);
 	if (size < 0 || CC2Sizes[size] == 0) {
-		printf("\ndata error");
+		errMsg = "data error";
 		errFlag = true;
 		return(0);
 	}
@@ -181,7 +181,7 @@ int CC3enc(uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS] ) {
 	linFlag = 0;
 	CCSizes = CC3Sizes;
 	if ((i=check2DData(str)) != 0) {
-		printf("\nillegal character in 2D data = '%c'", str[i]);
+		sprintf(errMsg, "illegal character in 2D data = '%c'", str[i]);
 		errFlag = true;
 		return(0);
 	}
@@ -190,7 +190,7 @@ int CC3enc(uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS] ) {
 #endif
 	size = pack(str, bitField);
 	if (size < 0 || CC3Sizes[size] == 0) {
-		printf("\ndata error");
+		errMsg = "data error";
 		errFlag = true;
 		return(0);
 	}
@@ -220,7 +220,7 @@ int CC4enc(uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS] ) {
 	linFlag = 0;
 	CCSizes = CC4Sizes;
 	if ((i=check2DData(str)) != 0) {
-		printf("\nillegal character in 2D data = '%c'", str[i]);
+		sprintf(errMsg, "illegal character in 2D data = '%c'", str[i]);
 		errFlag = true;
 		return(0);
 	}
@@ -229,7 +229,7 @@ int CC4enc(uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS] ) {
 #endif
 	size = pack(str, bitField);
 	if (size < 0 || CC4Sizes[size] == 0) {
-		printf("\ndata error");
+		errMsg = "data error";
 		errFlag = true;
 		return(0);
 	}
@@ -252,12 +252,13 @@ bool CCCenc(uint8_t str[], uint8_t patCCC[] ) {
 
 	linFlag = -1; // CC-C flag value
 	if ((i=check2DData(str)) != 0) {
-		printf("illegal character '%c'\n", str[i]);
+		sprintf(errMsg, "illegal character '%c'", str[i]);
+		errFlag = true;
 		return(false);
 	}
-	printf("%s\n", str);
 	if((byteCnt = pack(str, bitField)) < 0) {
-		printf("data error\n");
+		errMsg = "data error";
+		errFlag = true;
 		return(false);
 	}
 	encCCC(byteCnt, bitField, codeWords, patCCC);
@@ -769,14 +770,15 @@ int pack(uint8_t str[], uint8_t bitField[]) {
 			break;
 		}
 		default: {
-			printf("\nmode error");
+			errMsg = "mode error";
 			errFlag = true;
 			return(-1);
 		} } /* end of case */
 	}
 	if (linFlag == -1) { // CC-C
 		if (!insertPad(&encode)) { // will return false if error
-			printf("symbol too big\n");
+			errMsg = "symbol too big";
+			errFlag = true;
 			return(-1);
 		}
 		return(encode.iBit/8); // no error, return number of data bytes
@@ -1384,7 +1386,7 @@ static void encodeAI90(struct encodeT *encode) {
 			break;
 		}
 		default: {
-			printf("\nmode error");
+			errMsg = "mode error";
 			errFlag = true;
 			return;
 		} } /* end of case */
@@ -1684,7 +1686,7 @@ void putBits(uint8_t bitField[], int bitPos, int length, uint16_t bits) {
 		maxBytes = MAX_BYTES; // others
 	}
 	if ((bitPos+length > maxBytes*8) || (length > 16)) {
-		printf("\nputBits error, %d, %d\n", bitPos, length);
+		sprintf(errMsg, "putBits error, %d, %d", bitPos, length);
 		errFlag = true;
 		return;
 	}

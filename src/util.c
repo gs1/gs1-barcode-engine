@@ -222,7 +222,7 @@ void printElmnts(struct sParams *params, struct sPrints *prints) {
 		lineUCut[ndx] = (uint8_t)(((line[ndx]^xorMsk)&(bits&0xff))^xorMsk); // Y undercut
 		line[ndx++] = (uint8_t)((bits&0xff) ^ xorMsk);
 		if (ndx > MAX_LINE/8 + 1) {
-			printf("\nPrint line too long");
+			errMsg = "Print line too long";
 			errFlag = true;
 			return;
 		}
@@ -231,7 +231,7 @@ void printElmnts(struct sParams *params, struct sPrints *prints) {
 		while ((ndx & 3) != 0) {
 			line[ndx++] = 0xFF; // pad to long word boundary for .BMP
 			if (ndx >= MAX_LINE/8 + 1) {
-				printf("\nPrint line too long");
+				errMsg = "Print line too long";
 				errFlag = true;
 				return;
 			}
@@ -258,7 +258,7 @@ static void printElm(int width, int color, int *bits, int *ndx, uint8_t xorMsk) 
 			line[(*ndx)++] = (uint8_t)((*bits&0xff) ^ xorMsk);
 			if (*ndx >= MAX_LINE/8 + 1) {
 				*ndx = 0;
-				printf("\nPrint line too long in graphic line.");
+				errMsg = "Print line too long in graphic line.";
 				errFlag = true;
 				return;
 			}

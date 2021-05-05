@@ -22,14 +22,15 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-#include "release.h"
 #include "enc.h"
-#include "util.h"
 
+#define RELEASE __DATE__
+
+// Some limits for user input
 #define MAX_PIXMULT 12
-
 #define MAX_KEYDATA 120
 #define MAX_LINHT 500 // max UCC/EAN-128 height in X
+
 
 static const char* SYMBOLOGY_NAMES[] =
 {
@@ -48,106 +49,6 @@ static const char* SYMBOLOGY_NAMES[] =
 	"GS1-128 with CC-C"
 };
 
-static bool getSym(struct sParams *params);
-static bool userInt(struct sParams *params);
-
-int main(int argc, char *argv[]) {
-
-	// Silence compiler
-	(void)argc;
-	(void)argv;
-
-	FILE *iFile, *oFile;
-
-	struct sParams params;
-	int i;
-
-	params.pixMult = 1; // init params
-	params.Xundercut = 0;
-	params.Yundercut = 0;
-	params.sepHt = 1;
-	params.bmp = false;
-	params.segWidth = 22;
-	params.linHeight = 25;
-	strcpy(params.outFile, "out.tif");
-	params.sym = sNONE;
-	params.inputFlag = 0; // for kbd input
-	while (userInt(&params)) {
-		errFlag = false;
-		if (params.inputFlag == 1) {
-			if((iFile = fopen(params.dataFile, "r")) == NULL) {
-				printf("\nUNABLE TO OPEN %s FILE\n", params.dataFile);
-				continue;
-			}
-			i = (int)fread(params.dataStr, sizeof(char), MAX_DATA, iFile);
-			while (i > 0 && params.dataStr[i-1] < 32) i--; // strip trailing CRLF etc.
-			params.dataStr[i] = '\0';
-			fclose(iFile);
-		}
-
-		if((oFile = fopen(params.outFile, "wb")) == NULL) {
-			printf("\nUNABLE TO OPEN %s FILE\n", params.outFile);
-			continue;
-		}
-		params.outfp = oFile;
-
-		switch (params.sym) {
-			case sRSS14:
-			case sRSS14T:
-				RSS14(&params);
-				break;
-
-			case sRSS14S:
-				RSS14S(&params);
-				break;
-
-			case sRSS14SO:
-				RSS14SO(&params);
-				break;
-
-			case sRSSLIM:
-				RSSLim(&params);
-				break;
-
-			case sRSSEXP:
-				RSSExp(&params);
-				break;
-
-			case sUPCA:
-			case sEAN13:
-				EAN13(&params);
-				break;
-
-			case sUPCE:
-				UPCE(&params);
-				break;
-
-			case sEAN8:
-				EAN8(&params);
-				break;
-
-			case sUCC128_CCA:
-				U128A(&params);
-				break;
-
-			case sUCC128_CCC:
-				U128C(&params);
-				break;
-
-			default:
-				printf("\nILLEGAL SYMBOLOGY TYPE %d", params.sym);
-				errFlag = true;
-		}
-
-		fclose(oFile);
-		if (!errFlag) {
-			printf("\n%s created.", params.outFile);
-		}
-	}
-	return 0;
-}
-
-
 // Replacement for the deprecated gets(3) function
 static char* gets(char* in) {
 
@@ -158,6 +59,37 @@ static char* gets(char* in) {
 		s[strcspn(s, "\r\n")] = 0;
 	}
 	return s;
+}
+
+static bool getSym(struct sParams *params) {
+
+	char inpStr[MAX_KEYDATA+1];
+	int i;
+
+	while (true) {
+		printf("\nGS1 Encoders (Built " RELEASE "):");
+		printf("\n\nCopyright (c) 2020 GS1 AISBL. License: Apache-2.0");
+		printf("\n\nMAIN MENU:");
+		printf("\n 0)  Exit Program");
+		for (i = 1; i < sNUMSYMS; i += 2) {
+			printf("\n%2d)  %-25s     %2d)  %-25s",
+				i, SYMBOLOGY_NAMES[i], i + 1, SYMBOLOGY_NAMES[i + 1]);
+		}
+		printf("\n\nEnter symbology type or 0 to exit: ");
+		if (gets(inpStr) == NULL) {
+			printf("PLEASE ENTER 0 THROUGH 12.");
+			continue;
+		}
+		params->sym = atoi(inpStr);
+		if (params->sym == 0) {
+			return(false);
+		}
+		if (params->sym > 12) {
+			printf("PLEASE ENTER 0 THROUGH 12.");
+			continue;
+		}
+		return(true);
+	}
 }
 
 static bool userInt(struct sParams *params) {
@@ -450,33 +382,33 @@ static bool userInt(struct sParams *params) {
 	return(retFlag);
 }
 
-static bool getSym(struct sParams *params) {
+int main(int argc, char *argv[]) {
 
-	char inpStr[MAX_KEYDATA+1];
-	int i;
+	// Silence compiler
+	(void)argc;
+	(void)argv;
 
-	while (true) {
-		printf("\nGS1 Encoders (Built " RELEASE "):");
-		printf("\n\nCopyright (c) 2020 GS1 AISBL. License: Apache-2.0");
-		printf("\n\nMAIN MENU:");
-		printf("\n 0)  Exit Program");
-		for (i = 1; i < sNUMSYMS; i += 2) {
-			printf("\n%2d)  %-25s     %2d)  %-25s",
-				i, SYMBOLOGY_NAMES[i], i + 1, SYMBOLOGY_NAMES[i + 1]);
-		}
-		printf("\n\nEnter symbology type or 0 to exit: ");
-		if (gets(inpStr) == NULL) {
-			printf("PLEASE ENTER 0 THROUGH 12.");
+	struct sParams params;
+
+	params.pixMult = 1; // init params
+	params.Xundercut = 0;
+	params.Yundercut = 0;
+	params.sepHt = 1;
+	params.bmp = false;
+	params.segWidth = 22;
+	params.linHeight = 25;
+	strcpy(params.outFile, "out.tif");
+	params.sym = sNONE;
+	params.inputFlag = 0; // for kbd input
+
+	while (userInt(&params)) {
+		if (!encode(&params)) {
+			if (params.errMsg[0] != '\0') printf("\nERROR: %s\n", errMsg);
+			else printf("\nAn error occurred\n");
 			continue;
 		}
-		params->sym = atoi(inpStr);
-		if (params->sym == 0) {
-			return(false);
-		}
-		if (params->sym > 12) {
-			printf("PLEASE ENTER 0 THROUGH 12.");
-			continue;
-		}
-		return(true);
+		printf("\n%s created.", params.outFile);
 	}
+
+	return 0;
 }

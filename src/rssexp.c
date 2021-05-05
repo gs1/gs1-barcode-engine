@@ -60,7 +60,7 @@ void RSSExp(struct sParams *params) {
 	uint8_t dblPattern[MAX_DBL_SEGS][ELMNTS];
 
 	int i, j;
-	int rows, ccFlag;
+	int rows = 0, ccFlag;
 	int segs, lNdx, lNdx1, lMods, lHeight;
 	int evenRow, rev;
 	int chexSize;
@@ -77,7 +77,7 @@ void RSSExp(struct sParams *params) {
 	if (ccStr == NULL) ccFlag = false;
 	else {
 		if (params->segWidth < 4) {
-			printf("\nComposite must be at least 4 segments wide\n");
+			errMsg = "Composite must be at least 4 segments wide";
 			errFlag = true;
 			return;
 		}
@@ -87,79 +87,70 @@ void RSSExp(struct sParams *params) {
 	}
 
 	rowWidth = params->segWidth; // save for getUnusedBitCnt
-	if ((segs = RSS14Eenc((uint8_t*)params->dataStr, dblPattern, ccFlag)) > 0) {
-		if (errFlag) {
-			printf("\nRSS Exp encoding error occurred.");
-			return;
-		}
-		lNdx = 0;
-		for (i = 0; i < segs-1; i += 2) {
-			for (j = 0; j < 8+5+8; j++) { // copy double segments
-				linPattern[lNdx++] = dblPattern[i/2][j];
-			}
-		}
-		if (i == segs-1) {
-			for (j = 0; j < 8+5; j++) { // copy last odd segment if one exists
-				linPattern[lNdx++] = dblPattern[i/2][j];
-			}
-		}
-		j = (segs <= params->segWidth) ? segs : params->segWidth;
-		i = (segs+j-1)/j; // number of linear rows
-		lHeight = params->pixMult*i*SYM_H + params->sepHt*(i-1)*3;
-		lNdx = (j/2)*(8+5+8) + (j&1)*(8+5);
-		lMods = 2 + (j/2)*(17+15+17) + (j&1)*(17+15) + 2;
+	if (!((segs = RSS14Eenc((uint8_t*)params->dataStr, dblPattern, ccFlag)) > 0) || errFlag) return;
 
-		// set up checkered seperator pattern and print structure
-		for (i = 0; i < MAX_DBL_SEGS*SYM_W+2; i++) {
-			chexPattern[i] = 1; // chex = all 1X elements
+	lNdx = 0;
+	for (i = 0; i < segs-1; i += 2) {
+		for (j = 0; j < 8+5+8; j++) { // copy double segments
+			linPattern[lNdx++] = dblPattern[i/2][j];
 		}
-		chexPattern[0] = 5; // except first and last
-		if ((lMods&1) == 0) {
-			chexPattern[lMods-8] = 4;
-			chexSize = lMods-7;
+	}
+	if (i == segs-1) {
+		for (j = 0; j < 8+5; j++) { // copy last odd segment if one exists
+			linPattern[lNdx++] = dblPattern[i/2][j];
 		}
-		else {
-			chexPattern[lMods-9] = 5;
-			chexSize = lMods-8;
-		}
-		chexPrnts.elmCnt = chexSize;
-		chexPrnts.pattern = &chexPattern[0];
-		chexPrnts.guards = false;
-		chexPrnts.height = params->sepHt;
-		chexPrnts.whtFirst = true;
-		chexPrnts.leftPad = 0;
-		chexPrnts.rightPad = 0;
-		chexPrnts.reverse = false;
+	}
+	j = (segs <= params->segWidth) ? segs : params->segWidth;
+	i = (segs+j-1)/j; // number of linear rows
+	lHeight = params->pixMult*i*SYM_H + params->sepHt*(i-1)*3;
+	lNdx = (j/2)*(8+5+8) + (j&1)*(8+5);
+	lMods = 2 + (j/2)*(17+15+17) + (j&1)*(17+15) + 2;
 
-		rPadcc = lMods - L_PAD - CCB4_WIDTH;
+	// set up checkered seperator pattern and print structure
+	for (i = 0; i < MAX_DBL_SEGS*SYM_W+2; i++) {
+		chexPattern[i] = 1; // chex = all 1X elements
+	}
+	chexPattern[0] = 5; // except first and last
+	if ((lMods&1) == 0) {
+		chexPattern[lMods-8] = 4;
+		chexSize = lMods-7;
+	}
+	else {
+		chexPattern[lMods-9] = 5;
+		chexSize = lMods-8;
+	}
+	chexPrnts.elmCnt = chexSize;
+	chexPrnts.pattern = &chexPattern[0];
+	chexPrnts.guards = false;
+	chexPrnts.height = params->sepHt;
+	chexPrnts.whtFirst = true;
+	chexPrnts.leftPad = 0;
+	chexPrnts.rightPad = 0;
+	chexPrnts.reverse = false;
+
+	rPadcc = lMods - L_PAD - CCB4_WIDTH;
 
 #if PRNT
-		printf("\n%s", params->dataStr);
-		printf("\n");
-		for (i = 0; i < lNdx; i++) {
-			printf("%d", linPattern[i]);
-		}
-		printf("\n");
-#endif
+	printf("\n%s", params->dataStr);
+	printf("\n");
+	for (i = 0; i < lNdx; i++) {
+		printf("%d", linPattern[i]);
 	}
+	printf("\n");
+#endif
 	line1 = true; // so first line is not Y undercut
 	if (ccFlag) {
-		if ((rows = CC4enc((uint8_t*)ccStr, ccPattern)) > 0) {
-			if (errFlag) {
-				printf("\nComposite encoding error occurred.");
-				return;
-			}
+		if (!((rows = CC4enc((uint8_t*)ccStr, ccPattern)) > 0) || errFlag) return;
 #if PRNT
-			printf("\n%s", ccStr);
-			printf("\n");
-			for (i = 0; i < rows; i++) {
-				for (j = 0; j < CCB4_ELMNTS; j++) {
-					printf("%d", ccPattern[i][j]);
-				}
-				printf("\n");
+		printf("\n%s", ccStr);
+		printf("\n");
+		for (i = 0; i < rows; i++) {
+			for (j = 0; j < CCB4_ELMNTS; j++) {
+				printf("%d", ccPattern[i][j]);
 			}
-#endif
+			printf("\n");
 		}
+#endif
 	}
 
 	if (params->bmp) { // BMP version
@@ -428,7 +419,7 @@ static int RSS14Eenc(uint8_t string[], uint8_t bars[MAX_DBL_SEGS][ELMNTS], int c
 	weight = 0;
 
 	if (((i=check2DData(string)) != 0) || ((i=isSymbolSepatator(string)) != 0)) {
-		printf("\nillegal character in RSS Expanded data = '%c'", string[i]);
+		sprintf(errMsg, "illegal character in RSS Expanded data = '%c'", string[i]);
 		errFlag = true;
 		return(0);
 	}
@@ -438,7 +429,7 @@ static int RSS14Eenc(uint8_t string[], uint8_t bars[MAX_DBL_SEGS][ELMNTS], int c
 	putBits(bitField, 0, 1, (uint16_t)ccFlag); // 2D linkage bit
 	size = pack(string, bitField);
 	if (size < 0) {
-		printf("\ndata error");
+		errMsg = "data error";
 		errFlag = true;
 		return(0);
 	}

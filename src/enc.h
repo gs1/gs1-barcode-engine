@@ -60,6 +60,7 @@ struct sParams {
 	char dataFile[MAX_FNAME+1];
 	char outFile[MAX_FNAME+1];
 	char dataStr[MAX_DATA+1];
+	char *errMsg;
 };
 
 
@@ -84,5 +85,14 @@ void EAN8(struct sParams *params);
 void UPCE(struct sParams *params);
 void U128A(struct sParams *params);
 void U128C(struct sParams *params);
+
+bool encode(struct sParams *params);
+
+// globals
+int errFlag;
+char* errMsg;
+int rowWidth;
+int line1;
+int linFlag; // tells pack whether linear or cc is being encoded
 
 #endif /* ENC_H */

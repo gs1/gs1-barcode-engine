@@ -24,12 +24,6 @@
 #include <stdio.h>
 #include "enc.h"
 
-// globals
-int errFlag;
-int rowWidth;
-int line1;
-int linFlag; // tells pack whether linear or cc is being encoded
-
 #define min(X,Y) (((X) < (Y)) ? (X) : (Y))
 #define max(X,Y) (((X) > (Y)) ? (X) : (Y))
 

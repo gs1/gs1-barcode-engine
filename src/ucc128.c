@@ -73,8 +73,8 @@ void U128A(struct sParams *params) {
 	}
 
 	if (strlen(params->dataStr) > 48) {
+		errMsg = "primary data exceeds 48 characters";
 		errFlag = true;
-		printf("\nprimary data exceeds 48 characters");
 		return;
 	}
 
@@ -109,29 +109,24 @@ void U128A(struct sParams *params) {
 	prints.whtFirst = true;
 	prints.reverse = false;
 	if (ccFlag) {
-		if ((rows = CC4enc((uint8_t*)ccStr, ccPattern)) > 0) {
-			if (errFlag) {
-				printf("\nerror occurred, exiting.");
-				return;
-			}
+		if (!((rows = CC4enc((uint8_t*)ccStr, ccPattern)) > 0) || errFlag) return;
 #if PRNT
-			{
-				int j;
-				printf("\n%s", ccStr);
-				printf("\n");
-				for (i = 0; i < rows; i++) {
-					for (j = 0; j < CCB4_ELMNTS; j++) {
-						printf("%d", ccPattern[i][j]);
-					}
-					printf("\n");
+		{
+			int j;
+			printf("\n%s", ccStr);
+			printf("\n");
+			for (i = 0; i < rows; i++) {
+				for (j = 0; j < CCB4_ELMNTS; j++) {
+					printf("%d", ccPattern[i][j]);
 				}
+				printf("\n");
 			}
-#endif
 		}
+#endif
 
 		if (symChars < 9) {
+			errMsg = "linear component too short";
 			errFlag = true;
-			printf("\nlinear component too short");
 			return;
 		}
 
@@ -233,8 +228,8 @@ void U128C(struct sParams *params) {
 	}
 
 	if (strlen(params->dataStr) > 48) {
+		errMsg = "primary data exceeds 48 characters";
 		errFlag = true;
-		printf("\nprimary data exceeds 48 characters");
 		return;
 	}
 
@@ -260,8 +255,8 @@ void U128C(struct sParams *params) {
 
 	colCnt = ((symChars*11 + 22 - L_PAD - 5)/17) -4;
 	if (colCnt < 1) {
+		errMsg = "UCC-128 too small";
 		errFlag = true;
-		printf("\nUCC-128 too small\n");
 		return;
 	}
 	line1 = true; // so first line is not Y undercut
@@ -275,25 +270,20 @@ void U128C(struct sParams *params) {
 	prints.whtFirst = true;
 	prints.reverse = false;
 	if (ccFlag) {
-		if (CCCenc((uint8_t*)ccStr, patCCC)) {
-			if (errFlag) {
-				printf("\nerror occurred, exiting.");
-				return;
-			}
+		if (!CCCenc((uint8_t*)ccStr, patCCC) || errFlag) return;
 #if PRNT
-			{
-				int j;
-				printf("\n%s", ccStr);
-				printf("\n");
-				for (i = 0; i < rowCnt; i++) {
-					for (j = 0; j < (colCnt+4)*8+3; j++) {
-						printf("%d", patCCC[i*((colCnt+4)*8+3) + j]);
-					}
-					printf("\n");
+		{
+			int j;
+			printf("\n%s", ccStr);
+			printf("\n");
+			for (i = 0; i < rowCnt; i++) {
+				for (j = 0; j < (colCnt+4)*8+3; j++) {
+					printf("%d", patCCC[i*((colCnt+4)*8+3) + j]);
 				}
+				printf("\n");
 			}
-#endif
 		}
+#endif
 
 		symWidth = symChars*11+22;
 		ccRpad = symWidth - L_PAD - ((colCnt+4)*17+5);

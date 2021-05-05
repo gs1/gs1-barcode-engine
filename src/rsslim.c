@@ -62,8 +62,8 @@ void RSSLim(struct sParams *params) {
 	}
 
 	if (strlen(params->dataStr) > 13) {
+		errMsg = "primary data exceeds 13 digits";
 		errFlag = true;
-		printf("\nprimary data exceeds 13 digits");
 		return;
 	}
 
@@ -71,24 +71,15 @@ void RSSLim(struct sParams *params) {
 	strcat(tempStr, params->dataStr);
 	strcpy(primaryStr, tempStr + strlen(tempStr) - 13);
 
-	if (RSSLimEnc((uint8_t*)primaryStr, linPattern, ccFlag)) {
-		if (errFlag) {
-			printf("\nRSS Limited encoding error occurred.");
-			return;
-		}
+	if (!RSSLimEnc((uint8_t*)primaryStr, linPattern, ccFlag) || errFlag) return;
 #if PRNT
-		printf("\n%s", primaryStr);
-		printf("\n");
-		for (i = 0; i < ELMNTS; i++) {
-			printf("%d", linPattern[i]);
-		}
-		printf("\n");
+	printf("\n%s", primaryStr);
+	printf("\n");
+	for (i = 0; i < ELMNTS; i++) {
+		printf("%d", linPattern[i]);
+	}
+	printf("\n");
 #endif
-	}
-	else {
-		printf("\nerror occurred, exiting.");
-		return;
-	}
 	line1 = true; // so first line is not Y undercut
 	// init most common RSS Limited row prints values
 	prints.elmCnt = ELMNTS;
@@ -100,32 +91,27 @@ void RSSLim(struct sParams *params) {
 	prints.whtFirst = true;
 	prints.reverse = false;
 	if (ccFlag) {
-		if ((rows = CC3enc((uint8_t*)ccStr, ccPattern)) > 0) {
-			if (errFlag) {
-				printf("\nerror occurred, exiting.");
-				return;
-			}
+		if (!((rows = CC3enc((uint8_t*)ccStr, ccPattern)) > 0) || errFlag) return;
 #if PRNT
-			{
-				int j;
-				printf("\n%s", ccStr);
-				printf("\n");
-				for (i = 0; i < rows; i++) {
-					if (rows <= MAX_CCA3_ROWS) { // CCA composite
-						for (j = 0; j < CCA3_ELMNTS; j++) {
-							printf("%d", ccPattern[i][j]);
-						}
+		{
+			int j;
+			printf("\n%s", ccStr);
+			printf("\n");
+			for (i = 0; i < rows; i++) {
+				if (rows <= MAX_CCA3_ROWS) { // CCA composite
+					for (j = 0; j < CCA3_ELMNTS; j++) {
+						printf("%d", ccPattern[i][j]);
 					}
-					else {
-						for (j = 0; j < CCB3_ELMNTS; j++) {
-							printf("%d", ccPattern[i][j]);
-						}
-					}
-					printf("\n");
 				}
+				else {
+					for (j = 0; j < CCB3_ELMNTS; j++) {
+						printf("%d", ccPattern[i][j]);
+					}
+				}
+				printf("\n");
 			}
-#endif
 		}
+#endif
 
 		if (params->bmp) {
 			// note: BMP is bottom to top inverted
