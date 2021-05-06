@@ -26,6 +26,9 @@
 #include "gs1encoders.h"
 
 
+#define PRNT 0 // prints symbol data if 1
+
+
 struct sPrints {
 	int elmCnt;
 	int leftPad;
@@ -38,6 +41,7 @@ struct sPrints {
 };
 
 
+#include "cc.h"
 #include "driver.h"
 #include "ean.h"
 #include "rss14.h"
@@ -46,21 +50,19 @@ struct sPrints {
 #include "rssutil.h"
 #include "ucc128.h"
 
-#define PRNT 0 // prints symbol data if 1
-
 
 struct gs1_encoder {
 
 	// members with accessors
-	int sym;                // symbology type
-	int inputFlag;          // 1 = dataStr, 2 = dataFile
-	int pixMult;            // pixels per X
-	int Xundercut;          // X pixels to undercut
-	int Yundercut;          // Y pixels to undercut
-	int sepHt;              // separator row height
+	int sym;		// symbology type
+	int inputFlag;		// 1 = dataStr, 2 = dataFile
+	int pixMult;		// pixels per X
+	int Xundercut;		// X pixels to undercut
+	int Yundercut;		// Y pixels to undercut
+	int sepHt;		// separator row height
 	int segWidth;
-	int bmp;                // true is BMP else TIF file output
-	int linHeight;          // height of UCC/EAN-128 in X
+	int bmp;		// true is BMP else TIF file output
+	int linHeight;		// height of UCC/EAN-128 in X
 	char dataFile[MAX_FNAME+1];
 	char outFile[MAX_FNAME+1];
 	char dataStr[MAX_DATA+1];
@@ -71,8 +73,9 @@ struct gs1_encoder {
 	char* errMsg;
 	int rowWidth;
 	int line1;
-	int linFlag; // tells pack whether linear or cc is being encoded
-	const int *cc_CCSizes;  // will point to CCxSize
+	int linFlag; 		// tells pack whether linear or cc is being encoded
+	uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
+	const int *cc_CCSizes;	// will point to CCxSize
 	int cc_gpa[512];
 	uint8_t driver_line[MAX_LINE/8 + 1];
 	uint8_t driver_lineUCut[MAX_LINE/8 + 1];
@@ -93,5 +96,6 @@ char* errMsg;
 int rowWidth;
 int line1;
 int linFlag; // tells pack whether linear or cc is being encoded
+uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
 
 #endif /* ENC_PRIVATE_H */

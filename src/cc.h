@@ -49,8 +49,6 @@
 #define MAX_CCA3_SIZE	4	// index to 167 in CC3Sizes
 #define MAX_CCA4_SIZE	4	// index to 197 in CC4Sizes
 
-uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
-
 int CC2enc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
 int CC3enc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
 int CC4enc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
