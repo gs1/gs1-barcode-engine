@@ -110,6 +110,7 @@
   <ItemGroup>
     <ClCompile Include="cc.c" />
     <ClCompile Include="ean.c" />
+    <ClCompile Include="gs1encoders-app.c" />
     <ClCompile Include="gs1encoders.c" />
     <ClCompile Include="rss14.c" />
     <ClCompile Include="rssexp.c" />
@@ -120,9 +121,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cc.h" />
-    <ClInclude Include="enc.h" />
-    <ClInclude Include="release.h" />
+    <ClInclude Include="ean.h" />
+    <ClInclude Include="enc-private.h" />
+    <ClInclude Include="gs1encoders.h" />
+    <ClInclude Include="rss14.h" />
+    <ClInclude Include="rssexp.h" />
+    <ClInclude Include="rsslim.h" />
     <ClInclude Include="rssutil.h" />
+    <ClInclude Include="ucc128.h" />
     <ClInclude Include="util.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
