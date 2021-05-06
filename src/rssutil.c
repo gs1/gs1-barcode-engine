@@ -123,21 +123,20 @@ int *getRSSwidths(gs1_encoder *ctx, int val, int n, int elements, int maxWidth, 
 }
 
 
-static struct sPrints prntSep;
-static uint8_t sepPattern[MAX_SEP_ELMNTS];
-
 // copies pattern for separator adding 9 narrow elements inside each finder
 struct sPrints *cnvSeparator(gs1_encoder *params, struct sPrints *prints)
 {
 	int i, j, k;
+	uint8_t *sepPattern = params->rssutil_sepPattern;
+	struct sPrints *prntSep = &params->rssutil_prntSep;
 
-	prntSep.leftPad = prints->leftPad;
-	prntSep.rightPad = prints->rightPad;
-	prntSep.reverse = prints->reverse;
-	prntSep.pattern = sepPattern;
-	prntSep.height = params->sepHt;
-	prntSep.whtFirst = true;
-	prntSep.guards = false;
+	prntSep->leftPad = prints->leftPad;
+	prntSep->rightPad = prints->rightPad;
+	prntSep->reverse = prints->reverse;
+	prntSep->pattern = sepPattern;
+	prntSep->height = params->sepHt;
+	prntSep->whtFirst = true;
+	prntSep->guards = false;
 	for (i = 0, k = 2; k <= 4; k += prints->pattern[i], i++);
 	if ((prints->whtFirst && (i&1)==1) || (!prints->whtFirst && (i&1)==0)) {
 		sepPattern[0] = 4;
@@ -223,6 +222,6 @@ struct sPrints *cnvSeparator(gs1_encoder *params, struct sPrints *prints)
 		j++;
 		sepPattern[j] = (uint8_t)k;
 	}
-	prntSep.elmCnt = j+1;
-	return(&prntSep);
+	prntSep->elmCnt = j+1;
+	return(prntSep);
 }
