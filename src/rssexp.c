@@ -153,10 +153,10 @@ static int symCharPat(gs1_encoder *ctx, uint8_t bars[], int symValue, int parity
 }
 
 
+#define FINDER_SIZE 6
+
 // convert AI string to bar widths in dbl segments
 static int RSS14Eenc(gs1_encoder *ctx, uint8_t string[], uint8_t bars[MAX_DBL_SEGS][ELMNTS], int ccFlag) {
-
-	#define FINDER_SIZE 6
 
 	static const uint8_t finders[FINDER_SIZE][3] = {
 		{ 1,8,4 },
