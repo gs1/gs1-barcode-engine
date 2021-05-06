@@ -25,11 +25,7 @@
 #include "enc-private.h"
 #include "driver.h"
 #include "cc.h"
-
-#define SYMMAX		45	// UCC/EAN-128 40 symbol chars + strt,FNC1,link,chk & stop max
-#define MAX_LINHT	500	// max UCC/EAN-128 height in X
-#define MAX_PAT		10574	// 928*8 + 90*(4*8 + 3) for max codewords and 90 rows
-#define L_PAD		(10-9)	// CCC starts -9X from 1st start bar
+#include "ucc128.h"
 
 #define ISNUM(A) ((A<072)&&(A>057)) /* true if A is numeric ASCII */
 
@@ -44,8 +40,6 @@ int eccCnt; // determined by getUnusedBitCnt
 extern int errFlag;
 extern int line1;
 extern uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
-
-static uint8_t patCCC[MAX_PAT];
 
 
 /*
@@ -295,7 +289,7 @@ static int enc128(uint8_t data[], uint8_t bars[], int link)
 
 	static const int linkChar[3][2] = { { 100,99 }, { 99,101 }, { 101,100 } };
 	int si, di, i, code;
-	int symchr[SYMMAX+1];
+	int symchr[UCC128_SYMMAX+1];
 	long ckchr;
 
 	for (i = 0; i < (int)strlen((char*)data); i++) {
@@ -333,7 +327,7 @@ static int enc128(uint8_t data[], uint8_t bars[], int link)
 	/* convert ASCII data to symbol characters */
 	/* loop until data or symchr array expires */
 
-	while ((data[di] != 0) && (si < SYMMAX-2)) {
+	while ((data[di] != 0) && (si < UCC128_SYMMAX-2)) {
 
 		switch (code) {
 
@@ -378,7 +372,7 @@ void U128A(gs1_encoder *params) {
 
 	struct sPrints prints;
 
-	uint8_t linPattern[(SYMMAX*6)+3];
+	uint8_t linPattern[(UCC128_SYMMAX*6)+3];
 
 	int i;
 	int rows, ccFlag, symChars, symWidth, ccLpad, ccRpad;
@@ -532,8 +526,9 @@ void U128A(gs1_encoder *params) {
 void U128C(gs1_encoder *params) {
 
 	struct sPrints prints;
+	uint8_t *patCCC = params->ucc128_patCCC;
 
-	uint8_t linPattern[(SYMMAX*6)+3];
+	uint8_t linPattern[(UCC128_SYMMAX*6)+3];
 
 	int i;
 	int ccFlag, symChars, symWidth, ccRpad;
@@ -574,7 +569,7 @@ void U128C(gs1_encoder *params) {
 	printf("\n");
 #endif
 
-	colCnt = ((symChars*11 + 22 - L_PAD - 5)/17) -4;
+	colCnt = ((symChars*11 + 22 - UCC128_L_PAD - 5)/17) -4;
 	if (colCnt < 1) {
 		errMsg = "UCC-128 too small";
 		errFlag = true;
@@ -607,7 +602,7 @@ void U128C(gs1_encoder *params) {
 #endif
 
 		symWidth = symChars*11+22;
-		ccRpad = symWidth - L_PAD - ((colCnt+4)*17+5);
+		ccRpad = symWidth - UCC128_L_PAD - ((colCnt+4)*17+5);
 		if (params->bmp) {
 			// note: BMP is bottom to top inverted
 			bmpHeader(params->pixMult*symWidth,
@@ -628,7 +623,7 @@ void U128C(gs1_encoder *params) {
 			// CC-C
 			prints.elmCnt = (colCnt+4)*8+3;
 			prints.height = params->pixMult*3;
-			prints.leftPad = L_PAD;
+			prints.leftPad = UCC128_L_PAD;
 			prints.rightPad = ccRpad;
 			for (i = rowCnt-1; i >= 0; i--) {
 				prints.pattern = &patCCC[i*((colCnt+4)*8+3)];
@@ -643,7 +638,7 @@ void U128C(gs1_encoder *params) {
 			// CC-C
 			prints.elmCnt = (colCnt+4)*8+3;
 			prints.height = params->pixMult*3;
-			prints.leftPad = L_PAD;
+			prints.leftPad = UCC128_L_PAD;
 			prints.rightPad = ccRpad;
 			for (i = 0; i < rowCnt; i++) {
 				prints.pattern = &patCCC[i*((colCnt+4)*8+3)];

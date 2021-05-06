@@ -83,6 +83,7 @@ struct gs1_encoder {
 	struct sPrints rssutil_prntSep;
 	uint8_t rssutil_sepPattern[MAX_SEP_ELMNTS];
 	int rss_util_widths[MAX_K];
+	uint8_t ucc128_patCCC[UCC128_MAX_PAT];
 
 };
 

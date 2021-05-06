@@ -23,6 +23,10 @@
 
 #include "enc-private.h"
 
+#define UCC128_SYMMAX		45	// UCC/EAN-128 40 symbol chars + strt,FNC1,link,chk & stop max
+#define UCC128_MAX_PAT		10574	// 928*8 + 90*(4*8 + 3) for max codewords and 90 rows
+#define UCC128_L_PAD		(10-9)	// CCC starts -9X from 1st start bar
+
 void U128A(gs1_encoder *params);
 void U128C(gs1_encoder *params);
 
