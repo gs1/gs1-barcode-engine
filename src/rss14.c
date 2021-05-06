@@ -32,22 +32,20 @@ extern int errFlag;
 extern int line1;
 extern uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
 
-// TODO move into context
-static struct sPrints prntSep;
-static uint8_t sepPattern[RSS14_SYM_W/2+2];
-
 // RSS14 Stacked row separator pattern routine
 static struct sPrints *separator14S(gs1_encoder *params, struct sPrints *prints) {
 
 	int i, j, k, lNdx, rNdx, sNdx, lWidth, rWidth, matchWidth;
+	uint8_t *sepPattern = params->rss14_sepPattern;
+	struct sPrints *prntSep = &params->rss14_prntSep;
 
-	prntSep.leftPad = prints->leftPad;
-	prntSep.rightPad = prints->rightPad;
-	prntSep.reverse = prints->reverse;
-	prntSep.pattern = sepPattern;
-	prntSep.height = params->sepHt;
-	prntSep.whtFirst = true;
-	prntSep.guards = false;
+	prntSep->leftPad = prints->leftPad;
+	prntSep->rightPad = prints->rightPad;
+	prntSep->reverse = prints->reverse;
+	prntSep->pattern = sepPattern;
+	prntSep->height = params->sepHt;
+	prntSep->whtFirst = true;
+	prntSep->guards = false;
 
 	sepPattern[0] = sepPattern[1] = 1; // start with old SB guard in separator
 	lNdx = 0; // left (top) element index
@@ -123,8 +121,8 @@ static struct sPrints *separator14S(gs1_encoder *params, struct sPrints *prints)
 		j++;
 		sepPattern[j] = (uint8_t)k;
 	}
-	prntSep.elmCnt = j+1;
-	return(&prntSep);
+	prntSep->elmCnt = j+1;
+	return(prntSep);
 }
 
 
