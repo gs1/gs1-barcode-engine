@@ -258,7 +258,7 @@ static bool userInt(gs1_encoder *ctx) {
 					printf("UNKNOWN ENTRY.");
 					continue;
 				}
-				if (strlen(inpStr) > MAX_FNAME) {
+				if (strlen(inpStr) > GS1_ENCODERS_MAX_FNAME) {
 					printf("NOT ACCEPTED. MUST BE 25 CHARACTERS OR FEWER.");
 					continue;
 				}
@@ -293,7 +293,7 @@ static bool userInt(gs1_encoder *ctx) {
 					printf("UNKNOWN ENTRY.");
 					continue;
 				}
-				if (strlen(inpStr) > MAX_FNAME) {
+				if (strlen(inpStr) > GS1_ENCODERS_MAX_FNAME) {
 					printf("NOT ACCEPTED. MUST BE 25 CHARACTERS OR FEWER.");
 					continue;
 				}

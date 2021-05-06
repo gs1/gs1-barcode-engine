@@ -198,7 +198,7 @@ bool gs1_encoder_encode(gs1_encoder *ctx) {
 			ctx->errFlag = true;
 			return false;
 		}
-		i = fread(ctx->dataStr, sizeof(char), MAX_DATA, iFile);
+		i = fread(ctx->dataStr, sizeof(char), GS1_ENCODERS_MAX_DATA, iFile);
 		while (i > 0 && ctx->dataStr[i-1] < 32) i--; // strip trailing CRLF etc.
 		ctx->dataStr[i] = '\0';
 		fclose(iFile);

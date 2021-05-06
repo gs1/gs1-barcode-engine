@@ -24,11 +24,10 @@
 #include <stdio.h>
 #include <stdint.h>
 
-// TODO convert to properties of the instance?
-#define MAX_FNAME 120
-#define MAX_DATA (75+2361)
+#define GS1_ENCODERS_MAX_FNAME 120
+#define GS1_ENCODERS_MAX_DATA (75+2361)
 
-enum {   // TODO consider hiding
+enum {
 	sNONE = 0,	// none defined
 	sRSS14,		// RSS-14
 	sRSS14T,	// RSS-14 Truncated
@@ -68,8 +67,6 @@ void gs1_encoder_free(gs1_encoder *ctx);
 bool gs1_encoder_encode(gs1_encoder *ctx);
 
 
-
-// TODO docs for getters and setters
 int gs1_encoder_getSym(gs1_encoder *ctx);
 void gs1_encoder_setSym(gs1_encoder *ctx, int sym);
 
