@@ -72,11 +72,9 @@ static int combins(int n, int r) {
 * Return:
 * int widths[] = element widths
 ************************************************************************/
-
-static int widths[MAX_K];
-
-int *getRSSwidths(int val, int n, int elements, int maxWidth, int noNarrow)
+int *getRSSwidths(gs1_encoder *ctx, int val, int n, int elements, int maxWidth, int noNarrow)
 {
+	int *widths = ctx->rss_util_widths;
 	int bar;
 	int elmWidth;
 	int mxwElement;

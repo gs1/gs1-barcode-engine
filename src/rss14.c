@@ -145,7 +145,7 @@ static struct sPrints *separator14S(gs1_encoder *params, struct sPrints *prints)
 
 #define K	4
 // call with str = 13-digit primary, no check digit
-static bool RSS14enc(uint8_t string[], uint8_t bars[], int ccFlag) {
+static bool RSS14enc(gs1_encoder *ctx, uint8_t string[], uint8_t bars[], int ccFlag) {
 
 	#define	PARITYCHRSIZE	9
 	#define PARITY_MOD 79
@@ -224,7 +224,7 @@ static bool RSS14enc(uint8_t string[], uint8_t bars[], int ccFlag) {
 	longNum = value = (int)(semiValue / tbl164[iIndex+4]);
 
 	// generate and store odd element widths:
-	widths = getRSSwidths(value, elementN, K, elementMax, 1);
+	widths = getRSSwidths(ctx, value, elementN, K, elementMax, 1);
 	parity = 0l;
 	for (i = 0; i < K; i++) {
 		bars[(i * 2)] = (uint8_t)widths[i];
@@ -238,7 +238,7 @@ static bool RSS14enc(uint8_t string[], uint8_t bars[], int ccFlag) {
 	elementMax = tbl164[iIndex+3];
 
 	// generate and store even element widths:
-	widths = getRSSwidths(value, elementN, K, elementMax, 0);
+	widths = getRSSwidths(ctx, value, elementN, K, elementMax, 0);
 	for (i = 0; i < K; i++) {
 		bars[1 + (i * 2)] = (uint8_t)widths[i];
 		parity += leftWeights[(i * 2) + 1] * widths[i];
@@ -261,7 +261,7 @@ static bool RSS14enc(uint8_t string[], uint8_t bars[], int ccFlag) {
 	longNum = value = (int)(semiValue / tbl154[iIndex+4]);
 
 	// generate and store even element widths of the 2nd char:
-	widths = getRSSwidths(value, elementN, K, elementMax, 1);
+	widths = getRSSwidths(ctx, value, elementN, K, elementMax, 1);
 	for (i = 0; i < K; i++) {
 		bars[19 - (i * 2)] = (uint8_t)widths[i];
 		parity += leftWeights[(i * 2)+1+8] * widths[i];
@@ -274,7 +274,7 @@ static bool RSS14enc(uint8_t string[], uint8_t bars[], int ccFlag) {
 	elementMax = tbl154[iIndex+3];
 
 	// generate and store odd element widths:
-	widths = getRSSwidths(value, elementN, K, elementMax, 0);
+	widths = getRSSwidths(ctx, value, elementN, K, elementMax, 0);
 	for (i = 0; i < K; i++) {
 		bars[20 - (i * 2)] = (uint8_t)widths[i];
 		parity += leftWeights[(i * 2)+8] * widths[i];
@@ -301,7 +301,7 @@ static bool RSS14enc(uint8_t string[], uint8_t bars[], int ccFlag) {
 	longNum = value = (int)(semiValue / tbl164[iIndex+4]);
 
 	// generate and store odd element widths:
-	widths = getRSSwidths(value, elementN, K, elementMax, 1);
+	widths = getRSSwidths(ctx, value, elementN, K, elementMax, 1);
 	for (i = 0; i < K; i++) {
 		bars[41 - (i * 2)] = (uint8_t)widths[i];
 		parity += rightWeights[i * 2] * widths[i];
@@ -314,7 +314,7 @@ static bool RSS14enc(uint8_t string[], uint8_t bars[], int ccFlag) {
 	elementMax = tbl164[iIndex+3];
 
 	// generate and store even element widths:
-	widths = getRSSwidths(value, elementN, K, elementMax, 0);
+	widths = getRSSwidths(ctx, value, elementN, K, elementMax, 0);
 	for (i = 0; i < K; i++) {
 		bars[40 - (i * 2)] = (uint8_t)widths[i];
 		parity += rightWeights[(i * 2) + 1] * widths[i];
@@ -337,7 +337,7 @@ static bool RSS14enc(uint8_t string[], uint8_t bars[], int ccFlag) {
 	longNum = value = (int)(semiValue / tbl154[iIndex+4]);
 
 	// generate and store even element widths of the 4th char:
-	widths = getRSSwidths(value, elementN, K, elementMax, 1);
+	widths = getRSSwidths(ctx, value, elementN, K, elementMax, 1);
 	for (i = 0; i < K; i++) {
 		bars[22 + (i * 2)] = (uint8_t)widths[i];
 		parity += rightWeights[(i * 2)+1+8] * widths[i];
@@ -350,7 +350,7 @@ static bool RSS14enc(uint8_t string[], uint8_t bars[], int ccFlag) {
 	elementMax = tbl154[iIndex+3];
 
 	// generate and store odd element widths:
-	widths = getRSSwidths(value, elementN, K, elementMax, 0);
+	widths = getRSSwidths(ctx, value, elementN, K, elementMax, 0);
 	for (i = 0; i < K; i++) {
 		bars[21 + (i * 2)] = (uint8_t)widths[i];
 		parity += rightWeights[(i * 2)+8] * widths[i];
@@ -418,7 +418,7 @@ void RSS14(gs1_encoder *params) {
 	strcat(tempStr, params->dataStr);
 	strcpy(primaryStr, tempStr + strlen(tempStr) - 13);
 
-	if (!RSS14enc((uint8_t*)primaryStr, linPattern, ccFlag) || errFlag) return;
+	if (!RSS14enc(params, (uint8_t*)primaryStr, linPattern, ccFlag) || errFlag) return;
 
 #if PRNT
 	printf("\n%s", primaryStr);
@@ -550,7 +550,7 @@ void RSS14S(gs1_encoder *params) {
 	strcat(tempStr, params->dataStr);
 	strcpy(primaryStr, tempStr + strlen(tempStr) - 13);
 
-	if (!RSS14enc((uint8_t*)primaryStr, linPattern, ccFlag) || errFlag) return;
+	if (!RSS14enc(params, (uint8_t*)primaryStr, linPattern, ccFlag) || errFlag) return;
 #if PRNT
 	printf("\n%s", primaryStr);
 	printf("\n");
@@ -747,7 +747,7 @@ void RSS14SO(gs1_encoder *params) {
 	strcat(tempStr, params->dataStr);
 	strcpy(primaryStr, tempStr + strlen(tempStr) - 13);
 
-	if (!RSS14enc((uint8_t*)primaryStr, linPattern, ccFlag) || errFlag) return;
+	if (!RSS14enc(params, (uint8_t*)primaryStr, linPattern, ccFlag) || errFlag) return;
 #if PRNT
 	printf("\n%s", primaryStr);
 	printf("\n");

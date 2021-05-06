@@ -85,7 +85,7 @@ static int isSymbolSepatator(uint8_t string[]) {
 // and a symbol char value. Updates the parity *weight. Will fill in
 // the array forward or reverse order for odd or even characters.
 // Returns the updated parity.
-static int symCharPat(uint8_t bars[], int symValue, int parity, int weight,
+static int symCharPat(gs1_encoder *ctx, uint8_t bars[], int symValue, int parity, int weight,
 							 int forwardFlag) {
 
 	// odd elements N & max, even N & max, odd mul, combos:
@@ -118,7 +118,7 @@ static int symCharPat(uint8_t bars[], int symValue, int parity, int weight,
 	saveVal = value = symValue / tbl174[iIndex+4];
 
 	// generate and store odd element widths:
-	widths = getRSSwidths(value, elementN, K, elementMax, 0);
+	widths = getRSSwidths(ctx, value, elementN, K, elementMax, 0);
 	for (i = 0; i < 4; i++) {
 		if (forwardFlag) {
 			bars[i*2] = (uint8_t)widths[i]; // store in 0,2,4,6
@@ -137,7 +137,7 @@ static int symCharPat(uint8_t bars[], int symValue, int parity, int weight,
 	elementMax = tbl174[iIndex+3];
 
 	// generate and store even element widths:
-	widths = getRSSwidths(value, elementN, K, elementMax, 1);
+	widths = getRSSwidths(ctx, value, elementN, K, elementMax, 1);
 	for (i = 0; i < 4; i++) {
 		if (forwardFlag) {
 			bars[1 + i*2] = (uint8_t)widths[i]; // store in 1,3,5,7
@@ -230,7 +230,7 @@ static int RSS14Eenc(gs1_encoder *ctx, uint8_t string[], uint8_t bars[MAX_DBL_SE
 		if (i > 0) {
 			weight = parWts[2*(j-2)];
 			symValue = getVal12(bitField, i*2-1);
-			parity = symCharPat(&bars[i][0], symValue, parity, weight, true);
+			parity = symCharPat(ctx, &bars[i][0], symValue, parity, weight, true);
 		}
 		// fill finder for dbl segment
 		if (fndrNdx < 0) { // reversed finder
@@ -251,11 +251,11 @@ static int RSS14Eenc(gs1_encoder *ctx, uint8_t string[], uint8_t bars[MAX_DBL_SE
 		if (size > i*2) {
 			weight = parWts[2*(j-2)+1];
 			symValue = getVal12(bitField, i*2);
-			parity = symCharPat(&bars[i][8+5], symValue, parity, weight, false);
+			parity = symCharPat(ctx, &bars[i][8+5], symValue, parity, weight, false);
 		}
 	}
 	// fill in first parity char
-	symCharPat(bars[0], (size-3)*PARITY_MOD + parity, 0, weight, true);
+	symCharPat(ctx, bars[0], (size-3)*PARITY_MOD + parity, 0, weight, true);
 	return(size+1);
 }
 

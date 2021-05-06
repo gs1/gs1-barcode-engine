@@ -97,7 +97,7 @@ static struct sPrints *separatorLim(gs1_encoder *params, struct sPrints *prints)
 #define LEFT_MUL 2013571.
 
 // call with str = 13-digit primary, no check digit
-static bool RSSLimEnc(uint8_t string[], uint8_t bars[], int ccFlag) {
+static bool RSSLimEnc(gs1_encoder *ctx, uint8_t string[], uint8_t bars[], int ccFlag) {
 
 	// stores odd element N & max, even N & max, odd mul, combos
 	static const long oddEvenTbl[1*7*6] = { /* 26,7 */
@@ -235,7 +235,7 @@ static bool RSSLimEnc(uint8_t string[], uint8_t bars[], int ccFlag) {
 	longNum = value = (int)(chrValue / oddEvenTbl[iIndex+4]);
 
 	// generate and store odd element widths:
-	widths = getRSSwidths(value, elementN, K, elementMax, 1);
+	widths = getRSSwidths(ctx, value, elementN, K, elementMax, 1);
 	parity = 0l;
 	for (i = 0; i < K; i++) {
 		bars[(i*2)] = (uint8_t)widths[i];
@@ -249,7 +249,7 @@ static bool RSSLimEnc(uint8_t string[], uint8_t bars[], int ccFlag) {
 	elementMax = (int)oddEvenTbl[iIndex+3];
 
 	// generate and store even element widths:
-	widths = getRSSwidths(value, elementN, K, elementMax, 0);
+	widths = getRSSwidths(ctx, value, elementN, K, elementMax, 0);
 	for (i = 0; i < K; i++) {
 		bars[(i*2)+1] = (uint8_t)widths[i];
 		parity += leftWeights[(i * 2) + 1] * widths[i];
@@ -272,7 +272,7 @@ static bool RSSLimEnc(uint8_t string[], uint8_t bars[], int ccFlag) {
 	longNum = value = (int)(chrValue / oddEvenTbl[iIndex+4]);
 
 	// generate and store odd element widths:
-	widths = getRSSwidths(value, elementN, K, elementMax, 1);
+	widths = getRSSwidths(ctx, value, elementN, K, elementMax, 1);
 	for (i = 0; i < K; i++) {
 		bars[(i*2)+28] = (uint8_t)widths[i];
 		parity += rightWeights[i * 2] * widths[i];
@@ -285,7 +285,7 @@ static bool RSSLimEnc(uint8_t string[], uint8_t bars[], int ccFlag) {
 	elementMax = (int)oddEvenTbl[iIndex+3];
 
 	// generate and store even element widths:
-	widths = getRSSwidths(value, elementN, K, elementMax, 0);
+	widths = getRSSwidths(ctx, value, elementN, K, elementMax, 0);
 	for (i = 0; i < K; i++) {
 		bars[(i*2)+1+28] = (uint8_t)widths[i];
 		parity += rightWeights[(i * 2) + 1] * widths[i];
@@ -333,7 +333,7 @@ void RSSLim(gs1_encoder *params) {
 	strcat(tempStr, params->dataStr);
 	strcpy(primaryStr, tempStr + strlen(tempStr) - 13);
 
-	if (!RSSLimEnc((uint8_t*)primaryStr, linPattern, ccFlag) || errFlag) return;
+	if (!RSSLimEnc(params, (uint8_t*)primaryStr, linPattern, ccFlag) || errFlag) return;
 #if PRNT
 	printf("\n%s", primaryStr);
 	printf("\n");
