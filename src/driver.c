@@ -20,6 +20,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <string.h>
 
 #include "enc-private.h"
 #include "driver.h"
@@ -139,8 +140,8 @@ static void printElm(gs1_encoder *ctx, int width, int color, int *bits, int *ndx
 			line[(*ndx)++] = (uint8_t)((*bits&0xff) ^ xorMsk);
 			if (*ndx >= MAX_LINE/8 + 1) {
 				*ndx = 0;
-				errMsg = "Print line too long in graphic line.";
-				errFlag = true;
+				strcpy(ctx->errMsg, "Print line too long in graphic line.");
+				ctx->errFlag = true;
 				return;
 			}
 			*bits = 1;
@@ -243,8 +244,8 @@ void printElmnts(gs1_encoder *params, struct sPrints *prints) {
 		lineUCut[ndx] = (uint8_t)(((line[ndx]^xorMsk)&(bits&0xff))^xorMsk); // Y undercut
 		line[ndx++] = (uint8_t)((bits&0xff) ^ xorMsk);
 		if (ndx > MAX_LINE/8 + 1) {
-			errMsg = "Print line too long";
-			errFlag = true;
+			strcpy(params->errMsg, "Print line too long");
+			params->errFlag = true;
 			return;
 		}
 	}
@@ -252,8 +253,8 @@ void printElmnts(gs1_encoder *params, struct sPrints *prints) {
 		while ((ndx & 3) != 0) {
 			line[ndx++] = 0xFF; // pad to long word boundary for .BMP
 			if (ndx >= MAX_LINE/8 + 1) {
-				errMsg = "Print line too long";
-				errFlag = true;
+				strcpy(params->errMsg, "Print line too long");
+				params->errFlag = true;
 				return;
 			}
 		}

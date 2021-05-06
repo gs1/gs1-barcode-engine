@@ -29,7 +29,6 @@
 #include "rssutil.h"
 #include "cc.h"
 
-extern int errFlag;
 extern int line1;
 extern uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
 
@@ -394,8 +393,8 @@ void RSS14(gs1_encoder *params) {
 	}
 
 	if (strlen(params->dataStr) > 13) {
-		errMsg = "primary data exceeds 13 digits";
-		errFlag = true;
+		strcpy(params->errMsg, "primary data exceeds 13 digits");
+		params->errFlag = true;
 		return;
 	}
 
@@ -403,7 +402,7 @@ void RSS14(gs1_encoder *params) {
 	strcat(tempStr, params->dataStr);
 	strcpy(primaryStr, tempStr + strlen(tempStr) - 13);
 
-	if (!RSS14enc(params, (uint8_t*)primaryStr, linPattern, ccFlag) || errFlag) return;
+	if (!RSS14enc(params, (uint8_t*)primaryStr, linPattern, ccFlag) || params->errFlag) return;
 
 #if PRNT
 	printf("\n%s", primaryStr);
@@ -424,7 +423,7 @@ void RSS14(gs1_encoder *params) {
 	prints.whtFirst = true;
 	prints.reverse = false;
 	if (ccFlag) {
-		if (!((rows = CC4enc(params, (uint8_t*)ccStr, ccPattern)) > 0) || errFlag) return;
+		if (!((rows = CC4enc(params, (uint8_t*)ccStr, ccPattern)) > 0) || params->errFlag) return;
 #if PRNT
 		{
 			int j;
@@ -526,8 +525,8 @@ void RSS14S(gs1_encoder *params) {
 	}
 
 	if (strlen(params->dataStr) > 13) {
-		errMsg = "primary data exceeds 13 digits";
-		errFlag = true;
+		strcpy(params->errMsg, "primary data exceeds 13 digits");
+		params->errFlag = true;
 		return;
 	}
 
@@ -535,7 +534,7 @@ void RSS14S(gs1_encoder *params) {
 	strcat(tempStr, params->dataStr);
 	strcpy(primaryStr, tempStr + strlen(tempStr) - 13);
 
-	if (!RSS14enc(params, (uint8_t*)primaryStr, linPattern, ccFlag) || errFlag) return;
+	if (!RSS14enc(params, (uint8_t*)primaryStr, linPattern, ccFlag) || params->errFlag) return;
 #if PRNT
 	printf("\n%s", primaryStr);
 	printf("\n");
@@ -553,7 +552,7 @@ void RSS14S(gs1_encoder *params) {
 	prints.whtFirst = true;
 	prints.reverse = false;
 	if (ccFlag) {
-		if (!((rows = CC2enc(params, (uint8_t*)ccStr, ccPattern)) > 0) || errFlag) return;
+		if (!((rows = CC2enc(params, (uint8_t*)ccStr, ccPattern)) > 0) || params->errFlag) return;
 #if PRNT
 		{
 			int j;
@@ -723,8 +722,8 @@ void RSS14SO(gs1_encoder *params) {
 	}
 
 	if (strlen(params->dataStr) > 13) {
-		errMsg = "primary data exceeds 13 digits";
-		errFlag = true;
+		strcpy(params->errMsg, "primary data exceeds 13 digits");
+		params->errFlag = true;
 		return;
 	}
 
@@ -732,7 +731,7 @@ void RSS14SO(gs1_encoder *params) {
 	strcat(tempStr, params->dataStr);
 	strcpy(primaryStr, tempStr + strlen(tempStr) - 13);
 
-	if (!RSS14enc(params, (uint8_t*)primaryStr, linPattern, ccFlag) || errFlag) return;
+	if (!RSS14enc(params, (uint8_t*)primaryStr, linPattern, ccFlag) || params->errFlag) return;
 #if PRNT
 	printf("\n%s", primaryStr);
 	printf("\n");
@@ -751,7 +750,7 @@ void RSS14SO(gs1_encoder *params) {
 	prints.reverse = false;
 	if (ccFlag) {
 		chexPrnts.rightPad = RSS14_R_PADR; // pad for composite
-		if (!((rows = CC2enc(params, (uint8_t*)ccStr, ccPattern)) > 0) || errFlag) return;
+		if (!((rows = CC2enc(params, (uint8_t*)ccStr, ccPattern)) > 0) || params->errFlag) return;
 #if PRNT
 		{
 			int j;

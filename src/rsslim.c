@@ -29,7 +29,6 @@
 #include "rsslim.h"
 #include "rssutil.h"
 
-extern int errFlag;
 extern int line1;
 extern uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
 
@@ -316,8 +315,8 @@ void RSSLim(gs1_encoder *params) {
 	}
 
 	if (strlen(params->dataStr) > 13) {
-		errMsg = "primary data exceeds 13 digits";
-		errFlag = true;
+		strcpy(params->errMsg, "primary data exceeds 13 digits");
+		params->errFlag = true;
 		return;
 	}
 
@@ -325,7 +324,7 @@ void RSSLim(gs1_encoder *params) {
 	strcat(tempStr, params->dataStr);
 	strcpy(primaryStr, tempStr + strlen(tempStr) - 13);
 
-	if (!RSSLimEnc(params, (uint8_t*)primaryStr, linPattern, ccFlag) || errFlag) return;
+	if (!RSSLimEnc(params, (uint8_t*)primaryStr, linPattern, ccFlag) || params->errFlag) return;
 #if PRNT
 	printf("\n%s", primaryStr);
 	printf("\n");
@@ -345,7 +344,7 @@ void RSSLim(gs1_encoder *params) {
 	prints.whtFirst = true;
 	prints.reverse = false;
 	if (ccFlag) {
-		if (!((rows = CC3enc(params, (uint8_t*)ccStr, ccPattern)) > 0) || errFlag) return;
+		if (!((rows = CC3enc(params, (uint8_t*)ccStr, ccPattern)) > 0) || params->errFlag) return;
 #if PRNT
 		{
 			int j;

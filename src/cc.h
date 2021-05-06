@@ -56,6 +56,6 @@ bool CCCenc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[]);
 
 int check2DData(uint8_t dataStr[]);
 int pack(gs1_encoder *ctx, uint8_t str[], uint8_t bitField[]);
-void putBits(uint8_t bitField[], int bitPos, int length, uint16_t bits);
+void putBits(gs1_encoder *ctx, uint8_t bitField[], int bitPos, int length, uint16_t bits);
 
 #endif /* CC_H */

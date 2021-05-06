@@ -37,7 +37,6 @@ int rowCnt; // determined by getUnusedBitCnt
 int eccCnt; // determined by getUnusedBitCnt
 
 
-extern int errFlag;
 extern int line1;
 extern uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
 
@@ -388,8 +387,8 @@ void U128A(gs1_encoder *params) {
 	}
 
 	if (strlen(params->dataStr) > 48) {
-		errMsg = "primary data exceeds 48 characters";
-		errFlag = true;
+		strcpy(params->errMsg, "primary data exceeds 48 characters");
+		params->errFlag = true;
 		return;
 	}
 
@@ -424,7 +423,7 @@ void U128A(gs1_encoder *params) {
 	prints.whtFirst = true;
 	prints.reverse = false;
 	if (ccFlag) {
-		if (!((rows = CC4enc(params, (uint8_t*)ccStr, ccPattern)) > 0) || errFlag) return;
+		if (!((rows = CC4enc(params, (uint8_t*)ccStr, ccPattern)) > 0) || params->errFlag) return;
 #if PRNT
 		{
 			int j;
@@ -440,8 +439,8 @@ void U128A(gs1_encoder *params) {
 #endif
 
 		if (symChars < 9) {
-			errMsg = "linear component too short";
-			errFlag = true;
+			strcpy(params->errMsg, "linear component too short");
+			params->errFlag = true;
 			return;
 		}
 
@@ -544,8 +543,8 @@ void U128C(gs1_encoder *params) {
 	}
 
 	if (strlen(params->dataStr) > 48) {
-		errMsg = "primary data exceeds 48 characters";
-		errFlag = true;
+		strcpy(params->errMsg, "primary data exceeds 48 characters");
+		params->errFlag = true;
 		return;
 	}
 
@@ -571,8 +570,8 @@ void U128C(gs1_encoder *params) {
 
 	colCnt = ((symChars*11 + 22 - UCC128_L_PAD - 5)/17) -4;
 	if (colCnt < 1) {
-		errMsg = "UCC-128 too small";
-		errFlag = true;
+		strcpy(params->errMsg, "UCC-128 too small");
+		params->errFlag = true;
 		return;
 	}
 	line1 = true; // so first line is not Y undercut
@@ -586,7 +585,7 @@ void U128C(gs1_encoder *params) {
 	prints.whtFirst = true;
 	prints.reverse = false;
 	if (ccFlag) {
-		if (!CCCenc(params, (uint8_t*)ccStr, patCCC) || errFlag) return;
+		if (!CCCenc(params, (uint8_t*)ccStr, patCCC) || params->errFlag) return;
 #if PRNT
 		{
 			int j;

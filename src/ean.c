@@ -28,7 +28,6 @@
 #include "ean.h"
 
 
-extern int errFlag;
 extern int line1;
 extern uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
 
@@ -122,8 +121,8 @@ void EAN13(gs1_encoder *params) {
 	}
 
 	if (strlen(params->dataStr) > 12) {
-		errMsg = "primary data exceeds 12 digits";
-		errFlag = true;
+		strcpy(params->errMsg, "primary data exceeds 12 digits");
+		params->errFlag = true;
 		return;
 	}
 
@@ -132,7 +131,7 @@ void EAN13(gs1_encoder *params) {
 	strcat(tempStr, "0"); // check digit = 0 for now
 	strcpy(primaryStr, tempStr + strlen(tempStr) - 13);
 
-	if (!EAN13enc((uint8_t*)primaryStr, linPattern) || errFlag) return;
+	if (!EAN13enc((uint8_t*)primaryStr, linPattern) || params->errFlag) return;
 #if PRNT
 	printf("\n%s", primaryStr);
 	printf("\n");
@@ -161,7 +160,7 @@ void EAN13(gs1_encoder *params) {
 	sepPrnt.whtFirst = true;
 	sepPrnt.reverse = false;
 	if (ccFlag) {
-		if (!((rows = CC4enc(params, (uint8_t*)ccStr, ccPattern)) > 0) || errFlag) return;
+		if (!((rows = CC4enc(params, (uint8_t*)ccStr, ccPattern)) > 0) || params->errFlag) return;
 #if PRNT
 		{
 			int j;
@@ -328,8 +327,8 @@ void EAN8(gs1_encoder *params) {
 	}
 
 	if (strlen(params->dataStr) > 12) {
-		sprintf(errMsg, "primary data exceeds 12 digits");
-		errFlag = true;
+		sprintf(params->errMsg, "primary data exceeds 12 digits");
+		params->errFlag = true;
 		return;
 	}
 
@@ -338,7 +337,7 @@ void EAN8(gs1_encoder *params) {
 	strcat(tempStr, "0"); // check digit = 0 for now
 	strcpy(primaryStr, tempStr + strlen(tempStr) - 13);
 
-	if (!EAN8enc((uint8_t*)primaryStr, linPattern) || errFlag) return;
+	if (!EAN8enc((uint8_t*)primaryStr, linPattern) || params->errFlag) return;
 #if PRNT
 	printf("\n%s", primaryStr);
 	printf("\n");
@@ -370,7 +369,7 @@ void EAN8(gs1_encoder *params) {
 	sepPrnt.whtFirst = true;
 	sepPrnt.reverse = false;
 	if (ccFlag) {
-		if (!((rows = CC3enc(params, (uint8_t*)ccStr, ccPattern)) > 0) || errFlag) return;
+		if (!((rows = CC3enc(params, (uint8_t*)ccStr, ccPattern)) > 0) || params->errFlag) return;
 		if (rows > MAX_CCA3_ROWS) { // CCB composite
 			lpadEAN = EAN8_L_PADB;
 			lpadCC = 0;
@@ -468,7 +467,7 @@ void EAN8(gs1_encoder *params) {
 #define UPCE_R_PAD	5	// UPCE_W - MAX_WIDTH - UPCE_L_PAD
 
 // call with str = 13-digit primary with check digit = 0
-static bool UPCEenc(uint8_t str[], uint8_t pattern[] ) {
+static bool UPCEenc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[] ) {
 
 	static const uint16_t upcTblA[10] = {	0x3211, 0x2221, 0x2122, 0x1411, 0x1132,
 					0x1231, 0x1114, 0x1312, 0x1213, 0x3112 };
@@ -523,8 +522,8 @@ static bool UPCEenc(uint8_t str[], uint8_t pattern[] ) {
 		data6[5] = str[11];
 	}
 	else {
-		errMsg = "Data cannot be converted to UPC-E";
-		errFlag = true;
+		strcpy(ctx->errMsg, "Data cannot be converted to UPC-E");
+		ctx->errFlag = true;
 		return(false);
 	}
 
@@ -581,8 +580,8 @@ void UPCE(gs1_encoder *params) {
 	}
 
 	if (strlen(params->dataStr) > 12) {
-		sprintf(errMsg, "primary data exceeds 12 digits");
-		errFlag = true;
+		sprintf(params->errMsg, "primary data exceeds 12 digits");
+		params->errFlag = true;
 		return;
 	}
 
@@ -591,7 +590,7 @@ void UPCE(gs1_encoder *params) {
 	strcat(tempStr, "0"); // check digit = 0 for now
 	strcpy(primaryStr, tempStr + strlen(tempStr) - 13);
 
-	if (!UPCEenc((uint8_t*)primaryStr, linPattern) || errFlag) return;
+	if (!UPCEenc(params, (uint8_t*)primaryStr, linPattern) || params->errFlag) return;
 #if PRNT
 	printf("\n%s", primaryStr);
 	printf("\n");
@@ -620,7 +619,7 @@ void UPCE(gs1_encoder *params) {
 	sepPrnt.whtFirst = true;
 	sepPrnt.reverse = false;
 	if (ccFlag) {
-		if (!((rows = CC2enc(params, (uint8_t*)ccStr, ccPattern)) > 0) || errFlag) return;
+		if (!((rows = CC2enc(params, (uint8_t*)ccStr, ccPattern)) > 0) || params->errFlag) return;
 #if PRNT
 		{
 			int j;

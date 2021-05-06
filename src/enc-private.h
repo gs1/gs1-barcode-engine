@@ -70,7 +70,7 @@ struct gs1_encoder {
 	// per-instance globals
 	FILE *outfp;
 	int errFlag;
-	char* errMsg;
+	char errMsg[512];
 	int rowWidth;
 	int line1;
 	int linFlag; 		// tells pack whether linear or cc is being encoded
@@ -91,8 +91,6 @@ struct gs1_encoder {
 };
 
 // globals   TODO hoist
-int errFlag;
-char* errMsg;
 int rowWidth;
 int line1;
 int linFlag; // tells pack whether linear or cc is being encoded

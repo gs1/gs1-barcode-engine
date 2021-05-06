@@ -42,6 +42,8 @@ gs1_encoder* gs1_encoder_init(void) {
 	strcpy(ctx->outFile, "out.tif");
 	ctx->sym = sNONE;
 	ctx->inputFlag = 0; // for kbd input
+	ctx->errFlag = false;
+	ctx->errMsg[0] = '\0';
 
 	return ctx;
 
@@ -184,20 +186,17 @@ bool gs1_encoder_encode(gs1_encoder *ctx) {
 
 	FILE *iFile, *oFile;
 
-	errMsg = "";
-	errFlag = false;
+	if (!ctx) return false;
 
-	if (!ctx) {
-		errFlag = true;
-		goto out;
-	}
+	ctx->errMsg[0] = '\0';
+	ctx->errFlag = false;
 
 	if (ctx->inputFlag == 1) {
 		size_t i;
 		if ((iFile = fopen(ctx->dataFile, "r")) == NULL) {
-			sprintf(errMsg, "UNABLE TO OPEN %s FILE", ctx->dataFile);
-			errFlag = true;
-			goto out;
+			sprintf(ctx->errMsg, "UNABLE TO OPEN %s FILE", ctx->dataFile);
+			ctx->errFlag = true;
+			return false;
 		}
 		i = fread(ctx->dataStr, sizeof(char), MAX_DATA, iFile);
 		while (i > 0 && ctx->dataStr[i-1] < 32) i--; // strip trailing CRLF etc.
@@ -206,9 +205,9 @@ bool gs1_encoder_encode(gs1_encoder *ctx) {
 	}
 
 	if ((oFile = fopen(ctx->outFile, "wb")) == NULL) {
-		sprintf(errMsg, "UNABLE TO OPEN %s FILE", ctx->outFile);
-		errFlag = true;
-		goto out;
+		sprintf(ctx->errMsg, "UNABLE TO OPEN %s FILE", ctx->outFile);
+		ctx->errFlag = true;
+		return false;
 	}
 	ctx->outfp = oFile;
 
@@ -257,17 +256,14 @@ bool gs1_encoder_encode(gs1_encoder *ctx) {
 			break;
 
 		default:
-			sprintf(errMsg, "Unknown symbology type %d", ctx->sym);
-			errFlag = true;
+			sprintf(ctx->errMsg, "Unknown symbology type %d", ctx->sym);
+			ctx->errFlag = true;
 			break;
 
 	}
 
 	fclose(oFile);
 
-out:
-
-	ctx->errMsg = errFlag ? errMsg : "";  // TODO disappears
-	return !errFlag;
+	return !ctx->errFlag;
 
 }

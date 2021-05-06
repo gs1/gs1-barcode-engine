@@ -28,7 +28,6 @@
 #include "rssexp.h"
 #include "rssutil.h"
 
-extern int errFlag;
 extern int rowWidth;
 extern int line1;
 extern int linFlag; // tells pack whether linear or cc is being encoded
@@ -183,18 +182,18 @@ static int RSS14Eenc(gs1_encoder *ctx, uint8_t string[], uint8_t bars[RSSEXP_MAX
 	weight = 0;
 
 	if (((i=check2DData(string)) != 0) || ((i=isSymbolSepatator(string)) != 0)) {
-		sprintf(errMsg, "illegal character in RSS Expanded data = '%c'", string[i]);
-		errFlag = true;
+		sprintf(ctx->errMsg, "illegal character in RSS Expanded data = '%c'", string[i]);
+		ctx->errFlag = true;
 		return(0);
 	}
 #if PRNT
 	printf("%s\n", string);
 #endif
-	putBits(bitField, 0, 1, (uint16_t)ccFlag); // 2D linkage bit
+	putBits(ctx, bitField, 0, 1, (uint16_t)ccFlag); // 2D linkage bit
 	size = pack(ctx, string, bitField);
 	if (size < 0) {
-		errMsg = "data error";
-		errFlag = true;
+		strcpy(ctx->errMsg, "data error");
+		ctx->errFlag = true;
 		return(0);
 	}
 
@@ -278,8 +277,8 @@ void RSSExp(gs1_encoder *params) {
 	if (ccStr == NULL) ccFlag = false;
 	else {
 		if (params->segWidth < 4) {
-			errMsg = "Composite must be at least 4 segments wide";
-			errFlag = true;
+			strcpy(params->errMsg, "Composite must be at least 4 segments wide");
+			params->errFlag = true;
 			return;
 		}
 		ccFlag = true;
@@ -288,7 +287,7 @@ void RSSExp(gs1_encoder *params) {
 	}
 
 	rowWidth = params->segWidth; // save for getUnusedBitCnt
-	if (!((segs = RSS14Eenc(params, (uint8_t*)params->dataStr, dblPattern, ccFlag)) > 0) || errFlag) return;
+	if (!((segs = RSS14Eenc(params, (uint8_t*)params->dataStr, dblPattern, ccFlag)) > 0) || params->errFlag) return;
 
 	lNdx = 0;
 	for (i = 0; i < segs-1; i += 2) {
@@ -341,7 +340,7 @@ void RSSExp(gs1_encoder *params) {
 #endif
 	line1 = true; // so first line is not Y undercut
 	if (ccFlag) {
-		if (!((rows = CC4enc(params, (uint8_t*)ccStr, ccPattern)) > 0) || errFlag) return;
+		if (!((rows = CC4enc(params, (uint8_t*)ccStr, ccPattern)) > 0) || params->errFlag) return;
 #if PRNT
 		printf("\n%s", ccStr);
 		printf("\n");
