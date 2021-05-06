@@ -21,6 +21,8 @@
 #ifndef RSSEXP_H
 #define RSSEXP_H
 
-void RSSExp(struct sParams *params);
+#include "enc-private.h"
+
+void RSSExp(gs1_encoder *params);
 
 #endif

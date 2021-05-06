@@ -21,7 +21,9 @@
 #ifndef UCC128_H
 #define UCC128_H
 
-void U128A(struct sParams *params);
-void U128C(struct sParams *params);
+#include "enc-private.h"
+
+void U128A(gs1_encoder *params);
+void U128C(gs1_encoder *params);
 
 #endif

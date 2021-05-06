@@ -23,7 +23,40 @@
 #include "enc-private.h"
 #include "rssutil.h"
 
-static int combins(int n, int r);
+
+/*
+ * combins(n,r): returns the number of Combinations of r selected from n:
+ *		Combinations = n! /( n-r! * r!)
+ *
+ */
+static int combins(int n, int r) {
+
+	int i, j;
+	int maxDenom, minDenom;
+	int val;
+
+	if (n-r > r) {
+		minDenom = r;
+		maxDenom = n-r;
+	}
+	else {
+		minDenom = n-r;
+		maxDenom = r;
+	}
+	val = 1;
+	j = 1;
+	for (i = n; i > maxDenom; i--) {
+		val *= i;
+		if (j <= minDenom) {
+			val /= j;
+			j++;
+		}
+	}
+	for ( ; j <= minDenom; j++) {
+		val /= j;
+	}
+	return(val);
+}
 
 
 /**********************************************************************
@@ -97,7 +130,7 @@ static struct sPrints prntSep;
 static uint8_t sepPattern[MAX_SEP_ELMNTS];
 
 // copies pattern for separator adding 9 narrow elements inside each finder
-struct sPrints *cnvSeparator(struct sParams *params, struct sPrints *prints)
+struct sPrints *cnvSeparator(gs1_encoder *params, struct sPrints *prints)
 {
 	int i, j, k;
 
@@ -195,39 +228,4 @@ struct sPrints *cnvSeparator(struct sParams *params, struct sPrints *prints)
 	}
 	prntSep.elmCnt = j+1;
 	return(&prntSep);
-}
-
-
-/*
- * combins(n,r): returns the number of Combinations of r selected from n:
- *		Combinations = n! /( n-r! * r!)
- *
- */
-static int combins(int n, int r) {
-
-	int i, j;
-	int maxDenom, minDenom;
-	int val;
-
-	if (n-r > r) {
-		minDenom = r;
-		maxDenom = n-r;
-	}
-	else {
-		minDenom = n-r;
-		maxDenom = r;
-	}
-	val = 1;
-	j = 1;
-	for (i = n; i > maxDenom; i--) {
-		val *= i;
-		if (j <= minDenom) {
-			val /= j;
-			j++;
-		}
-	}
-	for ( ; j <= minDenom; j++) {
-		val /= j;
-	}
-	return(val);
 }

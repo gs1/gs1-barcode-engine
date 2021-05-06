@@ -21,8 +21,10 @@
 #ifndef RSS14_H
 #define RSS14_H
 
-void RSS14(struct sParams *params);
-void RSS14S(struct sParams *params);
-void RSS14SO(struct sParams *params);
+#include "enc-private.h"
+
+void RSS14(gs1_encoder *params);
+void RSS14S(gs1_encoder *params);
+void RSS14SO(gs1_encoder *params);
 
 #endif

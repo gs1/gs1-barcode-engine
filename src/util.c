@@ -26,10 +26,11 @@
 
 #define MAX_LINE 6032 // 10 inches wide at 600 dpi
 
+
+// TODO move into context
 static uint8_t line[MAX_LINE/8 + 1];
 static uint8_t lineUCut[MAX_LINE/8 + 1];
 
-static void printElm(int width, int color, int *bits, int *ndx, uint8_t xorMsk);
 
 void bmpHeader(long xdim, long ydim, FILE *oFile) {
 
@@ -63,6 +64,7 @@ void bmpHeader(long xdim, long ydim, FILE *oFile) {
 	fwrite(&id, sizeof(id), 1, oFile);
 	fwrite(&header, sizeof(header), 1, oFile);
 }
+
 
 void tifHeader(long xdim, long ydim, FILE *oFile) {
 
@@ -131,9 +133,31 @@ void tifHeader(long xdim, long ydim, FILE *oFile) {
 }
 
 
+static void printElm(int width, int color, int *bits, int *ndx, uint8_t xorMsk) {
+
+	int i;
+
+	for (i = 0; i < width; i++) {
+		*bits = (*bits<<1) + color;
+		if (*bits > 0xff) {
+			lineUCut[*ndx] = (uint8_t)(((line[*ndx]^xorMsk)&(*bits&0xff))^xorMsk); // Y undercut
+			line[(*ndx)++] = (uint8_t)((*bits&0xff) ^ xorMsk);
+			if (*ndx >= MAX_LINE/8 + 1) {
+				*ndx = 0;
+				errMsg = "Print line too long in graphic line.";
+				errFlag = true;
+				return;
+			}
+			*bits = 1;
+		}
+	}
+	return;
+}
+
+
 #define WHITE 0
 
-void printElmnts(struct sParams *params, struct sPrints *prints) {
+void printElmnts(gs1_encoder *params, struct sPrints *prints) {
 
 	int i, bits, width, ndx, white;
 	uint8_t xorMsk;
@@ -243,27 +267,6 @@ void printElmnts(struct sParams *params, struct sPrints *prints) {
 	}
 	for ( ; i < prints->height; i++) {
 		fwrite(line, sizeof(uint8_t), (size_t)ndx, params->outfp);
-	}
-	return;
-}
-
-static void printElm(int width, int color, int *bits, int *ndx, uint8_t xorMsk) {
-
-	int i;
-
-	for (i = 0; i < width; i++) {
-		*bits = (*bits<<1) + color;
-		if (*bits > 0xff) {
-			lineUCut[*ndx] = (uint8_t)(((line[*ndx]^xorMsk)&(*bits&0xff))^xorMsk); // Y undercut
-			line[(*ndx)++] = (uint8_t)((*bits&0xff) ^ xorMsk);
-			if (*ndx >= MAX_LINE/8 + 1) {
-				*ndx = 0;
-				errMsg = "Print line too long in graphic line.";
-				errFlag = true;
-				return;
-			}
-			*bits = 1;
-		}
 	}
 	return;
 }

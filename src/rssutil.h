@@ -24,6 +24,6 @@
 #include "enc-private.h"
 
 int *getRSSwidths(int val, int n, int elements, int maxWidth, int noNarrow);
-struct sPrints *cnvSeparator(struct sParams *params, struct sPrints *prints);
+struct sPrints *cnvSeparator(gs1_encoder *params, struct sPrints *prints);
 
 #endif /* RSSUTIL_H */

@@ -21,9 +21,10 @@
 #ifndef EAN_H
 #define EAN_H
 
-void RSS14(struct sParams *params);
-void EAN13(struct sParams *params);
-void EAN8(struct sParams *params);
-void UPCE(struct sParams *params);
+#include "enc-private.h"
+
+void EAN13(gs1_encoder *params);
+void EAN8(gs1_encoder *params);
+void UPCE(gs1_encoder *params);
 
 #endif

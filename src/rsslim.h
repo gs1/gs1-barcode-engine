@@ -21,6 +21,8 @@
 #ifndef RSSLIM_H
 #define RSSLIM_H
 
-void RSSLim(struct sParams *params);
+#include "enc-private.h"
+
+void RSSLim(gs1_encoder *params);
 
 #endif

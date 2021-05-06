@@ -46,11 +46,12 @@ extern int errFlag;
 extern int line1;
 extern uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
 
+// TODO move into context
 static struct sPrints prntSep;
 static uint8_t sepPattern[SYM_W/2+2];
 
 // RSS14 Stacked row separator pattern routine
-static struct sPrints *separator14S(struct sParams *params, struct sPrints *prints) {
+static struct sPrints *separator14S(gs1_encoder *params, struct sPrints *prints) {
 
 	int i, j, k, lNdx, rNdx, sNdx, lWidth, rWidth, matchWidth;
 
@@ -377,7 +378,7 @@ static bool RSS14enc(uint8_t string[], uint8_t bars[], int ccFlag) {
 }
 
 
-void RSS14(struct sParams *params) {
+void RSS14(gs1_encoder *params) {
 
 	struct sPrints prints;
 	struct sPrints *prntCnv;
@@ -516,7 +517,7 @@ void RSS14(struct sParams *params) {
 }
 
 
-void RSS14S(struct sParams *params) {
+void RSS14S(gs1_encoder *params) {
 
 	struct sPrints prints;
 	struct sPrints *prntCnv;
@@ -699,7 +700,7 @@ void RSS14S(struct sParams *params) {
 }
 
 
-void RSS14SO(struct sParams *params) {
+void RSS14SO(gs1_encoder *params) {
 
 	struct sPrints prints;
 	struct sPrints chexPrnts;

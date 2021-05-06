@@ -18,397 +18,256 @@
  *
  */
 
+#include <stdlib.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include <stdlib.h>
 #include <string.h>
-#include "enc.h"
 
-#define RELEASE __DATE__
-
-// Some limits for user input
-#define MAX_PIXMULT 12
-#define MAX_KEYDATA 120
-#define MAX_LINHT 500 // max UCC/EAN-128 height in X
+#include "enc-private.h"
 
 
-static const char* SYMBOLOGY_NAMES[] =
-{
-	"",  // Spacer
-	"GS1 DataBar",
-	"GS1 DataBar Truncated",
-	"GS1 DataBar Stacked",
-	"GS1 DataBar Stacked Omnidirectional",
-	"GS1 DataBar Limited",
-	"GS1 DataBar Expanded (Stacked)",
-	"UPC-A",
-	"UPC-E",
-	"EAN-13",
-	"EAN-8",
-	"GS1-128 with CC-A or CC-B",
-	"GS1-128 with CC-C"
-};
+gs1_encoder* gs1_encoder_init(void) {
 
-// Replacement for the deprecated gets(3) function
-static char* gets(char* in) {
+	gs1_encoder *ctx = malloc(sizeof(gs1_encoder));
+	if (ctx == NULL) return NULL;
 
-	char* s;
+	// Set default parameters
+	ctx->pixMult = 1;
+	ctx->Xundercut = 0;
+	ctx->Yundercut = 0;
+	ctx->sepHt = 1;
+	ctx->bmp = false;
+	ctx->segWidth = 22;
+	ctx->linHeight = 25;
+	strcpy(ctx->outFile, "out.tif");
+	ctx->sym = sNONE;
+	ctx->inputFlag = 0; // for kbd input
 
-	s = fgets(in,MAX_KEYDATA+1,stdin);
-	if (s != NULL) {
-		s[strcspn(s, "\r\n")] = 0;
-	}
-	return s;
+	return ctx;
+
 }
 
-static bool getSym(struct sParams *params) {
 
-	char inpStr[MAX_KEYDATA+1];
-	int i;
-
-	while (true) {
-		printf("\nGS1 Encoders (Built " RELEASE "):");
-		printf("\n\nCopyright (c) 2020 GS1 AISBL. License: Apache-2.0");
-		printf("\n\nMAIN MENU:");
-		printf("\n 0)  Exit Program");
-		for (i = 1; i < sNUMSYMS; i += 2) {
-			printf("\n%2d)  %-25s     %2d)  %-25s",
-				i, SYMBOLOGY_NAMES[i], i + 1, SYMBOLOGY_NAMES[i + 1]);
-		}
-		printf("\n\nEnter symbology type or 0 to exit: ");
-		if (gets(inpStr) == NULL) {
-			printf("PLEASE ENTER 0 THROUGH 12.");
-			continue;
-		}
-		params->sym = atoi(inpStr);
-		if (params->sym == 0) {
-			return(false);
-		}
-		if (params->sym > 12) {
-			printf("PLEASE ENTER 0 THROUGH 12.");
-			continue;
-		}
-		return(true);
-	}
+void gs1_encoder_free(gs1_encoder *ctx) {
+	if (ctx == NULL) return;
+	free(ctx);
+	ctx = NULL;
 }
 
-static bool userInt(struct sParams *params) {
 
-	int inMenu = true;
-	int retFlag = true; // return is false if exit program
-	char inpStr[MAX_KEYDATA+1];
-	int menuVal, i;
-
-	while (inMenu) {
-		if (params->sym == sNONE) {
-			if (!getSym(params)) {
-				printf("DONE.\n");
-				return(false);
-			}
-		}
-		printf("\n\nData input string or file format:");
-		switch (params->sym) {
-			case sRSS14:
-			case sRSS14T:
-			case sRSS14S:
-			case sRSS14SO:
-			case sRSSLIM:
-				printf("\n Primary data is up to 13 digits. Check digit must be omitted.");
-				printf("\n 2D component data starts with 1st AI. Only interior FNC1s are needed.");
-				break;
-			case sRSSEXP:
-				printf("\n GS1 DataBar Expanded (& 2D component) data starts with 1st AI. Only interior FNC1s are needed.");
-				printf("\nSpecial data input characters:");
-				break;
-			case sUPCA:
-				printf("\n Primary data is up to 11 digits. Check digit must be omitted.");
-				printf("\n 2D component data starts with 1st AI. Only interior FNC1s are necessary.");
-				break;
-			case sUPCE:
-				printf("\n Primary data (not zero suppressed) is up to 10 digits. Check digit must be omitted.");
-				printf("\n 2D component data starts with 1st AI. Only interior FNC1s are necessary.");
-				break;
-			case sEAN13:
-				printf("\n Primary data is up to 12 digits. Check digit must be omitted.");
-				printf("\n 2D component data starts with 1st AI. Only interior FNC1s are necessary.");
-				break;
-			case sEAN8:
-				printf("\n Primary data is up to 7 digits. Check digit must be omitted.");
-				printf("\n 2D component data starts with 1st AI. Only interior FNC1s are necessary.");
-				break;
-			case sUCC128_CCA:
-			case sUCC128_CCC:
-				printf("\n Code 128 data starts with 1st AI. Only interior FNC1s are necessary.");
-				printf("\n 2D component data starts with 1st AI. Only interior FNC1s are necessary.");
-				break;
-			default:
-				printf("\nSYMBOL TYPE ERROR.");
-				return(false);
-		}
-		printf("\n Special characters:");
-		printf("\n   # (pound sign):   FNC1");
-		printf("\n   | (vertical bar): Separates primary and secondary data");
-		printf("\n   ^ (caret):        Symbol separator used to flag ]e1n format in 2D data");
-		printf("\n\nMENU (Symbology: %s):", SYMBOLOGY_NAMES[params->sym]);
-		printf("\n 0) Enter pixels per X. Current value = %d", params->pixMult);
-		printf("\n 1) Enter X pixels to undercut. Current value = %d", params->Xundercut);
-		printf("\n 2) Enter Y pixels to undercut. Current value = %d", params->Yundercut);
-		printf("\n 3) Enter %s output file name. Current name = %s",
-							 (params->bmp) ? "BMP":"TIF", params->outFile);
-		printf("\n 4) Select keyboard or file input source. Current = %s",
-							 (params->inputFlag == 0) ? "keyboard":"file");
-		if (params->inputFlag == 0) { // for kbd input
-			printf("\n 5) Key enter data input string. %s output file will be created.",
-							 (params->bmp) ? "BMP":"TIF");
-		}
-		else {
-			printf("\n 5) Enter data input file name. %s output file will be created.",
-							 (params->bmp) ? "BMP":"TIF");
-		}
-		printf("\n 6) Select TIF or BMP format. Current = %s",
-							 (params->bmp) ? "BMP":"TIF");
-		if (params->sym == sRSSEXP) {
-			printf("\n 7) Select maximum segments per row. Current value = %d", params->segWidth);
-		}
-		if ((params->sym == sUCC128_CCA) || (params->sym == sUCC128_CCC)) {
-			printf("\n 7) Enter GS1-128 height in X. Current value = %d",
-								params->linHeight);
-		}
-		printf("\n 8) Enter separator row height. Current value = %d", params->sepHt);
-		printf("\n 9) Select another symbology or exit program");
-		printf("\n\nMenu selection: ");
-		if (gets(inpStr) == NULL) {
-			printf("UNKNOWN OPTION. PLEASE ENTER 1 THROUGH 9.");
-			continue;
-		}
-		menuVal = atoi(inpStr);
-		switch (menuVal) {
-			case 0:
-				printf("\nEnter pixels per X. 1-%d valid: ",MAX_PIXMULT);
-				if (gets(inpStr) == NULL) {
-					printf("UNKNOWN. PLEASE ENTER 1 THROUGH %d.",MAX_PIXMULT);
-					continue;
-				}
-				i = atoi(inpStr);
-				if (i < 1 || i > MAX_PIXMULT) {
-					printf("OUT OF RANGE. PLEASE ENTER 1 THROUGH %d.",MAX_PIXMULT);
-					continue;
-				}
-				params->pixMult = i;
-				if (i <= params->Xundercut) {
-					printf("RESETTING X UNDERCUT TO 0.");
-					params->Xundercut = 0;
-				}
-				if (i <= params->Yundercut) {
-					printf("RESETTING Y UNDERCUT TO 0.");
-					params->Yundercut = 0;
-				}
-				if (i*2 < params->sepHt || i > params->sepHt) {
-					printf("RESETTING SEPRATOR HEIGHT TO %d.", i);
-					params->sepHt = i;
-				}
-				break;
-			case 1:
-				if (params->pixMult > 1) {
-					printf("\nEnter X pixels to undercut. 0 through %d valid: ",
-										params->pixMult-1);
-					if (gets(inpStr) == NULL) {
-						printf("UNKNOWN. PLEASE ENTER 0 THROUGH %d.",
-										params->pixMult-1);
-						continue;
-					}
-					i = atoi(inpStr);
-					if (i < 0 || i > params->pixMult-1) {
-						printf("OUT OF RANGE. PLEASE ENTER 0 THROUGH %d",
-										params->pixMult-1);
-						continue;
-					}
-					params->Xundercut = i;
-				}
-				else {
-					printf("NO UNDERCUT WHEN 1 PIXEL PER X");
-				}
-				break;
-			case 2:
-				if (params->pixMult > 1) {
-					printf("\nEnter Y pixels to undercut. 0 through %d valid: ",
-										params->pixMult-1);
-					if (gets(inpStr) == NULL) {
-						printf("UNKNOWN. PLEASE ENTER 0 THROUGH %d.",
-										params->pixMult-1);
-						continue;
-					}
-					i = atoi(inpStr);
-					if (i < 0 || i > params->pixMult-1) {
-						printf("OUT OF RANGE. PLEASE ENTER 0 THROUGH %d",
-										params->pixMult-1);
-						continue;
-					}
-					params->Yundercut = i;
-				}
-				else {
-					printf("NO UNDERCUT WHEN 1 PIXEL PER X");
-				}
-				break;
-			case 3:
-				printf("\nEnter %s output file name with extension: ",
-							 (params->bmp) ? "BMP":"TIF");
-				if (gets(inpStr) == NULL) {
-					printf("UNKNOWN ENTRY.");
-					continue;
-				}
-				if (strlen(inpStr) > MAX_FNAME) {
-					printf("NOT ACCEPTED. MUST BE 25 CHARACTERS OR FEWER.");
-					continue;
-				}
-				strcpy(params->outFile, inpStr);
-				break;
-			case 4:
-				printf("\nEnter 0 for keyboard or 1 for file input: ");
-				if (gets(inpStr) == NULL) {
-					printf("UNKNOWN. PLEASE ENTER 0 or 1.");
-					continue;
-				}
-				i = atoi(inpStr);
-				if (!(i == 0 || i == 1)) {
-					printf("OUT OF RANGE. PLEASE ENTER 0 or 1");
-					continue;
-				}
-				params->inputFlag = i;
-				break;
-			case 5:
-			 if (params->inputFlag == 0) { // for kbd input
-				printf("\nEnter linear|2d data. No more than %d characters: ", MAX_KEYDATA);
-				if (gets(inpStr) == NULL) {
-					printf("UNKNOWN ENTRY.");
-					continue;
-				}
-				strcpy(params->dataStr, inpStr);
-				inMenu = false;
-			 }
-			 else {
-				printf("\nEnter data input file name: ");
-				if (gets(inpStr) == NULL) {
-					printf("UNKNOWN ENTRY.");
-					continue;
-				}
-				if (strlen(inpStr) > MAX_FNAME) {
-					printf("NOT ACCEPTED. MUST BE 25 CHARACTERS OR FEWER.");
-					continue;
-				}
-				strcpy(params->dataFile, inpStr);
-				inMenu = false;
-			 }
-			 break;
-			case 6:
-				printf("\nEnter 0 for TIF or 1 for BMP output: ");
-				if (gets(inpStr) == NULL) {
-					printf("UNKNOWN. PLEASE ENTER 0 or 1.");
-					continue;
-				}
-				i = atoi(inpStr);
-				if (!(i == 0 || i == 1)) {
-					printf("OUT OF RANGE. PLEASE ENTER 0 or 1");
-					continue;
-				}
-				if (params->bmp != i) {
-					if (i == 0) {
-						strcpy(params->outFile, "out.tif");
-					}
-					else {
-						strcpy(params->outFile, "out.bmp");
-					}
-				}
-				params->bmp = i;
-				break;
-			case 7:
-			 if (params->sym == sRSSEXP) {
-				printf("\nEnter maximum segments per row. Even values 2 to 22 valid: ");
-				if (gets(inpStr) == NULL) {
-					printf("UNKNOWN. PLEASE ENTER 2 THROUGH 22.");
-					continue;
-				}
-				i = atoi(inpStr);
-				if (i < 2 || i > 22) {
-					printf("OUT OF RANGE. PLEASE ENTER 2 THROUGH 22.");
-					continue;
-				}
-				if (i & 1) {
-					printf("ODD NUMBER. PLEASE ENTER AN EVEN NUMBER 2 TO 22.");
-					continue;
-				}
-				params->segWidth = i;
-			 }
-			 else if ((params->sym == sUCC128_CCA) || (params->sym == sUCC128_CCC)) {
-				printf("\nEnter UCC/EAN-128 height in X. 1-%d valid: ",MAX_LINHT);
-				if (gets(inpStr) == NULL) {
-					printf("UNKNOWN. PLEASE ENTER 1 THROUGH %d.",MAX_LINHT);
-					continue;
-				}
-				i = atoi(inpStr);
-				if (i < 1 || i > MAX_LINHT) {
-					printf("OUT OF RANGE. PLEASE ENTER 1 THROUGH %d.",MAX_LINHT);
-					continue;
-				}
-				params->linHeight = i;
-			 }
-			 else {
-				printf("7 NOT A VALID SELECTION.");
-			 }
-			 break;
-			case 8:
-				printf("\nEnter separator row height %d through %d valid: ",
-										params->pixMult, 2*params->pixMult);
-				if (gets(inpStr) == NULL) {
-					printf("UNKNOWN. PLEASE ENTER %d THROUGH %d.",
-									params->pixMult, 2*params->pixMult);
-					continue;
-				}
-				i = atoi(inpStr);
-				if (i < params->pixMult || i > 2*params->pixMult) {
-					printf("OUT OF RANGE. PLEASE ENTER %d THROUGH %d",
-									params->pixMult, 2*params->pixMult);
-					continue;
-				}
-				params->sepHt = i;
-				break;
-			case 9:
-				params->sym = sNONE;
-				break;
-			default:
-				printf("OUT OF RANGE. PLEASE ENTER 1 THROUGH 9.");
-		}
-	}
-	return(retFlag);
+int gs1_encoder_getSym(gs1_encoder *ctx) {
+	if (ctx == NULL) return -1;
+	return ctx->sym;
+}
+void gs1_encoder_setSym(gs1_encoder *ctx, int sym) {
+	if (ctx == NULL) return;
+	ctx->sym = sym;
 }
 
-int main(int argc, char *argv[]) {
 
-	// Silence compiler
-	(void)argc;
-	(void)argv;
+int gs1_encoder_getInputFlag(gs1_encoder *ctx) {
+	if (ctx == NULL) return -1;
+	return ctx->inputFlag;
+}
+void gs1_encoder_setInputFlag(gs1_encoder *ctx, int inputFlag) {
+	if (ctx == NULL) return;
+	ctx->inputFlag = inputFlag;
+}
 
-	struct sParams params;
 
-	params.pixMult = 1; // init params
-	params.Xundercut = 0;
-	params.Yundercut = 0;
-	params.sepHt = 1;
-	params.bmp = false;
-	params.segWidth = 22;
-	params.linHeight = 25;
-	strcpy(params.outFile, "out.tif");
-	params.sym = sNONE;
-	params.inputFlag = 0; // for kbd input
+int gs1_encoder_getPixMult(gs1_encoder *ctx) {
+	if (ctx == NULL) return -1;
+	return ctx->pixMult;
+}
+void gs1_encoder_setPixMult(gs1_encoder *ctx, int pixMult) {
+	if (ctx == NULL) return;
+	ctx->pixMult = pixMult;
+}
 
-	while (userInt(&params)) {
-		if (!encode(&params)) {
-			if (params.errMsg[0] != '\0') printf("\nERROR: %s\n", params.errMsg);
-			else printf("\nAn error occurred\n");
-			continue;
-		}
-		printf("\n%s created.", params.outFile);
+
+int gs1_encoder_getXundercut(gs1_encoder *ctx) {
+	if (ctx == NULL) return -1;
+	return ctx->Xundercut;
+}
+void gs1_encoder_setXundercut(gs1_encoder *ctx, int Xundercut) {
+	if (ctx == NULL) return;
+	ctx->Xundercut = Xundercut;
+}
+
+
+int gs1_encoder_getYundercut(gs1_encoder *ctx) {
+	if (ctx == NULL) return -1;
+	return ctx->Yundercut;
+}
+void gs1_encoder_setYundercut(gs1_encoder *ctx, int Yundercut) {
+	if (ctx == NULL) return;
+	ctx->Yundercut = Yundercut;
+}
+
+int gs1_encoder_getSepHt(gs1_encoder *ctx) {
+	if (ctx == NULL) return -1;
+	return ctx->sepHt;
+}
+void gs1_encoder_setSepHt(gs1_encoder *ctx, int sepHt) {
+	if (ctx == NULL) return;
+	ctx->sepHt = sepHt;
+}
+
+
+int gs1_encoder_getSegWidth(gs1_encoder *ctx) {
+	if (ctx == NULL) return -1;
+	return ctx->segWidth;
+}
+void gs1_encoder_setSegWidth(gs1_encoder *ctx, int segWidth) {
+	if (ctx == NULL) return;
+	ctx->segWidth = segWidth;
+}
+
+
+int gs1_encoder_getBmp(gs1_encoder *ctx) {
+	if (ctx == NULL) return -1;
+	return ctx->bmp;
+}
+void gs1_encoder_setBmp(gs1_encoder *ctx, int bmp) {
+	if (ctx == NULL) return;
+	ctx->bmp = bmp;
+}
+
+
+int gs1_encoder_getLinHeight(gs1_encoder *ctx) {
+	if (ctx == NULL) return -1;
+	return ctx->linHeight;
+}
+void gs1_encoder_setLinHeight(gs1_encoder *ctx, int linHeight) {
+	if (ctx == NULL) return;
+	ctx->linHeight = linHeight;
+}
+
+
+char* gs1_encoder_getOutFile(gs1_encoder *ctx) {
+	if (ctx == NULL) return NULL;
+	return ctx->outFile;
+}
+void gs1_encoder_setOutFile(gs1_encoder *ctx, char* outFile) {
+	if (ctx == NULL) return;
+	strcpy(ctx->outFile, outFile);
+}
+
+
+char* gs1_encoder_getDataStr(gs1_encoder *ctx) {
+	if (ctx == NULL) return NULL;
+	return ctx->dataStr;
+}
+void gs1_encoder_setDataStr(gs1_encoder *ctx, char* dataStr) {
+	if (ctx == NULL) return;
+	strcpy(ctx->dataStr, dataStr);
+}
+
+
+char* gs1_encoder_getDataFile(gs1_encoder *ctx) {
+	if (ctx == NULL) return NULL;
+	return ctx->dataFile;
+}
+void gs1_encoder_setDataFile(gs1_encoder *ctx, char* dataFile) {
+	if (ctx == NULL) return;
+	strcpy(ctx->dataFile, dataFile);
+}
+
+
+char* gs1_encoder_getErrMsg(gs1_encoder *ctx) {
+	if (ctx == NULL) return NULL;
+	return ctx->errMsg;
+}
+
+
+bool gs1_encoder_encode(gs1_encoder *ctx) {
+
+	FILE *iFile, *oFile;
+
+	errMsg = "";
+	errFlag = false;
+
+	if (!ctx) {
+		errFlag = true;
+		goto out;
 	}
 
-	return 0;
+	if (ctx->inputFlag == 1) {
+		size_t i;
+		if ((iFile = fopen(ctx->dataFile, "r")) == NULL) {
+			sprintf(errMsg, "UNABLE TO OPEN %s FILE", ctx->dataFile);
+			errFlag = true;
+			goto out;
+		}
+		i = fread(ctx->dataStr, sizeof(char), MAX_DATA, iFile);
+		while (i > 0 && ctx->dataStr[i-1] < 32) i--; // strip trailing CRLF etc.
+		ctx->dataStr[i] = '\0';
+		fclose(iFile);
+	}
+
+	if ((oFile = fopen(ctx->outFile, "wb")) == NULL) {
+		sprintf(errMsg, "UNABLE TO OPEN %s FILE", ctx->outFile);
+		errFlag = true;
+		goto out;
+	}
+	ctx->outfp = oFile;
+
+	switch (ctx->sym) {
+
+		case sRSS14:
+		case sRSS14T:
+			RSS14(ctx);
+			break;
+
+		case sRSS14S:
+			RSS14S(ctx);
+			break;
+
+		case sRSS14SO:
+			RSS14SO(ctx);
+			break;
+
+		case sRSSLIM:
+			RSSLim(ctx);
+			break;
+
+		case sRSSEXP:
+			RSSExp(ctx);
+			break;
+
+		case sUPCA:
+		case sEAN13:
+			EAN13(ctx);
+			break;
+
+		case sUPCE:
+			UPCE(ctx);
+			break;
+
+		case sEAN8:
+			EAN8(ctx);
+			break;
+
+		case sUCC128_CCA:
+			U128A(ctx);
+			break;
+
+		case sUCC128_CCC:
+			U128C(ctx);
+			break;
+
+		default:
+			sprintf(errMsg, "Unknown symbology type %d", ctx->sym);
+			errFlag = true;
+			break;
+
+	}
+
+	fclose(oFile);
+
+out:
+
+	ctx->errMsg = errFlag ? errMsg : "";  // TODO disappears
+	return !errFlag;
+
 }

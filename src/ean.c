@@ -95,7 +95,7 @@ static bool EAN13enc(uint8_t str[], uint8_t pattern[] ) {
 	return(true);
 }
 
-void EAN13(struct sParams *params) {
+void EAN13(gs1_encoder *params) {
 
 	struct sPrints prints;
 	struct sPrints sepPrnt;
@@ -298,7 +298,7 @@ static bool EAN8enc(uint8_t str[], uint8_t pattern[] ) {
 	return(true);
 }
 
-void EAN8(struct sParams *params) {
+void EAN8(gs1_encoder *params) {
 
 	struct sPrints prints;
 	struct sPrints sepPrnt;
@@ -554,7 +554,7 @@ static bool UPCEenc(uint8_t str[], uint8_t pattern[] ) {
 	return(true);
 }
 
-void UPCE(struct sParams *params) {
+void UPCE(gs1_encoder *params) {
 
 	struct sPrints prints;
 	struct sPrints sepPrnt;

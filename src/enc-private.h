@@ -22,7 +22,8 @@
 #define ENC_PRIVATE_H
 
 #include <stdint.h>
-#include "enc.h"
+
+#include "gs1encoders.h"
 #include "rss14.h"
 #include "rsslim.h"
 #include "rssexp.h"
@@ -30,6 +31,23 @@
 #include "ucc128.h"
 
 #define PRNT 0 // prints symbol data if 1
+
+struct gs1_encoder {
+	int sym;                // symbology type
+	int inputFlag;          // 1 = dataStr, 2 = dataFile
+	int pixMult;            // pixels per X
+	int Xundercut;          // X pixels to undercut
+	int Yundercut;          // Y pixels to undercut
+	int sepHt;              // separator row height
+	int segWidth;
+	int bmp;                // true is BMP else TIF file output
+	int linHeight;          // height of UCC/EAN-128 in X
+	FILE *outfp;
+	char dataFile[MAX_FNAME+1];
+	char outFile[MAX_FNAME+1];
+	char dataStr[MAX_DATA+1];
+	char *errMsg;
+};
 
 struct sPrints {
 	int elmCnt;

@@ -45,7 +45,7 @@ int CC4enc(uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
 bool CCCenc(uint8_t str[], uint8_t pattern[]);
 
 int check2DData(uint8_t dataStr[]);
-int pack(uint8_t str[], uint8_t bitField[] );
+int pack(uint8_t str[], uint8_t bitField[]);
 void putBits(uint8_t bitField[], int bitPos, int length, uint16_t bits);
 
 #endif /* CC_H */
