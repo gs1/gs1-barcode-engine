@@ -46,7 +46,6 @@ enum {
 	AI8004
 };
 
-extern int linFlag; // tells pack whether linear, cc-a/b or cc-c is being encoded
 extern uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
 
 // CC-C external variables
@@ -575,7 +574,7 @@ static void genECC(gs1_encoder *ctx, int dsize, int csize, uint16_t sym[]) {
 void putBits(gs1_encoder *ctx, uint8_t bitField[], int bitPos, int length, uint16_t bits) {
 	int i, maxBytes;
 
-	if (linFlag == -1) {
+	if (ctx->linFlag == -1) {
 		maxBytes = MAX_CCC_BYTES; // CC-C
 	}
 	else {
@@ -656,7 +655,7 @@ static int getUnusedBitCnt(gs1_encoder *ctx, int iBit, int *size) {
 
 	int i, byteCnt, cwCnt;
 
-	if (linFlag == 1) { // RSS Expanded
+	if (ctx->linFlag == 1) { // RSS Expanded
 		*size = 0;
 		if (iBit <= 252) {
 			if ((*size = (iBit + 11) / 12) < 3) {
@@ -668,7 +667,7 @@ static int getUnusedBitCnt(gs1_encoder *ctx, int iBit, int *size) {
 			return(*size*12 - iBit);
 		}
 	}
-	else if (linFlag == 0) { // CC-A/B
+	else if (ctx->linFlag == 0) { // CC-A/B
 		for (i = 0; CCSizes[i] != 0; i++) {
 			if (iBit <= CCSizes[i]) {
 				*size = i;
@@ -676,7 +675,7 @@ static int getUnusedBitCnt(gs1_encoder *ctx, int iBit, int *size) {
 			}
 		}
 	}
-	else if (linFlag == -1) { // CC-C
+	else if (ctx->linFlag == -1) { // CC-C
 		*size = false; // size used as error flag for CC-C
 		// calculate cwCnt from # of bits
 		byteCnt = (iBit+7)/8;
@@ -1522,7 +1521,7 @@ int pack(gs1_encoder *ctx, uint8_t str[], uint8_t bitField[]) {
 	encode.str = str;
 	encode.bitField = bitField;
 	encode.iStr = encode.iBit = 0;
-	if (linFlag == 1) {
+	if (ctx->linFlag == 1) {
 		encode.iBit++; // skip composite link bit if linear component
 		encode.mode = doLinMethods(ctx, encode.str, &encode.iStr,
 						encode.bitField, &encode.iBit);
@@ -1551,7 +1550,7 @@ int pack(gs1_encoder *ctx, uint8_t str[], uint8_t bitField[]) {
 			return(-1);
 		} } /* end of case */
 	}
-	if (linFlag == -1) { // CC-C
+	if (ctx->linFlag == -1) { // CC-C
 		if (!insertPad(ctx, &encode)) { // will return false if error
 			strcpy(ctx->errMsg, "symbol too big");
 			ctx->errFlag = true;
@@ -2104,7 +2103,7 @@ int CC2enc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_
 	int size;
 	int i;
 
-	linFlag = 0;
+	ctx->linFlag = 0;
 	ctx->cc_CCSizes = CC2Sizes;
 	if ((i=check2DData(str)) != 0) {
 		sprintf(ctx->errMsg, "illegal character in 2D data = '%c'", str[i]);
@@ -2139,7 +2138,7 @@ int CC3enc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_
 	int size;
 	int i;
 
-	linFlag = 0;
+	ctx->linFlag = 0;
 	ctx->cc_CCSizes = CC3Sizes;
 	if ((i=check2DData(str)) != 0) {
 		sprintf(ctx->errMsg, "illegal character in 2D data = '%c'", str[i]);
@@ -2174,7 +2173,7 @@ int CC4enc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_
 	int size;
 	int i;
 
-	linFlag = 0;
+	ctx->linFlag = 0;
 	ctx->cc_CCSizes = CC4Sizes;
 	if ((i=check2DData(str)) != 0) {
 		sprintf(ctx->errMsg, "illegal character in 2D data = '%c'", str[i]);
@@ -2207,7 +2206,7 @@ bool CCCenc(gs1_encoder *ctx, uint8_t str[], uint8_t patCCC[] ) {
 	int byteCnt;
 	int i;
 
-	linFlag = -1; // CC-C flag value
+	ctx->linFlag = -1; // CC-C flag value
 	if ((i=check2DData(str)) != 0) {
 		sprintf(ctx->errMsg, "illegal character '%c'", str[i]);
 		ctx->errFlag = true;

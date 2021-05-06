@@ -28,7 +28,6 @@
 #include "rssexp.h"
 #include "rssutil.h"
 
-extern int linFlag; // tells pack whether linear or cc is being encoded
 extern uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
 
 
@@ -175,7 +174,7 @@ static int RSS14Eenc(gs1_encoder *ctx, uint8_t string[], uint8_t bars[RSSEXP_MAX
 	int size, fndrNdx, fndrSetNdx;
 	uint8_t bitField[RSSEXP_MAX_DBL_SEGS*3];
 
-	linFlag = true;
+	ctx->linFlag = true;
 	parity = 0;
 	weight = 0;
 

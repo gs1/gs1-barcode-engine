@@ -73,7 +73,7 @@ struct gs1_encoder {
 	char errMsg[512];
 	int rowWidth;
 	int line1;
-	int linFlag; 		// tells pack whether linear or cc is being encoded
+	int linFlag;		// tells pack whether linear or cc is being encoded
 	uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
 	const int *cc_CCSizes;	// will point to CCxSize
 	int cc_gpa[512];
@@ -91,7 +91,6 @@ struct gs1_encoder {
 };
 
 // globals   TODO hoist
-int linFlag; // tells pack whether linear or cc is being encoded
 uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
 
 #endif /* ENC_PRIVATE_H */
