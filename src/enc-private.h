@@ -24,13 +24,30 @@
 #include <stdint.h>
 
 #include "gs1encoders.h"
-#include "rss14.h"
-#include "rsslim.h"
-#include "rssexp.h"
+
+
+struct sPrints {
+	int elmCnt;
+	int leftPad;
+	int rightPad;
+	int guards;
+	int height;
+	int whtFirst;
+	int reverse;
+	uint8_t *pattern;
+};
+
+
+#include "driver.h"
 #include "ean.h"
+#include "rss14.h"
+#include "rssexp.h"
+#include "rsslim.h"
+#include "rssutil.h"
 #include "ucc128.h"
 
 #define PRNT 0 // prints symbol data if 1
+
 
 struct gs1_encoder {
 	int sym;                // symbology type
@@ -47,20 +64,23 @@ struct gs1_encoder {
 	char outFile[MAX_FNAME+1];
 	char dataStr[MAX_DATA+1];
 	char *errMsg;
+
+	// per-instance globals
+	const int *cc_CCSizes;  // will point to CCxSize
+	int cc_gpa[512];
+	uint8_t driver_line[MAX_LINE/8 + 1];
+	uint8_t driver_lineUCut[MAX_LINE/8 + 1];
+	struct sPrints rss14_prntSep;
+	uint8_t rss14_sepPattern;
+	struct sPrints rsslim_prntSep;
+	uint8_t rsslim_sepPattern;
+	struct sPrints rssutil_prntSep;
+	uint8_t rssutil_sepPattern;
+	int rss_util_widths[MAX_K];
+
 };
 
-struct sPrints {
-	int elmCnt;
-	int leftPad;
-	int rightPad;
-	int guards;
-	int height;
-	int whtFirst;
-	int reverse;
-	uint8_t *pattern;
-};
-
-// globals
+// globals   TODO hoist
 int errFlag;
 char* errMsg;
 int rowWidth;

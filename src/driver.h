@@ -25,6 +25,8 @@
 
 #include "enc-private.h"
 
+#define MAX_LINE 6032 // 10 inches wide at 600 dpi
+
 #define min(X,Y) (((X) < (Y)) ? (X) : (Y))
 #define max(X,Y) (((X) > (Y)) ? (X) : (Y))
 

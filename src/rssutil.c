@@ -20,6 +20,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+
 #include "enc-private.h"
 #include "rssutil.h"
 
@@ -71,11 +72,11 @@ static int combins(int n, int r) {
 * Return:
 * int widths[] = element widths
 ************************************************************************/
-#define MAX_K	14
+
+static int widths[MAX_K];
 
 int *getRSSwidths(int val, int n, int elements, int maxWidth, int noNarrow)
 {
-	static int widths[MAX_K];
 	int bar;
 	int elmWidth;
 	int mxwElement;
