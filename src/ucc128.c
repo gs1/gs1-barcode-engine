@@ -562,8 +562,8 @@ void U128C(gs1_encoder *params) {
 	printf("\n");
 #endif
 
-	colCnt = ((symChars*11 + 22 - UCC128_L_PAD - 5)/17) -4;
-	if (colCnt < 1) {
+	params->colCnt = ((symChars*11 + 22 - UCC128_L_PAD - 5)/17) -4;
+	if (params->colCnt < 1) {
 		strcpy(params->errMsg, "UCC-128 too small");
 		params->errFlag = true;
 		return;
@@ -585,9 +585,9 @@ void U128C(gs1_encoder *params) {
 			int j;
 			printf("\n%s", ccStr);
 			printf("\n");
-			for (i = 0; i < rowCnt; i++) {
-				for (j = 0; j < (colCnt+4)*8+3; j++) {
-					printf("%d", patCCC[i*((colCnt+4)*8+3) + j]);
+			for (i = 0; i < params->rowCnt; i++) {
+				for (j = 0; j < (params->colCnt+4)*8+3; j++) {
+					printf("%d", patCCC[i*((params->colCnt+4)*8+3) + j]);
 				}
 				printf("\n");
 			}
@@ -595,11 +595,11 @@ void U128C(gs1_encoder *params) {
 #endif
 
 		symWidth = symChars*11+22;
-		ccRpad = symWidth - UCC128_L_PAD - ((colCnt+4)*17+5);
+		ccRpad = symWidth - UCC128_L_PAD - ((params->colCnt+4)*17+5);
 		if (params->bmp) {
 			// note: BMP is bottom to top inverted
 			bmpHeader(params->pixMult*symWidth,
-					params->pixMult*(rowCnt*3+params->linHeight) + params->sepHt,
+					params->pixMult*(params->rowCnt*3+params->linHeight) + params->sepHt,
 						 params->outfp);
 
 			// UCC-128
@@ -614,27 +614,27 @@ void U128C(gs1_encoder *params) {
 			printElmnts(params, &prints);
 
 			// CC-C
-			prints.elmCnt = (colCnt+4)*8+3;
+			prints.elmCnt = (params->colCnt+4)*8+3;
 			prints.height = params->pixMult*3;
 			prints.leftPad = UCC128_L_PAD;
 			prints.rightPad = ccRpad;
-			for (i = rowCnt-1; i >= 0; i--) {
-				prints.pattern = &patCCC[i*((colCnt+4)*8+3)];
+			for (i = params->rowCnt-1; i >= 0; i--) {
+				prints.pattern = &patCCC[i*((params->colCnt+4)*8+3)];
 				printElmnts(params, &prints);
 			}
 		}
 		else {
 			tifHeader(params->pixMult*symWidth,
-					params->pixMult*(rowCnt*3+params->linHeight) + params->sepHt,
+					params->pixMult*(params->rowCnt*3+params->linHeight) + params->sepHt,
 						 params->outfp);
 
 			// CC-C
-			prints.elmCnt = (colCnt+4)*8+3;
+			prints.elmCnt = (params->colCnt+4)*8+3;
 			prints.height = params->pixMult*3;
 			prints.leftPad = UCC128_L_PAD;
 			prints.rightPad = ccRpad;
-			for (i = 0; i < rowCnt; i++) {
-				prints.pattern = &patCCC[i*((colCnt+4)*8+3)];
+			for (i = 0; i < params->rowCnt; i++) {
+				prints.pattern = &patCCC[i*((params->colCnt+4)*8+3)];
 				printElmnts(params, &prints);
 			}
 

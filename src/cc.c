@@ -48,11 +48,6 @@ enum {
 
 extern uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
 
-// CC-C external variables
-extern int colCnt; // after set in main, may be decreased by getUnusedBitCnt
-extern int rowCnt; // determined by getUnusedBitCnt
-extern int eccCnt; // determined by getUnusedBitCnt
-
 
 static const uint32_t barData[3][929] = {{
  6591070,8688228,10785386,6591133,8688291,10785449,4494038,6591196,4494101,2397006,
@@ -682,28 +677,28 @@ static int getUnusedBitCnt(gs1_encoder *ctx, int iBit, int *size) {
 		i = byteCnt/6;
 		cwCnt = (byteCnt/6)*5 + byteCnt%6;
 		// find # of ecc codewords
-		for (i = 0, eccCnt = 8; eccCnt <= 64; i++, eccCnt *= 2) {
-			if (cwCnt + eccCnt <= eccMaxCW[i]) {
+		for (i = 0, ctx->eccCnt = 8; ctx->eccCnt <= 64; i++, ctx->eccCnt *= 2) {
+			if (cwCnt + ctx->eccCnt <= eccMaxCW[i]) {
 				break;
 			}
 		}
-		if (eccCnt > 64) {
+		if (ctx->eccCnt > 64) {
 			return(-1); // too many codewords for CCC
 		}
 
-		colCnt++; // preadjust for first decrement in loop
+		ctx->colCnt++; // preadjust for first decrement in loop
 		do {
-			colCnt--; // make narrower until satisfies min aspect ratio
-			rowCnt = max(3, (1 + 2 + cwCnt + eccCnt + colCnt-1) / colCnt);
-			if (rowCnt > MAX_CCC_ROWS) {
+			ctx->colCnt--; // make narrower until satisfies min aspect ratio
+			ctx->rowCnt = max(3, (1 + 2 + cwCnt + ctx->eccCnt + ctx->colCnt-1) / ctx->colCnt);
+			if (ctx->rowCnt > MAX_CCC_ROWS) {
 				return(-1); // too many rows for CCC
 			}
-		} while (colCnt + 4 > rowCnt*4);
+		} while (ctx->colCnt + 4 > ctx->rowCnt*4);
 
-		if (rowCnt == 3) { // find minimum width if 3 rows, but no less than 4 data)
-			colCnt = max(4, (1 + 2 + cwCnt + eccCnt + 2) / 3);
+		if (ctx->rowCnt == 3) { // find minimum width if 3 rows, but no less than 4 data)
+			ctx->colCnt = max(4, (1 + 2 + cwCnt + ctx->eccCnt + 2) / 3);
 		}
-		cwCnt = colCnt*rowCnt - 1 - 2 - eccCnt;
+		cwCnt = ctx->colCnt*ctx->rowCnt - 1 - 2 - ctx->eccCnt;
 		byteCnt = (cwCnt/5)*6 + cwCnt%5;
 		*size = true;
 		return(byteCnt*8 - iBit);
@@ -1919,7 +1914,7 @@ static void imgCCB4(int size, uint16_t codeWords[], uint8_t pattern[MAX_CCB4_ROW
 }
 
 
-static void imgCCC(uint16_t codeWords[], uint8_t patCCC[]) {
+static void imgCCC(gs1_encoder *ctx, uint16_t codeWords[], uint8_t patCCC[]) {
 
 	static const uint8_t leftPtn[9] = { 2,8,1,1,1,1,1,1,3 }; // qz + start
 	static const uint8_t rightPtn[10] = { 7,1,1,3,1,1,1,2,1,2 }; // stop + qz
@@ -1931,31 +1926,31 @@ static void imgCCC(uint16_t codeWords[], uint8_t patCCC[]) {
 	int cwNdx, row, bar, offset, col;
 	int i;
 
-	i = eccCnt >> 4;
+	i = ctx->eccCnt >> 4;
 	for (errLvl = 2; i > 0; i >>= 1, errLvl++); // calc ecc level
-	leftRowBase[0] = (rowCnt-1)/3; // set up row indicator value bases
-	leftRowBase[1] = errLvl*3 + (rowCnt-1)%3;
-	leftRowBase[2] = colCnt-1;
+	leftRowBase[0] = (ctx->rowCnt-1)/3; // set up row indicator value bases
+	leftRowBase[1] = errLvl*3 + (ctx->rowCnt-1)%3;
+	leftRowBase[2] = ctx->colCnt-1;
 	cwNdx = 0;
-	for (cluster = row = 0; row < rowCnt; cluster = (cluster+1)%3, row++) {
+	for (cluster = row = 0; row < ctx->rowCnt; cluster = (cluster+1)%3, row++) {
 		rowFactor = (row/3)*30; // row number factor for row indicators
 		// left qz and start
 		for (bar = 0; bar < 9; bar++) {
-			patCCC[row*((colCnt+4)*8+3) + bar] = leftPtn[bar];
+			patCCC[row*((ctx->colCnt+4)*8+3) + bar] = leftPtn[bar];
 		}
 		offset = bar;
 		// left row indicator
 		bars = barData[cluster][rowFactor + leftRowBase[cluster]]; // left R.I.
 		for (bar = 0; bar < 8; bar++) {
 			// get 8 3-bit widths left to right:
-			patCCC[row*((colCnt+4)*8+3) + bar+offset] = (uint8_t)(bars >> ((7-bar)*3)) & 7;
+			patCCC[row*((ctx->colCnt+4)*8+3) + bar+offset] = (uint8_t)(bars >> ((7-bar)*3)) & 7;
 		}
 		offset += bar;
-		for (col = 0; col < colCnt; col++) {
+		for (col = 0; col < ctx->colCnt; col++) {
 			bars = barData[cluster][codeWords[cwNdx++]]; // codeword
 			for (bar = 0; bar < 8; bar++) {
 				// get 8 3-bit widths left to right:
-				patCCC[row*((colCnt+4)*8+3) + bar+offset] = (uint8_t)(bars >> ((7-bar)*3)) & 7;
+				patCCC[row*((ctx->colCnt+4)*8+3) + bar+offset] = (uint8_t)(bars >> ((7-bar)*3)) & 7;
 			}
 			offset += bar;
 		}
@@ -1963,12 +1958,12 @@ static void imgCCC(uint16_t codeWords[], uint8_t patCCC[]) {
 		bars = barData[cluster][rowFactor + leftRowBase[(cluster+2)%3]]; // right R.I.
 		for (bar = 0; bar < 8; bar++) {
 			// get 8 3-bit widths left to right:
-			patCCC[row*((colCnt+4)*8+3) + bar+offset] = (uint8_t)(bars >> ((7-bar)*3)) & 7;
+			patCCC[row*((ctx->colCnt+4)*8+3) + bar+offset] = (uint8_t)(bars >> ((7-bar)*3)) & 7;
 		}
 		offset += bar;
 		// left qz and start
 		for (bar = 0; bar < 10; bar++) {
-			patCCC[row*((colCnt+4)*8+3) + bar+offset] = rightPtn[bar];
+			patCCC[row*((ctx->colCnt+4)*8+3) + bar+offset] = rightPtn[bar];
 		}
 	}
 	return;
@@ -2082,14 +2077,14 @@ static void encCCC(gs1_encoder *ctx, int byteCnt, uint8_t bitField[], uint16_t c
 
 	int nonEccCwCnt;
 
-	nonEccCwCnt = colCnt*rowCnt-eccCnt;
+	nonEccCwCnt = ctx->colCnt * ctx->rowCnt - ctx->eccCnt;
 	codeWords[0] = (uint16_t)nonEccCwCnt;
 	codeWords[1] = 920; // insert UCC/EAN flag and byte mode latch
 	codeWords[2] =
 		(byteCnt % 6 == 0) ? 924 : 901; // 924 iff even multiple of 6
 	encode900(bitField, &codeWords[3], byteCnt);
-	genECC(ctx, nonEccCwCnt, eccCnt, codeWords);
-	imgCCC(codeWords, patCCC);
+	genECC(ctx, nonEccCwCnt, ctx->eccCnt, codeWords);
+	imgCCC(ctx, codeWords, patCCC);
 	return;
 }
 
