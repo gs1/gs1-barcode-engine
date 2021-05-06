@@ -42,21 +42,39 @@
     <ClCompile Include="driver.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="gs1encoders-app.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="release.h">
+    <ClInclude Include="cc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="cc.h">
+    <ClInclude Include="rssutil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="driver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="enc.h">
+    <ClInclude Include="ean.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="rssutil.h">
+    <ClInclude Include="enc-private.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gs1encoders.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="rss14.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ucc128.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="rsslim.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="rssexp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
