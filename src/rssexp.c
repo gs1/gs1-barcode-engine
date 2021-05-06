@@ -26,18 +26,6 @@
 #include "rssutil.h"
 #include "cc.h"
 
-// 2-segments, no guard patterns
-#define ELMNTS 21
-// 2-segment symbol width in modules, no guard patterns
-#define SYM_W 49
-// height
-#define SYM_H 34
-// max double segments
-#define MAX_DBL_SEGS 12
-
-#define L_PAD 1 // CC left offset
-
-
 extern int errFlag;
 extern int rowWidth;
 extern int line1;
@@ -156,7 +144,7 @@ static int symCharPat(gs1_encoder *ctx, uint8_t bars[], int symValue, int parity
 #define FINDER_SIZE 6
 
 // convert AI string to bar widths in dbl segments
-static int RSS14Eenc(gs1_encoder *ctx, uint8_t string[], uint8_t bars[MAX_DBL_SEGS][ELMNTS], int ccFlag) {
+static int RSS14Eenc(gs1_encoder *ctx, uint8_t string[], uint8_t bars[RSSEXP_MAX_DBL_SEGS][RSSEXP_ELMNTS], int ccFlag) {
 
 	static const uint8_t finders[FINDER_SIZE][3] = {
 		{ 1,8,4 },
@@ -186,7 +174,7 @@ static int RSS14Eenc(gs1_encoder *ctx, uint8_t string[], uint8_t bars[MAX_DBL_SE
 	int parity, weight;
 	int symValue;
 	int size, fndrNdx, fndrSetNdx;
-	uint8_t bitField[MAX_DBL_SEGS*3];
+	uint8_t bitField[RSSEXP_MAX_DBL_SEGS*3];
 
 	linFlag = true;
 	parity = 0;
@@ -266,9 +254,9 @@ void RSSExp(gs1_encoder *params) {
 	struct sPrints chexPrnts;
 	struct sPrints *prntCnv;
 
-	uint8_t linPattern[MAX_DBL_SEGS*ELMNTS+4];
-	uint8_t chexPattern[MAX_DBL_SEGS*SYM_W+2];
-	uint8_t dblPattern[MAX_DBL_SEGS][ELMNTS];
+	uint8_t linPattern[RSSEXP_MAX_DBL_SEGS*RSSEXP_ELMNTS+4];
+	uint8_t chexPattern[RSSEXP_MAX_DBL_SEGS*RSSEXP_SYM_W+2];
+	uint8_t dblPattern[RSSEXP_MAX_DBL_SEGS][RSSEXP_ELMNTS];
 
 	int i, j;
 	int rows = 0, ccFlag;
@@ -313,12 +301,12 @@ void RSSExp(gs1_encoder *params) {
 	}
 	j = (segs <= params->segWidth) ? segs : params->segWidth;
 	i = (segs+j-1)/j; // number of linear rows
-	lHeight = params->pixMult*i*SYM_H + params->sepHt*(i-1)*3;
+	lHeight = params->pixMult*i*RSSEXP_SYM_H + params->sepHt*(i-1)*3;
 	lNdx = (j/2)*(8+5+8) + (j&1)*(8+5);
 	lMods = 2 + (j/2)*(17+15+17) + (j&1)*(17+15) + 2;
 
 	// set up checkered seperator pattern and print structure
-	for (i = 0; i < MAX_DBL_SEGS*SYM_W+2; i++) {
+	for (i = 0; i < RSSEXP_MAX_DBL_SEGS*RSSEXP_SYM_W+2; i++) {
 		chexPattern[i] = 1; // chex = all 1X elements
 	}
 	chexPattern[0] = 5; // except first and last
@@ -339,7 +327,7 @@ void RSSExp(gs1_encoder *params) {
 	chexPrnts.rightPad = 0;
 	chexPrnts.reverse = false;
 
-	rPadcc = lMods - L_PAD - CCB4_WIDTH;
+	rPadcc = lMods - RSSEXP_L_PAD - CCB4_WIDTH;
 
 #if PRNT
 	printf("\n%s", params->dataStr);
@@ -356,7 +344,7 @@ void RSSExp(gs1_encoder *params) {
 		printf("\n%s", ccStr);
 		printf("\n");
 		for (i = 0; i < rows; i++) {
-			for (j = 0; j < CCB4_ELMNTS; j++) {
+			for (j = 0; j < CCB4_RSSEXP_ELMNTS; j++) {
 				printf("%d", ccPattern[i][j]);
 			}
 			printf("\n");
@@ -389,7 +377,7 @@ void RSSExp(gs1_encoder *params) {
 		prints.elmCnt = lNdx1;
 		prints.pattern = &linPattern[(i/2)*(8+5+8)+(i&1)*8];
 		prints.guards = true;
-		prints.height = params->pixMult*SYM_H;
+		prints.height = params->pixMult*RSSEXP_SYM_H;
 		prints.whtFirst = (i/2+1)&1;
 		rev = evenRow ^ ((i/2)&1);
 		if (rev && (((lNdx1-4)%8)&1)) {
@@ -465,7 +453,7 @@ void RSSExp(gs1_encoder *params) {
 			prints.elmCnt = CCB4_ELMNTS;
 			prints.guards = false;
 			prints.height = params->pixMult*2;
-			prints.leftPad = L_PAD;
+			prints.leftPad = RSSEXP_L_PAD;
 			prints.rightPad = rPadcc;
 			prints.whtFirst = true;
 			prints.reverse = false;
@@ -490,7 +478,7 @@ void RSSExp(gs1_encoder *params) {
 			prints.elmCnt = CCB4_ELMNTS;
 			prints.guards = false;
 			prints.height = params->pixMult*2;
-			prints.leftPad = L_PAD;
+			prints.leftPad = RSSEXP_L_PAD;
 			prints.rightPad = rPadcc;
 			prints.whtFirst = true;
 			prints.reverse = false;
@@ -504,7 +492,7 @@ void RSSExp(gs1_encoder *params) {
 		evenRow = false; // start with 1st row
 		prints.elmCnt = lNdx;
 		prints.guards = true;
-		prints.height = params->pixMult*SYM_H;
+		prints.height = params->pixMult*RSSEXP_SYM_H;
 		prints.leftPad = 0;
 		prints.rightPad = 0;
 

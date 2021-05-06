@@ -23,6 +23,15 @@
 
 #include "enc-private.h"
 
+#define RSS14_ELMNTS	(46-4)	// not including guard bars
+#define RSS14_SYM_W	96	// symbol width in modules including guard bars
+#define RSS14_SYM_H	33	// RSS-14 height
+#define RSS14_TRNC_H	13	// RSS-14 truncated height
+#define RSS14_ROWS1_H	5	// RSS-14S row heights
+#define RSS14_ROWS2_H	7
+#define RSS14_L_PADR	5	// RSS-14 left offset
+#define RSS14_R_PADR	7	// RSS-14s right offset
+
 void RSS14(gs1_encoder *params);
 void RSS14S(gs1_encoder *params);
 void RSS14SO(gs1_encoder *params);

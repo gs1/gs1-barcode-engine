@@ -28,28 +28,13 @@
 #include "rssutil.h"
 #include "cc.h"
 
-// not including guard bars
-#define ELMNTS (46-4)
-// symbol width in modules including guard bars:
-#define SYM_W		96
-// RSS-14 height
-#define SYM_H 33
-// RSS-14 truncated height
-#define TRNC_H 13
-// RSS-14S row heights
-#define ROWS1_H	5
-#define ROWS2_H	7
-
-#define L_PADR 5 // RSS-14 left offset
-#define R_PADR 7 // RSS-14s right offset
-
 extern int errFlag;
 extern int line1;
 extern uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
 
 // TODO move into context
 static struct sPrints prntSep;
-static uint8_t sepPattern[SYM_W/2+2];
+static uint8_t sepPattern[RSS14_SYM_W/2+2];
 
 // RSS14 Stacked row separator pattern routine
 static struct sPrints *separator14S(gs1_encoder *params, struct sPrints *prints) {
@@ -66,10 +51,10 @@ static struct sPrints *separator14S(gs1_encoder *params, struct sPrints *prints)
 
 	sepPattern[0] = sepPattern[1] = 1; // start with old SB guard in separator
 	lNdx = 0; // left (top) element index
-	rNdx = ELMNTS/2; // right (bottom) element index
+	rNdx = RSS14_ELMNTS/2; // right (bottom) element index
 	sNdx = 2; // separator element index
 	lWidth = rWidth = matchWidth = 0;
-	for (i = 0; i < SYM_W/2 - 2; i++, lWidth--, rWidth--) {
+	for (i = 0; i < RSS14_SYM_W/2 - 2; i++, lWidth--, rWidth--) {
 		if (lWidth == 0) {
 			lWidth = prints->pattern[lNdx++]; // next left element width
 		}
@@ -385,7 +370,7 @@ void RSS14(gs1_encoder *params) {
 	struct sPrints prints;
 	struct sPrints *prntCnv;
 
-	uint8_t linPattern[ELMNTS];
+	uint8_t linPattern[RSS14_ELMNTS];
 
 	char primaryStr[14+1];
 	char tempStr[28+1];
@@ -396,10 +381,10 @@ void RSS14(gs1_encoder *params) {
 	int symHt;
 
 	if (params->sym == sRSS14) {
-		symHt = SYM_H;
+		symHt = RSS14_SYM_H;
 	}
 	else {
-		symHt = TRNC_H;
+		symHt = RSS14_TRNC_H;
 	}
 	ccStr = strchr(params->dataStr, '|');
 	if (ccStr == NULL) ccFlag = false;
@@ -424,14 +409,14 @@ void RSS14(gs1_encoder *params) {
 #if PRNT
 	printf("\n%s", primaryStr);
 	printf("\n");
-	for (i = 0; i < ELMNTS; i++) {
+	for (i = 0; i < RSS14_ELMNTS; i++) {
 		printf("%d", linPattern[i]);
 	}
 	printf("\n");
 #endif
 	line1 = true; // so first line is not Y undercut
 	// init most likely prints values
-	prints.elmCnt = ELMNTS;
+	prints.elmCnt = RSS14_ELMNTS;
 	prints.pattern = linPattern;
 	prints.guards = true;
 	prints.height = params->pixMult*symHt;
@@ -447,7 +432,7 @@ void RSS14(gs1_encoder *params) {
 			printf("\n%s", ccStr);
 			printf("\n");
 			for (i = 0; i < rows; i++) {
-				for (j = 0; j < CCB4_ELMNTS; j++) {
+				for (j = 0; j < CCB4_RSS14_ELMNTS; j++) {
 					printf("%d", ccPattern[i][j]);
 				}
 				printf("\n");
@@ -460,7 +445,7 @@ void RSS14(gs1_encoder *params) {
 					params->pixMult*(rows*2+symHt) + params->sepHt, params->outfp);
 
 			// RSS-14
-			prints.leftPad = L_PADR;
+			prints.leftPad = RSS14_L_PADR;
 			printElmnts(params, &prints);
 
 			// CC separator
@@ -490,11 +475,11 @@ void RSS14(gs1_encoder *params) {
 				printElmnts(params, &prints);
 			}
 
-			prints.elmCnt = ELMNTS;
+			prints.elmCnt = RSS14_ELMNTS;
 			prints.pattern = linPattern;
 			prints.guards = true;
 			prints.height = params->pixMult*symHt;
-			prints.leftPad = L_PADR;
+			prints.leftPad = RSS14_L_PADR;
 
 			// CC separator
 			prntCnv = cnvSeparator(params, &prints);
@@ -506,10 +491,10 @@ void RSS14(gs1_encoder *params) {
 	}
 	else { // primary only
 		if (params->bmp) {
-			bmpHeader(params->pixMult*SYM_W, params->pixMult*symHt, params->outfp);
+			bmpHeader(params->pixMult*RSS14_SYM_W, params->pixMult*symHt, params->outfp);
 		}
 		else {
-			tifHeader(params->pixMult*SYM_W, params->pixMult*symHt, params->outfp);
+			tifHeader(params->pixMult*RSS14_SYM_W, params->pixMult*symHt, params->outfp);
 		}
 
 		// RSS-14
@@ -524,7 +509,7 @@ void RSS14S(gs1_encoder *params) {
 	struct sPrints prints;
 	struct sPrints *prntCnv;
 
-	uint8_t linPattern[ELMNTS];
+	uint8_t linPattern[RSS14_ELMNTS];
 
 	char primaryStr[14+1];
 	char tempStr[28+1];
@@ -555,14 +540,14 @@ void RSS14S(gs1_encoder *params) {
 #if PRNT
 	printf("\n%s", primaryStr);
 	printf("\n");
-	for (i = 0; i < ELMNTS; i++) {
+	for (i = 0; i < RSS14_ELMNTS; i++) {
 		printf("%d", linPattern[i]);
 	}
 	printf("\n");
 #endif
 	line1 = true; // so first line is not Y undercut
 	// init most common RSS14S row prints values
-	prints.elmCnt = ELMNTS/2;
+	prints.elmCnt = RSS14_ELMNTS/2;
 	prints.guards = true;
 	prints.leftPad = 0;
 	prints.rightPad = 0;
@@ -576,7 +561,7 @@ void RSS14S(gs1_encoder *params) {
 			printf("\n%s", ccStr);
 			printf("\n");
 			for (i = 0; i < rows; i++) {
-				for (j = 0; j < CCB2_ELMNTS; j++) {
+				for (j = 0; j < CCB2_RSS14_ELMNTS; j++) {
 					printf("%d", ccPattern[i][j]);
 				}
 				printf("\n");
@@ -587,12 +572,12 @@ void RSS14S(gs1_encoder *params) {
 		if (params->bmp) {
 			// note: BMP is bottom to top inverted
 			bmpHeader(params->pixMult*(CCB2_WIDTH),
-				params->pixMult*(rows*2+ROWS1_H+ROWS2_H) + 2*params->sepHt, params->outfp);
+				params->pixMult*(rows*2+RSS14_ROWS1_H+RSS14_ROWS2_H) + 2*params->sepHt, params->outfp);
 
 			// RSS14S lower row
-			prints.height = params->pixMult*ROWS2_H;
-			prints.pattern = &linPattern[ELMNTS/2];
-			prints.rightPad = R_PADR;
+			prints.height = params->pixMult*RSS14_ROWS2_H;
+			prints.pattern = &linPattern[RSS14_ELMNTS/2];
+			prints.rightPad = RSS14_R_PADR;
 			prints.whtFirst = false;
 			printElmnts(params, &prints);
 
@@ -603,7 +588,7 @@ void RSS14S(gs1_encoder *params) {
 
 			// RSS14S upper row
 			prints.whtFirst = true;
-			prints.height = params->pixMult*ROWS1_H;
+			prints.height = params->pixMult*RSS14_ROWS1_H;
 			printElmnts(params, &prints);
 
 			// CC separator
@@ -622,7 +607,7 @@ void RSS14S(gs1_encoder *params) {
 		}
 		else {
 			tifHeader(params->pixMult*(CCB2_WIDTH),
-					params->pixMult*(rows*2+ROWS1_H+ROWS2_H) + 2*params->sepHt, params->outfp);
+					params->pixMult*(rows*2+RSS14_ROWS1_H+RSS14_ROWS2_H) + 2*params->sepHt, params->outfp);
 
 			// Composite Component
 			prints.elmCnt = CCB2_ELMNTS;
@@ -634,15 +619,15 @@ void RSS14S(gs1_encoder *params) {
 			}
 
 			// CC separator
-			prints.elmCnt = ELMNTS/2;
+			prints.elmCnt = RSS14_ELMNTS/2;
 			prints.pattern = linPattern;
-			prints.rightPad = R_PADR;
+			prints.rightPad = RSS14_R_PADR;
 			prntCnv = cnvSeparator(params, &prints);
 			printElmnts(params, prntCnv);
 
 			// RSS14S upper row
 			prints.guards = true;
-			prints.height = params->pixMult*ROWS1_H;
+			prints.height = params->pixMult*RSS14_ROWS1_H;
 			printElmnts(params, &prints);
 
 			// RSS14S separator pattern
@@ -650,21 +635,21 @@ void RSS14S(gs1_encoder *params) {
 			printElmnts(params, prntCnv);
 
 			// RSS14S lower row
-			prints.height = params->pixMult*ROWS2_H;
-			prints.pattern = &linPattern[ELMNTS/2];
+			prints.height = params->pixMult*RSS14_ROWS2_H;
+			prints.pattern = &linPattern[RSS14_ELMNTS/2];
 			prints.whtFirst = false;
 			printElmnts(params, &prints);
 		}
 	}
 	else { // primary only
 		if (params->bmp) {
-			bmpHeader(params->pixMult*(SYM_W/2+2),
-				params->pixMult*(ROWS1_H+ROWS2_H) + params->sepHt, params->outfp);
+			bmpHeader(params->pixMult*(RSS14_SYM_W/2+2),
+				params->pixMult*(RSS14_ROWS1_H+RSS14_ROWS2_H) + params->sepHt, params->outfp);
 
 
 			// RSS14S lower row
-			prints.height = params->pixMult*ROWS2_H;
-			prints.pattern = &linPattern[ELMNTS/2];
+			prints.height = params->pixMult*RSS14_ROWS2_H;
+			prints.pattern = &linPattern[RSS14_ELMNTS/2];
 			prints.whtFirst = false;
 			printElmnts(params, &prints);
 
@@ -675,16 +660,16 @@ void RSS14S(gs1_encoder *params) {
 
 			// RSS14S upper row
 			prints.whtFirst = true;
-			prints.height = params->pixMult*ROWS1_H;
+			prints.height = params->pixMult*RSS14_ROWS1_H;
 			printElmnts(params, &prints);
 		}
 		else {
-			tifHeader(params->pixMult*(SYM_W/2+2),
-					params->pixMult*(ROWS1_H+ROWS2_H) + params->sepHt, params->outfp);
+			tifHeader(params->pixMult*(RSS14_SYM_W/2+2),
+					params->pixMult*(RSS14_ROWS1_H+RSS14_ROWS2_H) + params->sepHt, params->outfp);
 
 			// RSS14S upper row
 			prints.pattern = linPattern;
-			prints.height = params->pixMult*ROWS1_H;
+			prints.height = params->pixMult*RSS14_ROWS1_H;
 			printElmnts(params, &prints);
 
 			// RSS14S separator pattern
@@ -692,8 +677,8 @@ void RSS14S(gs1_encoder *params) {
 			printElmnts(params, prntCnv);
 
 			// RSS14S lower row
-			prints.pattern = &linPattern[ELMNTS/2];
-			prints.height = params->pixMult*ROWS2_H;
+			prints.pattern = &linPattern[RSS14_ELMNTS/2];
+			prints.height = params->pixMult*RSS14_ROWS2_H;
 			prints.whtFirst = false;
 			printElmnts(params, &prints);
 		}
@@ -708,8 +693,8 @@ void RSS14SO(gs1_encoder *params) {
 	struct sPrints chexPrnts;
 	struct sPrints *prntCnv;
 
-	uint8_t linPattern[ELMNTS];
-	uint8_t chexPattern[SYM_W/2+2];
+	uint8_t linPattern[RSS14_ELMNTS];
+	uint8_t chexPattern[RSS14_SYM_W/2+2];
 
 	char primaryStr[14+1];
 	char tempStr[28+1];
@@ -718,10 +703,10 @@ void RSS14SO(gs1_encoder *params) {
 	int rows, ccFlag;
 	char *ccStr;
 
-	for (i = 0; i < SYM_W/2+2; i++) chexPattern[i] = 1; // chex = all 1X elements
+	for (i = 0; i < RSS14_SYM_W/2+2; i++) chexPattern[i] = 1; // chex = all 1X elements
 	chexPattern[0] = 5; // wide space on left
-	chexPattern[SYM_W/2+1-7] = 4; // wide space on right
-	chexPrnts.elmCnt = SYM_W/2+2-7;
+	chexPattern[RSS14_SYM_W/2+1-7] = 4; // wide space on right
+	chexPrnts.elmCnt = RSS14_SYM_W/2+2-7;
 	chexPrnts.pattern = &chexPattern[0];
 	chexPrnts.guards = false;
 	chexPrnts.height = params->sepHt;
@@ -752,21 +737,21 @@ void RSS14SO(gs1_encoder *params) {
 #if PRNT
 	printf("\n%s", primaryStr);
 	printf("\n");
-	for (i = 0; i < ELMNTS; i++) {
+	for (i = 0; i < RSS14_ELMNTS; i++) {
 		printf("%d", linPattern[i]);
 	}
 	printf("\n");
 #endif
 	line1 = true; // so first line is not Y undercut
 	// init most common RSS14SO row prints values
-	prints.elmCnt = ELMNTS/2;
+	prints.elmCnt = RSS14_ELMNTS/2;
 	prints.guards = true;
 	prints.leftPad = 0;
 	prints.rightPad = 0;
 	prints.whtFirst = true;
 	prints.reverse = false;
 	if (ccFlag) {
-		chexPrnts.rightPad = R_PADR; // pad for composite
+		chexPrnts.rightPad = RSS14_R_PADR; // pad for composite
 		if (!((rows = CC2enc(params, (uint8_t*)ccStr, ccPattern)) > 0) || errFlag) return;
 #if PRNT
 		{
@@ -774,7 +759,7 @@ void RSS14SO(gs1_encoder *params) {
 			printf("\n%s", ccStr);
 			printf("\n");
 			for (i = 0; i < rows; i++) {
-				for (j = 0; j < CCB2_ELMNTS; j++) {
+				for (j = 0; j < CCB2_RSS14_ELMNTS; j++) {
 					printf("%d", ccPattern[i][j]);
 				}
 				printf("\n");
@@ -785,12 +770,12 @@ void RSS14SO(gs1_encoder *params) {
 		if (params->bmp) {
 			// note: BMP is bottom to top inverted
 			bmpHeader(params->pixMult*(CCB2_WIDTH),
-				params->pixMult*(rows*2+SYM_H*2) + 4*params->sepHt, params->outfp);
+				params->pixMult*(rows*2+RSS14_SYM_H*2) + 4*params->sepHt, params->outfp);
 
 			// RSS14SO lower row
-			prints.height = params->pixMult*SYM_H;
-			prints.pattern = &linPattern[ELMNTS/2];
-			prints.rightPad = R_PADR;
+			prints.height = params->pixMult*RSS14_SYM_H;
+			prints.pattern = &linPattern[RSS14_ELMNTS/2];
+			prints.rightPad = RSS14_R_PADR;
 			prints.whtFirst = false;
 			printElmnts(params, &prints);
 
@@ -826,7 +811,7 @@ void RSS14SO(gs1_encoder *params) {
 		}
 		else {
 			tifHeader(params->pixMult*(CCB2_WIDTH),
-				params->pixMult*(rows*2+SYM_H*2) + 4*params->sepHt, params->outfp);
+				params->pixMult*(rows*2+RSS14_SYM_H*2) + 4*params->sepHt, params->outfp);
 
 			// Composite Component
 			prints.elmCnt = CCB2_ELMNTS;
@@ -838,15 +823,15 @@ void RSS14SO(gs1_encoder *params) {
 			}
 
 			// CC separator
-			prints.elmCnt = ELMNTS/2;
+			prints.elmCnt = RSS14_ELMNTS/2;
 			prints.pattern = linPattern;
-			prints.rightPad = R_PADR;
+			prints.rightPad = RSS14_R_PADR;
 			prntCnv = cnvSeparator(params, &prints);
 			printElmnts(params, prntCnv);
 
 			// RSS14SO upper row
 			prints.guards = true;
-			prints.height = params->pixMult*SYM_H;
+			prints.height = params->pixMult*RSS14_SYM_H;
 			printElmnts(params, &prints);
 
 			// RSS14SO upper row separator pattern
@@ -857,24 +842,24 @@ void RSS14SO(gs1_encoder *params) {
 			printElmnts(params, &chexPrnts);
 
 			// RSS14SO lower row separator pattern
-			prints.pattern = &linPattern[ELMNTS/2];
+			prints.pattern = &linPattern[RSS14_ELMNTS/2];
 			prints.whtFirst = false;
 			prntCnv = cnvSeparator(params, &prints);
 			printElmnts(params, prntCnv);
 
 			// RSS14SO lower row
-			prints.height = params->pixMult*SYM_H;
+			prints.height = params->pixMult*RSS14_SYM_H;
 			printElmnts(params, &prints);
 		}
 	}
 	else { // primary only
 		if (params->bmp) {
-			bmpHeader(params->pixMult*(SYM_W/2+2),
-				params->pixMult*(SYM_H*2) + 3*params->sepHt, params->outfp);
+			bmpHeader(params->pixMult*(RSS14_SYM_W/2+2),
+				params->pixMult*(RSS14_SYM_H*2) + 3*params->sepHt, params->outfp);
 
 			// RSS14SO lower row
-			prints.height = params->pixMult*SYM_H;
-			prints.pattern = &linPattern[ELMNTS/2];
+			prints.height = params->pixMult*RSS14_SYM_H;
+			prints.pattern = &linPattern[RSS14_ELMNTS/2];
 			prints.whtFirst = false;
 			printElmnts(params, &prints);
 
@@ -892,16 +877,16 @@ void RSS14SO(gs1_encoder *params) {
 			printElmnts(params, prntCnv);
 
 			// RSS14SO upper row
-			prints.height = params->pixMult*SYM_H;
+			prints.height = params->pixMult*RSS14_SYM_H;
 			printElmnts(params, &prints);
 		}
 		else {
-			tifHeader(params->pixMult*(SYM_W/2+2),
-				params->pixMult*(SYM_H*2) + 3*params->sepHt, params->outfp);
+			tifHeader(params->pixMult*(RSS14_SYM_W/2+2),
+				params->pixMult*(RSS14_SYM_H*2) + 3*params->sepHt, params->outfp);
 
 			// RSS14SO upper row
 			prints.pattern = linPattern;
-			prints.height = params->pixMult*SYM_H;
+			prints.height = params->pixMult*RSS14_SYM_H;
 			printElmnts(params, &prints);
 
 			// RSS14SO upper row separator pattern
@@ -912,13 +897,13 @@ void RSS14SO(gs1_encoder *params) {
 			printElmnts(params, &chexPrnts);
 
 			// RSS14SO lower row separator pattern
-			prints.pattern = &linPattern[ELMNTS/2];
+			prints.pattern = &linPattern[RSS14_ELMNTS/2];
 			prints.whtFirst = false;
 			prntCnv = cnvSeparator(params, &prints);
 			printElmnts(params, prntCnv);
 
 			// RSS14SO lower row
-			prints.height = params->pixMult*SYM_H;
+			prints.height = params->pixMult*RSS14_SYM_H;
 			printElmnts(params, &prints);
 		}
 	}

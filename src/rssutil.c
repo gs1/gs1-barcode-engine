@@ -123,8 +123,6 @@ int *getRSSwidths(gs1_encoder *ctx, int val, int n, int elements, int maxWidth, 
 }
 
 
-#define MAX_SEP_ELMNTS (11*21+4) // for 22 segment RSS Exp
-
 static struct sPrints prntSep;
 static uint8_t sepPattern[MAX_SEP_ELMNTS];
 

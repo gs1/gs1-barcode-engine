@@ -25,19 +25,29 @@
 
 #include "enc-private.h"
 
-#define CCB2_WIDTH 57		// 2 column cca/b
-#define CCB2_ELMNTS 31		// includes qz's
+#define CCB2_WIDTH	57	// 2 column cca/b
+#define CCB2_ELMNTS	31	// includes qz's
 
-#define CCA3_WIDTH 74		// 3 column cca
-#define CCA3_ELMNTS 39		// includes qz's
-#define MAX_CCA3_ROWS 8		// cca-3 max rows
+#define CCA3_WIDTH	74	// 3 column cca
+#define CCA3_ELMNTS	39	// includes qz's
+#define MAX_CCA3_ROWS	8	// cca-3 max rows
 
-#define CCB3_WIDTH 84		// 3 column ccb
-#define CCB3_ELMNTS 45		// includes qz's
+#define CCB3_WIDTH	84	// 3 column ccb
+#define CCB3_ELMNTS	45	// includes qz's
 
-#define CCB4_WIDTH 101		// 4 column cca/b
-#define CCB4_ELMNTS 53		// includes qz's
-#define MAX_CCB4_ROWS 44	// ccb-4 max rows
+#define CCB4_WIDTH	101	// 4 column cca/b
+#define CCB4_ELMNTS	53	// includes qz's
+#define MAX_CCB4_CW	176	// ccb-4 max codewords
+#define MAX_CCB4_ROWS	44	// ccb-4 max rows
+#define MAX_CCB4_BYTES	148	// maximum byte mode capacity for ccb4
+
+#define MAX_CCC_CW	863	// ccc max data codewords
+#define MAX_CCC_ROWS	90	// ccc max rows
+#define MAX_CCC_BYTES	1033	// maximum byte mode capacity for ccc
+
+#define MAX_CCA2_SIZE	6	// index to 167 in CC2Sizes
+#define MAX_CCA3_SIZE	4	// index to 167 in CC3Sizes
+#define MAX_CCA4_SIZE	4	// index to 197 in CC4Sizes
 
 uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
 

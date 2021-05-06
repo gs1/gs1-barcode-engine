@@ -25,19 +25,8 @@
 #include <stdint.h>
 
 #include "enc-private.h"
-#include "driver.h"
 #include "cc.h"
-
-#define MAX_CCA2_SIZE 6		// index to 167 in CC2Sizes
-#define MAX_CCA3_SIZE 4		// index to 167 in CC3Sizes
-#define MAX_CCA4_SIZE 4		// index to 197 in CC4Sizes
-
-#define MAX_CW 176		// ccb-4 max codewords
-#define MAX_BYTES 148		// maximum byte mode capacity for ccb4
-
-#define MAX_CCC_CW 863		// ccc max data codewords
-#define MAX_CCC_ROWS 90		// ccc max rows
-#define MAX_CCC_BYTES 1033	// maximum byte mode capacity for ccc
+#include "driver.h"
 
 struct encodeT {
 	uint8_t *str;
@@ -593,7 +582,7 @@ void putBits(uint8_t bitField[], int bitPos, int length, uint16_t bits) {
 		maxBytes = MAX_CCC_BYTES; // CC-C
 	}
 	else {
-		maxBytes = MAX_BYTES; // others
+		maxBytes = MAX_CCB4_BYTES; // others
 	}
 	if ((bitPos+length > maxBytes*8) || (length > 16)) {
 		sprintf(errMsg, "putBits error, %d, %d", bitPos, length);
@@ -2113,8 +2102,8 @@ int CC2enc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_
 
 	static const int rows[11] = { 5,6,7,8,9,10,12,  17,20,23,26 }; // 7 CCA & 4 CCB row counts
 
-	uint8_t bitField[MAX_BYTES];
-	uint16_t codeWords[MAX_CW];
+	uint8_t bitField[MAX_CCB4_BYTES];
+	uint16_t codeWords[MAX_CCB4_CW];
 	int size;
 	int i;
 
@@ -2148,8 +2137,8 @@ int CC3enc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_
 
 	static const int rows[11] = { 4,5,6,7,8,  15,20,26,32,38,44 }; // 5 CCA & 6 CCB row counts
 
-	uint8_t bitField[MAX_BYTES];
-	uint16_t codeWords[MAX_CW];
+	uint8_t bitField[MAX_CCB4_BYTES];
+	uint16_t codeWords[MAX_CCB4_CW];
 	int size;
 	int i;
 
@@ -2183,8 +2172,8 @@ int CC4enc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_
 
 	static const int rows[13] = { 3,4,5,6,7,  10,12,15,20,26,32,38,44 }; // 5 CCA & 8 CCB row counts
 
-	uint8_t bitField[MAX_BYTES];
-	uint16_t codeWords[MAX_CW];
+	uint8_t bitField[MAX_CCB4_BYTES];
+	uint16_t codeWords[MAX_CCB4_CW];
 	int size;
 	int i;
 

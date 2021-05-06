@@ -50,6 +50,8 @@ struct sPrints {
 
 
 struct gs1_encoder {
+
+	// members with accessors
 	int sym;                // symbology type
 	int inputFlag;          // 1 = dataStr, 2 = dataFile
 	int pixMult;            // pixels per X
@@ -59,23 +61,27 @@ struct gs1_encoder {
 	int segWidth;
 	int bmp;                // true is BMP else TIF file output
 	int linHeight;          // height of UCC/EAN-128 in X
-	FILE *outfp;
 	char dataFile[MAX_FNAME+1];
 	char outFile[MAX_FNAME+1];
 	char dataStr[MAX_DATA+1];
-	char *errMsg;
 
 	// per-instance globals
+	FILE *outfp;
+	int errFlag;
+	char* errMsg;
+	int rowWidth;
+	int line1;
+	int linFlag; // tells pack whether linear or cc is being encoded
 	const int *cc_CCSizes;  // will point to CCxSize
 	int cc_gpa[512];
 	uint8_t driver_line[MAX_LINE/8 + 1];
 	uint8_t driver_lineUCut[MAX_LINE/8 + 1];
 	struct sPrints rss14_prntSep;
-	uint8_t rss14_sepPattern;
+	uint8_t rss14_sepPattern[RSS14_SYM_W/2+2];
 	struct sPrints rsslim_prntSep;
-	uint8_t rsslim_sepPattern;
+	uint8_t rsslim_sepPattern[RSSLIM_SYM_W];
 	struct sPrints rssutil_prntSep;
-	uint8_t rssutil_sepPattern;
+	uint8_t rssutil_sepPattern[MAX_SEP_ELMNTS];
 	int rss_util_widths[MAX_K];
 
 };

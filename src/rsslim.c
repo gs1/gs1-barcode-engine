@@ -27,12 +27,6 @@
 #include "rssutil.h"
 #include "cc.h"
 
-#define ELMNTS	(46-4)	// not including guard bars
-#define SYM_W	74	// symbol width in modules including any quiet zones
-#define SYM_H	10	// total pixel ht of RSS14L
-#define L_PADB 10	// RSS14L left pad for ccb
-
-
 extern int errFlag;
 extern int line1;
 extern uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
@@ -40,7 +34,7 @@ extern uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
 
 // TODO move into context
 static struct sPrints prntSep;
-static uint8_t sepPattern[SYM_W];
+static uint8_t sepPattern[RSSLIM_SYM_W];
 
 
 static struct sPrints *separatorLim(gs1_encoder *params, struct sPrints *prints) {
@@ -56,8 +50,8 @@ static struct sPrints *separatorLim(gs1_encoder *params, struct sPrints *prints)
 	prntSep.guards = false;
 
 	sepPattern[0] = sepPattern[1] = 1;
-	sepPattern[ELMNTS+2] = sepPattern[ELMNTS+3] = 1;
-	for (i = 0; i < ELMNTS; i++) {
+	sepPattern[RSSLIM_ELMNTS+2] = sepPattern[RSSLIM_ELMNTS+3] = 1;
+	for (i = 0; i < RSSLIM_ELMNTS; i++) {
 		sepPattern[i+2] = prints->pattern[i];
 	}
 	for (i = k = 0; k <= 4; k += sepPattern[i], i++);
@@ -70,7 +64,7 @@ static struct sPrints *separatorLim(gs1_encoder *params, struct sPrints *prints)
 		sepPattern[0] = (uint8_t)k;
 		j = 1;
 	}
-	for ( ; i < ELMNTS+4; i++, j++) {
+	for ( ; i < RSSLIM_ELMNTS+4; i++, j++) {
 		sepPattern[j] = sepPattern[i];
 	}
 	for (j--, k = 0; k <= 4; k += sepPattern[j], j--);
@@ -306,7 +300,7 @@ void RSSLim(gs1_encoder *params) {
 	struct sPrints prints;
 	struct sPrints *prntCnv;
 
-	uint8_t linPattern[ELMNTS];
+	uint8_t linPattern[RSSLIM_ELMNTS];
 
 	char primaryStr[14+1];
 	char tempStr[28+1];
@@ -337,16 +331,16 @@ void RSSLim(gs1_encoder *params) {
 #if PRNT
 	printf("\n%s", primaryStr);
 	printf("\n");
-	for (i = 0; i < ELMNTS; i++) {
+	for (i = 0; i < RSSLIM_ELMNTS; i++) {
 		printf("%d", linPattern[i]);
 	}
 	printf("\n");
 #endif
 	line1 = true; // so first line is not Y undercut
 	// init most common RSS Limited row prints values
-	prints.elmCnt = ELMNTS;
+	prints.elmCnt = RSSLIM_ELMNTS;
 	prints.pattern = linPattern;
-	prints.height = params->pixMult*SYM_H;
+	prints.height = params->pixMult*RSSLIM_SYM_H;
 	prints.guards = true;
 	prints.leftPad = 0;
 	prints.rightPad = 0;
@@ -378,8 +372,8 @@ void RSSLim(gs1_encoder *params) {
 		if (params->bmp) {
 			// note: BMP is bottom to top inverted
 			if (rows <= MAX_CCA3_ROWS) { // CCA composite
-				bmpHeader(params->pixMult*SYM_W,
-						params->pixMult*(rows*2+SYM_H) + params->sepHt, params->outfp);
+				bmpHeader(params->pixMult*RSSLIM_SYM_W,
+						params->pixMult*(rows*2+RSSLIM_SYM_H) + params->sepHt, params->outfp);
 
 				// RSS Limited row
 				printElmnts(params, &prints);
@@ -398,11 +392,11 @@ void RSSLim(gs1_encoder *params) {
 				}
 			}
 			else { // CCB composite, extends beyond RSS14L on left
-				bmpHeader(params->pixMult*(L_PADB+SYM_W),
-						params->pixMult*(rows*2+SYM_H) + params->sepHt, params->outfp);
+				bmpHeader(params->pixMult*(RSSLIM_L_PADB+RSSLIM_SYM_W),
+						params->pixMult*(rows*2+RSSLIM_SYM_H) + params->sepHt, params->outfp);
 
 				// RSS Limited row
-				prints.leftPad = L_PADB;
+				prints.leftPad = RSSLIM_L_PADB;
 				printElmnts(params, &prints);
 
 				// RSS Limited CC separator pattern
@@ -422,8 +416,8 @@ void RSSLim(gs1_encoder *params) {
 		}
 		else { // TIF format
 			if (rows <= MAX_CCA3_ROWS) { // CCA composite
-				tifHeader(params->pixMult*SYM_W,
-						params->pixMult*(rows*2+SYM_H) + params->sepHt, params->outfp);
+				tifHeader(params->pixMult*RSSLIM_SYM_W,
+						params->pixMult*(rows*2+RSSLIM_SYM_H) + params->sepHt, params->outfp);
 
           // 2D composite
 				prints.elmCnt = CCA3_ELMNTS;
@@ -434,9 +428,9 @@ void RSSLim(gs1_encoder *params) {
 					printElmnts(params, &prints);
 				}
 
-				prints.elmCnt = ELMNTS;
+				prints.elmCnt = RSSLIM_ELMNTS;
 				prints.pattern = linPattern;
-				prints.height = params->pixMult*SYM_H;
+				prints.height = params->pixMult*RSSLIM_SYM_H;
 				prints.guards = true;
 
 				// RSS Limited CC separator pattern
@@ -447,8 +441,8 @@ void RSSLim(gs1_encoder *params) {
 				printElmnts(params, &prints);
 			}
 			else { // CCB composite, extends beyond RSS14L on left
-				tifHeader(params->pixMult*(L_PADB+SYM_W),
-						params->pixMult*(rows*2+SYM_H) + params->sepHt, params->outfp);
+				tifHeader(params->pixMult*(RSSLIM_L_PADB+RSSLIM_SYM_W),
+						params->pixMult*(rows*2+RSSLIM_SYM_H) + params->sepHt, params->outfp);
 
 				// 2D composite
 				prints.elmCnt = CCB3_ELMNTS;
@@ -460,11 +454,11 @@ void RSSLim(gs1_encoder *params) {
 					printElmnts(params, &prints);
 				}
 
-				prints.elmCnt = ELMNTS;
+				prints.elmCnt = RSSLIM_ELMNTS;
 				prints.pattern = linPattern;
-				prints.height = params->pixMult*SYM_H;
+				prints.height = params->pixMult*RSSLIM_SYM_H;
 				prints.guards = true;
-				prints.leftPad = L_PADB;
+				prints.leftPad = RSSLIM_L_PADB;
 
 				// RSS Limited CC separator pattern
 				prntCnv = separatorLim(params, &prints);
@@ -477,10 +471,10 @@ void RSSLim(gs1_encoder *params) {
 	}
 	else { // primary only
 		if (params->bmp) {
-			bmpHeader(params->pixMult*SYM_W, params->pixMult*SYM_H, params->outfp);
+			bmpHeader(params->pixMult*RSSLIM_SYM_W, params->pixMult*RSSLIM_SYM_H, params->outfp);
 		}
 		else {
-			tifHeader(params->pixMult*SYM_W, params->pixMult*SYM_H, params->outfp);
+			tifHeader(params->pixMult*RSSLIM_SYM_W, params->pixMult*RSSLIM_SYM_H, params->outfp);
 		}
 
 		// RSS Limited row

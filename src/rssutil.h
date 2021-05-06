@@ -23,6 +23,7 @@
 
 #include "enc-private.h"
 
+#define MAX_SEP_ELMNTS (11*21+4) // for 22 segment RSS Exp
 #define MAX_K 14
 
 int *getRSSwidths(gs1_encoder *ctx, int val, int n, int elements, int maxWidth, int noNarrow);
