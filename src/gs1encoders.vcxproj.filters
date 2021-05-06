@@ -39,10 +39,10 @@
     <ClCompile Include="gs1encoders.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="driver.c">
+    <ClCompile Include="gs1encoders-app.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="gs1encoders-app.c">
+    <ClCompile Include="driver.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
