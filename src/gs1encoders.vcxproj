@@ -120,10 +120,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cc.h" />
+    <ClInclude Include="driver.h" />
     <ClInclude Include="enc.h" />
     <ClInclude Include="release.h" />
     <ClInclude Include="rssutil.h" />
-    <ClInclude Include="util.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

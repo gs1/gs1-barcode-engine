@@ -39,7 +39,7 @@
     <ClCompile Include="gs1encoders.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="util.c">
+    <ClCompile Include="driver.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -50,13 +50,13 @@
     <ClInclude Include="cc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="driver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="enc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="rssutil.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="util.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

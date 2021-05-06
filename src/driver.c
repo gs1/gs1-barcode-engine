@@ -22,7 +22,7 @@
 #include <stdint.h>
 
 #include "enc-private.h"
-#include "util.h"
+#include "driver.h"
 
 #define MAX_LINE 6032 // 10 inches wide at 600 dpi
 

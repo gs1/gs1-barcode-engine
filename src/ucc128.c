@@ -21,8 +21,9 @@
 #include <string.h>
 #include <stdbool.h>
 #include <stdint.h>
+
 #include "enc-private.h"
-#include "util.h"
+#include "driver.h"
 #include "cc.h"
 
 #define SYMMAX		45	// UCC/EAN-128 40 symbol chars + strt,FNC1,link,chk & stop max

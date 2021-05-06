@@ -22,7 +22,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include "enc-private.h"
-#include "util.h"
+#include "driver.h"
 #include "rssutil.h"
 #include "cc.h"
 

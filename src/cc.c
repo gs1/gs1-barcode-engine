@@ -25,7 +25,7 @@
 #include <stdint.h>
 
 #include "enc-private.h"
-#include "util.h"
+#include "driver.h"
 #include "cc.h"
 
 #define MAX_CCA2_SIZE 6		// index to 167 in CC2Sizes

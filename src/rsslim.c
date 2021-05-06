@@ -23,7 +23,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include "enc-private.h"
-#include "util.h"
+#include "driver.h"
 #include "rssutil.h"
 #include "cc.h"
 

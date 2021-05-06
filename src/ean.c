@@ -22,7 +22,7 @@
 #include <stdint.h>
 #include <string.h>
 #include "enc-private.h"
-#include "util.h"
+#include "driver.h"
 #include "cc.h"
 
 
