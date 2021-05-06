@@ -29,8 +29,6 @@
 #include "rsslim.h"
 #include "rssutil.h"
 
-extern uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
-
 static struct sPrints *separatorLim(gs1_encoder *ctx, struct sPrints *prints) {
 
 	int i, j, k;
@@ -297,6 +295,8 @@ void RSSLim(gs1_encoder *ctx) {
 	struct sPrints *prntCnv;
 
 	uint8_t linPattern[RSSLIM_ELMNTS];
+
+	uint8_t (*ccPattern)[CCB4_ELMNTS] = ctx->ccPattern;
 
 	char primaryStr[14+1];
 	char tempStr[28+1];

@@ -30,11 +30,6 @@
 #define ISNUM(A) ((A<072)&&(A>057)) /* true if A is numeric ASCII */
 
 
-// TODO move into context
-
-extern uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
-
-
 /*
  * tbl128 converts an array of Code 128 symbol values to an array of
  * bar and space widths which represent that symbol.
@@ -366,6 +361,8 @@ void U128A(gs1_encoder *ctx) {
 	struct sPrints prints;
 
 	uint8_t linPattern[(UCC128_SYMMAX*6)+3];
+
+	uint8_t (*ccPattern)[CCB4_ELMNTS] = ctx->ccPattern;
 
 	int i;
 	int rows, ccFlag, symChars, symWidth, ccLpad, ccRpad;

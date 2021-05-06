@@ -46,8 +46,6 @@ enum {
 	AI8004
 };
 
-extern uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
-
 
 static const uint32_t barData[3][929] = {{
  6591070,8688228,10785386,6591133,8688291,10785449,4494038,6591196,4494101,2397006,

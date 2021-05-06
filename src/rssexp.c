@@ -28,9 +28,6 @@
 #include "rssexp.h"
 #include "rssutil.h"
 
-extern uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
-
-
 // gets the next 12 bit sym char from bit string
 static int getVal12(uint8_t bitString[], int symNdx) {
 	int val, ndx;
@@ -255,6 +252,8 @@ void RSSExp(gs1_encoder *ctx) {
 	uint8_t linPattern[RSSEXP_MAX_DBL_SEGS*RSSEXP_ELMNTS+4];
 	uint8_t chexPattern[RSSEXP_MAX_DBL_SEGS*RSSEXP_SYM_W+2];
 	uint8_t dblPattern[RSSEXP_MAX_DBL_SEGS][RSSEXP_ELMNTS];
+
+	uint8_t (*ccPattern)[CCB4_ELMNTS] = ctx->ccPattern;
 
 	int i, j;
 	int rows = 0, ccFlag;

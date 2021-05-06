@@ -93,7 +93,5 @@ struct gs1_encoder {
 
 };
 
-// globals   TODO hoist
-uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
 
 #endif /* ENC_PRIVATE_H */

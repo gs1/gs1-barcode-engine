@@ -29,7 +29,6 @@
 #include "rssutil.h"
 #include "cc.h"
 
-extern uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
 
 // RSS14 Stacked row separator pattern routine
 static struct sPrints *separator14S(gs1_encoder *ctx, struct sPrints *prints) {
@@ -369,6 +368,8 @@ void RSS14(gs1_encoder *ctx) {
 
 	uint8_t linPattern[RSS14_ELMNTS];
 
+	uint8_t (*ccPattern)[CCB4_ELMNTS] = ctx->ccPattern;
+
 	char primaryStr[14+1];
 	char tempStr[28+1];
 
@@ -507,6 +508,8 @@ void RSS14S(gs1_encoder *ctx) {
 	struct sPrints *prntCnv;
 
 	uint8_t linPattern[RSS14_ELMNTS];
+
+	uint8_t (*ccPattern)[CCB4_ELMNTS] = ctx->ccPattern;
 
 	char primaryStr[14+1];
 	char tempStr[28+1];
@@ -692,6 +695,8 @@ void RSS14SO(gs1_encoder *ctx) {
 
 	uint8_t linPattern[RSS14_ELMNTS];
 	uint8_t chexPattern[RSS14_SYM_W/2+2];
+
+	uint8_t (*ccPattern)[CCB4_ELMNTS] = ctx->ccPattern;
 
 	char primaryStr[14+1];
 	char tempStr[28+1];

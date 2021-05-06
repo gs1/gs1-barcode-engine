@@ -28,9 +28,6 @@
 #include "ean.h"
 
 
-extern uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
-
-
 #define EAN13_ELMNTS	61	// includes qz's
 #define EAN13_W		109 	// includes 7X quiet zones
 #define EAN13_H		74	// total ht in x
@@ -103,6 +100,8 @@ void EAN13(gs1_encoder *ctx) {
 	uint8_t linPattern[EAN13_ELMNTS];
 	uint8_t sepPat1[5] = { 7,1,EAN13_W-16,1,7 }; // separator pattern 1
 	uint8_t sepPat2[5] = { 6,1,EAN13_W-14,1,6 }; // separator pattern 2
+
+	uint8_t (*ccPattern)[CCB4_ELMNTS] = ctx->ccPattern;
 
 	char primaryStr[14+1];
 	char tempStr[28+1];
@@ -306,6 +305,8 @@ void EAN8(gs1_encoder *ctx) {
 	uint8_t linPattern[EAN8_ELMNTS];
 	uint8_t sepPat1[5] = { 7,1,EAN8_W-16,1,7 }; // separator pattern 1
 	uint8_t sepPat2[5] = { 6,1,EAN8_W-14,1,6 }; // separator pattern 2
+
+	uint8_t (*ccPattern)[CCB4_ELMNTS] = ctx->ccPattern;
 
 	char primaryStr[14+1];
 	char tempStr[28+1];
@@ -562,6 +563,8 @@ void UPCE(gs1_encoder *ctx) {
 	uint8_t linPattern[UPCE_ELMNTS];
 	uint8_t sepPat1[5] = { 7,1,UPCE_W-16,1,7 }; // separator pattern 1
 	uint8_t sepPat2[5] = { 6,1,UPCE_W-14,1,6 }; // separator pattern 2
+
+	uint8_t (*ccPattern)[CCB4_ELMNTS] = ctx->ccPattern;
 
 	char primaryStr[14+1];
 	char tempStr[28+1];
