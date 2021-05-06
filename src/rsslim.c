@@ -31,17 +31,17 @@
 
 extern uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
 
-static struct sPrints *separatorLim(gs1_encoder *params, struct sPrints *prints) {
+static struct sPrints *separatorLim(gs1_encoder *ctx, struct sPrints *prints) {
 
 	int i, j, k;
-	uint8_t *sepPattern = params->rsslim_sepPattern;
-	struct sPrints *prntSep = &params->rsslim_prntSep;
+	uint8_t *sepPattern = ctx->rsslim_sepPattern;
+	struct sPrints *prntSep = &ctx->rsslim_prntSep;
 
 	prntSep->leftPad = prints->leftPad;
 	prntSep->rightPad = prints->rightPad;
 	prntSep->reverse = prints->reverse;
 	prntSep->pattern = sepPattern;
-	prntSep->height = params->sepHt;
+	prntSep->height = ctx->sepHt;
 	prntSep->whtFirst = true;
 	prntSep->guards = false;
 
@@ -291,7 +291,7 @@ static bool RSSLimEnc(gs1_encoder *ctx, uint8_t string[], uint8_t bars[], int cc
 }
 
 
-void RSSLim(gs1_encoder *params) {
+void RSSLim(gs1_encoder *ctx) {
 
 	struct sPrints prints;
 	struct sPrints *prntCnv;
@@ -305,7 +305,7 @@ void RSSLim(gs1_encoder *params) {
 	int rows, ccFlag;
 	char *ccStr;
 
-	ccStr = strchr(params->dataStr, '|');
+	ccStr = strchr(ctx->dataStr, '|');
 	if (ccStr == NULL) ccFlag = false;
 	else {
 		ccFlag = true;
@@ -313,17 +313,17 @@ void RSSLim(gs1_encoder *params) {
 		ccStr++; // point to secondary data
 	}
 
-	if (strlen(params->dataStr) > 13) {
-		strcpy(params->errMsg, "primary data exceeds 13 digits");
-		params->errFlag = true;
+	if (strlen(ctx->dataStr) > 13) {
+		strcpy(ctx->errMsg, "primary data exceeds 13 digits");
+		ctx->errFlag = true;
 		return;
 	}
 
 	strcpy(tempStr, "000000000000");
-	strcat(tempStr, params->dataStr);
+	strcat(tempStr, ctx->dataStr);
 	strcpy(primaryStr, tempStr + strlen(tempStr) - 13);
 
-	if (!RSSLimEnc(params, (uint8_t*)primaryStr, linPattern, ccFlag) || params->errFlag) return;
+	if (!RSSLimEnc(ctx, (uint8_t*)primaryStr, linPattern, ccFlag) || ctx->errFlag) return;
 #if PRNT
 	printf("\n%s", primaryStr);
 	printf("\n");
@@ -332,18 +332,18 @@ void RSSLim(gs1_encoder *params) {
 	}
 	printf("\n");
 #endif
-	params->line1 = true; // so first line is not Y undercut
+	ctx->line1 = true; // so first line is not Y undercut
 	// init most common RSS Limited row prints values
 	prints.elmCnt = RSSLIM_ELMNTS;
 	prints.pattern = linPattern;
-	prints.height = params->pixMult*RSSLIM_SYM_H;
+	prints.height = ctx->pixMult*RSSLIM_SYM_H;
 	prints.guards = true;
 	prints.leftPad = 0;
 	prints.rightPad = 0;
 	prints.whtFirst = true;
 	prints.reverse = false;
 	if (ccFlag) {
-		if (!((rows = CC3enc(params, (uint8_t*)ccStr, ccPattern)) > 0) || params->errFlag) return;
+		if (!((rows = CC3enc(ctx, (uint8_t*)ccStr, ccPattern)) > 0) || ctx->errFlag) return;
 #if PRNT
 		{
 			int j;
@@ -365,116 +365,116 @@ void RSSLim(gs1_encoder *params) {
 		}
 #endif
 
-		if (params->bmp) {
+		if (ctx->bmp) {
 			// note: BMP is bottom to top inverted
 			if (rows <= MAX_CCA3_ROWS) { // CCA composite
-				bmpHeader(params->pixMult*RSSLIM_SYM_W,
-						params->pixMult*(rows*2+RSSLIM_SYM_H) + params->sepHt, params->outfp);
+				bmpHeader(ctx->pixMult*RSSLIM_SYM_W,
+						ctx->pixMult*(rows*2+RSSLIM_SYM_H) + ctx->sepHt, ctx->outfp);
 
 				// RSS Limited row
-				printElmnts(params, &prints);
+				printElmnts(ctx, &prints);
 
 				// RSS Limited CC separator pattern
-				prntCnv = separatorLim(params, &prints);
-				printElmnts(params, prntCnv);
+				prntCnv = separatorLim(ctx, &prints);
+				printElmnts(ctx, prntCnv);
 
 				// 2D composite
 				prints.elmCnt = CCA3_ELMNTS;
 				prints.guards = false;
-				prints.height = params->pixMult*2;
+				prints.height = ctx->pixMult*2;
 				for (i = rows-1; i >= 0; i--) {
 					prints.pattern = ccPattern[i];
-					printElmnts(params, &prints);
+					printElmnts(ctx, &prints);
 				}
 			}
 			else { // CCB composite, extends beyond RSS14L on left
-				bmpHeader(params->pixMult*(RSSLIM_L_PADB+RSSLIM_SYM_W),
-						params->pixMult*(rows*2+RSSLIM_SYM_H) + params->sepHt, params->outfp);
+				bmpHeader(ctx->pixMult*(RSSLIM_L_PADB+RSSLIM_SYM_W),
+						ctx->pixMult*(rows*2+RSSLIM_SYM_H) + ctx->sepHt, ctx->outfp);
 
 				// RSS Limited row
 				prints.leftPad = RSSLIM_L_PADB;
-				printElmnts(params, &prints);
+				printElmnts(ctx, &prints);
 
 				// RSS Limited CC separator pattern
-				prntCnv = separatorLim(params, &prints);
-				printElmnts(params, prntCnv);
+				prntCnv = separatorLim(ctx, &prints);
+				printElmnts(ctx, prntCnv);
 
 				// 2D composite
 				prints.elmCnt = CCB3_ELMNTS;
 				prints.guards = false;
-				prints.height = params->pixMult*2;
+				prints.height = ctx->pixMult*2;
 				prints.leftPad = 0;
 				for (i = rows-1; i >= 0; i--) {
 					prints.pattern = ccPattern[i];
-					printElmnts(params, &prints);
+					printElmnts(ctx, &prints);
 				}
 			}
 		}
 		else { // TIF format
 			if (rows <= MAX_CCA3_ROWS) { // CCA composite
-				tifHeader(params->pixMult*RSSLIM_SYM_W,
-						params->pixMult*(rows*2+RSSLIM_SYM_H) + params->sepHt, params->outfp);
+				tifHeader(ctx->pixMult*RSSLIM_SYM_W,
+						ctx->pixMult*(rows*2+RSSLIM_SYM_H) + ctx->sepHt, ctx->outfp);
 
           // 2D composite
 				prints.elmCnt = CCA3_ELMNTS;
 				prints.guards = false;
-				prints.height = params->pixMult*2;
+				prints.height = ctx->pixMult*2;
 				for (i = 0; i < rows; i++) {
 					prints.pattern = ccPattern[i];
-					printElmnts(params, &prints);
+					printElmnts(ctx, &prints);
 				}
 
 				prints.elmCnt = RSSLIM_ELMNTS;
 				prints.pattern = linPattern;
-				prints.height = params->pixMult*RSSLIM_SYM_H;
+				prints.height = ctx->pixMult*RSSLIM_SYM_H;
 				prints.guards = true;
 
 				// RSS Limited CC separator pattern
-				prntCnv = separatorLim(params, &prints);
-				printElmnts(params, prntCnv);
+				prntCnv = separatorLim(ctx, &prints);
+				printElmnts(ctx, prntCnv);
 
 				// RSS Limited row
-				printElmnts(params, &prints);
+				printElmnts(ctx, &prints);
 			}
 			else { // CCB composite, extends beyond RSS14L on left
-				tifHeader(params->pixMult*(RSSLIM_L_PADB+RSSLIM_SYM_W),
-						params->pixMult*(rows*2+RSSLIM_SYM_H) + params->sepHt, params->outfp);
+				tifHeader(ctx->pixMult*(RSSLIM_L_PADB+RSSLIM_SYM_W),
+						ctx->pixMult*(rows*2+RSSLIM_SYM_H) + ctx->sepHt, ctx->outfp);
 
 				// 2D composite
 				prints.elmCnt = CCB3_ELMNTS;
 				prints.guards = false;
-				prints.height = params->pixMult*2;
+				prints.height = ctx->pixMult*2;
 				prints.leftPad = 0;
 				for (i = 0; i < rows; i++) {
 					prints.pattern = ccPattern[i];
-					printElmnts(params, &prints);
+					printElmnts(ctx, &prints);
 				}
 
 				prints.elmCnt = RSSLIM_ELMNTS;
 				prints.pattern = linPattern;
-				prints.height = params->pixMult*RSSLIM_SYM_H;
+				prints.height = ctx->pixMult*RSSLIM_SYM_H;
 				prints.guards = true;
 				prints.leftPad = RSSLIM_L_PADB;
 
 				// RSS Limited CC separator pattern
-				prntCnv = separatorLim(params, &prints);
-				printElmnts(params, prntCnv);
+				prntCnv = separatorLim(ctx, &prints);
+				printElmnts(ctx, prntCnv);
 
 				// RSS Limited row
-				printElmnts(params, &prints);
+				printElmnts(ctx, &prints);
 			}
 		}
 	}
 	else { // primary only
-		if (params->bmp) {
-			bmpHeader(params->pixMult*RSSLIM_SYM_W, params->pixMult*RSSLIM_SYM_H, params->outfp);
+		if (ctx->bmp) {
+			bmpHeader(ctx->pixMult*RSSLIM_SYM_W, ctx->pixMult*RSSLIM_SYM_H, ctx->outfp);
 		}
 		else {
-			tifHeader(params->pixMult*RSSLIM_SYM_W, params->pixMult*RSSLIM_SYM_H, params->outfp);
+			tifHeader(ctx->pixMult*RSSLIM_SYM_W, ctx->pixMult*RSSLIM_SYM_H, ctx->outfp);
 		}
 
 		// RSS Limited row
-		printElmnts(params, &prints);
+		printElmnts(ctx, &prints);
 	}
 	return;
 }

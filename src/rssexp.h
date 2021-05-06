@@ -29,6 +29,6 @@
 #define RSSEXP_MAX_DBL_SEGS	12	// max double segments
 #define RSSEXP_L_PAD		1	// CC left offset
 
-void RSSExp(gs1_encoder *params);
+void RSSExp(gs1_encoder *ctx);
 
 #endif

@@ -27,6 +27,6 @@
 #define MAX_K 14
 
 int *getRSSwidths(gs1_encoder *ctx, int val, int n, int elements, int maxWidth, int noNarrow);
-struct sPrints *cnvSeparator(gs1_encoder *params, struct sPrints *prints);
+struct sPrints *cnvSeparator(gs1_encoder *ctx, struct sPrints *prints);
 
 #endif /* RSSUTIL_H */

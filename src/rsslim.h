@@ -28,6 +28,6 @@
 #define RSSLIM_SYM_H	10	// total pixel ht of RSS14L
 #define RSSLIM_L_PADB	10	// RSS Limited left pad for ccb
 
-void RSSLim(gs1_encoder *params);
+void RSSLim(gs1_encoder *ctx);
 
 #endif

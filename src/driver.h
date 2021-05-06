@@ -32,6 +32,6 @@
 
 void bmpHeader(long xdim, long ydim, FILE *oFile);
 void tifHeader(long xdim, long ydim, FILE *oFile);
-void printElmnts(gs1_encoder *params, struct sPrints *prints);
+void printElmnts(gs1_encoder *ctx, struct sPrints *prints);
 
 #endif /* UTIL_H */

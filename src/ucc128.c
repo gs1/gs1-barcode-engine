@@ -361,7 +361,7 @@ static int enc128(uint8_t data[], uint8_t bars[], int link)
 }
 
 
-void U128A(gs1_encoder *params) {
+void U128A(gs1_encoder *ctx) {
 
 	struct sPrints prints;
 
@@ -372,7 +372,7 @@ void U128A(gs1_encoder *params) {
 	char primaryStr[120+1];
 	char *ccStr;
 
-	ccStr = strchr(params->dataStr, '|');
+	ccStr = strchr(ctx->dataStr, '|');
 	if (ccStr == NULL) ccFlag = false;
 	else {
 		ccFlag = true;
@@ -380,20 +380,20 @@ void U128A(gs1_encoder *params) {
 		ccStr++; // point to secondary data
 	}
 
-	if (strlen(params->dataStr) > 48) {
-		strcpy(params->errMsg, "primary data exceeds 48 characters");
-		params->errFlag = true;
+	if (strlen(ctx->dataStr) > 48) {
+		strcpy(ctx->errMsg, "primary data exceeds 48 characters");
+		ctx->errFlag = true;
 		return;
 	}
 
 	// insert leading FNC1 if not already there
-	if (params->dataStr[0] != '#') {
+	if (ctx->dataStr[0] != '#') {
 		strcpy(primaryStr, "#");
 	}
 	else {
 		primaryStr[0] = '\0';
 	}
-	strcat(primaryStr, params->dataStr);
+	strcat(primaryStr, ctx->dataStr);
 
 	symChars = enc128((uint8_t*)primaryStr, linPattern, (ccFlag) ? 1 : 0);
 
@@ -406,18 +406,18 @@ void U128A(gs1_encoder *params) {
 	printf("\n");
 #endif
 
-	params->line1 = true; // so first line is not Y undercut
+	ctx->line1 = true; // so first line is not Y undercut
 	// init most likely prints values
 	prints.elmCnt = symChars*6+3;
 	prints.pattern = linPattern;
 	prints.guards = false;
-	prints.height = params->pixMult*params->linHeight;
+	prints.height = ctx->pixMult*ctx->linHeight;
 	prints.leftPad = 0;
 	prints.rightPad = 0;
 	prints.whtFirst = true;
 	prints.reverse = false;
 	if (ccFlag) {
-		if (!((rows = CC4enc(params, (uint8_t*)ccStr, ccPattern)) > 0) || params->errFlag) return;
+		if (!((rows = CC4enc(ctx, (uint8_t*)ccStr, ccPattern)) > 0) || ctx->errFlag) return;
 #if PRNT
 		{
 			int j;
@@ -433,8 +433,8 @@ void U128A(gs1_encoder *params) {
 #endif
 
 		if (symChars < 9) {
-			strcpy(params->errMsg, "linear component too short");
-			params->errFlag = true;
+			strcpy(ctx->errMsg, "linear component too short");
+			ctx->errFlag = true;
 			return;
 		}
 
@@ -442,84 +442,84 @@ void U128A(gs1_encoder *params) {
 		ccRpad = 10+2 + ((symChars-9)/2)*11;
 		ccLpad = symWidth - (CCB4_WIDTH + ccRpad);
 
-		if (params->bmp) {
+		if (ctx->bmp) {
 			// note: BMP is bottom to top inverted
-			bmpHeader(params->pixMult*symWidth,
-					params->pixMult*(rows*2+params->linHeight) + params->sepHt,
-						 params->outfp);
+			bmpHeader(ctx->pixMult*symWidth,
+					ctx->pixMult*(rows*2+ctx->linHeight) + ctx->sepHt,
+						 ctx->outfp);
 
 			// UCC-128
-			printElmnts(params, &prints);
+			printElmnts(ctx, &prints);
 
 			// CC separator pattern
 			prints.elmCnt = symChars*6+1;
 			prints.pattern = &linPattern[1];
-			prints.height = params->sepHt;
+			prints.height = ctx->sepHt;
 			prints.leftPad = 10;
 			prints.rightPad = 10;
-			printElmnts(params, &prints);
+			printElmnts(ctx, &prints);
 
 			// CC-C
 			prints.elmCnt = CCB4_ELMNTS;
-			prints.height = params->pixMult*2;
+			prints.height = ctx->pixMult*2;
 			prints.leftPad = ccLpad;
 			prints.rightPad = ccRpad;
 			for (i = rows-1; i >= 0; i--) {
 				prints.pattern = ccPattern[i];
-				printElmnts(params, &prints);
+				printElmnts(ctx, &prints);
 			}
 		}
 		else {
-			tifHeader(params->pixMult*symWidth,
-					params->pixMult*(rows*2+params->linHeight) + params->sepHt,
-						 params->outfp);
+			tifHeader(ctx->pixMult*symWidth,
+					ctx->pixMult*(rows*2+ctx->linHeight) + ctx->sepHt,
+						 ctx->outfp);
 
 			// CC-C
 			prints.elmCnt = CCB4_ELMNTS;
-			prints.height = params->pixMult*2;
+			prints.height = ctx->pixMult*2;
 			prints.leftPad = ccLpad;
 			prints.rightPad = ccRpad;
 			for (i = 0; i < rows; i++) {
 				prints.pattern = ccPattern[i];
-				printElmnts(params, &prints);
+				printElmnts(ctx, &prints);
 			}
 
 			// CC separator pattern
 			prints.elmCnt = symChars*6+1;
 			prints.pattern = &linPattern[1];
-			prints.height = params->sepHt;
+			prints.height = ctx->sepHt;
 			prints.leftPad = 10;
 			prints.rightPad = 10;
-			printElmnts(params, &prints);
+			printElmnts(ctx, &prints);
 
 			// UCC-128
 			prints.elmCnt = symChars*6+3;
 			prints.pattern = linPattern;
-			prints.height = params->pixMult*params->linHeight;
+			prints.height = ctx->pixMult*ctx->linHeight;
 			prints.leftPad = 0;
 			prints.rightPad = 0;
-			printElmnts(params, &prints);
+			printElmnts(ctx, &prints);
 		}
 	}
 	else { // primary only
-		if (params->bmp) {
-			bmpHeader(params->pixMult*(symChars*11+22), params->pixMult*params->linHeight, params->outfp);
+		if (ctx->bmp) {
+			bmpHeader(ctx->pixMult*(symChars*11+22), ctx->pixMult*ctx->linHeight, ctx->outfp);
 		}
 		else {
-			tifHeader(params->pixMult*(symChars*11+22), params->pixMult*params->linHeight, params->outfp);
+			tifHeader(ctx->pixMult*(symChars*11+22), ctx->pixMult*ctx->linHeight, ctx->outfp);
 		}
 
 		// UCC-128
-		printElmnts(params, &prints);
+		printElmnts(ctx, &prints);
 	}
 	return;
 }
 
 
-void U128C(gs1_encoder *params) {
+void U128C(gs1_encoder *ctx) {
 
 	struct sPrints prints;
-	uint8_t *patCCC = params->ucc128_patCCC;
+	uint8_t *patCCC = ctx->ucc128_patCCC;
 
 	uint8_t linPattern[(UCC128_SYMMAX*6)+3];
 
@@ -528,7 +528,7 @@ void U128C(gs1_encoder *params) {
 	char primaryStr[120+1];
 	char *ccStr;
 
-	ccStr = strchr(params->dataStr, '|');
+	ccStr = strchr(ctx->dataStr, '|');
 	if (ccStr == NULL) ccFlag = false;
 	else {
 		ccFlag = true;
@@ -536,20 +536,20 @@ void U128C(gs1_encoder *params) {
 		ccStr++; // point to secondary data
 	}
 
-	if (strlen(params->dataStr) > 48) {
-		strcpy(params->errMsg, "primary data exceeds 48 characters");
-		params->errFlag = true;
+	if (strlen(ctx->dataStr) > 48) {
+		strcpy(ctx->errMsg, "primary data exceeds 48 characters");
+		ctx->errFlag = true;
 		return;
 	}
 
 	// insert leading FNC1 if not already there
-	if (params->dataStr[0] != '#') {
+	if (ctx->dataStr[0] != '#') {
 		strcpy(primaryStr, "#");
 	}
 	else {
 		primaryStr[0] = '\0';
 	}
-	strcat(primaryStr, params->dataStr);
+	strcat(primaryStr, ctx->dataStr);
 
 	symChars = enc128((uint8_t*)primaryStr, linPattern, (ccFlag) ? 2 : 0); // 2 for CCC
 
@@ -562,32 +562,32 @@ void U128C(gs1_encoder *params) {
 	printf("\n");
 #endif
 
-	params->colCnt = ((symChars*11 + 22 - UCC128_L_PAD - 5)/17) -4;
-	if (params->colCnt < 1) {
-		strcpy(params->errMsg, "UCC-128 too small");
-		params->errFlag = true;
+	ctx->colCnt = ((symChars*11 + 22 - UCC128_L_PAD - 5)/17) -4;
+	if (ctx->colCnt < 1) {
+		strcpy(ctx->errMsg, "UCC-128 too small");
+		ctx->errFlag = true;
 		return;
 	}
-	params->line1 = true; // so first line is not Y undercut
+	ctx->line1 = true; // so first line is not Y undercut
 	// init most likely prints values
 	prints.elmCnt = symChars*6+3;
 	prints.pattern = linPattern;
 	prints.guards = false;
-	prints.height = params->pixMult*params->linHeight;
+	prints.height = ctx->pixMult*ctx->linHeight;
 	prints.leftPad = 0;
 	prints.rightPad = 0;
 	prints.whtFirst = true;
 	prints.reverse = false;
 	if (ccFlag) {
-		if (!CCCenc(params, (uint8_t*)ccStr, patCCC) || params->errFlag) return;
+		if (!CCCenc(ctx, (uint8_t*)ccStr, patCCC) || ctx->errFlag) return;
 #if PRNT
 		{
 			int j;
 			printf("\n%s", ccStr);
 			printf("\n");
-			for (i = 0; i < params->rowCnt; i++) {
-				for (j = 0; j < (params->colCnt+4)*8+3; j++) {
-					printf("%d", patCCC[i*((params->colCnt+4)*8+3) + j]);
+			for (i = 0; i < ctx->rowCnt; i++) {
+				for (j = 0; j < (ctx->colCnt+4)*8+3; j++) {
+					printf("%d", patCCC[i*((ctx->colCnt+4)*8+3) + j]);
 				}
 				printf("\n");
 			}
@@ -595,76 +595,76 @@ void U128C(gs1_encoder *params) {
 #endif
 
 		symWidth = symChars*11+22;
-		ccRpad = symWidth - UCC128_L_PAD - ((params->colCnt+4)*17+5);
-		if (params->bmp) {
+		ccRpad = symWidth - UCC128_L_PAD - ((ctx->colCnt+4)*17+5);
+		if (ctx->bmp) {
 			// note: BMP is bottom to top inverted
-			bmpHeader(params->pixMult*symWidth,
-					params->pixMult*(params->rowCnt*3+params->linHeight) + params->sepHt,
-						 params->outfp);
+			bmpHeader(ctx->pixMult*symWidth,
+					ctx->pixMult*(ctx->rowCnt*3+ctx->linHeight) + ctx->sepHt,
+						 ctx->outfp);
 
 			// UCC-128
-			printElmnts(params, &prints);
+			printElmnts(ctx, &prints);
 
 			// CC separator pattern
 			prints.elmCnt = symChars*6+1;
 			prints.pattern = &linPattern[1];
-			prints.height = params->sepHt;
+			prints.height = ctx->sepHt;
 			prints.leftPad = 10;
 			prints.rightPad = 10;
-			printElmnts(params, &prints);
+			printElmnts(ctx, &prints);
 
 			// CC-C
-			prints.elmCnt = (params->colCnt+4)*8+3;
-			prints.height = params->pixMult*3;
+			prints.elmCnt = (ctx->colCnt+4)*8+3;
+			prints.height = ctx->pixMult*3;
 			prints.leftPad = UCC128_L_PAD;
 			prints.rightPad = ccRpad;
-			for (i = params->rowCnt-1; i >= 0; i--) {
-				prints.pattern = &patCCC[i*((params->colCnt+4)*8+3)];
-				printElmnts(params, &prints);
+			for (i = ctx->rowCnt-1; i >= 0; i--) {
+				prints.pattern = &patCCC[i*((ctx->colCnt+4)*8+3)];
+				printElmnts(ctx, &prints);
 			}
 		}
 		else {
-			tifHeader(params->pixMult*symWidth,
-					params->pixMult*(params->rowCnt*3+params->linHeight) + params->sepHt,
-						 params->outfp);
+			tifHeader(ctx->pixMult*symWidth,
+					ctx->pixMult*(ctx->rowCnt*3+ctx->linHeight) + ctx->sepHt,
+						 ctx->outfp);
 
 			// CC-C
-			prints.elmCnt = (params->colCnt+4)*8+3;
-			prints.height = params->pixMult*3;
+			prints.elmCnt = (ctx->colCnt+4)*8+3;
+			prints.height = ctx->pixMult*3;
 			prints.leftPad = UCC128_L_PAD;
 			prints.rightPad = ccRpad;
-			for (i = 0; i < params->rowCnt; i++) {
-				prints.pattern = &patCCC[i*((params->colCnt+4)*8+3)];
-				printElmnts(params, &prints);
+			for (i = 0; i < ctx->rowCnt; i++) {
+				prints.pattern = &patCCC[i*((ctx->colCnt+4)*8+3)];
+				printElmnts(ctx, &prints);
 			}
 
 			// CC separator pattern
 			prints.elmCnt = symChars*6+1;
 			prints.pattern = &linPattern[1];
-			prints.height = params->sepHt;
+			prints.height = ctx->sepHt;
 			prints.leftPad = 10;
 			prints.rightPad = 10;
-			printElmnts(params, &prints);
+			printElmnts(ctx, &prints);
 
 			// UCC-128
 			prints.elmCnt = symChars*6+3;
 			prints.pattern = linPattern;
-			prints.height = params->pixMult*params->linHeight;
+			prints.height = ctx->pixMult*ctx->linHeight;
 			prints.leftPad = 0;
 			prints.rightPad = 0;
-			printElmnts(params, &prints);
+			printElmnts(ctx, &prints);
 		}
 	}
 	else { // primary only
-		if (params->bmp) {
-			bmpHeader(params->pixMult*(symChars*11+22), params->pixMult*params->linHeight, params->outfp);
+		if (ctx->bmp) {
+			bmpHeader(ctx->pixMult*(symChars*11+22), ctx->pixMult*ctx->linHeight, ctx->outfp);
 		}
 		else {
-			tifHeader(params->pixMult*(symChars*11+22), params->pixMult*params->linHeight, params->outfp);
+			tifHeader(ctx->pixMult*(symChars*11+22), ctx->pixMult*ctx->linHeight, ctx->outfp);
 		}
 
 		// UCC-128
-		printElmnts(params, &prints);
+		printElmnts(ctx, &prints);
 	}
 	return;
 }

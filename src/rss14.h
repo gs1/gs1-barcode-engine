@@ -32,8 +32,8 @@
 #define RSS14_L_PADR	5	// RSS-14 left offset
 #define RSS14_R_PADR	7	// RSS-14s right offset
 
-void RSS14(gs1_encoder *params);
-void RSS14S(gs1_encoder *params);
-void RSS14SO(gs1_encoder *params);
+void RSS14(gs1_encoder *ctx);
+void RSS14S(gs1_encoder *ctx);
+void RSS14SO(gs1_encoder *ctx);
 
 #endif

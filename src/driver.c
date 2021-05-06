@@ -153,118 +153,118 @@ static void printElm(gs1_encoder *ctx, int width, int color, int *bits, int *ndx
 
 #define WHITE 0
 
-void printElmnts(gs1_encoder *params, struct sPrints *prints) {
+void printElmnts(gs1_encoder *ctx, struct sPrints *prints) {
 
 	int i, bits, width, ndx, white;
 	uint8_t xorMsk;
 	int undercut;
-	uint8_t *line = params->driver_line;
-	uint8_t *lineUCut = params->driver_lineUCut;
+	uint8_t *line = ctx->driver_line;
+	uint8_t *lineUCut = ctx->driver_lineUCut;
 
 	bits = 1;
 	ndx = 0;
 	if (prints->whtFirst) {
 		white = WHITE;
-		undercut = params->Xundercut;
+		undercut = ctx->Xundercut;
 	}
 	else {
 		white = WHITE^1; // invert white if starting black
-		undercut = -params->Xundercut; // -undercut if starting black
+		undercut = -ctx->Xundercut; // -undercut if starting black
 	}
 	if ((prints->reverse) && ((prints->elmCnt & 1) == 0)) {
 		white = white^1; // invert if reversed even elements
 		undercut = -undercut;
 	}
-	xorMsk = params->bmp ? 0xFF : 0; // invert BMP bits
-	if (params->line1) {
+	xorMsk = ctx->bmp ? 0xFF : 0; // invert BMP bits
+	if (ctx->line1) {
 		for (i = 0; i < MAX_LINE/8; i++) {
 			line[i] = xorMsk;
 		}
-		params->line1 = false;
+		ctx->line1 = false;
 	}
 	// fill left pad worth of WHITE
-	printElm(params, prints->leftPad*params->pixMult, WHITE , &bits, &ndx, xorMsk);
+	printElm(ctx, prints->leftPad*ctx->pixMult, WHITE , &bits, &ndx, xorMsk);
 
 	// process WHITE/BLACK elements in pairs for undercut
 	if (prints->guards) { // print guard pattern
-		printElm(params, params->pixMult + undercut, white , &bits, &ndx, xorMsk);
-		printElm(params, params->pixMult - undercut, (white^1) , &bits, &ndx, xorMsk);
+		printElm(ctx, ctx->pixMult + undercut, white , &bits, &ndx, xorMsk);
+		printElm(ctx, ctx->pixMult - undercut, (white^1) , &bits, &ndx, xorMsk);
 	}
 	for(i = 0; i < prints->elmCnt-1; i += 2) {
 		if (prints->reverse) {
-			width = (int)prints->pattern[prints->elmCnt-1-i]*params->pixMult + undercut;
+			width = (int)prints->pattern[prints->elmCnt-1-i]*ctx->pixMult + undercut;
 		}
 		else {
-			width = (int)prints->pattern[i]*params->pixMult + undercut;
+			width = (int)prints->pattern[i]*ctx->pixMult + undercut;
 		}
-		printElm(params, width, white , &bits, &ndx, xorMsk);
+		printElm(ctx, width, white , &bits, &ndx, xorMsk);
 
 		if (prints->reverse) {
-			width = (int)prints->pattern[prints->elmCnt-2-i]*params->pixMult - undercut;
+			width = (int)prints->pattern[prints->elmCnt-2-i]*ctx->pixMult - undercut;
 		}
 		else {
-			width = (int)prints->pattern[i+1]*params->pixMult - undercut;
+			width = (int)prints->pattern[i+1]*ctx->pixMult - undercut;
 		}
-		printElm(params, width, (white^1) , &bits, &ndx, xorMsk);
+		printElm(ctx, width, (white^1) , &bits, &ndx, xorMsk);
 	}
 
 	// process any trailing odd numbered element with no undercut
 	if (i < prints->elmCnt) {
 		if (prints->guards) { // print last element plus guard pattern
 			if (prints->reverse) {
-				width = (int)prints->pattern[0]*params->pixMult + undercut;
+				width = (int)prints->pattern[0]*ctx->pixMult + undercut;
 			}
 			else {
-				width = (int)prints->pattern[i]*params->pixMult + undercut;
+				width = (int)prints->pattern[i]*ctx->pixMult + undercut;
 			}
-			printElm(params, width, white , &bits, &ndx, xorMsk);
+			printElm(ctx, width, white , &bits, &ndx, xorMsk);
 
-			printElm(params, params->pixMult - undercut, (white^1) , &bits, &ndx, xorMsk);
-			printElm(params, params->pixMult, white , &bits, &ndx, xorMsk); // last- no undercut
+			printElm(ctx, ctx->pixMult - undercut, (white^1) , &bits, &ndx, xorMsk);
+			printElm(ctx, ctx->pixMult, white , &bits, &ndx, xorMsk); // last- no undercut
 		}
 		else { // no guard, print last odd without undercut
 			if (prints->reverse) {
-				width = (int)prints->pattern[0]*params->pixMult;
+				width = (int)prints->pattern[0]*ctx->pixMult;
 			}
 			else {
-				width = (int)prints->pattern[i]*params->pixMult;
+				width = (int)prints->pattern[i]*ctx->pixMult;
 			}
-			printElm(params, width, white , &bits, &ndx, xorMsk);
+			printElm(ctx, width, white , &bits, &ndx, xorMsk);
 		}
 	}
 	else if (prints->guards) { // even number, just print guard pattern
-		printElm(params, params->pixMult + undercut, white , &bits, &ndx, xorMsk);
-		printElm(params, params->pixMult - undercut, (white^1) , &bits, &ndx, xorMsk);
+		printElm(ctx, ctx->pixMult + undercut, white , &bits, &ndx, xorMsk);
+		printElm(ctx, ctx->pixMult - undercut, (white^1) , &bits, &ndx, xorMsk);
 	}
 	// fill right pad worth of WHITE
-	printElm(params, prints->rightPad*params->pixMult, WHITE , &bits, &ndx, xorMsk);
+	printElm(ctx, prints->rightPad*ctx->pixMult, WHITE , &bits, &ndx, xorMsk);
 	// pad last byte's bits
 	if (bits != 1) {
 		while ((bits = (bits<<1) + WHITE) <= 0xff);
 		lineUCut[ndx] = (uint8_t)(((line[ndx]^xorMsk)&(bits&0xff))^xorMsk); // Y undercut
 		line[ndx++] = (uint8_t)((bits&0xff) ^ xorMsk);
 		if (ndx > MAX_LINE/8 + 1) {
-			strcpy(params->errMsg, "Print line too long");
-			params->errFlag = true;
+			strcpy(ctx->errMsg, "Print line too long");
+			ctx->errFlag = true;
 			return;
 		}
 	}
-	if (params->bmp) {
+	if (ctx->bmp) {
 		while ((ndx & 3) != 0) {
 			line[ndx++] = 0xFF; // pad to long word boundary for .BMP
 			if (ndx >= MAX_LINE/8 + 1) {
-				strcpy(params->errMsg, "Print line too long");
-				params->errFlag = true;
+				strcpy(ctx->errMsg, "Print line too long");
+				ctx->errFlag = true;
 				return;
 			}
 		}
 	}
 
-	for (i = 0; i < params->Yundercut; i++) {
-		fwrite(lineUCut, sizeof(uint8_t), (size_t)ndx, params->outfp);
+	for (i = 0; i < ctx->Yundercut; i++) {
+		fwrite(lineUCut, sizeof(uint8_t), (size_t)ndx, ctx->outfp);
 	}
 	for ( ; i < prints->height; i++) {
-		fwrite(line, sizeof(uint8_t), (size_t)ndx, params->outfp);
+		fwrite(line, sizeof(uint8_t), (size_t)ndx, ctx->outfp);
 	}
 	return;
 }

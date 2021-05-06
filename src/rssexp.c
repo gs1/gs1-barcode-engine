@@ -246,7 +246,7 @@ static int RSS14Eenc(gs1_encoder *ctx, uint8_t string[], uint8_t bars[RSSEXP_MAX
 }
 
 
-void RSSExp(gs1_encoder *params) {
+void RSSExp(gs1_encoder *ctx) {
 
 	struct sPrints prints;
 	struct sPrints chexPrnts;
@@ -270,12 +270,12 @@ void RSSExp(gs1_encoder *params) {
 	lHeight = 0;
 	rPadcc = 0;
 
-	ccStr = strchr(params->dataStr, '|');
+	ccStr = strchr(ctx->dataStr, '|');
 	if (ccStr == NULL) ccFlag = false;
 	else {
-		if (params->segWidth < 4) {
-			strcpy(params->errMsg, "Composite must be at least 4 segments wide");
-			params->errFlag = true;
+		if (ctx->segWidth < 4) {
+			strcpy(ctx->errMsg, "Composite must be at least 4 segments wide");
+			ctx->errFlag = true;
 			return;
 		}
 		ccFlag = true;
@@ -283,8 +283,8 @@ void RSSExp(gs1_encoder *params) {
 		ccStr++; // point to secondary data
 	}
 
-	params->rowWidth = params->segWidth; // save for getUnusedBitCnt
-	if (!((segs = RSS14Eenc(params, (uint8_t*)params->dataStr, dblPattern, ccFlag)) > 0) || params->errFlag) return;
+	ctx->rowWidth = ctx->segWidth; // save for getUnusedBitCnt
+	if (!((segs = RSS14Eenc(ctx, (uint8_t*)ctx->dataStr, dblPattern, ccFlag)) > 0) || ctx->errFlag) return;
 
 	lNdx = 0;
 	for (i = 0; i < segs-1; i += 2) {
@@ -297,9 +297,9 @@ void RSSExp(gs1_encoder *params) {
 			linPattern[lNdx++] = dblPattern[i/2][j];
 		}
 	}
-	j = (segs <= params->segWidth) ? segs : params->segWidth;
+	j = (segs <= ctx->segWidth) ? segs : ctx->segWidth;
 	i = (segs+j-1)/j; // number of linear rows
-	lHeight = params->pixMult*i*RSSEXP_SYM_H + params->sepHt*(i-1)*3;
+	lHeight = ctx->pixMult*i*RSSEXP_SYM_H + ctx->sepHt*(i-1)*3;
 	lNdx = (j/2)*(8+5+8) + (j&1)*(8+5);
 	lMods = 2 + (j/2)*(17+15+17) + (j&1)*(17+15) + 2;
 
@@ -319,7 +319,7 @@ void RSSExp(gs1_encoder *params) {
 	chexPrnts.elmCnt = chexSize;
 	chexPrnts.pattern = &chexPattern[0];
 	chexPrnts.guards = false;
-	chexPrnts.height = params->sepHt;
+	chexPrnts.height = ctx->sepHt;
 	chexPrnts.whtFirst = true;
 	chexPrnts.leftPad = 0;
 	chexPrnts.rightPad = 0;
@@ -328,16 +328,16 @@ void RSSExp(gs1_encoder *params) {
 	rPadcc = lMods - RSSEXP_L_PAD - CCB4_WIDTH;
 
 #if PRNT
-	printf("\n%s", params->dataStr);
+	printf("\n%s", ctx->dataStr);
 	printf("\n");
 	for (i = 0; i < lNdx; i++) {
 		printf("%d", linPattern[i]);
 	}
 	printf("\n");
 #endif
-	params->line1 = true; // so first line is not Y undercut
+	ctx->line1 = true; // so first line is not Y undercut
 	if (ccFlag) {
-		if (!((rows = CC4enc(params, (uint8_t*)ccStr, ccPattern)) > 0) || params->errFlag) return;
+		if (!((rows = CC4enc(ctx, (uint8_t*)ccStr, ccPattern)) > 0) || ctx->errFlag) return;
 #if PRNT
 		printf("\n%s", ccStr);
 		printf("\n");
@@ -350,21 +350,21 @@ void RSSExp(gs1_encoder *params) {
 #endif
 	}
 
-	if (params->bmp) { // BMP version
+	if (ctx->bmp) { // BMP version
 		// note: BMP is bottom to top inverted
 		if (ccFlag) {
-			bmpHeader(params->pixMult*(lMods),
-					params->pixMult*rows*2 + params->sepHt + lHeight, params->outfp);
+			bmpHeader(ctx->pixMult*(lMods),
+					ctx->pixMult*rows*2 + ctx->sepHt + lHeight, ctx->outfp);
 		}
 		else {
-			bmpHeader(params->pixMult*lMods, lHeight, params->outfp);
+			bmpHeader(ctx->pixMult*lMods, lHeight, ctx->outfp);
 		}
 
 		// print RSS Exp component
 		i = 0;
 		evenRow = false; // start with odd
-		while (segs > i+params->segWidth) {
-			i += params->segWidth;
+		while (segs > i+ctx->segWidth) {
+			i += ctx->segWidth;
 			evenRow = !evenRow; // alternate row parity
 		}
 
@@ -375,7 +375,7 @@ void RSSExp(gs1_encoder *params) {
 		prints.elmCnt = lNdx1;
 		prints.pattern = &linPattern[(i/2)*(8+5+8)+(i&1)*8];
 		prints.guards = true;
-		prints.height = params->pixMult*RSSEXP_SYM_H;
+		prints.height = ctx->pixMult*RSSEXP_SYM_H;
 		prints.whtFirst = (i/2+1)&1;
 		rev = evenRow ^ ((i/2)&1);
 		if (rev && (((lNdx1-4)%8)&1)) {
@@ -384,14 +384,14 @@ void RSSExp(gs1_encoder *params) {
 			prints.rightPad = rPadl1-1;
 			prints.reverse = false;
 			// bottom right offset RSS E row
-			printElmnts(params, &prints);
+			printElmnts(ctx, &prints);
 
 			// bottom complement separator
-			prntCnv = cnvSeparator(params, &prints);
-			printElmnts(params, prntCnv);
+			prntCnv = cnvSeparator(ctx, &prints);
+			printElmnts(ctx, prntCnv);
 
 			// chex pattern
-			printElmnts(params, &chexPrnts);
+			printElmnts(ctx, &chexPrnts);
 		}
 		else {
 			// otherwise normal bottom or only RSS E row
@@ -400,17 +400,17 @@ void RSSExp(gs1_encoder *params) {
 			prints.reverse = rev;
 
 			// bottom or only RSS row
-			printElmnts(params, &prints);
+			printElmnts(ctx, &prints);
 
 			if ((i > 0) || (ccFlag)) {
 				// CC or lower complement separator
-				prntCnv = cnvSeparator(params, &prints);
-				printElmnts(params, prntCnv);
+				prntCnv = cnvSeparator(ctx, &prints);
+				printElmnts(ctx, prntCnv);
 			}
 
 			if (i > 0) {
 				// chex pattern
-				printElmnts(params, &chexPrnts);
+				printElmnts(ctx, &chexPrnts);
 			}
 		}
 		evenRow = !evenRow;
@@ -419,29 +419,29 @@ void RSSExp(gs1_encoder *params) {
 		prints.elmCnt = lNdx;
 		prints.leftPad = 0;
 		prints.rightPad = 0;
-		for (i -= params->segWidth ; i >= 0; i -= params->segWidth) {
-			j = i + params->segWidth; // last segment number + 1 in this row
+		for (i -= ctx->segWidth ; i >= 0; i -= ctx->segWidth) {
+			j = i + ctx->segWidth; // last segment number + 1 in this row
 			rev = evenRow ^ ((i/2)&1);
 			prints.pattern = &linPattern[(i/2)*(8+5+8)+(i&1)*8];
 			prints.whtFirst = (i/2+1)&1;
 			prints.reverse = rev;
 
 			// top complement separator
-			prntCnv = cnvSeparator(params, &prints);
-			printElmnts(params, prntCnv);
+			prntCnv = cnvSeparator(ctx, &prints);
+			printElmnts(ctx, prntCnv);
 
 			// upper RSS row
-			printElmnts(params, &prints);
+			printElmnts(ctx, &prints);
 
 			if ((i > 0) || (ccFlag)) {
 				// CC or lower complement separator
-				prntCnv = cnvSeparator(params, &prints);
-				printElmnts(params, prntCnv);
+				prntCnv = cnvSeparator(ctx, &prints);
+				printElmnts(ctx, prntCnv);
 			}
 
 			if (i > 0) {
 				// chex pattern
-				printElmnts(params, &chexPrnts);
+				printElmnts(ctx, &chexPrnts);
 			}
 			evenRow = !evenRow;
 		}
@@ -450,39 +450,39 @@ void RSSExp(gs1_encoder *params) {
 			// print composite component
 			prints.elmCnt = CCB4_ELMNTS;
 			prints.guards = false;
-			prints.height = params->pixMult*2;
+			prints.height = ctx->pixMult*2;
 			prints.leftPad = RSSEXP_L_PAD;
 			prints.rightPad = rPadcc;
 			prints.whtFirst = true;
 			prints.reverse = false;
 			for (i = rows-1; i >= 0; i--) {
 				prints.pattern = ccPattern[i];
-				printElmnts(params, &prints);
+				printElmnts(ctx, &prints);
 			}
 		}
 	}
 
 	else { // TIFF version
 		if (ccFlag) {
-			tifHeader(params->pixMult*(lMods),
-					params->pixMult*rows*2 + params->sepHt + lHeight, params->outfp);
+			tifHeader(ctx->pixMult*(lMods),
+					ctx->pixMult*rows*2 + ctx->sepHt + lHeight, ctx->outfp);
 		}
 		else {
-			tifHeader(params->pixMult*lMods, lHeight, params->outfp);
+			tifHeader(ctx->pixMult*lMods, lHeight, ctx->outfp);
 		}
 
 		if (ccFlag) {
 			// print composite component
 			prints.elmCnt = CCB4_ELMNTS;
 			prints.guards = false;
-			prints.height = params->pixMult*2;
+			prints.height = ctx->pixMult*2;
 			prints.leftPad = RSSEXP_L_PAD;
 			prints.rightPad = rPadcc;
 			prints.whtFirst = true;
 			prints.reverse = false;
 			for (i = 0; i < rows; i++) {
 				prints.pattern = ccPattern[i];
-				printElmnts(params, &prints);
+				printElmnts(ctx, &prints);
 			}
 		}
 
@@ -490,12 +490,12 @@ void RSSExp(gs1_encoder *params) {
 		evenRow = false; // start with 1st row
 		prints.elmCnt = lNdx;
 		prints.guards = true;
-		prints.height = params->pixMult*RSSEXP_SYM_H;
+		prints.height = ctx->pixMult*RSSEXP_SYM_H;
 		prints.leftPad = 0;
 		prints.rightPad = 0;
 
-		for (i = 0; i < segs-params->segWidth; i += params->segWidth) {
-			j = i + params->segWidth; // last segment number + 1 in this row
+		for (i = 0; i < segs-ctx->segWidth; i += ctx->segWidth) {
+			j = i + ctx->segWidth; // last segment number + 1 in this row
 
 			rev = evenRow ^ ((i/2)&1);
 			prints.pattern = &linPattern[(i/2)*(8+5+8)+(i&1)*8];
@@ -504,21 +504,21 @@ void RSSExp(gs1_encoder *params) {
 
 			if (i > 0) {
 				// chex pattern
-				printElmnts(params, &chexPrnts);
+				printElmnts(ctx, &chexPrnts);
 			}
 
 			if ((i > 0) || (ccFlag)) {
 				// CC or lower complement separator
-				prntCnv = cnvSeparator(params, &prints);
-				printElmnts(params, prntCnv);
+				prntCnv = cnvSeparator(ctx, &prints);
+				printElmnts(ctx, prntCnv);
 			}
 
 			// upper RSS row
-			printElmnts(params, &prints);
+			printElmnts(ctx, &prints);
 
 			// upper complement separator
-			prntCnv = cnvSeparator(params, &prints);
-			printElmnts(params, prntCnv);
+			prntCnv = cnvSeparator(ctx, &prints);
+			printElmnts(ctx, prntCnv);
 
 			evenRow = !evenRow;
 		}
@@ -538,14 +538,14 @@ void RSSExp(gs1_encoder *params) {
 			prints.reverse = false;
 
 			// chex pattern
-			printElmnts(params, &chexPrnts);
+			printElmnts(ctx, &chexPrnts);
 
 			// bottom complement separator
-			prntCnv = cnvSeparator(params, &prints);
-			printElmnts(params, prntCnv);
+			prntCnv = cnvSeparator(ctx, &prints);
+			printElmnts(ctx, prntCnv);
 
 			// bottom right offset RSS E row
-			printElmnts(params, &prints);
+			printElmnts(ctx, &prints);
 		}
 		else {
 			// otherwise normal row
@@ -555,17 +555,17 @@ void RSSExp(gs1_encoder *params) {
 
 			if (i > 0) {
 				// chex pattern
-				printElmnts(params, &chexPrnts);
+				printElmnts(ctx, &chexPrnts);
 			}
 
 			if ((i > 0) || (ccFlag)) {
 				// CC or lower complement separator
-				prntCnv = cnvSeparator(params, &prints);
-				printElmnts(params, prntCnv);
+				prntCnv = cnvSeparator(ctx, &prints);
+				printElmnts(ctx, prntCnv);
 			}
 
 			// bottom right offset RSS E row
-			printElmnts(params, &prints);
+			printElmnts(ctx, &prints);
 		}
 		evenRow = !evenRow;
 	}
