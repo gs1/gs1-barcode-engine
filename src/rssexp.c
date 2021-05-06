@@ -28,7 +28,6 @@
 #include "rssexp.h"
 #include "rssutil.h"
 
-extern int rowWidth;
 extern int line1;
 extern int linFlag; // tells pack whether linear or cc is being encoded
 extern uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
@@ -286,7 +285,7 @@ void RSSExp(gs1_encoder *params) {
 		ccStr++; // point to secondary data
 	}
 
-	rowWidth = params->segWidth; // save for getUnusedBitCnt
+	params->rowWidth = params->segWidth; // save for getUnusedBitCnt
 	if (!((segs = RSS14Eenc(params, (uint8_t*)params->dataStr, dblPattern, ccFlag)) > 0) || params->errFlag) return;
 
 	lNdx = 0;

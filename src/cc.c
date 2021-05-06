@@ -46,7 +46,6 @@ enum {
 	AI8004
 };
 
-extern int rowWidth;
 extern int line1;
 extern int linFlag; // tells pack whether linear, cc-a/b or cc-c is being encoded
 extern uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
@@ -664,7 +663,7 @@ static int getUnusedBitCnt(gs1_encoder *ctx, int iBit, int *size) {
 			if ((*size = (iBit + 11) / 12) < 3) {
 				*size = 3; // 3 data sym chars minimum
 			}
-			if ((((*size)+1+rowWidth) % rowWidth) == 1) {
+			if ((((*size)+1+ctx->rowWidth) % ctx->rowWidth) == 1) {
 				(*size)++; // last row minimum of 2
 			}
 			return(*size*12 - iBit);
