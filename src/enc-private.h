@@ -91,7 +91,6 @@ struct gs1_encoder {
 };
 
 // globals   TODO hoist
-int line1;
 int linFlag; // tells pack whether linear or cc is being encoded
 uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
 

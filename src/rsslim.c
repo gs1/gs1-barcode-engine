@@ -29,7 +29,6 @@
 #include "rsslim.h"
 #include "rssutil.h"
 
-extern int line1;
 extern uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
 
 static struct sPrints *separatorLim(gs1_encoder *params, struct sPrints *prints) {
@@ -333,7 +332,7 @@ void RSSLim(gs1_encoder *params) {
 	}
 	printf("\n");
 #endif
-	line1 = true; // so first line is not Y undercut
+	params->line1 = true; // so first line is not Y undercut
 	// init most common RSS Limited row prints values
 	prints.elmCnt = RSSLIM_ELMNTS;
 	prints.pattern = linPattern;

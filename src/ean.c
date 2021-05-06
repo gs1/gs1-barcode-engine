@@ -28,7 +28,6 @@
 #include "ean.h"
 
 
-extern int line1;
 extern uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
 
 
@@ -140,7 +139,7 @@ void EAN13(gs1_encoder *params) {
 	}
 	printf("\n");
 #endif
-	line1 = true; // so first line is not Y undercut
+	params->line1 = true; // so first line is not Y undercut
 	// init most likely prints values
 	prints.elmCnt = EAN13_ELMNTS;
 	prints.pattern = linPattern;
@@ -346,7 +345,7 @@ void EAN8(gs1_encoder *params) {
 	}
 	printf("\n");
 #endif
-	line1 = true; // so first line is not Y undercut
+	params->line1 = true; // so first line is not Y undercut
 	// init most likely prints values
 	lpadEAN = 0;
 	lpadCC = EAN8_L_PAD;
@@ -599,7 +598,7 @@ void UPCE(gs1_encoder *params) {
 	}
 	printf("\n");
 #endif
-	line1 = true; // so first line is not Y undercut
+	params->line1 = true; // so first line is not Y undercut
 	// init most likely prints values
 	prints.elmCnt = UPCE_ELMNTS;
 	prints.pattern = linPattern;

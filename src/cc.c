@@ -46,7 +46,6 @@ enum {
 	AI8004
 };
 
-extern int line1;
 extern int linFlag; // tells pack whether linear, cc-a/b or cc-c is being encoded
 extern uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
 

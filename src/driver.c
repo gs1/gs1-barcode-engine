@@ -176,11 +176,11 @@ void printElmnts(gs1_encoder *params, struct sPrints *prints) {
 		undercut = -undercut;
 	}
 	xorMsk = params->bmp ? 0xFF : 0; // invert BMP bits
-	if (line1) {
+	if (params->line1) {
 		for (i = 0; i < MAX_LINE/8; i++) {
 			line[i] = xorMsk;
 		}
-		line1 = false;
+		params->line1 = false;
 	}
 	// fill left pad worth of WHITE
 	printElm(params, prints->leftPad*params->pixMult, WHITE , &bits, &ndx, xorMsk);

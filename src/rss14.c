@@ -29,7 +29,6 @@
 #include "rssutil.h"
 #include "cc.h"
 
-extern int line1;
 extern uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
 
 // RSS14 Stacked row separator pattern routine
@@ -412,7 +411,7 @@ void RSS14(gs1_encoder *params) {
 	}
 	printf("\n");
 #endif
-	line1 = true; // so first line is not Y undercut
+	params->line1 = true; // so first line is not Y undercut
 	// init most likely prints values
 	prints.elmCnt = RSS14_ELMNTS;
 	prints.pattern = linPattern;
@@ -543,7 +542,7 @@ void RSS14S(gs1_encoder *params) {
 	}
 	printf("\n");
 #endif
-	line1 = true; // so first line is not Y undercut
+	params->line1 = true; // so first line is not Y undercut
 	// init most common RSS14S row prints values
 	prints.elmCnt = RSS14_ELMNTS/2;
 	prints.guards = true;
@@ -740,7 +739,7 @@ void RSS14SO(gs1_encoder *params) {
 	}
 	printf("\n");
 #endif
-	line1 = true; // so first line is not Y undercut
+	params->line1 = true; // so first line is not Y undercut
 	// init most common RSS14SO row prints values
 	prints.elmCnt = RSS14_ELMNTS/2;
 	prints.guards = true;

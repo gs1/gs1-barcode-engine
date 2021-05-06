@@ -28,7 +28,6 @@
 #include "rssexp.h"
 #include "rssutil.h"
 
-extern int line1;
 extern int linFlag; // tells pack whether linear or cc is being encoded
 extern uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
 
@@ -337,7 +336,7 @@ void RSSExp(gs1_encoder *params) {
 	}
 	printf("\n");
 #endif
-	line1 = true; // so first line is not Y undercut
+	params->line1 = true; // so first line is not Y undercut
 	if (ccFlag) {
 		if (!((rows = CC4enc(params, (uint8_t*)ccStr, ccPattern)) > 0) || params->errFlag) return;
 #if PRNT

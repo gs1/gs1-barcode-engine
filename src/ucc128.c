@@ -37,7 +37,6 @@ int rowCnt; // determined by getUnusedBitCnt
 int eccCnt; // determined by getUnusedBitCnt
 
 
-extern int line1;
 extern uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
 
 
@@ -412,7 +411,7 @@ void U128A(gs1_encoder *params) {
 	printf("\n");
 #endif
 
-	line1 = true; // so first line is not Y undercut
+	params->line1 = true; // so first line is not Y undercut
 	// init most likely prints values
 	prints.elmCnt = symChars*6+3;
 	prints.pattern = linPattern;
@@ -574,7 +573,7 @@ void U128C(gs1_encoder *params) {
 		params->errFlag = true;
 		return;
 	}
-	line1 = true; // so first line is not Y undercut
+	params->line1 = true; // so first line is not Y undercut
 	// init most likely prints values
 	prints.elmCnt = symChars*6+3;
 	prints.pattern = linPattern;
