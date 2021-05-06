@@ -23,8 +23,8 @@
 #include <stdint.h>
 
 #include "enc-private.h"
-#include "driver.h"
 #include "cc.h"
+#include "driver.h"
 #include "ucc128.h"
 
 #define ISNUM(A) ((A<072)&&(A>057)) /* true if A is numeric ASCII */

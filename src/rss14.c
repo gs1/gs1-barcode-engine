@@ -25,6 +25,7 @@
 
 #include "enc-private.h"
 #include "driver.h"
+#include "rss14.h"
 #include "rssutil.h"
 #include "cc.h"
 

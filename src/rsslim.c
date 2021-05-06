@@ -22,10 +22,12 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
+
 #include "enc-private.h"
-#include "driver.h"
-#include "rssutil.h"
 #include "cc.h"
+#include "driver.h"
+#include "rsslim.h"
+#include "rssutil.h"
 
 extern int errFlag;
 extern int line1;

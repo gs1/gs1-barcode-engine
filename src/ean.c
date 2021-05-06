@@ -21,9 +21,11 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
+
 #include "enc-private.h"
-#include "driver.h"
 #include "cc.h"
+#include "driver.h"
+#include "ean.h"
 
 
 extern int errFlag;

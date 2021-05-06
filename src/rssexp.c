@@ -21,10 +21,12 @@
 #include <string.h>
 #include <stdbool.h>
 #include <stdint.h>
+
 #include "enc-private.h"
-#include "driver.h"
-#include "rssutil.h"
 #include "cc.h"
+#include "driver.h"
+#include "rssexp.h"
+#include "rssutil.h"
 
 extern int errFlag;
 extern int rowWidth;
