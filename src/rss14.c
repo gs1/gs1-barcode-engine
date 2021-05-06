@@ -206,7 +206,7 @@ static bool RSS14enc(gs1_encoder *ctx, uint8_t string[], uint8_t bars[], int ccF
 	longNum = value = (int)(semiValue / tbl164[iIndex+4]);
 
 	// generate and store odd element widths:
-	widths = getRSSwidths(ctx, value, elementN, K, elementMax, 1);
+	widths = gs1_getRSSwidths(ctx, value, elementN, K, elementMax, 1);
 	parity = 0l;
 	for (i = 0; i < K; i++) {
 		bars[(i * 2)] = (uint8_t)widths[i];
@@ -220,7 +220,7 @@ static bool RSS14enc(gs1_encoder *ctx, uint8_t string[], uint8_t bars[], int ccF
 	elementMax = tbl164[iIndex+3];
 
 	// generate and store even element widths:
-	widths = getRSSwidths(ctx, value, elementN, K, elementMax, 0);
+	widths = gs1_getRSSwidths(ctx, value, elementN, K, elementMax, 0);
 	for (i = 0; i < K; i++) {
 		bars[1 + (i * 2)] = (uint8_t)widths[i];
 		parity += leftWeights[(i * 2) + 1] * widths[i];
@@ -243,7 +243,7 @@ static bool RSS14enc(gs1_encoder *ctx, uint8_t string[], uint8_t bars[], int ccF
 	longNum = value = (int)(semiValue / tbl154[iIndex+4]);
 
 	// generate and store even element widths of the 2nd char:
-	widths = getRSSwidths(ctx, value, elementN, K, elementMax, 1);
+	widths = gs1_getRSSwidths(ctx, value, elementN, K, elementMax, 1);
 	for (i = 0; i < K; i++) {
 		bars[19 - (i * 2)] = (uint8_t)widths[i];
 		parity += leftWeights[(i * 2)+1+8] * widths[i];
@@ -256,7 +256,7 @@ static bool RSS14enc(gs1_encoder *ctx, uint8_t string[], uint8_t bars[], int ccF
 	elementMax = tbl154[iIndex+3];
 
 	// generate and store odd element widths:
-	widths = getRSSwidths(ctx, value, elementN, K, elementMax, 0);
+	widths = gs1_getRSSwidths(ctx, value, elementN, K, elementMax, 0);
 	for (i = 0; i < K; i++) {
 		bars[20 - (i * 2)] = (uint8_t)widths[i];
 		parity += leftWeights[(i * 2)+8] * widths[i];
@@ -283,7 +283,7 @@ static bool RSS14enc(gs1_encoder *ctx, uint8_t string[], uint8_t bars[], int ccF
 	longNum = value = (int)(semiValue / tbl164[iIndex+4]);
 
 	// generate and store odd element widths:
-	widths = getRSSwidths(ctx, value, elementN, K, elementMax, 1);
+	widths = gs1_getRSSwidths(ctx, value, elementN, K, elementMax, 1);
 	for (i = 0; i < K; i++) {
 		bars[41 - (i * 2)] = (uint8_t)widths[i];
 		parity += rightWeights[i * 2] * widths[i];
@@ -296,7 +296,7 @@ static bool RSS14enc(gs1_encoder *ctx, uint8_t string[], uint8_t bars[], int ccF
 	elementMax = tbl164[iIndex+3];
 
 	// generate and store even element widths:
-	widths = getRSSwidths(ctx, value, elementN, K, elementMax, 0);
+	widths = gs1_getRSSwidths(ctx, value, elementN, K, elementMax, 0);
 	for (i = 0; i < K; i++) {
 		bars[40 - (i * 2)] = (uint8_t)widths[i];
 		parity += rightWeights[(i * 2) + 1] * widths[i];
@@ -319,7 +319,7 @@ static bool RSS14enc(gs1_encoder *ctx, uint8_t string[], uint8_t bars[], int ccF
 	longNum = value = (int)(semiValue / tbl154[iIndex+4]);
 
 	// generate and store even element widths of the 4th char:
-	widths = getRSSwidths(ctx, value, elementN, K, elementMax, 1);
+	widths = gs1_getRSSwidths(ctx, value, elementN, K, elementMax, 1);
 	for (i = 0; i < K; i++) {
 		bars[22 + (i * 2)] = (uint8_t)widths[i];
 		parity += rightWeights[(i * 2)+1+8] * widths[i];
@@ -332,7 +332,7 @@ static bool RSS14enc(gs1_encoder *ctx, uint8_t string[], uint8_t bars[], int ccF
 	elementMax = tbl154[iIndex+3];
 
 	// generate and store odd element widths:
-	widths = getRSSwidths(ctx, value, elementN, K, elementMax, 0);
+	widths = gs1_getRSSwidths(ctx, value, elementN, K, elementMax, 0);
 	for (i = 0; i < K; i++) {
 		bars[21 + (i * 2)] = (uint8_t)widths[i];
 		parity += rightWeights[(i * 2)+8] * widths[i];
@@ -361,7 +361,7 @@ static bool RSS14enc(gs1_encoder *ctx, uint8_t string[], uint8_t bars[], int ccF
 }
 
 
-void RSS14(gs1_encoder *ctx) {
+void gs1_RSS14(gs1_encoder *ctx) {
 
 	struct sPrints prints;
 	struct sPrints *prntCnv;
@@ -423,7 +423,7 @@ void RSS14(gs1_encoder *ctx) {
 	prints.whtFirst = true;
 	prints.reverse = false;
 	if (ccFlag) {
-		if (!((rows = CC4enc(ctx, (uint8_t*)ccStr, ccPattern)) > 0) || ctx->errFlag) return;
+		if (!((rows = gs1_CC4enc(ctx, (uint8_t*)ccStr, ccPattern)) > 0) || ctx->errFlag) return;
 #if PRNT
 		{
 			int j;
@@ -439,16 +439,16 @@ void RSS14(gs1_encoder *ctx) {
 #endif
 		if (ctx->bmp) {
 			// note: BMP is bottom to top inverted
-			bmpHeader(ctx->pixMult*CCB4_WIDTH,
+			gs1_bmpHeader(ctx->pixMult*CCB4_WIDTH,
 					ctx->pixMult*(rows*2+symHt) + ctx->sepHt, ctx->outfp);
 
 			// RSS-14
 			prints.leftPad = RSS14_L_PADR;
-			printElmnts(ctx, &prints);
+			gs1_printElmnts(ctx, &prints);
 
 			// CC separator
-			prntCnv = cnvSeparator(ctx, &prints);
-			printElmnts(ctx, prntCnv);
+			prntCnv = gs1_cnvSeparator(ctx, &prints);
+			gs1_printElmnts(ctx, prntCnv);
 
 			// Composite Component
 			prints.elmCnt = CCB4_ELMNTS;
@@ -457,11 +457,11 @@ void RSS14(gs1_encoder *ctx) {
 			prints.leftPad = 0;
 			for (i = rows-1; i >= 0; i--) {
 				prints.pattern = ccPattern[i];
-				printElmnts(ctx, &prints);
+				gs1_printElmnts(ctx, &prints);
 			}
 		}
 		else {
-			tifHeader(ctx->pixMult*CCB4_WIDTH,
+			gs1_tifHeader(ctx->pixMult*CCB4_WIDTH,
 					ctx->pixMult*(rows*2+symHt) + ctx->sepHt, ctx->outfp);
 
 			// Composite Component
@@ -470,7 +470,7 @@ void RSS14(gs1_encoder *ctx) {
 			prints.height = ctx->pixMult*2;
 			for (i = 0; i < rows; i++) {
 				prints.pattern = ccPattern[i];
-				printElmnts(ctx, &prints);
+				gs1_printElmnts(ctx, &prints);
 			}
 
 			prints.elmCnt = RSS14_ELMNTS;
@@ -480,29 +480,29 @@ void RSS14(gs1_encoder *ctx) {
 			prints.leftPad = RSS14_L_PADR;
 
 			// CC separator
-			prntCnv = cnvSeparator(ctx, &prints);
-			printElmnts(ctx, prntCnv);
+			prntCnv = gs1_cnvSeparator(ctx, &prints);
+			gs1_printElmnts(ctx, prntCnv);
 
 			// RSS-14
-			printElmnts(ctx, &prints);
+			gs1_printElmnts(ctx, &prints);
 		}
 	}
 	else { // primary only
 		if (ctx->bmp) {
-			bmpHeader(ctx->pixMult*RSS14_SYM_W, ctx->pixMult*symHt, ctx->outfp);
+			gs1_bmpHeader(ctx->pixMult*RSS14_SYM_W, ctx->pixMult*symHt, ctx->outfp);
 		}
 		else {
-			tifHeader(ctx->pixMult*RSS14_SYM_W, ctx->pixMult*symHt, ctx->outfp);
+			gs1_tifHeader(ctx->pixMult*RSS14_SYM_W, ctx->pixMult*symHt, ctx->outfp);
 		}
 
 		// RSS-14
-		printElmnts(ctx, &prints);
+		gs1_printElmnts(ctx, &prints);
 	}
 	return;
 }
 
 
-void RSS14S(gs1_encoder *ctx) {
+void gs1_RSS14S(gs1_encoder *ctx) {
 
 	struct sPrints prints;
 	struct sPrints *prntCnv;
@@ -554,7 +554,7 @@ void RSS14S(gs1_encoder *ctx) {
 	prints.whtFirst = true;
 	prints.reverse = false;
 	if (ccFlag) {
-		if (!((rows = CC2enc(ctx, (uint8_t*)ccStr, ccPattern)) > 0) || ctx->errFlag) return;
+		if (!((rows = gs1_CC2enc(ctx, (uint8_t*)ccStr, ccPattern)) > 0) || ctx->errFlag) return;
 #if PRNT
 		{
 			int j;
@@ -571,7 +571,7 @@ void RSS14S(gs1_encoder *ctx) {
 
 		if (ctx->bmp) {
 			// note: BMP is bottom to top inverted
-			bmpHeader(ctx->pixMult*(CCB2_WIDTH),
+			gs1_bmpHeader(ctx->pixMult*(CCB2_WIDTH),
 				ctx->pixMult*(rows*2+RSS14_ROWS1_H+RSS14_ROWS2_H) + 2*ctx->sepHt, ctx->outfp);
 
 			// RSS14S lower row
@@ -579,21 +579,21 @@ void RSS14S(gs1_encoder *ctx) {
 			prints.pattern = &linPattern[RSS14_ELMNTS/2];
 			prints.rightPad = RSS14_R_PADR;
 			prints.whtFirst = false;
-			printElmnts(ctx, &prints);
+			gs1_printElmnts(ctx, &prints);
 
 			// RSS14S separator pattern
 			prints.pattern = linPattern;
 			prntCnv = separator14S(ctx, &prints);
-			printElmnts(ctx, prntCnv);
+			gs1_printElmnts(ctx, prntCnv);
 
 			// RSS14S upper row
 			prints.whtFirst = true;
 			prints.height = ctx->pixMult*RSS14_ROWS1_H;
-			printElmnts(ctx, &prints);
+			gs1_printElmnts(ctx, &prints);
 
 			// CC separator
-			prntCnv = cnvSeparator(ctx, &prints);
-			printElmnts(ctx, prntCnv);
+			prntCnv = gs1_cnvSeparator(ctx, &prints);
+			gs1_printElmnts(ctx, prntCnv);
 
 			// Composite Component
 			prints.elmCnt = CCB2_ELMNTS;
@@ -602,11 +602,11 @@ void RSS14S(gs1_encoder *ctx) {
 			prints.rightPad = 0;
 			for (i = rows-1; i >= 0; i--) {
 				prints.pattern = ccPattern[i];
-				printElmnts(ctx, &prints);
+				gs1_printElmnts(ctx, &prints);
 			}
 		}
 		else {
-			tifHeader(ctx->pixMult*(CCB2_WIDTH),
+			gs1_tifHeader(ctx->pixMult*(CCB2_WIDTH),
 					ctx->pixMult*(rows*2+RSS14_ROWS1_H+RSS14_ROWS2_H) + 2*ctx->sepHt, ctx->outfp);
 
 			// Composite Component
@@ -615,35 +615,35 @@ void RSS14S(gs1_encoder *ctx) {
 			prints.height = ctx->pixMult*2;
 			for (i = 0; i < rows; i++) {
 				prints.pattern = ccPattern[i];
-				printElmnts(ctx, &prints);
+				gs1_printElmnts(ctx, &prints);
 			}
 
 			// CC separator
 			prints.elmCnt = RSS14_ELMNTS/2;
 			prints.pattern = linPattern;
 			prints.rightPad = RSS14_R_PADR;
-			prntCnv = cnvSeparator(ctx, &prints);
-			printElmnts(ctx, prntCnv);
+			prntCnv = gs1_cnvSeparator(ctx, &prints);
+			gs1_printElmnts(ctx, prntCnv);
 
 			// RSS14S upper row
 			prints.guards = true;
 			prints.height = ctx->pixMult*RSS14_ROWS1_H;
-			printElmnts(ctx, &prints);
+			gs1_printElmnts(ctx, &prints);
 
 			// RSS14S separator pattern
 			prntCnv = separator14S(ctx, &prints);
-			printElmnts(ctx, prntCnv);
+			gs1_printElmnts(ctx, prntCnv);
 
 			// RSS14S lower row
 			prints.height = ctx->pixMult*RSS14_ROWS2_H;
 			prints.pattern = &linPattern[RSS14_ELMNTS/2];
 			prints.whtFirst = false;
-			printElmnts(ctx, &prints);
+			gs1_printElmnts(ctx, &prints);
 		}
 	}
 	else { // primary only
 		if (ctx->bmp) {
-			bmpHeader(ctx->pixMult*(RSS14_SYM_W/2+2),
+			gs1_bmpHeader(ctx->pixMult*(RSS14_SYM_W/2+2),
 				ctx->pixMult*(RSS14_ROWS1_H+RSS14_ROWS2_H) + ctx->sepHt, ctx->outfp);
 
 
@@ -651,43 +651,43 @@ void RSS14S(gs1_encoder *ctx) {
 			prints.height = ctx->pixMult*RSS14_ROWS2_H;
 			prints.pattern = &linPattern[RSS14_ELMNTS/2];
 			prints.whtFirst = false;
-			printElmnts(ctx, &prints);
+			gs1_printElmnts(ctx, &prints);
 
 			// RSS14S separator pattern
 			prints.pattern = linPattern;
 			prntCnv = separator14S(ctx, &prints);
-			printElmnts(ctx, prntCnv);
+			gs1_printElmnts(ctx, prntCnv);
 
 			// RSS14S upper row
 			prints.whtFirst = true;
 			prints.height = ctx->pixMult*RSS14_ROWS1_H;
-			printElmnts(ctx, &prints);
+			gs1_printElmnts(ctx, &prints);
 		}
 		else {
-			tifHeader(ctx->pixMult*(RSS14_SYM_W/2+2),
+			gs1_tifHeader(ctx->pixMult*(RSS14_SYM_W/2+2),
 					ctx->pixMult*(RSS14_ROWS1_H+RSS14_ROWS2_H) + ctx->sepHt, ctx->outfp);
 
 			// RSS14S upper row
 			prints.pattern = linPattern;
 			prints.height = ctx->pixMult*RSS14_ROWS1_H;
-			printElmnts(ctx, &prints);
+			gs1_printElmnts(ctx, &prints);
 
 			// RSS14S separator pattern
 			prntCnv = separator14S(ctx, &prints);
-			printElmnts(ctx, prntCnv);
+			gs1_printElmnts(ctx, prntCnv);
 
 			// RSS14S lower row
 			prints.pattern = &linPattern[RSS14_ELMNTS/2];
 			prints.height = ctx->pixMult*RSS14_ROWS2_H;
 			prints.whtFirst = false;
-			printElmnts(ctx, &prints);
+			gs1_printElmnts(ctx, &prints);
 		}
 	}
 	return;
 }
 
 
-void RSS14SO(gs1_encoder *ctx) {
+void gs1_RSS14SO(gs1_encoder *ctx) {
 
 	struct sPrints prints;
 	struct sPrints chexPrnts;
@@ -754,7 +754,7 @@ void RSS14SO(gs1_encoder *ctx) {
 	prints.reverse = false;
 	if (ccFlag) {
 		chexPrnts.rightPad = RSS14_R_PADR; // pad for composite
-		if (!((rows = CC2enc(ctx, (uint8_t*)ccStr, ccPattern)) > 0) || ctx->errFlag) return;
+		if (!((rows = gs1_CC2enc(ctx, (uint8_t*)ccStr, ccPattern)) > 0) || ctx->errFlag) return;
 #if PRNT
 		{
 			int j;
@@ -771,7 +771,7 @@ void RSS14SO(gs1_encoder *ctx) {
 
 		if (ctx->bmp) {
 			// note: BMP is bottom to top inverted
-			bmpHeader(ctx->pixMult*(CCB2_WIDTH),
+			gs1_bmpHeader(ctx->pixMult*(CCB2_WIDTH),
 				ctx->pixMult*(rows*2+RSS14_SYM_H*2) + 4*ctx->sepHt, ctx->outfp);
 
 			// RSS14SO lower row
@@ -779,27 +779,27 @@ void RSS14SO(gs1_encoder *ctx) {
 			prints.pattern = &linPattern[RSS14_ELMNTS/2];
 			prints.rightPad = RSS14_R_PADR;
 			prints.whtFirst = false;
-			printElmnts(ctx, &prints);
+			gs1_printElmnts(ctx, &prints);
 
 			// RSS14SO lower row separator pattern
-			prntCnv = cnvSeparator(ctx, &prints);
-			printElmnts(ctx, prntCnv);
+			prntCnv = gs1_cnvSeparator(ctx, &prints);
+			gs1_printElmnts(ctx, prntCnv);
 
 			// chex pattern
-			printElmnts(ctx, &chexPrnts);
+			gs1_printElmnts(ctx, &chexPrnts);
 
 			// RSS14SO upper row separator pattern
 			prints.pattern = linPattern;
 			prints.whtFirst = true;
-			prntCnv = cnvSeparator(ctx, &prints);
-			printElmnts(ctx, prntCnv);
+			prntCnv = gs1_cnvSeparator(ctx, &prints);
+			gs1_printElmnts(ctx, prntCnv);
 
 			// RSS14SO upper row
-			printElmnts(ctx, &prints);
+			gs1_printElmnts(ctx, &prints);
 
 			// CC separator
-			prntCnv = cnvSeparator(ctx, &prints);
-			printElmnts(ctx, prntCnv);
+			prntCnv = gs1_cnvSeparator(ctx, &prints);
+			gs1_printElmnts(ctx, prntCnv);
 
 			// Composite Component
 			prints.elmCnt = CCB2_ELMNTS;
@@ -808,11 +808,11 @@ void RSS14SO(gs1_encoder *ctx) {
 			prints.rightPad = 0;
 			for (i = rows-1; i >= 0; i--) {
 				prints.pattern = ccPattern[i];
-				printElmnts(ctx, &prints);
+				gs1_printElmnts(ctx, &prints);
 			}
 		}
 		else {
-			tifHeader(ctx->pixMult*(CCB2_WIDTH),
+			gs1_tifHeader(ctx->pixMult*(CCB2_WIDTH),
 				ctx->pixMult*(rows*2+RSS14_SYM_H*2) + 4*ctx->sepHt, ctx->outfp);
 
 			// Composite Component
@@ -821,92 +821,92 @@ void RSS14SO(gs1_encoder *ctx) {
 			prints.height = ctx->pixMult*2;
 			for (i = 0; i < rows; i++) {
 				prints.pattern = ccPattern[i];
-				printElmnts(ctx, &prints);
+				gs1_printElmnts(ctx, &prints);
 			}
 
 			// CC separator
 			prints.elmCnt = RSS14_ELMNTS/2;
 			prints.pattern = linPattern;
 			prints.rightPad = RSS14_R_PADR;
-			prntCnv = cnvSeparator(ctx, &prints);
-			printElmnts(ctx, prntCnv);
+			prntCnv = gs1_cnvSeparator(ctx, &prints);
+			gs1_printElmnts(ctx, prntCnv);
 
 			// RSS14SO upper row
 			prints.guards = true;
 			prints.height = ctx->pixMult*RSS14_SYM_H;
-			printElmnts(ctx, &prints);
+			gs1_printElmnts(ctx, &prints);
 
 			// RSS14SO upper row separator pattern
-			prntCnv = cnvSeparator(ctx, &prints);
-			printElmnts(ctx, prntCnv);
+			prntCnv = gs1_cnvSeparator(ctx, &prints);
+			gs1_printElmnts(ctx, prntCnv);
 
 			// chex pattern
-			printElmnts(ctx, &chexPrnts);
+			gs1_printElmnts(ctx, &chexPrnts);
 
 			// RSS14SO lower row separator pattern
 			prints.pattern = &linPattern[RSS14_ELMNTS/2];
 			prints.whtFirst = false;
-			prntCnv = cnvSeparator(ctx, &prints);
-			printElmnts(ctx, prntCnv);
+			prntCnv = gs1_cnvSeparator(ctx, &prints);
+			gs1_printElmnts(ctx, prntCnv);
 
 			// RSS14SO lower row
 			prints.height = ctx->pixMult*RSS14_SYM_H;
-			printElmnts(ctx, &prints);
+			gs1_printElmnts(ctx, &prints);
 		}
 	}
 	else { // primary only
 		if (ctx->bmp) {
-			bmpHeader(ctx->pixMult*(RSS14_SYM_W/2+2),
+			gs1_bmpHeader(ctx->pixMult*(RSS14_SYM_W/2+2),
 				ctx->pixMult*(RSS14_SYM_H*2) + 3*ctx->sepHt, ctx->outfp);
 
 			// RSS14SO lower row
 			prints.height = ctx->pixMult*RSS14_SYM_H;
 			prints.pattern = &linPattern[RSS14_ELMNTS/2];
 			prints.whtFirst = false;
-			printElmnts(ctx, &prints);
+			gs1_printElmnts(ctx, &prints);
 
 			// RSS14SO lower row separator pattern
-			prntCnv = cnvSeparator(ctx, &prints);
-			printElmnts(ctx, prntCnv);
+			prntCnv = gs1_cnvSeparator(ctx, &prints);
+			gs1_printElmnts(ctx, prntCnv);
 
 			// chex pattern
-			printElmnts(ctx, &chexPrnts);
+			gs1_printElmnts(ctx, &chexPrnts);
 
 			// RSS14SO upper row separator pattern
 			prints.pattern = linPattern;
 			prints.whtFirst = true;
-			prntCnv = cnvSeparator(ctx, &prints);
-			printElmnts(ctx, prntCnv);
+			prntCnv = gs1_cnvSeparator(ctx, &prints);
+			gs1_printElmnts(ctx, prntCnv);
 
 			// RSS14SO upper row
 			prints.height = ctx->pixMult*RSS14_SYM_H;
-			printElmnts(ctx, &prints);
+			gs1_printElmnts(ctx, &prints);
 		}
 		else {
-			tifHeader(ctx->pixMult*(RSS14_SYM_W/2+2),
+			gs1_tifHeader(ctx->pixMult*(RSS14_SYM_W/2+2),
 				ctx->pixMult*(RSS14_SYM_H*2) + 3*ctx->sepHt, ctx->outfp);
 
 			// RSS14SO upper row
 			prints.pattern = linPattern;
 			prints.height = ctx->pixMult*RSS14_SYM_H;
-			printElmnts(ctx, &prints);
+			gs1_printElmnts(ctx, &prints);
 
 			// RSS14SO upper row separator pattern
-			prntCnv = cnvSeparator(ctx, &prints);
-			printElmnts(ctx, prntCnv);
+			prntCnv = gs1_cnvSeparator(ctx, &prints);
+			gs1_printElmnts(ctx, prntCnv);
 
 			// chex pattern
-			printElmnts(ctx, &chexPrnts);
+			gs1_printElmnts(ctx, &chexPrnts);
 
 			// RSS14SO lower row separator pattern
 			prints.pattern = &linPattern[RSS14_ELMNTS/2];
 			prints.whtFirst = false;
-			prntCnv = cnvSeparator(ctx, &prints);
-			printElmnts(ctx, prntCnv);
+			prntCnv = gs1_cnvSeparator(ctx, &prints);
+			gs1_printElmnts(ctx, prntCnv);
 
 			// RSS14SO lower row
 			prints.height = ctx->pixMult*RSS14_SYM_H;
-			printElmnts(ctx, &prints);
+			gs1_printElmnts(ctx, &prints);
 		}
 	}
 	return;

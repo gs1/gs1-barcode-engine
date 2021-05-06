@@ -215,44 +215,44 @@ bool gs1_encoder_encode(gs1_encoder *ctx) {
 
 		case sRSS14:
 		case sRSS14T:
-			RSS14(ctx);
+			gs1_RSS14(ctx);
 			break;
 
 		case sRSS14S:
-			RSS14S(ctx);
+			gs1_RSS14S(ctx);
 			break;
 
 		case sRSS14SO:
-			RSS14SO(ctx);
+			gs1_RSS14SO(ctx);
 			break;
 
 		case sRSSLIM:
-			RSSLim(ctx);
+			gs1_RSSLim(ctx);
 			break;
 
 		case sRSSEXP:
-			RSSExp(ctx);
+			gs1_RSSExp(ctx);
 			break;
 
 		case sUPCA:
 		case sEAN13:
-			EAN13(ctx);
+			gs1_EAN13(ctx);
 			break;
 
 		case sUPCE:
-			UPCE(ctx);
+			gs1_UPCE(ctx);
 			break;
 
 		case sEAN8:
-			EAN8(ctx);
+			gs1_EAN8(ctx);
 			break;
 
 		case sUCC128_CCA:
-			U128A(ctx);
+			gs1_U128A(ctx);
 			break;
 
 		case sUCC128_CCC:
-			U128C(ctx);
+			gs1_U128C(ctx);
 			break;
 
 		default:

@@ -26,7 +26,7 @@
 #include "driver.h"
 
 
-void bmpHeader(long xdim, long ydim, FILE *oFile) {
+void gs1_bmpHeader(long xdim, long ydim, FILE *oFile) {
 
 	uint8_t id[2] = {'B','M'};
 	struct b_hdr {
@@ -60,7 +60,7 @@ void bmpHeader(long xdim, long ydim, FILE *oFile) {
 }
 
 
-void tifHeader(long xdim, long ydim, FILE *oFile) {
+void gs1_tifHeader(long xdim, long ydim, FILE *oFile) {
 
 	struct t_hdr {
 		uint8_t endian[2];
@@ -153,7 +153,7 @@ static void printElm(gs1_encoder *ctx, int width, int color, int *bits, int *ndx
 
 #define WHITE 0
 
-void printElmnts(gs1_encoder *ctx, struct sPrints *prints) {
+void gs1_printElmnts(gs1_encoder *ctx, struct sPrints *prints) {
 
 	int i, bits, width, ndx, white;
 	uint8_t xorMsk;

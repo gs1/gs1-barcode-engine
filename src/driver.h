@@ -30,8 +30,8 @@
 #define min(X,Y) (((X) < (Y)) ? (X) : (Y))
 #define max(X,Y) (((X) > (Y)) ? (X) : (Y))
 
-void bmpHeader(long xdim, long ydim, FILE *oFile);
-void tifHeader(long xdim, long ydim, FILE *oFile);
-void printElmnts(gs1_encoder *ctx, struct sPrints *prints);
+void gs1_bmpHeader(long xdim, long ydim, FILE *oFile);
+void gs1_tifHeader(long xdim, long ydim, FILE *oFile);
+void gs1_printElmnts(gs1_encoder *ctx, struct sPrints *prints);
 
 #endif /* UTIL_H */

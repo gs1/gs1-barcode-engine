@@ -356,7 +356,7 @@ static int enc128(uint8_t data[], uint8_t bars[], int link)
 }
 
 
-void U128A(gs1_encoder *ctx) {
+void gs1_U128A(gs1_encoder *ctx) {
 
 	struct sPrints prints;
 
@@ -414,7 +414,7 @@ void U128A(gs1_encoder *ctx) {
 	prints.whtFirst = true;
 	prints.reverse = false;
 	if (ccFlag) {
-		if (!((rows = CC4enc(ctx, (uint8_t*)ccStr, ccPattern)) > 0) || ctx->errFlag) return;
+		if (!((rows = gs1_CC4enc(ctx, (uint8_t*)ccStr, ccPattern)) > 0) || ctx->errFlag) return;
 #if PRNT
 		{
 			int j;
@@ -441,12 +441,12 @@ void U128A(gs1_encoder *ctx) {
 
 		if (ctx->bmp) {
 			// note: BMP is bottom to top inverted
-			bmpHeader(ctx->pixMult*symWidth,
+			gs1_bmpHeader(ctx->pixMult*symWidth,
 					ctx->pixMult*(rows*2+ctx->linHeight) + ctx->sepHt,
 						 ctx->outfp);
 
 			// UCC-128
-			printElmnts(ctx, &prints);
+			gs1_printElmnts(ctx, &prints);
 
 			// CC separator pattern
 			prints.elmCnt = symChars*6+1;
@@ -454,7 +454,7 @@ void U128A(gs1_encoder *ctx) {
 			prints.height = ctx->sepHt;
 			prints.leftPad = 10;
 			prints.rightPad = 10;
-			printElmnts(ctx, &prints);
+			gs1_printElmnts(ctx, &prints);
 
 			// CC-C
 			prints.elmCnt = CCB4_ELMNTS;
@@ -463,11 +463,11 @@ void U128A(gs1_encoder *ctx) {
 			prints.rightPad = ccRpad;
 			for (i = rows-1; i >= 0; i--) {
 				prints.pattern = ccPattern[i];
-				printElmnts(ctx, &prints);
+				gs1_printElmnts(ctx, &prints);
 			}
 		}
 		else {
-			tifHeader(ctx->pixMult*symWidth,
+			gs1_tifHeader(ctx->pixMult*symWidth,
 					ctx->pixMult*(rows*2+ctx->linHeight) + ctx->sepHt,
 						 ctx->outfp);
 
@@ -478,7 +478,7 @@ void U128A(gs1_encoder *ctx) {
 			prints.rightPad = ccRpad;
 			for (i = 0; i < rows; i++) {
 				prints.pattern = ccPattern[i];
-				printElmnts(ctx, &prints);
+				gs1_printElmnts(ctx, &prints);
 			}
 
 			// CC separator pattern
@@ -487,7 +487,7 @@ void U128A(gs1_encoder *ctx) {
 			prints.height = ctx->sepHt;
 			prints.leftPad = 10;
 			prints.rightPad = 10;
-			printElmnts(ctx, &prints);
+			gs1_printElmnts(ctx, &prints);
 
 			// UCC-128
 			prints.elmCnt = symChars*6+3;
@@ -495,25 +495,25 @@ void U128A(gs1_encoder *ctx) {
 			prints.height = ctx->pixMult*ctx->linHeight;
 			prints.leftPad = 0;
 			prints.rightPad = 0;
-			printElmnts(ctx, &prints);
+			gs1_printElmnts(ctx, &prints);
 		}
 	}
 	else { // primary only
 		if (ctx->bmp) {
-			bmpHeader(ctx->pixMult*(symChars*11+22), ctx->pixMult*ctx->linHeight, ctx->outfp);
+			gs1_bmpHeader(ctx->pixMult*(symChars*11+22), ctx->pixMult*ctx->linHeight, ctx->outfp);
 		}
 		else {
-			tifHeader(ctx->pixMult*(symChars*11+22), ctx->pixMult*ctx->linHeight, ctx->outfp);
+			gs1_tifHeader(ctx->pixMult*(symChars*11+22), ctx->pixMult*ctx->linHeight, ctx->outfp);
 		}
 
 		// UCC-128
-		printElmnts(ctx, &prints);
+		gs1_printElmnts(ctx, &prints);
 	}
 	return;
 }
 
 
-void U128C(gs1_encoder *ctx) {
+void gs1_U128C(gs1_encoder *ctx) {
 
 	struct sPrints prints;
 	uint8_t *patCCC = ctx->ucc128_patCCC;
@@ -576,7 +576,7 @@ void U128C(gs1_encoder *ctx) {
 	prints.whtFirst = true;
 	prints.reverse = false;
 	if (ccFlag) {
-		if (!CCCenc(ctx, (uint8_t*)ccStr, patCCC) || ctx->errFlag) return;
+		if (!gs1_CCCenc(ctx, (uint8_t*)ccStr, patCCC) || ctx->errFlag) return;
 #if PRNT
 		{
 			int j;
@@ -595,12 +595,12 @@ void U128C(gs1_encoder *ctx) {
 		ccRpad = symWidth - UCC128_L_PAD - ((ctx->colCnt+4)*17+5);
 		if (ctx->bmp) {
 			// note: BMP is bottom to top inverted
-			bmpHeader(ctx->pixMult*symWidth,
+			gs1_bmpHeader(ctx->pixMult*symWidth,
 					ctx->pixMult*(ctx->rowCnt*3+ctx->linHeight) + ctx->sepHt,
 						 ctx->outfp);
 
 			// UCC-128
-			printElmnts(ctx, &prints);
+			gs1_printElmnts(ctx, &prints);
 
 			// CC separator pattern
 			prints.elmCnt = symChars*6+1;
@@ -608,7 +608,7 @@ void U128C(gs1_encoder *ctx) {
 			prints.height = ctx->sepHt;
 			prints.leftPad = 10;
 			prints.rightPad = 10;
-			printElmnts(ctx, &prints);
+			gs1_printElmnts(ctx, &prints);
 
 			// CC-C
 			prints.elmCnt = (ctx->colCnt+4)*8+3;
@@ -617,11 +617,11 @@ void U128C(gs1_encoder *ctx) {
 			prints.rightPad = ccRpad;
 			for (i = ctx->rowCnt-1; i >= 0; i--) {
 				prints.pattern = &patCCC[i*((ctx->colCnt+4)*8+3)];
-				printElmnts(ctx, &prints);
+				gs1_printElmnts(ctx, &prints);
 			}
 		}
 		else {
-			tifHeader(ctx->pixMult*symWidth,
+			gs1_tifHeader(ctx->pixMult*symWidth,
 					ctx->pixMult*(ctx->rowCnt*3+ctx->linHeight) + ctx->sepHt,
 						 ctx->outfp);
 
@@ -632,7 +632,7 @@ void U128C(gs1_encoder *ctx) {
 			prints.rightPad = ccRpad;
 			for (i = 0; i < ctx->rowCnt; i++) {
 				prints.pattern = &patCCC[i*((ctx->colCnt+4)*8+3)];
-				printElmnts(ctx, &prints);
+				gs1_printElmnts(ctx, &prints);
 			}
 
 			// CC separator pattern
@@ -641,7 +641,7 @@ void U128C(gs1_encoder *ctx) {
 			prints.height = ctx->sepHt;
 			prints.leftPad = 10;
 			prints.rightPad = 10;
-			printElmnts(ctx, &prints);
+			gs1_printElmnts(ctx, &prints);
 
 			// UCC-128
 			prints.elmCnt = symChars*6+3;
@@ -649,19 +649,19 @@ void U128C(gs1_encoder *ctx) {
 			prints.height = ctx->pixMult*ctx->linHeight;
 			prints.leftPad = 0;
 			prints.rightPad = 0;
-			printElmnts(ctx, &prints);
+			gs1_printElmnts(ctx, &prints);
 		}
 	}
 	else { // primary only
 		if (ctx->bmp) {
-			bmpHeader(ctx->pixMult*(symChars*11+22), ctx->pixMult*ctx->linHeight, ctx->outfp);
+			gs1_bmpHeader(ctx->pixMult*(symChars*11+22), ctx->pixMult*ctx->linHeight, ctx->outfp);
 		}
 		else {
-			tifHeader(ctx->pixMult*(symChars*11+22), ctx->pixMult*ctx->linHeight, ctx->outfp);
+			gs1_tifHeader(ctx->pixMult*(symChars*11+22), ctx->pixMult*ctx->linHeight, ctx->outfp);
 		}
 
 		// UCC-128
-		printElmnts(ctx, &prints);
+		gs1_printElmnts(ctx, &prints);
 	}
 	return;
 }

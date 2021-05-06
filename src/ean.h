@@ -23,8 +23,8 @@
 
 #include "enc-private.h"
 
-void EAN13(gs1_encoder *ctx);
-void EAN8(gs1_encoder *ctx);
-void UPCE(gs1_encoder *ctx);
+void gs1_EAN13(gs1_encoder *ctx);
+void gs1_EAN8(gs1_encoder *ctx);
+void gs1_UPCE(gs1_encoder *ctx);
 
 #endif

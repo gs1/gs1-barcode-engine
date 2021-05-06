@@ -101,7 +101,7 @@ static int symCharPat(gs1_encoder *ctx, uint8_t bars[], int symValue, int parity
 	saveVal = value = symValue / tbl174[iIndex+4];
 
 	// generate and store odd element widths:
-	widths = getRSSwidths(ctx, value, elementN, K, elementMax, 0);
+	widths = gs1_getRSSwidths(ctx, value, elementN, K, elementMax, 0);
 	for (i = 0; i < 4; i++) {
 		if (forwardFlag) {
 			bars[i*2] = (uint8_t)widths[i]; // store in 0,2,4,6
@@ -120,7 +120,7 @@ static int symCharPat(gs1_encoder *ctx, uint8_t bars[], int symValue, int parity
 	elementMax = tbl174[iIndex+3];
 
 	// generate and store even element widths:
-	widths = getRSSwidths(ctx, value, elementN, K, elementMax, 1);
+	widths = gs1_getRSSwidths(ctx, value, elementN, K, elementMax, 1);
 	for (i = 0; i < 4; i++) {
 		if (forwardFlag) {
 			bars[1 + i*2] = (uint8_t)widths[i]; // store in 1,3,5,7
@@ -175,7 +175,7 @@ static int RSS14Eenc(gs1_encoder *ctx, uint8_t string[], uint8_t bars[RSSEXP_MAX
 	parity = 0;
 	weight = 0;
 
-	if (((i=check2DData(string)) != 0) || ((i=isSymbolSepatator(string)) != 0)) {
+	if (((i=gs1_check2DData(string)) != 0) || ((i=isSymbolSepatator(string)) != 0)) {
 		sprintf(ctx->errMsg, "illegal character in RSS Expanded data = '%c'", string[i]);
 		ctx->errFlag = true;
 		return(0);
@@ -183,8 +183,8 @@ static int RSS14Eenc(gs1_encoder *ctx, uint8_t string[], uint8_t bars[RSSEXP_MAX
 #if PRNT
 	printf("%s\n", string);
 #endif
-	putBits(ctx, bitField, 0, 1, (uint16_t)ccFlag); // 2D linkage bit
-	size = pack(ctx, string, bitField);
+	gs1_putBits(ctx, bitField, 0, 1, (uint16_t)ccFlag); // 2D linkage bit
+	size = gs1_pack(ctx, string, bitField);
 	if (size < 0) {
 		strcpy(ctx->errMsg, "data error");
 		ctx->errFlag = true;
@@ -243,7 +243,7 @@ static int RSS14Eenc(gs1_encoder *ctx, uint8_t string[], uint8_t bars[RSSEXP_MAX
 }
 
 
-void RSSExp(gs1_encoder *ctx) {
+void gs1_RSSExp(gs1_encoder *ctx) {
 
 	struct sPrints prints;
 	struct sPrints chexPrnts;
@@ -336,7 +336,7 @@ void RSSExp(gs1_encoder *ctx) {
 #endif
 	ctx->line1 = true; // so first line is not Y undercut
 	if (ccFlag) {
-		if (!((rows = CC4enc(ctx, (uint8_t*)ccStr, ccPattern)) > 0) || ctx->errFlag) return;
+		if (!((rows = gs1_CC4enc(ctx, (uint8_t*)ccStr, ccPattern)) > 0) || ctx->errFlag) return;
 #if PRNT
 		printf("\n%s", ccStr);
 		printf("\n");
@@ -352,11 +352,11 @@ void RSSExp(gs1_encoder *ctx) {
 	if (ctx->bmp) { // BMP version
 		// note: BMP is bottom to top inverted
 		if (ccFlag) {
-			bmpHeader(ctx->pixMult*(lMods),
+			gs1_bmpHeader(ctx->pixMult*(lMods),
 					ctx->pixMult*rows*2 + ctx->sepHt + lHeight, ctx->outfp);
 		}
 		else {
-			bmpHeader(ctx->pixMult*lMods, lHeight, ctx->outfp);
+			gs1_bmpHeader(ctx->pixMult*lMods, lHeight, ctx->outfp);
 		}
 
 		// print RSS Exp component
@@ -383,14 +383,14 @@ void RSSExp(gs1_encoder *ctx) {
 			prints.rightPad = rPadl1-1;
 			prints.reverse = false;
 			// bottom right offset RSS E row
-			printElmnts(ctx, &prints);
+			gs1_printElmnts(ctx, &prints);
 
 			// bottom complement separator
-			prntCnv = cnvSeparator(ctx, &prints);
-			printElmnts(ctx, prntCnv);
+			prntCnv = gs1_cnvSeparator(ctx, &prints);
+			gs1_printElmnts(ctx, prntCnv);
 
 			// chex pattern
-			printElmnts(ctx, &chexPrnts);
+			gs1_printElmnts(ctx, &chexPrnts);
 		}
 		else {
 			// otherwise normal bottom or only RSS E row
@@ -399,17 +399,17 @@ void RSSExp(gs1_encoder *ctx) {
 			prints.reverse = rev;
 
 			// bottom or only RSS row
-			printElmnts(ctx, &prints);
+			gs1_printElmnts(ctx, &prints);
 
 			if ((i > 0) || (ccFlag)) {
 				// CC or lower complement separator
-				prntCnv = cnvSeparator(ctx, &prints);
-				printElmnts(ctx, prntCnv);
+				prntCnv = gs1_cnvSeparator(ctx, &prints);
+				gs1_printElmnts(ctx, prntCnv);
 			}
 
 			if (i > 0) {
 				// chex pattern
-				printElmnts(ctx, &chexPrnts);
+				gs1_printElmnts(ctx, &chexPrnts);
 			}
 		}
 		evenRow = !evenRow;
@@ -426,21 +426,21 @@ void RSSExp(gs1_encoder *ctx) {
 			prints.reverse = rev;
 
 			// top complement separator
-			prntCnv = cnvSeparator(ctx, &prints);
-			printElmnts(ctx, prntCnv);
+			prntCnv = gs1_cnvSeparator(ctx, &prints);
+			gs1_printElmnts(ctx, prntCnv);
 
 			// upper RSS row
-			printElmnts(ctx, &prints);
+			gs1_printElmnts(ctx, &prints);
 
 			if ((i > 0) || (ccFlag)) {
 				// CC or lower complement separator
-				prntCnv = cnvSeparator(ctx, &prints);
-				printElmnts(ctx, prntCnv);
+				prntCnv = gs1_cnvSeparator(ctx, &prints);
+				gs1_printElmnts(ctx, prntCnv);
 			}
 
 			if (i > 0) {
 				// chex pattern
-				printElmnts(ctx, &chexPrnts);
+				gs1_printElmnts(ctx, &chexPrnts);
 			}
 			evenRow = !evenRow;
 		}
@@ -456,18 +456,18 @@ void RSSExp(gs1_encoder *ctx) {
 			prints.reverse = false;
 			for (i = rows-1; i >= 0; i--) {
 				prints.pattern = ccPattern[i];
-				printElmnts(ctx, &prints);
+				gs1_printElmnts(ctx, &prints);
 			}
 		}
 	}
 
 	else { // TIFF version
 		if (ccFlag) {
-			tifHeader(ctx->pixMult*(lMods),
+			gs1_tifHeader(ctx->pixMult*(lMods),
 					ctx->pixMult*rows*2 + ctx->sepHt + lHeight, ctx->outfp);
 		}
 		else {
-			tifHeader(ctx->pixMult*lMods, lHeight, ctx->outfp);
+			gs1_tifHeader(ctx->pixMult*lMods, lHeight, ctx->outfp);
 		}
 
 		if (ccFlag) {
@@ -481,7 +481,7 @@ void RSSExp(gs1_encoder *ctx) {
 			prints.reverse = false;
 			for (i = 0; i < rows; i++) {
 				prints.pattern = ccPattern[i];
-				printElmnts(ctx, &prints);
+				gs1_printElmnts(ctx, &prints);
 			}
 		}
 
@@ -503,21 +503,21 @@ void RSSExp(gs1_encoder *ctx) {
 
 			if (i > 0) {
 				// chex pattern
-				printElmnts(ctx, &chexPrnts);
+				gs1_printElmnts(ctx, &chexPrnts);
 			}
 
 			if ((i > 0) || (ccFlag)) {
 				// CC or lower complement separator
-				prntCnv = cnvSeparator(ctx, &prints);
-				printElmnts(ctx, prntCnv);
+				prntCnv = gs1_cnvSeparator(ctx, &prints);
+				gs1_printElmnts(ctx, prntCnv);
 			}
 
 			// upper RSS row
-			printElmnts(ctx, &prints);
+			gs1_printElmnts(ctx, &prints);
 
 			// upper complement separator
-			prntCnv = cnvSeparator(ctx, &prints);
-			printElmnts(ctx, prntCnv);
+			prntCnv = gs1_cnvSeparator(ctx, &prints);
+			gs1_printElmnts(ctx, prntCnv);
 
 			evenRow = !evenRow;
 		}
@@ -537,14 +537,14 @@ void RSSExp(gs1_encoder *ctx) {
 			prints.reverse = false;
 
 			// chex pattern
-			printElmnts(ctx, &chexPrnts);
+			gs1_printElmnts(ctx, &chexPrnts);
 
 			// bottom complement separator
-			prntCnv = cnvSeparator(ctx, &prints);
-			printElmnts(ctx, prntCnv);
+			prntCnv = gs1_cnvSeparator(ctx, &prints);
+			gs1_printElmnts(ctx, prntCnv);
 
 			// bottom right offset RSS E row
-			printElmnts(ctx, &prints);
+			gs1_printElmnts(ctx, &prints);
 		}
 		else {
 			// otherwise normal row
@@ -554,17 +554,17 @@ void RSSExp(gs1_encoder *ctx) {
 
 			if (i > 0) {
 				// chex pattern
-				printElmnts(ctx, &chexPrnts);
+				gs1_printElmnts(ctx, &chexPrnts);
 			}
 
 			if ((i > 0) || (ccFlag)) {
 				// CC or lower complement separator
-				prntCnv = cnvSeparator(ctx, &prints);
-				printElmnts(ctx, prntCnv);
+				prntCnv = gs1_cnvSeparator(ctx, &prints);
+				gs1_printElmnts(ctx, prntCnv);
 			}
 
 			// bottom right offset RSS E row
-			printElmnts(ctx, &prints);
+			gs1_printElmnts(ctx, &prints);
 		}
 		evenRow = !evenRow;
 	}

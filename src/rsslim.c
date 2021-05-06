@@ -223,7 +223,7 @@ static bool RSSLimEnc(gs1_encoder *ctx, uint8_t string[], uint8_t bars[], int cc
 	longNum = value = (int)(chrValue / oddEvenTbl[iIndex+4]);
 
 	// generate and store odd element widths:
-	widths = getRSSwidths(ctx, value, elementN, K, elementMax, 1);
+	widths = gs1_getRSSwidths(ctx, value, elementN, K, elementMax, 1);
 	parity = 0l;
 	for (i = 0; i < K; i++) {
 		bars[(i*2)] = (uint8_t)widths[i];
@@ -237,7 +237,7 @@ static bool RSSLimEnc(gs1_encoder *ctx, uint8_t string[], uint8_t bars[], int cc
 	elementMax = (int)oddEvenTbl[iIndex+3];
 
 	// generate and store even element widths:
-	widths = getRSSwidths(ctx, value, elementN, K, elementMax, 0);
+	widths = gs1_getRSSwidths(ctx, value, elementN, K, elementMax, 0);
 	for (i = 0; i < K; i++) {
 		bars[(i*2)+1] = (uint8_t)widths[i];
 		parity += leftWeights[(i * 2) + 1] * widths[i];
@@ -260,7 +260,7 @@ static bool RSSLimEnc(gs1_encoder *ctx, uint8_t string[], uint8_t bars[], int cc
 	longNum = value = (int)(chrValue / oddEvenTbl[iIndex+4]);
 
 	// generate and store odd element widths:
-	widths = getRSSwidths(ctx, value, elementN, K, elementMax, 1);
+	widths = gs1_getRSSwidths(ctx, value, elementN, K, elementMax, 1);
 	for (i = 0; i < K; i++) {
 		bars[(i*2)+28] = (uint8_t)widths[i];
 		parity += rightWeights[i * 2] * widths[i];
@@ -273,7 +273,7 @@ static bool RSSLimEnc(gs1_encoder *ctx, uint8_t string[], uint8_t bars[], int cc
 	elementMax = (int)oddEvenTbl[iIndex+3];
 
 	// generate and store even element widths:
-	widths = getRSSwidths(ctx, value, elementN, K, elementMax, 0);
+	widths = gs1_getRSSwidths(ctx, value, elementN, K, elementMax, 0);
 	for (i = 0; i < K; i++) {
 		bars[(i*2)+1+28] = (uint8_t)widths[i];
 		parity += rightWeights[(i * 2) + 1] * widths[i];
@@ -289,7 +289,7 @@ static bool RSSLimEnc(gs1_encoder *ctx, uint8_t string[], uint8_t bars[], int cc
 }
 
 
-void RSSLim(gs1_encoder *ctx) {
+void gs1_RSSLim(gs1_encoder *ctx) {
 
 	struct sPrints prints;
 	struct sPrints *prntCnv;
@@ -343,7 +343,7 @@ void RSSLim(gs1_encoder *ctx) {
 	prints.whtFirst = true;
 	prints.reverse = false;
 	if (ccFlag) {
-		if (!((rows = CC3enc(ctx, (uint8_t*)ccStr, ccPattern)) > 0) || ctx->errFlag) return;
+		if (!((rows = gs1_CC3enc(ctx, (uint8_t*)ccStr, ccPattern)) > 0) || ctx->errFlag) return;
 #if PRNT
 		{
 			int j;
@@ -368,15 +368,15 @@ void RSSLim(gs1_encoder *ctx) {
 		if (ctx->bmp) {
 			// note: BMP is bottom to top inverted
 			if (rows <= MAX_CCA3_ROWS) { // CCA composite
-				bmpHeader(ctx->pixMult*RSSLIM_SYM_W,
+				gs1_bmpHeader(ctx->pixMult*RSSLIM_SYM_W,
 						ctx->pixMult*(rows*2+RSSLIM_SYM_H) + ctx->sepHt, ctx->outfp);
 
 				// RSS Limited row
-				printElmnts(ctx, &prints);
+				gs1_printElmnts(ctx, &prints);
 
 				// RSS Limited CC separator pattern
 				prntCnv = separatorLim(ctx, &prints);
-				printElmnts(ctx, prntCnv);
+				gs1_printElmnts(ctx, prntCnv);
 
 				// 2D composite
 				prints.elmCnt = CCA3_ELMNTS;
@@ -384,20 +384,20 @@ void RSSLim(gs1_encoder *ctx) {
 				prints.height = ctx->pixMult*2;
 				for (i = rows-1; i >= 0; i--) {
 					prints.pattern = ccPattern[i];
-					printElmnts(ctx, &prints);
+					gs1_printElmnts(ctx, &prints);
 				}
 			}
 			else { // CCB composite, extends beyond RSS14L on left
-				bmpHeader(ctx->pixMult*(RSSLIM_L_PADB+RSSLIM_SYM_W),
+				gs1_bmpHeader(ctx->pixMult*(RSSLIM_L_PADB+RSSLIM_SYM_W),
 						ctx->pixMult*(rows*2+RSSLIM_SYM_H) + ctx->sepHt, ctx->outfp);
 
 				// RSS Limited row
 				prints.leftPad = RSSLIM_L_PADB;
-				printElmnts(ctx, &prints);
+				gs1_printElmnts(ctx, &prints);
 
 				// RSS Limited CC separator pattern
 				prntCnv = separatorLim(ctx, &prints);
-				printElmnts(ctx, prntCnv);
+				gs1_printElmnts(ctx, prntCnv);
 
 				// 2D composite
 				prints.elmCnt = CCB3_ELMNTS;
@@ -406,13 +406,13 @@ void RSSLim(gs1_encoder *ctx) {
 				prints.leftPad = 0;
 				for (i = rows-1; i >= 0; i--) {
 					prints.pattern = ccPattern[i];
-					printElmnts(ctx, &prints);
+					gs1_printElmnts(ctx, &prints);
 				}
 			}
 		}
 		else { // TIF format
 			if (rows <= MAX_CCA3_ROWS) { // CCA composite
-				tifHeader(ctx->pixMult*RSSLIM_SYM_W,
+				gs1_tifHeader(ctx->pixMult*RSSLIM_SYM_W,
 						ctx->pixMult*(rows*2+RSSLIM_SYM_H) + ctx->sepHt, ctx->outfp);
 
           // 2D composite
@@ -421,7 +421,7 @@ void RSSLim(gs1_encoder *ctx) {
 				prints.height = ctx->pixMult*2;
 				for (i = 0; i < rows; i++) {
 					prints.pattern = ccPattern[i];
-					printElmnts(ctx, &prints);
+					gs1_printElmnts(ctx, &prints);
 				}
 
 				prints.elmCnt = RSSLIM_ELMNTS;
@@ -431,13 +431,13 @@ void RSSLim(gs1_encoder *ctx) {
 
 				// RSS Limited CC separator pattern
 				prntCnv = separatorLim(ctx, &prints);
-				printElmnts(ctx, prntCnv);
+				gs1_printElmnts(ctx, prntCnv);
 
 				// RSS Limited row
-				printElmnts(ctx, &prints);
+				gs1_printElmnts(ctx, &prints);
 			}
 			else { // CCB composite, extends beyond RSS14L on left
-				tifHeader(ctx->pixMult*(RSSLIM_L_PADB+RSSLIM_SYM_W),
+				gs1_tifHeader(ctx->pixMult*(RSSLIM_L_PADB+RSSLIM_SYM_W),
 						ctx->pixMult*(rows*2+RSSLIM_SYM_H) + ctx->sepHt, ctx->outfp);
 
 				// 2D composite
@@ -447,7 +447,7 @@ void RSSLim(gs1_encoder *ctx) {
 				prints.leftPad = 0;
 				for (i = 0; i < rows; i++) {
 					prints.pattern = ccPattern[i];
-					printElmnts(ctx, &prints);
+					gs1_printElmnts(ctx, &prints);
 				}
 
 				prints.elmCnt = RSSLIM_ELMNTS;
@@ -458,23 +458,23 @@ void RSSLim(gs1_encoder *ctx) {
 
 				// RSS Limited CC separator pattern
 				prntCnv = separatorLim(ctx, &prints);
-				printElmnts(ctx, prntCnv);
+				gs1_printElmnts(ctx, prntCnv);
 
 				// RSS Limited row
-				printElmnts(ctx, &prints);
+				gs1_printElmnts(ctx, &prints);
 			}
 		}
 	}
 	else { // primary only
 		if (ctx->bmp) {
-			bmpHeader(ctx->pixMult*RSSLIM_SYM_W, ctx->pixMult*RSSLIM_SYM_H, ctx->outfp);
+			gs1_bmpHeader(ctx->pixMult*RSSLIM_SYM_W, ctx->pixMult*RSSLIM_SYM_H, ctx->outfp);
 		}
 		else {
-			tifHeader(ctx->pixMult*RSSLIM_SYM_W, ctx->pixMult*RSSLIM_SYM_H, ctx->outfp);
+			gs1_tifHeader(ctx->pixMult*RSSLIM_SYM_W, ctx->pixMult*RSSLIM_SYM_H, ctx->outfp);
 		}
 
 		// RSS Limited row
-		printElmnts(ctx, &prints);
+		gs1_printElmnts(ctx, &prints);
 	}
 	return;
 }

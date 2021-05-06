@@ -564,7 +564,7 @@ static void genECC(gs1_encoder *ctx, int dsize, int csize, uint16_t sym[]) {
 }
 
 
-void putBits(gs1_encoder *ctx, uint8_t bitField[], int bitPos, int length, uint16_t bits) {
+void gs1_putBits(gs1_encoder *ctx, uint8_t bitField[], int bitPos, int length, uint16_t bits) {
 	int i, maxBytes;
 
 	if (ctx->linFlag == -1) {
@@ -623,7 +623,7 @@ static const uint8_t iswhat[256] = { /* byte look up table with IS_XXX bits */
 };
 
 
-int check2DData(uint8_t dataStr[]) {
+int gs1_check2DData(uint8_t dataStr[]) {
 	int i;
 
 	for (i = 0; iswhat[dataStr[i]] != 0x80; i++) {
@@ -735,14 +735,14 @@ static int procNUM(gs1_encoder *ctx, struct encodeT *encode) {
 		}
 		if (bitCnt > 0) {
 			// insert full or partial 0000 alnu latch for pad
-			putBits(ctx, encode->bitField, encode->iBit, bitCnt, 0);
+			gs1_putBits(ctx, encode->bitField, encode->iBit, bitCnt, 0);
 			encode->iBit += bitCnt;
 		}
 		return(FINI_MODE);
 	}
 	if ((what1 & IS_NUM) == 0) {
 		// first not a "number", latch to ALNU
-		putBits(ctx, encode->bitField, encode->iBit, 4, 0);
+		gs1_putBits(ctx, encode->bitField, encode->iBit, 4, 0);
 		encode->iBit += 4;
 		return(ALNU_MODE);
 	}
@@ -754,17 +754,17 @@ static int procNUM(gs1_encoder *ctx, struct encodeT *encode) {
 		bitCnt = getUnusedBitCnt(ctx, encode->iBit, &i);
 		if ((bitCnt >= 4) && (bitCnt < 7)) {
 			// less than 7 bits, encode a bcd+1
-			putBits(ctx, encode->bitField, encode->iBit, 4, (uint16_t)(char1+1 -(int)'0'));
+			gs1_putBits(ctx, encode->bitField, encode->iBit, 4, (uint16_t)(char1+1 -(int)'0'));
 			bitCnt -= 4;
 			if (bitCnt > 0) {
 				// 0 or 00 final pad
-				putBits(ctx, encode->bitField, (encode->iBit)+4, bitCnt, 0);
+				gs1_putBits(ctx, encode->bitField, (encode->iBit)+4, bitCnt, 0);
 			}
 			encode->iBit += 4 + bitCnt;
 		}
 		else {
 			// encode as digit & FNC1
-			putBits(ctx, encode->bitField, encode->iBit, 7, (uint16_t)(((char1-(int)'0') * 11) + 10 + 8));
+			gs1_putBits(ctx, encode->bitField, encode->iBit, 7, (uint16_t)(((char1-(int)'0') * 11) + 10 + 8));
 			encode->iBit += 7;
 			bitCnt -= 7;
 			if ((bitCnt > 4) || (bitCnt < 0)) {
@@ -772,7 +772,7 @@ static int procNUM(gs1_encoder *ctx, struct encodeT *encode) {
 			}
 			if (bitCnt > 0) {
 				// insert full or partial 0000 alnu latch
-				putBits(ctx, encode->bitField, encode->iBit, bitCnt, 0);
+				gs1_putBits(ctx, encode->bitField, encode->iBit, bitCnt, 0);
 				encode->iBit += bitCnt;
 			}
 		}
@@ -780,7 +780,7 @@ static int procNUM(gs1_encoder *ctx, struct encodeT *encode) {
 	}
 	if (((what1 & what2 & IS_FNC1) != 0) || ((what2 & IS_NUM) == 0)) {
 		// dbl FNC1 or 2nd char not a digit, latch to alnu
-		putBits(ctx, encode->bitField, encode->iBit, 4, 0);
+		gs1_putBits(ctx, encode->bitField, encode->iBit, 4, 0);
 		encode->iBit += 4;
 		return(ALNU_MODE);
 	}
@@ -799,7 +799,7 @@ static int procNUM(gs1_encoder *ctx, struct encodeT *encode) {
 		else {
 			char2 -= (int)'0';
 		}
-		putBits(ctx, encode->bitField, encode->iBit, 7, (uint16_t)((char1 * 11) + char2 + 8));
+		gs1_putBits(ctx, encode->bitField, encode->iBit, 7, (uint16_t)((char1 * 11) + char2 + 8));
 		encode->iBit += 7;
 		return(NUM_MODE);
 	}
@@ -819,7 +819,7 @@ static int procALNU(gs1_encoder *ctx, struct encodeT *encode) {
 	}
 	if ((what & IS_ALNU) == 0) {
 		// not a ALNU, latch to ISO
-		putBits(ctx, encode->bitField, encode->iBit, 5, 4);
+		gs1_putBits(ctx, encode->bitField, encode->iBit, 5, 4);
 		encode->iBit += 5;
 		return(ISO_MODE);
 	}
@@ -830,7 +830,7 @@ static int procALNU(gs1_encoder *ctx, struct encodeT *encode) {
 			if ((whatN = iswhat[encode->str[(encode->iStr)+i]]) == IS_FINI) {
 				if (i >= 4) {
 					// latch numeric if >= 4 numbers at end
-					putBits(ctx, encode->bitField, encode->iBit, 3, 0);
+					gs1_putBits(ctx, encode->bitField, encode->iBit, 3, 0);
 					encode->iBit += 3;
 					return(NUM_MODE);
 				}
@@ -846,7 +846,7 @@ static int procALNU(gs1_encoder *ctx, struct encodeT *encode) {
 		}
 		if (i == 6) {
 			// NUM if 6 or more digits coming up
-			putBits(ctx, encode->bitField, encode->iBit, 3, 0);
+			gs1_putBits(ctx, encode->bitField, encode->iBit, 3, 0);
 			encode->iBit += 3;
 			return(NUM_MODE);
 		}
@@ -862,7 +862,7 @@ static int procALNU(gs1_encoder *ctx, struct encodeT *encode) {
 		else {
 			chr = chr - (int)'0' + 5;
 		}
-		putBits(ctx, encode->bitField, encode->iBit, 5, (uint16_t)chr);
+		gs1_putBits(ctx, encode->bitField, encode->iBit, 5, (uint16_t)chr);
 		encode->iBit += 5;
 	}
 	else {
@@ -883,7 +883,7 @@ static int procALNU(gs1_encoder *ctx, struct encodeT *encode) {
 			// *
 			chr = 0x1A;
 		}
-		putBits(ctx, encode->bitField, encode->iBit, 6, (uint16_t)(chr + 0x20));
+		gs1_putBits(ctx, encode->bitField, encode->iBit, 6, (uint16_t)(chr + 0x20));
 		encode->iBit += 6;
 	}
 	return(encode->mode);
@@ -913,13 +913,13 @@ static int procISO(gs1_encoder *ctx, struct encodeT *encode) {
 			if (whatN == IS_FINI) {
 				if ((numCnt >= 4) || (numCnt <= -4)) {
 					// latch numeric if >= 4 numbers at end
-					putBits(ctx, encode->bitField, encode->iBit, 3, 0);
+					gs1_putBits(ctx, encode->bitField, encode->iBit, 3, 0);
 					encode->iBit += 3;
 					return(NUM_MODE);
 				}
 				if (i >= 5) {
 					// latch ALNU if >= 5 alphanumbers at end
-					putBits(ctx, encode->bitField, encode->iBit, 5, 4);
+					gs1_putBits(ctx, encode->bitField, encode->iBit, 5, 4);
 					encode->iBit += 5;
 					return(ALNU_MODE);
 				}
@@ -944,13 +944,13 @@ static int procISO(gs1_encoder *ctx, struct encodeT *encode) {
 		if (i == 10) {
 			if ((numCnt >= 4) || (numCnt <= -4)) {
 				// latch numeric if >= 4 numbers follow & no ISO chars in next 10
-				putBits(ctx, encode->bitField, encode->iBit, 3, 0);
+				gs1_putBits(ctx, encode->bitField, encode->iBit, 3, 0);
 				encode->iBit += 3;
 				return(NUM_MODE);
 			}
 			else {
 				// latch ALNU if no ISO only chars in next 10
-				putBits(ctx, encode->bitField, encode->iBit, 5, 4);
+				gs1_putBits(ctx, encode->bitField, encode->iBit, 5, 4);
 				encode->iBit += 5;
 				return(ALNU_MODE);
 			}
@@ -967,19 +967,19 @@ static int procISO(gs1_encoder *ctx, struct encodeT *encode) {
 		else {
 			chr = chr - (int)'0' + 5;
 		}
-		putBits(ctx, encode->bitField, encode->iBit, 5, (uint16_t)chr);
+		gs1_putBits(ctx, encode->bitField, encode->iBit, 5, (uint16_t)chr);
 		encode->iBit += 5;
 	}
 	else if ((chr >= (int)'A') && (chr <= (int)'Z')) {
 		// A-Z
 		chr = chr - (int)'A' + 0x40;
-		putBits(ctx, encode->bitField, encode->iBit, 7, (uint16_t)chr);
+		gs1_putBits(ctx, encode->bitField, encode->iBit, 7, (uint16_t)chr);
 		encode->iBit += 7;
 	}
 	else if ((chr >= (int)'a') && (chr <= (int)'z')) {
 		// a-z
 		chr = chr - (int)'a' + 0x5A;
-		putBits(ctx, encode->bitField, encode->iBit, 7, (uint16_t)chr);
+		gs1_putBits(ctx, encode->bitField, encode->iBit, 7, (uint16_t)chr);
 		encode->iBit += 7;
 	}
 	else {
@@ -1002,7 +1002,7 @@ static int procISO(gs1_encoder *ctx, struct encodeT *encode) {
 		else {
 			chr = chr - 33 + 0xE8; // !-"
 		}
-		putBits(ctx, encode->bitField, encode->iBit, 8, (uint16_t)chr);
+		gs1_putBits(ctx, encode->bitField, encode->iBit, 8, (uint16_t)chr);
 		encode->iBit += 8;
 	}
 	return(encode->mode);
@@ -1016,19 +1016,19 @@ static int procALPH(gs1_encoder *ctx, struct encodeT *encode) {
 	// check next char type
 	if (isupper(encode->str[encode->iStr])) {
 		// alpha
-		putBits(ctx, encode->bitField, encode->iBit, 5, (uint16_t)(encode->str[encode->iStr]-65));
+		gs1_putBits(ctx, encode->bitField, encode->iBit, 5, (uint16_t)(encode->str[encode->iStr]-65));
 		encode->iBit += 5;
 		encode->iStr += 1;
 	}
 	else if (isdigit(encode->str[encode->iStr])) {
 		// number
-		putBits(ctx, encode->bitField, encode->iBit, 6, (uint16_t)(encode->str[encode->iStr]+4));
+		gs1_putBits(ctx, encode->bitField, encode->iBit, 6, (uint16_t)(encode->str[encode->iStr]+4));
 		encode->iBit += 6;
 		encode->iStr += 1;
 	}
 	else if (encode->str[encode->iStr] == FNC1) {
 		// FNC1
-		putBits(ctx, encode->bitField, encode->iBit, 5, 31);
+		gs1_putBits(ctx, encode->bitField, encode->iBit, 5, 31);
 		encode->iBit += 5;
 		encode->iStr += 1;
 		encode->mode = NUM_MODE;
@@ -1039,7 +1039,7 @@ static int procALPH(gs1_encoder *ctx, struct encodeT *encode) {
 		if (i > 5) {
 			i = 5; // i is minimum of 5 or unused bit count
 		}
-		putBits(ctx, encode->bitField, encode->iBit, i, 31);
+		gs1_putBits(ctx, encode->bitField, encode->iBit, i, 31);
 		encode->iBit += i;
 		encode->mode = NUM_MODE;
 	}
@@ -1194,27 +1194,27 @@ static void procAI90(gs1_encoder *ctx, struct encodeT *encode) {
 	}
 	// do encodation bit(s)
 	if (alLessNu > 0) {
-		putBits(ctx, encode->bitField, encode->iBit, 2, 3); // 11: alpha encoding
+		gs1_putBits(ctx, encode->bitField, encode->iBit, 2, 3); // 11: alpha encoding
 		encode->iBit += 2;
 		encode->mode = ALPH_MODE;
 	}
 	else if (i > j && j-encode->iStr < 4) {
-		putBits(ctx, encode->bitField, encode->iBit, 1, 0); // 0: alphanumeric encoding
+		gs1_putBits(ctx, encode->bitField, encode->iBit, 1, 0); // 0: alphanumeric encoding
 		encode->iBit += 1;
 		encode->mode = ALNU_MODE;
 	}
 	else {
-		putBits(ctx, encode->bitField, encode->iBit, 2, 2); // 10: numeric encoding
+		gs1_putBits(ctx, encode->bitField, encode->iBit, 2, 2); // 10: numeric encoding
 		encode->iBit += 2;
 		encode->mode = NUM_MODE;
 	}
 	// next AI is 1 or 2 bit field
 	if (encode->typeAI == AIx) {
-		putBits(ctx, encode->bitField, encode->iBit, 1, 0); // 0: not AI 21 or 8004
+		gs1_putBits(ctx, encode->bitField, encode->iBit, 1, 0); // 0: not AI 21 or 8004
 		encode->iBit += 1;
 	}
 	else { // 10: AI 21 or 11: AI 8004
-		putBits(ctx, encode->bitField, encode->iBit, 2, (uint16_t)encode->typeAI);
+		gs1_putBits(ctx, encode->bitField, encode->iBit, 2, (uint16_t)encode->typeAI);
 		encode->iBit += 2;
 	}
 	for (j = 0; j < 16; j++) {
@@ -1223,16 +1223,16 @@ static void procAI90(gs1_encoder *ctx, struct encodeT *encode) {
 		}
 	}
 	if (diNum1 < 31 && j < 16) {
-		putBits(ctx, encode->bitField, encode->iBit, 5, (uint16_t)diNum1); // DI number < 31
-		putBits(ctx, encode->bitField,
+		gs1_putBits(ctx, encode->bitField, encode->iBit, 5, (uint16_t)diNum1); // DI number < 31
+		gs1_putBits(ctx, encode->bitField,
 				encode->iBit+5, 4, (uint16_t)j); // DI alpha from alphaTbl
 		encode->iBit += 9;
 	}
 	else {
-		putBits(ctx, encode->bitField, encode->iBit, 5, 31);
-		putBits(ctx, encode->bitField,
+		gs1_putBits(ctx, encode->bitField, encode->iBit, 5, 31);
+		gs1_putBits(ctx, encode->bitField,
 				encode->iBit+5, 10, (uint16_t)diNum1); // DI number >= 31
-		putBits(ctx, encode->bitField,
+		gs1_putBits(ctx, encode->bitField,
 				encode->iBit+15, 5, (uint16_t)(diAlpha1-65)); // or alpha not in table
 		encode->iBit += 20;
 	}
@@ -1254,15 +1254,15 @@ static int doMethods(gs1_encoder *ctx, struct encodeT *encode) {
 	if (strlen((char*)encode->str) >= 8 && encode->str[0] == '1' &&
 				(encode->str[1] == '1' || encode->str[1] == '7')) {
 		// method "10"
-		putBits(ctx, encode->bitField, 0, 2, 2); // mfg/exp date-lot encodation method bit flag 10
+		gs1_putBits(ctx, encode->bitField, 0, 2, 2); // mfg/exp date-lot encodation method bit flag 10
 		bits = (uint16_t)(((uint16_t)(encode->str[2]-'0')*10 +
 				(uint16_t)(encode->str[3]-'0')) * 384); // YY
 		bits = (uint16_t)(bits + ((uint16_t)(encode->str[4]-'0')*10 +
 				(uint16_t)(encode->str[5]-'0') - 1) * 32); // MM
 		bits = (uint16_t)(bits + (uint16_t)(encode->str[6]-'0')*10 +
 				(uint16_t)(encode->str[7]-'0')); // DD
-		putBits(ctx, encode->bitField, 2, 16, bits); // date packed data
-		putBits(ctx, encode->bitField, 2+16, 1,
+		gs1_putBits(ctx, encode->bitField, 2, 16, bits); // date packed data
+		gs1_putBits(ctx, encode->bitField, 2+16, 1,
 				(uint16_t)((encode->str[1] == '1') ? 0 : 1)); // 0/1 bit for AI 11/17
 		if (encode->str[8] == '1' && encode->str[9] == '0' &&
 				encode->str[10] != '#') {
@@ -1279,13 +1279,13 @@ static int doMethods(gs1_encoder *ctx, struct encodeT *encode) {
 	if (encode->str[0] == '9' &&
 			encode->str[1] == '0' &&
 			testAI90(encode)) {
-		putBits(ctx, encode->bitField, encode->iBit, 2, 3); // method 11
+		gs1_putBits(ctx, encode->bitField, encode->iBit, 2, 3); // method 11
 		encode->iBit += 2;
 		procAI90(ctx, encode);
 	}
 	else {
 		// method 0
-		putBits(ctx, encode->bitField, 0, 1, 0); // g.p. encodation method bit flag 0
+		gs1_putBits(ctx, encode->bitField, 0, 1, 0); // g.p. encodation method bit flag 0
 		encode->iBit = 1;
 		encode->mode = NUM_MODE;
 		encode->iStr = 0;
@@ -1303,13 +1303,13 @@ static int insertPad(gs1_encoder *ctx, struct encodeT *encode) {
 		return(-1); // too many bits
 	}
 	while (bitCnt >= 5) {
-		putBits(ctx, encode->bitField, encode->iBit, 5, 4);
+		gs1_putBits(ctx, encode->bitField, encode->iBit, 5, 4);
 		encode->iBit += 5;
 		bitCnt -= 5;
 	}
 	if (bitCnt > 0) {
 		chr = 4 >> (5-bitCnt);
-		putBits(ctx, encode->bitField, encode->iBit, bitCnt, (uint16_t)chr);
+		gs1_putBits(ctx, encode->bitField, encode->iBit, bitCnt, (uint16_t)chr);
 		encode->iBit += bitCnt;
 	}
 	return(size);
@@ -1321,7 +1321,7 @@ static void cnv12(gs1_encoder *ctx, uint8_t str[], int *iStr, uint8_t bitField[]
 	int i;
 
 	for (i = 0; i < 4 ; i++) {
-		putBits(ctx, bitField, *iBit, 10, (uint16_t)((uint16_t)(str[*iStr] - '0')*100 +
+		gs1_putBits(ctx, bitField, *iBit, 10, (uint16_t)((uint16_t)(str[*iStr] - '0')*100 +
 				(str[*iStr+1] - '0')*10 +
 				str[*iStr+2] - '0')); // 10 bit groups bits
 		*iBit += 10;
@@ -1336,11 +1336,11 @@ static void cnv13(gs1_encoder *ctx, uint8_t str[], int *iStr, uint8_t bitField[]
 
 	int i;
 
-	putBits(ctx, bitField, *iBit, 4, (uint16_t)(str[*iStr] - '0')); // high order 4 bits
+	gs1_putBits(ctx, bitField, *iBit, 4, (uint16_t)(str[*iStr] - '0')); // high order 4 bits
 	*iBit += 4;
 	*iStr += 1;
 	for (i = 0; i < 4 ; i++) {
-		putBits(ctx, bitField, *iBit, 10, (uint16_t)((uint16_t)(str[*iStr] - '0')*100 +
+		gs1_putBits(ctx, bitField, *iBit, 10, (uint16_t)((uint16_t)(str[*iStr] - '0')*100 +
 							(str[*iStr+1] - '0')*10 +
 							str[*iStr+2] - '0')); // 10 bit groups bits
 		*iBit += 10;
@@ -1379,11 +1379,11 @@ static int doLinMethods(gs1_encoder *ctx, uint8_t str[], int *iStr, uint8_t bitF
 			str[16]=='3' && str[17]=='1' && str[18]=='0' && str[19]=='3' &&
 			(weight=atol(numStr))<=32767L) {
 			// method 0100, AI's 01 + 3103
-			putBits(ctx, bitField, *iBit, 4, 4); // write method
+			gs1_putBits(ctx, bitField, *iBit, 4, 4); // write method
 			*iBit += 4;
 			*iStr += 3; // skip AI 01 and PI 9
 			cnv12(ctx, str, iStr, bitField, iBit); // write PID-12
-			putBits(ctx, bitField, *iBit, 15, (uint16_t)weight); // write weight
+			gs1_putBits(ctx, bitField, *iBit, 15, (uint16_t)weight); // write weight
 			*iBit += 15;
 			*iStr += 1+10; // skip check digit & jump weight field
 		}
@@ -1393,11 +1393,11 @@ static int doLinMethods(gs1_encoder *ctx, uint8_t str[], int *iStr, uint8_t bitF
 			str[16]=='3' && str[17]=='2' && str[18]=='0' && str[19]=='2' &&
 			(weight=atol(numStr))<=9999L) {
 			// method 0101, AI's 01 + 3202
-			putBits(ctx, bitField, *iBit, 4, 5); // write method
+			gs1_putBits(ctx, bitField, *iBit, 4, 5); // write method
 			*iBit += 4;
 			*iStr += 3; // skip AI 01 and PI 9
 			cnv12(ctx, str, iStr, bitField, iBit); // write PID-12
-			putBits(ctx, bitField, *iBit, 15, (uint16_t)weight); // write weight
+			gs1_putBits(ctx, bitField, *iBit, 15, (uint16_t)weight); // write weight
 			*iBit += 15;
 			*iStr += 1+10; // skip check digit & jump weight field
 		}
@@ -1407,11 +1407,11 @@ static int doLinMethods(gs1_encoder *ctx, uint8_t str[], int *iStr, uint8_t bitF
 			str[16]=='3' && str[17]=='2' && str[18]=='0' && str[19]=='3' &&
 			(weight=atol(numStr))<=22767L) {
 			// method 0101, AI's 01 + 3203
-			putBits(ctx, bitField, *iBit, 4, 5); // write method
+			gs1_putBits(ctx, bitField, *iBit, 4, 5); // write method
 			*iBit += 4;
 			*iStr += 3; // skip AI 01 and PI 9
 			cnv12(ctx, str, iStr, bitField, iBit); // write PID-12
-			putBits(ctx, bitField, *iBit, 15, (uint16_t)(weight+10000)); // write weight
+			gs1_putBits(ctx, bitField, *iBit, 15, (uint16_t)(weight+10000)); // write weight
 			*iBit += 15;
 			*iStr += 1+10; // skip check digit & jump weight field
 		}
@@ -1421,11 +1421,11 @@ static int doLinMethods(gs1_encoder *ctx, uint8_t str[], int *iStr, uint8_t bitF
 			str[16]=='3' && str[17]=='9' && str[18]=='2' &&
 			(str[19]>='0' && str[19]<='3')) {
 			// method 01100, AI's 01 + 392x + G.P.
-			putBits(ctx, bitField, *iBit, 5+2, 0x0C<<2); // write method + 2 VLS bits
+			gs1_putBits(ctx, bitField, *iBit, 5+2, 0x0C<<2); // write method + 2 VLS bits
 			*iBit += 5+2;
 			*iStr += 3; // skip AI 01 and PI 9
 			cnv12(ctx, str, iStr, bitField, iBit); // write PID-12
-			putBits(ctx, bitField, *iBit, 2, (uint16_t)(str[19]-'0')); // write D.P.
+			gs1_putBits(ctx, bitField, *iBit, 2, (uint16_t)(str[19]-'0')); // write D.P.
 			*iBit += 2;
 			*iStr += 1+4; // skip check digit & jump price AI
 		}
@@ -1435,16 +1435,16 @@ static int doLinMethods(gs1_encoder *ctx, uint8_t str[], int *iStr, uint8_t bitF
 			str[16]=='3' && str[17]=='9' && str[18]=='3' &&
 			(str[19]>='0' && str[19]<='3')) {
 			// method 01101, AI's 01 + 393x[NNN] + G.P.
-			putBits(ctx, bitField, *iBit, 5+2, 0x0D<<2); // write method + 2 VLS bits
+			gs1_putBits(ctx, bitField, *iBit, 5+2, 0x0D<<2); // write method + 2 VLS bits
 			*iBit += 5+2;
 			*iStr += 3; // skip AI 01 and PI 9
 			cnv12(ctx, str, iStr, bitField, iBit); // write PID-12
-			putBits(ctx, bitField, *iBit, 2, (uint16_t)(str[19]-'0')); // write D.P.
+			gs1_putBits(ctx, bitField, *iBit, 2, (uint16_t)(str[19]-'0')); // write D.P.
 			*iBit += 2;
 			*iStr += 1+4; // skip check digit & jump price AI
 			strncpy(numStr, (char*)&str[20], 3); // ISO country code
 			numStr[3] = '\0';
-			putBits(ctx, bitField, *iBit, 10, (uint16_t)atoi(numStr)); // write ISO c.c.
+			gs1_putBits(ctx, bitField, *iBit, 10, (uint16_t)atoi(numStr)); // write ISO c.c.
 			*iBit += 10;
 			*iStr += 3; // jump ISO country code
 		}
@@ -1455,16 +1455,16 @@ static int doLinMethods(gs1_encoder *ctx, uint8_t str[], int *iStr, uint8_t bitF
 			(weight=atol(numStr))<=99999L) {
 			// methods 0111000-0111001, AI's 01 + 3x0x no date
 			bits = (uint16_t)(0x38+(str[17]-'1'));
-			putBits(ctx, bitField, *iBit, 7, bits); // write method
+			gs1_putBits(ctx, bitField, *iBit, 7, bits); // write method
 			*iBit += 7;
 			*iStr += 3; // skip AI 01 and PI 9
 			cnv12(ctx, str, iStr, bitField, iBit); // write PID-12
 			weight = weight + ((long)(str[19] - '0') * 100000L); // decimal digit
-			putBits(ctx, bitField, *iBit, 4, (uint16_t)(weight>>16)); // write weight
-			putBits(ctx, bitField, *iBit+4, 16, (uint16_t)(weight&0xFFFF));
+			gs1_putBits(ctx, bitField, *iBit, 4, (uint16_t)(weight>>16)); // write weight
+			gs1_putBits(ctx, bitField, *iBit+4, 16, (uint16_t)(weight&0xFFFF));
 			*iBit += 20;
 			*iStr += 1+10; // jump check digit and weight field
-			putBits(ctx, bitField, *iBit, 16, (uint16_t)38400); // write no date
+			gs1_putBits(ctx, bitField, *iBit, 16, (uint16_t)38400); // write no date
 			*iBit += 16;
 		}
 
@@ -1476,22 +1476,22 @@ static int doLinMethods(gs1_encoder *ctx, uint8_t str[], int *iStr, uint8_t bitF
 			(str[27]=='1' || str[27]=='3' || str[27]=='5' || str[27]=='7')) {
 			// methods 0111000-0111111, AI's 01 + 3x0x + 1x
 			bits = (uint16_t)(0x38+(str[27]-'1')+(str[17] - '1'));
-			putBits(ctx, bitField, *iBit, 7, bits); // write method
+			gs1_putBits(ctx, bitField, *iBit, 7, bits); // write method
 			*iBit += 7;
 			*iStr += 3; // skip AI 01 and PI 9
 			cnv12(ctx, str, iStr, bitField, iBit); // write PID-12
 			weight = weight + ((long)(str[19] - '0') * 100000L); // decimal digit
-			putBits(ctx, bitField, *iBit, 4, (uint16_t)(weight>>16)); // write weight
-			putBits(ctx, bitField, *iBit+4, 16, (uint16_t)(weight&0xFFFF));
+			gs1_putBits(ctx, bitField, *iBit, 4, (uint16_t)(weight>>16)); // write weight
+			gs1_putBits(ctx, bitField, *iBit+4, 16, (uint16_t)(weight&0xFFFF));
 			*iBit += 20;
 			*iStr += 11; // jump check digit & weight field
-			putBits(ctx, bitField, *iBit, 16, yymmdd(&str[*iStr+2])); // write date
+			gs1_putBits(ctx, bitField, *iBit, 16, yymmdd(&str[*iStr+2])); // write date
 			*iBit += 16;
 			*iStr += 8; // date field
 		}
 		else {
 			// method 1 (plus 2-bit variable lng sym bit fld), AI 01
-			putBits(ctx, bitField, *iBit, 1+2, 1<<2); // write method + 2 VLS bits
+			gs1_putBits(ctx, bitField, *iBit, 1+2, 1<<2); // write method + 2 VLS bits
 			*iBit += 1+2;
 			*iStr += 2;
 			cnv13(ctx, str, iStr, bitField, iBit);
@@ -1500,14 +1500,14 @@ static int doLinMethods(gs1_encoder *ctx, uint8_t str[], int *iStr, uint8_t bitF
 	}
 	else {
 		// method 00 (plus 2-bit variable lng sym bit fld), not AI 01
-		putBits(ctx, bitField, *iBit, 2+2, 0); // write method + 2 VLSB bits
+		gs1_putBits(ctx, bitField, *iBit, 2+2, 0); // write method + 2 VLSB bits
 		*iBit += 2+2;
 	}
 	return(NUM_MODE);
 }
 
 
-int pack(gs1_encoder *ctx, uint8_t str[], uint8_t bitField[]) {
+int gs1_pack(gs1_encoder *ctx, uint8_t str[], uint8_t bitField[]) {
 
 	struct encodeT encode;
 
@@ -2087,7 +2087,7 @@ static void encCCC(gs1_encoder *ctx, int byteCnt, uint8_t bitField[], uint16_t c
 }
 
 
-int CC2enc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS] ) {
+int gs1_CC2enc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS] ) {
 
 	static const int rows[11] = { 5,6,7,8,9,10,12,  17,20,23,26 }; // 7 CCA & 4 CCB row counts
 
@@ -2098,7 +2098,7 @@ int CC2enc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_
 
 	ctx->linFlag = 0;
 	ctx->cc_CCSizes = CC2Sizes;
-	if ((i=check2DData(str)) != 0) {
+	if ((i=gs1_check2DData(str)) != 0) {
 		sprintf(ctx->errMsg, "illegal character in 2D data = '%c'", str[i]);
 		ctx->errFlag = true;
 		return(0);
@@ -2106,7 +2106,7 @@ int CC2enc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_
 #if PRNT
 	printf("%s\n", str);
 #endif
-	size = pack(ctx, str, bitField);
+	size = gs1_pack(ctx, str, bitField);
 	if (size < 0 || CC2Sizes[size] == 0) {
 		strcpy(ctx->errMsg, "data error");
 		ctx->errFlag = true;
@@ -2122,7 +2122,7 @@ int CC2enc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_
 }
 
 
-int CC3enc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS] ) {
+int gs1_CC3enc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS] ) {
 
 	static const int rows[11] = { 4,5,6,7,8,  15,20,26,32,38,44 }; // 5 CCA & 6 CCB row counts
 
@@ -2133,7 +2133,7 @@ int CC3enc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_
 
 	ctx->linFlag = 0;
 	ctx->cc_CCSizes = CC3Sizes;
-	if ((i=check2DData(str)) != 0) {
+	if ((i=gs1_check2DData(str)) != 0) {
 		sprintf(ctx->errMsg, "illegal character in 2D data = '%c'", str[i]);
 		ctx->errFlag = true;
 		return(0);
@@ -2141,7 +2141,7 @@ int CC3enc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_
 #if PRNT
 	printf("%s\n", str);
 #endif
-	size = pack(ctx, str, bitField);
+	size = gs1_pack(ctx, str, bitField);
 	if (size < 0 || CC3Sizes[size] == 0) {
 		strcpy(ctx->errMsg, "data error");
 		ctx->errFlag = true;
@@ -2157,7 +2157,7 @@ int CC3enc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_
 }
 
 
-int CC4enc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS] ) {
+int gs1_CC4enc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS] ) {
 
 	static const int rows[13] = { 3,4,5,6,7,  10,12,15,20,26,32,38,44 }; // 5 CCA & 8 CCB row counts
 
@@ -2168,7 +2168,7 @@ int CC4enc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_
 
 	ctx->linFlag = 0;
 	ctx->cc_CCSizes = CC4Sizes;
-	if ((i=check2DData(str)) != 0) {
+	if ((i=gs1_check2DData(str)) != 0) {
 		sprintf(ctx->errMsg, "illegal character in 2D data = '%c'", str[i]);
 		ctx->errFlag = true;
 		return(0);
@@ -2176,7 +2176,7 @@ int CC4enc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_
 #if PRNT
 	printf("%s\n", str);
 #endif
-	size = pack(ctx, str, bitField);
+	size = gs1_pack(ctx, str, bitField);
 	if (size < 0 || CC4Sizes[size] == 0) {
 		strcpy(ctx->errMsg, "data error");
 		ctx->errFlag = true;
@@ -2192,7 +2192,7 @@ int CC4enc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_
 }
 
 
-bool CCCenc(gs1_encoder *ctx, uint8_t str[], uint8_t patCCC[] ) {
+bool gs1_CCCenc(gs1_encoder *ctx, uint8_t str[], uint8_t patCCC[] ) {
 
 	uint8_t bitField[MAX_CCC_BYTES];
 	uint16_t codeWords[MAX_CCC_CW];
@@ -2200,12 +2200,12 @@ bool CCCenc(gs1_encoder *ctx, uint8_t str[], uint8_t patCCC[] ) {
 	int i;
 
 	ctx->linFlag = -1; // CC-C flag value
-	if ((i=check2DData(str)) != 0) {
+	if ((i=gs1_check2DData(str)) != 0) {
 		sprintf(ctx->errMsg, "illegal character '%c'", str[i]);
 		ctx->errFlag = true;
 		return(false);
 	}
-	if((byteCnt = pack(ctx, str, bitField)) < 0) {
+	if((byteCnt = gs1_pack(ctx, str, bitField)) < 0) {
 		strcpy(ctx->errMsg, "data error");
 		ctx->errFlag = true;
 		return(false);

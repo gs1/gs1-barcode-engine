@@ -49,13 +49,13 @@
 #define MAX_CCA3_SIZE	4	// index to 167 in CC3Sizes
 #define MAX_CCA4_SIZE	4	// index to 197 in CC4Sizes
 
-int CC2enc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
-int CC3enc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
-int CC4enc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
-bool CCCenc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[]);
+int gs1_CC2enc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
+int gs1_CC3enc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
+int gs1_CC4enc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
+bool gs1_CCCenc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[]);
 
-int check2DData(uint8_t dataStr[]);
-int pack(gs1_encoder *ctx, uint8_t str[], uint8_t bitField[]);
-void putBits(gs1_encoder *ctx, uint8_t bitField[], int bitPos, int length, uint16_t bits);
+int gs1_check2DData(uint8_t dataStr[]);
+int gs1_pack(gs1_encoder *ctx, uint8_t str[], uint8_t bitField[]);
+void gs1_putBits(gs1_encoder *ctx, uint8_t bitField[], int bitPos, int length, uint16_t bits);
 
 #endif /* CC_H */

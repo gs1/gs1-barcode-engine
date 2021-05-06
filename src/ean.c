@@ -92,7 +92,7 @@ static bool EAN13enc(uint8_t str[], uint8_t pattern[] ) {
 	return(true);
 }
 
-void EAN13(gs1_encoder *ctx) {
+void gs1_EAN13(gs1_encoder *ctx) {
 
 	struct sPrints prints;
 	struct sPrints sepPrnt;
@@ -158,7 +158,7 @@ void EAN13(gs1_encoder *ctx) {
 	sepPrnt.whtFirst = true;
 	sepPrnt.reverse = false;
 	if (ccFlag) {
-		if (!((rows = CC4enc(ctx, (uint8_t*)ccStr, ccPattern)) > 0) || ctx->errFlag) return;
+		if (!((rows = gs1_CC4enc(ctx, (uint8_t*)ccStr, ccPattern)) > 0) || ctx->errFlag) return;
 #if PRNT
 		{
 			int j;
@@ -175,17 +175,17 @@ void EAN13(gs1_encoder *ctx) {
 
 		if (ctx->bmp) {
 			// note: BMP is bottom to top inverted
-			bmpHeader(ctx->pixMult*EAN13_W, ctx->pixMult*(rows*2 + 6 + EAN13_H), ctx->outfp);
+			gs1_bmpHeader(ctx->pixMult*EAN13_W, ctx->pixMult*(rows*2 + 6 + EAN13_H), ctx->outfp);
 
 			// EAN-13
-			printElmnts(ctx, &prints);
+			gs1_printElmnts(ctx, &prints);
 
 			// CC separator
-			printElmnts(ctx, &sepPrnt);
+			gs1_printElmnts(ctx, &sepPrnt);
 			sepPrnt.pattern = sepPat2;
-			printElmnts(ctx, &sepPrnt);
+			gs1_printElmnts(ctx, &sepPrnt);
 			sepPrnt.pattern = sepPat1;
-			printElmnts(ctx, &sepPrnt);
+			gs1_printElmnts(ctx, &sepPrnt);
 
 			// Composite Component
 			prints.elmCnt = CCB4_ELMNTS;
@@ -194,11 +194,11 @@ void EAN13(gs1_encoder *ctx) {
 			prints.rightPad = EAN13_R_PAD;
 			for (i = rows-1; i >= 0; i--) {
 				prints.pattern = ccPattern[i];
-				printElmnts(ctx, &prints);
+				gs1_printElmnts(ctx, &prints);
 			}
 		}
 		else {
-			tifHeader(ctx->pixMult*EAN13_W, ctx->pixMult*(rows*2 + 6 + EAN13_H), ctx->outfp);
+			gs1_tifHeader(ctx->pixMult*EAN13_W, ctx->pixMult*(rows*2 + 6 + EAN13_H), ctx->outfp);
 
 			// Composite Component
 			prints.elmCnt = CCB4_ELMNTS;
@@ -207,15 +207,15 @@ void EAN13(gs1_encoder *ctx) {
 			prints.rightPad = EAN13_R_PAD;
 			for (i = 0; i < rows; i++) {
 				prints.pattern = ccPattern[i];
-				printElmnts(ctx, &prints);
+				gs1_printElmnts(ctx, &prints);
 			}
 
 			// CC separator
-			printElmnts(ctx, &sepPrnt);
+			gs1_printElmnts(ctx, &sepPrnt);
 			sepPrnt.pattern = sepPat2;
-			printElmnts(ctx, &sepPrnt);
+			gs1_printElmnts(ctx, &sepPrnt);
 			sepPrnt.pattern = sepPat1;
-			printElmnts(ctx, &sepPrnt);
+			gs1_printElmnts(ctx, &sepPrnt);
 
 			// EAN-13
 			prints.elmCnt = EAN13_ELMNTS;
@@ -223,19 +223,19 @@ void EAN13(gs1_encoder *ctx) {
 			prints.height = ctx->pixMult*EAN13_H;
 			prints.leftPad = 0;
 			prints.rightPad = 0;
-			printElmnts(ctx, &prints);
+			gs1_printElmnts(ctx, &prints);
 		}
 	}
 	else { // primary only
 		if (ctx->bmp) {
-			bmpHeader(ctx->pixMult*EAN13_W, ctx->pixMult*EAN13_H, ctx->outfp);
+			gs1_bmpHeader(ctx->pixMult*EAN13_W, ctx->pixMult*EAN13_H, ctx->outfp);
 		}
 		else {
-			tifHeader(ctx->pixMult*EAN13_W, ctx->pixMult*EAN13_H, ctx->outfp);
+			gs1_tifHeader(ctx->pixMult*EAN13_W, ctx->pixMult*EAN13_H, ctx->outfp);
 		}
 
 		// EAN-13
-		printElmnts(ctx, &prints);
+		gs1_printElmnts(ctx, &prints);
 	}
 	return;
 }
@@ -297,7 +297,7 @@ static bool EAN8enc(uint8_t str[], uint8_t pattern[] ) {
 	return(true);
 }
 
-void EAN8(gs1_encoder *ctx) {
+void gs1_EAN8(gs1_encoder *ctx) {
 
 	struct sPrints prints;
 	struct sPrints sepPrnt;
@@ -369,7 +369,7 @@ void EAN8(gs1_encoder *ctx) {
 	sepPrnt.whtFirst = true;
 	sepPrnt.reverse = false;
 	if (ccFlag) {
-		if (!((rows = CC3enc(ctx, (uint8_t*)ccStr, ccPattern)) > 0) || ctx->errFlag) return;
+		if (!((rows = gs1_CC3enc(ctx, (uint8_t*)ccStr, ccPattern)) > 0) || ctx->errFlag) return;
 		if (rows > MAX_CCA3_ROWS) { // CCB composite
 			lpadEAN = EAN8_L_PADB;
 			lpadCC = 0;
@@ -393,17 +393,17 @@ void EAN8(gs1_encoder *ctx) {
 
 		if (ctx->bmp) {
 			// note: BMP is bottom to top inverted
-			bmpHeader(ctx->pixMult*(EAN8_W+lpadEAN), ctx->pixMult*(rows*2 + 6 + EAN8_H), ctx->outfp);
+			gs1_bmpHeader(ctx->pixMult*(EAN8_W+lpadEAN), ctx->pixMult*(rows*2 + 6 + EAN8_H), ctx->outfp);
 
 			// EAN-8
-			printElmnts(ctx, &prints);
+			gs1_printElmnts(ctx, &prints);
 
 			// CC separator
-			printElmnts(ctx, &sepPrnt);
+			gs1_printElmnts(ctx, &sepPrnt);
 			sepPrnt.pattern = sepPat2;
-			printElmnts(ctx, &sepPrnt);
+			gs1_printElmnts(ctx, &sepPrnt);
 			sepPrnt.pattern = sepPat1;
-			printElmnts(ctx, &sepPrnt);
+			gs1_printElmnts(ctx, &sepPrnt);
 
 			// Composite Component
 			prints.elmCnt = elmntsCC;
@@ -412,11 +412,11 @@ void EAN8(gs1_encoder *ctx) {
 			prints.rightPad = EAN8_R_PAD;
 			for (i = rows-1; i >= 0; i--) {
 				prints.pattern = ccPattern[i];
-				printElmnts(ctx, &prints);
+				gs1_printElmnts(ctx, &prints);
 			}
 		}
 		else {
-			tifHeader(ctx->pixMult*(EAN8_W+lpadEAN), ctx->pixMult*(rows*2 + 6 + EAN8_H), ctx->outfp);
+			gs1_tifHeader(ctx->pixMult*(EAN8_W+lpadEAN), ctx->pixMult*(rows*2 + 6 + EAN8_H), ctx->outfp);
 
 			// Composite Component
 			prints.elmCnt = elmntsCC;
@@ -425,15 +425,15 @@ void EAN8(gs1_encoder *ctx) {
 			prints.rightPad = EAN8_R_PAD;
 			for (i = 0; i < rows; i++) {
 				prints.pattern = ccPattern[i];
-				printElmnts(ctx, &prints);
+				gs1_printElmnts(ctx, &prints);
 			}
 
 			// CC separator
-			printElmnts(ctx, &sepPrnt);
+			gs1_printElmnts(ctx, &sepPrnt);
 			sepPrnt.pattern = sepPat2;
-			printElmnts(ctx, &sepPrnt);
+			gs1_printElmnts(ctx, &sepPrnt);
 			sepPrnt.pattern = sepPat1;
-			printElmnts(ctx, &sepPrnt);
+			gs1_printElmnts(ctx, &sepPrnt);
 
 			// EAN-8
 			prints.elmCnt = EAN8_ELMNTS;
@@ -441,19 +441,19 @@ void EAN8(gs1_encoder *ctx) {
 			prints.height = ctx->pixMult*EAN8_H;
 			prints.leftPad = lpadEAN;
 			prints.rightPad = 0;
-			printElmnts(ctx, &prints);
+			gs1_printElmnts(ctx, &prints);
 		}
 	}
 	else { // primary only
 		if (ctx->bmp) {
-			bmpHeader(ctx->pixMult*EAN8_W, ctx->pixMult*EAN8_H, ctx->outfp);
+			gs1_bmpHeader(ctx->pixMult*EAN8_W, ctx->pixMult*EAN8_H, ctx->outfp);
 		}
 		else {
-			tifHeader(ctx->pixMult*EAN8_W, ctx->pixMult*EAN8_H, ctx->outfp);
+			gs1_tifHeader(ctx->pixMult*EAN8_W, ctx->pixMult*EAN8_H, ctx->outfp);
 		}
 
 		// EAN-8
-		printElmnts(ctx, &prints);
+		gs1_printElmnts(ctx, &prints);
 	}
 	return;
 }
@@ -555,7 +555,7 @@ static bool UPCEenc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[] ) {
 	return(true);
 }
 
-void UPCE(gs1_encoder *ctx) {
+void gs1_UPCE(gs1_encoder *ctx) {
 
 	struct sPrints prints;
 	struct sPrints sepPrnt;
@@ -621,7 +621,7 @@ void UPCE(gs1_encoder *ctx) {
 	sepPrnt.whtFirst = true;
 	sepPrnt.reverse = false;
 	if (ccFlag) {
-		if (!((rows = CC2enc(ctx, (uint8_t*)ccStr, ccPattern)) > 0) || ctx->errFlag) return;
+		if (!((rows = gs1_CC2enc(ctx, (uint8_t*)ccStr, ccPattern)) > 0) || ctx->errFlag) return;
 #if PRNT
 		{
 			int j;
@@ -638,17 +638,17 @@ void UPCE(gs1_encoder *ctx) {
 
 		if (ctx->bmp) {
 			// note: BMP is bottom to top inverted
-			bmpHeader(ctx->pixMult*UPCE_W, ctx->pixMult*(rows*2 + 6 + UPCE_H), ctx->outfp);
+			gs1_bmpHeader(ctx->pixMult*UPCE_W, ctx->pixMult*(rows*2 + 6 + UPCE_H), ctx->outfp);
 
 			// UPC-E
-			printElmnts(ctx, &prints);
+			gs1_printElmnts(ctx, &prints);
 
 			// CC separator
-			printElmnts(ctx, &sepPrnt);
+			gs1_printElmnts(ctx, &sepPrnt);
 			sepPrnt.pattern = sepPat2;
-			printElmnts(ctx, &sepPrnt);
+			gs1_printElmnts(ctx, &sepPrnt);
 			sepPrnt.pattern = sepPat1;
-			printElmnts(ctx, &sepPrnt);
+			gs1_printElmnts(ctx, &sepPrnt);
 
 			// Composite Component
 			prints.elmCnt = CCB2_ELMNTS;
@@ -657,11 +657,11 @@ void UPCE(gs1_encoder *ctx) {
 			prints.rightPad = UPCE_R_PAD;
 			for (i = rows-1; i >= 0; i--) {
 				prints.pattern = ccPattern[i];
-				printElmnts(ctx, &prints);
+				gs1_printElmnts(ctx, &prints);
 			}
 		}
 		else {
-			tifHeader(ctx->pixMult*UPCE_W, ctx->pixMult*(rows*2 + 6 + UPCE_H), ctx->outfp);
+			gs1_tifHeader(ctx->pixMult*UPCE_W, ctx->pixMult*(rows*2 + 6 + UPCE_H), ctx->outfp);
 
 			// Composite Component
 			prints.elmCnt = CCB2_ELMNTS;
@@ -670,15 +670,15 @@ void UPCE(gs1_encoder *ctx) {
 			prints.rightPad = UPCE_R_PAD;
 			for (i = 0; i < rows; i++) {
 				prints.pattern = ccPattern[i];
-				printElmnts(ctx, &prints);
+				gs1_printElmnts(ctx, &prints);
 			}
 
 			// CC separator
-			printElmnts(ctx, &sepPrnt);
+			gs1_printElmnts(ctx, &sepPrnt);
 			sepPrnt.pattern = sepPat2;
-			printElmnts(ctx, &sepPrnt);
+			gs1_printElmnts(ctx, &sepPrnt);
 			sepPrnt.pattern = sepPat1;
-			printElmnts(ctx, &sepPrnt);
+			gs1_printElmnts(ctx, &sepPrnt);
 
 			// UPC-E
 			prints.elmCnt = UPCE_ELMNTS;
@@ -686,19 +686,19 @@ void UPCE(gs1_encoder *ctx) {
 			prints.height = ctx->pixMult*UPCE_H;
 			prints.leftPad = 0;
 			prints.rightPad = 0;
-			printElmnts(ctx, &prints);
+			gs1_printElmnts(ctx, &prints);
 		}
 	}
 	else { // primary only
 		if (ctx->bmp) {
-			bmpHeader(ctx->pixMult*UPCE_W, ctx->pixMult*UPCE_H, ctx->outfp);
+			gs1_bmpHeader(ctx->pixMult*UPCE_W, ctx->pixMult*UPCE_H, ctx->outfp);
 		}
 		else {
-			tifHeader(ctx->pixMult*UPCE_W, ctx->pixMult*UPCE_H, ctx->outfp);
+			gs1_tifHeader(ctx->pixMult*UPCE_W, ctx->pixMult*UPCE_H, ctx->outfp);
 		}
 
 		// UPC-E
-		printElmnts(ctx, &prints);
+		gs1_printElmnts(ctx, &prints);
 	}
 	return;
 }
