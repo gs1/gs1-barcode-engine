@@ -31,11 +31,6 @@
 
 
 // TODO move into context
-// globals used by CC-C:
-int colCnt; // after set in main, may be decreased by getUnusedBitCnt
-int rowCnt; // determined by getUnusedBitCnt
-int eccCnt; // determined by getUnusedBitCnt
-
 
 extern uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
 

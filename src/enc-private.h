@@ -74,6 +74,9 @@ struct gs1_encoder {
 	int rowWidth;
 	int line1;
 	int linFlag;		// tells pack whether linear or cc is being encoded
+	int colCnt;		// after set, may be decreased by getUnusedBitCnt
+	int rowCnt;		// determined by getUnusedBitCnt
+	int eccCnt;		// determined by getUnusedBitCnt
 	uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
 	const int *cc_CCSizes;	// will point to CCxSize
 	int cc_gpa[512];
@@ -92,5 +95,9 @@ struct gs1_encoder {
 
 // globals   TODO hoist
 uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
+
+//int colCnt; // after set in main, may be decreased by getUnusedBitCnt
+int rowCnt; // determined by getUnusedBitCnt
+int eccCnt; // determined by getUnusedBitCnt
 
 #endif /* ENC_PRIVATE_H */
