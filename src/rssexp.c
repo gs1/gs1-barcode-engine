@@ -154,7 +154,7 @@ static int symCharPat(uint8_t bars[], int symValue, int parity, int weight,
 
 
 // convert AI string to bar widths in dbl segments
-static int RSS14Eenc(uint8_t string[], uint8_t bars[MAX_DBL_SEGS][ELMNTS], int ccFlag) {
+static int RSS14Eenc(gs1_encoder *ctx, uint8_t string[], uint8_t bars[MAX_DBL_SEGS][ELMNTS], int ccFlag) {
 
 	#define FINDER_SIZE 6
 
@@ -201,7 +201,7 @@ static int RSS14Eenc(uint8_t string[], uint8_t bars[MAX_DBL_SEGS][ELMNTS], int c
 	printf("%s\n", string);
 #endif
 	putBits(bitField, 0, 1, (uint16_t)ccFlag); // 2D linkage bit
-	size = pack(string, bitField);
+	size = pack(ctx, string, bitField);
 	if (size < 0) {
 		errMsg = "data error";
 		errFlag = true;
@@ -298,7 +298,7 @@ void RSSExp(gs1_encoder *params) {
 	}
 
 	rowWidth = params->segWidth; // save for getUnusedBitCnt
-	if (!((segs = RSS14Eenc((uint8_t*)params->dataStr, dblPattern, ccFlag)) > 0) || errFlag) return;
+	if (!((segs = RSS14Eenc(params, (uint8_t*)params->dataStr, dblPattern, ccFlag)) > 0) || errFlag) return;
 
 	lNdx = 0;
 	for (i = 0; i < segs-1; i += 2) {
@@ -351,7 +351,7 @@ void RSSExp(gs1_encoder *params) {
 #endif
 	line1 = true; // so first line is not Y undercut
 	if (ccFlag) {
-		if (!((rows = CC4enc((uint8_t*)ccStr, ccPattern)) > 0) || errFlag) return;
+		if (!((rows = CC4enc(params, (uint8_t*)ccStr, ccPattern)) > 0) || errFlag) return;
 #if PRNT
 		printf("\n%s", ccStr);
 		printf("\n");

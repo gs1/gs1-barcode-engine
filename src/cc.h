@@ -23,6 +23,8 @@
 
 #include <stdint.h>
 
+#include "enc-private.h"
+
 #define CCB2_WIDTH 57		// 2 column cca/b
 #define CCB2_ELMNTS 31		// includes qz's
 
@@ -39,13 +41,13 @@
 
 uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
 
-int CC2enc(uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
-int CC3enc(uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
-int CC4enc(uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
-bool CCCenc(uint8_t str[], uint8_t pattern[]);
+int CC2enc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
+int CC3enc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
+int CC4enc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
+bool CCCenc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[]);
 
 int check2DData(uint8_t dataStr[]);
-int pack(uint8_t str[], uint8_t bitField[]);
+int pack(gs1_encoder *ctx, uint8_t str[], uint8_t bitField[]);
 void putBits(uint8_t bitField[], int bitPos, int length, uint16_t bits);
 
 #endif /* CC_H */

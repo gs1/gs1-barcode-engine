@@ -439,7 +439,7 @@ void RSS14(gs1_encoder *params) {
 	prints.whtFirst = true;
 	prints.reverse = false;
 	if (ccFlag) {
-		if (!((rows = CC4enc((uint8_t*)ccStr, ccPattern)) > 0) || errFlag) return;
+		if (!((rows = CC4enc(params, (uint8_t*)ccStr, ccPattern)) > 0) || errFlag) return;
 #if PRNT
 		{
 			int j;
@@ -568,7 +568,7 @@ void RSS14S(gs1_encoder *params) {
 	prints.whtFirst = true;
 	prints.reverse = false;
 	if (ccFlag) {
-		if (!((rows = CC2enc((uint8_t*)ccStr, ccPattern)) > 0) || errFlag) return;
+		if (!((rows = CC2enc(params, (uint8_t*)ccStr, ccPattern)) > 0) || errFlag) return;
 #if PRNT
 		{
 			int j;
@@ -766,7 +766,7 @@ void RSS14SO(gs1_encoder *params) {
 	prints.reverse = false;
 	if (ccFlag) {
 		chexPrnts.rightPad = R_PADR; // pad for composite
-		if (!((rows = CC2enc((uint8_t*)ccStr, ccPattern)) > 0) || errFlag) return;
+		if (!((rows = CC2enc(params, (uint8_t*)ccStr, ccPattern)) > 0) || errFlag) return;
 #if PRNT
 		{
 			int j;

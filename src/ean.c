@@ -159,7 +159,7 @@ void EAN13(gs1_encoder *params) {
 	sepPrnt.whtFirst = true;
 	sepPrnt.reverse = false;
 	if (ccFlag) {
-		if (!((rows = CC4enc((uint8_t*)ccStr, ccPattern)) > 0) || errFlag) return;
+		if (!((rows = CC4enc(params, (uint8_t*)ccStr, ccPattern)) > 0) || errFlag) return;
 #if PRNT
 		{
 			int j;
@@ -368,7 +368,7 @@ void EAN8(gs1_encoder *params) {
 	sepPrnt.whtFirst = true;
 	sepPrnt.reverse = false;
 	if (ccFlag) {
-		if (!((rows = CC3enc((uint8_t*)ccStr, ccPattern)) > 0) || errFlag) return;
+		if (!((rows = CC3enc(params, (uint8_t*)ccStr, ccPattern)) > 0) || errFlag) return;
 		if (rows > MAX_CCA3_ROWS) { // CCB composite
 			lpadEAN = EAN8_L_PADB;
 			lpadCC = 0;
@@ -618,7 +618,7 @@ void UPCE(gs1_encoder *params) {
 	sepPrnt.whtFirst = true;
 	sepPrnt.reverse = false;
 	if (ccFlag) {
-		if (!((rows = CC2enc((uint8_t*)ccStr, ccPattern)) > 0) || errFlag) return;
+		if (!((rows = CC2enc(params, (uint8_t*)ccStr, ccPattern)) > 0) || errFlag) return;
 #if PRNT
 		{
 			int j;

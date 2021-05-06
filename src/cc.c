@@ -539,16 +539,14 @@ static const int gfPwr[928] = { 1,3,9,27,81,243,729,329,58,174,522,637,53,159,47
  894,824,614,913,881,785,497,562,757,413,310 };
 
 
-/* GF(929) log and antilog tables: */
-static int gpa[512];
-
 static int gfMul(int a,int b) {
 	if ((a == 0) || (b == 0)) return(0);
 	return(gfPwr[(gfLog[a] + gfLog[b]) % 928]);
 }
 
-static void genPoly(int eccSize) {
-	int	i, j;
+static void genPoly(gs1_encoder *ctx, int eccSize) {
+	int i, j;
+	int *gpa = ctx->cc_gpa;
 
 	gpa[0] = 1;
 	for (i = 1; i < eccSize+1; i ++) { gpa[i] = 0; }
@@ -563,10 +561,11 @@ static void genPoly(int eccSize) {
 	}
 }
 
-static void genECC(int dsize, int csize, uint16_t sym[]) {
+static void genECC(gs1_encoder *ctx, int dsize, int csize, uint16_t sym[]) {
 	int i, n, t;
+	int *gpa = ctx->cc_gpa;
 
-	genPoly(csize);
+	genPoly(ctx, csize);
 
 	/* first zero ecc words */
 	for (i = dsize; i < dsize+csize; i++) {
@@ -658,18 +657,16 @@ int check2DData(uint8_t dataStr[]) {
 }
 
 
-static const int *CCSizes; // will point to CCxSizes
-
-
 /*
 returns number of bits left to closest 2d symbol,
  or -1 if iBit is larger than largest in type and width
  also returns CCSizes index or data char cnt for RSS14E in *size
 */
-static int getUnusedBitCnt(int iBit, int *size) {
+static int getUnusedBitCnt(gs1_encoder *ctx, int iBit, int *size) {
 
 	// max data plus ecc codewords for CC-C
 	static const int eccMaxCW[] = { 40+8, 160+16, 320+32, 863+64, 0 };
+	const int *CCSizes = ctx->cc_CCSizes;
 
 	int i, byteCnt, cwCnt;
 
@@ -747,14 +744,14 @@ static int getUnusedBitCnt(int iBit, int *size) {
 #define	IS_FINI		0x80
 
 
-static int procNUM(struct encodeT *encode) {
+static int procNUM(gs1_encoder *ctx, struct encodeT *encode) {
 
 	int bitCnt, char1, char2, what1, what2, i;
 
 	// check first char type
 	if ((what1 = iswhat[(char1 = encode->str[encode->iStr])]) == IS_FINI) {
 		// end of data
-		bitCnt = getUnusedBitCnt(encode->iBit, &i);
+		bitCnt = getUnusedBitCnt(ctx, encode->iBit, &i);
 		if (bitCnt > 4) {
 			bitCnt = 4;
 		}
@@ -776,7 +773,7 @@ static int procNUM(struct encodeT *encode) {
 			((what1 & IS_FNC1) == 0)) {
 		// single digit left, check for nearly at end of bits
 		encode->iStr += 1;
-		bitCnt = getUnusedBitCnt(encode->iBit, &i);
+		bitCnt = getUnusedBitCnt(ctx, encode->iBit, &i);
 		if ((bitCnt >= 4) && (bitCnt < 7)) {
 			// less than 7 bits, encode a bcd+1
 			putBits(encode->bitField, encode->iBit, 4, (uint16_t)(char1+1 -(int)'0'));
@@ -831,9 +828,11 @@ static int procNUM(struct encodeT *encode) {
 }
 
 
-static int procALNU(struct encodeT *encode) {
+static int procALNU(gs1_encoder *ctx, struct encodeT *encode) {
 
 	int chr, i, what, whatN;
+
+	(void)ctx;  // unused
 
 	// check next char type
 	if ((what = iswhat[(chr = encode->str[encode->iStr])]) == IS_FINI) {
@@ -913,9 +912,11 @@ static int procALNU(struct encodeT *encode) {
 }
 
 
-static int procISO(struct encodeT *encode) {
+static int procISO(gs1_encoder *ctx, struct encodeT *encode) {
 
 	int chr, i, what, whatN, numCnt;
+
+	(void)ctx;  // unused
 
 	// check next char type
 	if ((what = iswhat[(chr = encode->str[encode->iStr])]) == IS_FINI) {
@@ -1030,7 +1031,7 @@ static int procISO(struct encodeT *encode) {
 }
 
 
-static int procALPH(struct encodeT *encode) {
+static int procALPH(gs1_encoder *ctx, struct encodeT *encode) {
 
 	int i;
 
@@ -1056,7 +1057,7 @@ static int procALPH(struct encodeT *encode) {
 	}
 	else {
 		// '\0'
-		i = getUnusedBitCnt(encode->iBit, &i);
+		i = getUnusedBitCnt(ctx, encode->iBit, &i);
 		if (i > 5) {
 			i = 5; // i is minimum of 5 or unused bit count
 		}
@@ -1089,7 +1090,7 @@ static void nextAI(struct encodeT *encode) {
 }
 
 
-static void encodeAI90(struct encodeT *encode) {
+static void encodeAI90(gs1_encoder *ctx, struct encodeT *encode) {
 
 	while ((encode->str[encode->iStr-1] != FNC1) &&
 					(encode->str[encode->iStr-2] != FNC1) &&
@@ -1107,19 +1108,19 @@ static void encodeAI90(struct encodeT *encode) {
 					encode->str[encode->iStr+1] = encode->str[encode->iStr+5];
 				}
 			}
-			encode->mode = procNUM(encode);
+			encode->mode = procNUM(ctx, encode);
 			break;
 		}
 		case ALNU_MODE: {
-			encode->mode = procALNU(encode);
+			encode->mode = procALNU(ctx, encode);
 			break;
 		}
 		case ISO_MODE: {
-			encode->mode = procISO(encode);
+			encode->mode = procISO(ctx, encode);
 			break;
 		}
 		case ALPH_MODE: {
-			encode->mode = procALPH(encode);
+			encode->mode = procALPH(ctx, encode);
 			break;
 		}
 		default: {
@@ -1175,7 +1176,7 @@ static int testAI90(struct encodeT *encode) {
 }
 
 
-static void procAI90(struct encodeT *encode) {
+static void procAI90(gs1_encoder *ctx, struct encodeT *encode) {
 
 	int i, j, k;
 	int alLessNu;
@@ -1257,7 +1258,7 @@ static void procAI90(struct encodeT *encode) {
 				encode->iBit+15, 5, (uint16_t)(diAlpha1-65)); // or alpha not in table
 		encode->iBit += 20;
 	}
-	encodeAI90(encode);
+	encodeAI90(ctx, encode);
 	if (encode->typeAI == AI21) {
 		encode->iStr += 2; // skip "21"
 	}
@@ -1268,7 +1269,7 @@ static void procAI90(struct encodeT *encode) {
 }
 
 
-static int doMethods(struct encodeT *encode) {
+static int doMethods(gs1_encoder *ctx, struct encodeT *encode) {
 
 	uint16_t bits;
 
@@ -1302,7 +1303,7 @@ static int doMethods(struct encodeT *encode) {
 			testAI90(encode)) {
 		putBits(encode->bitField, encode->iBit, 2, 3); // method 11
 		encode->iBit += 2;
-		procAI90(encode);
+		procAI90(ctx, encode);
 	}
 	else {
 		// method 0
@@ -1315,11 +1316,11 @@ static int doMethods(struct encodeT *encode) {
 }
 
 
-static int insertPad(struct encodeT *encode) {
+static int insertPad(gs1_encoder *ctx, struct encodeT *encode) {
 
 	int bitCnt, chr, size;
 
-	bitCnt = getUnusedBitCnt(encode->iBit, &size);
+	bitCnt = getUnusedBitCnt(ctx, encode->iBit, &size);
 	if (bitCnt < 0) {
 		return(-1); // too many bits
 	}
@@ -1528,7 +1529,7 @@ static int doLinMethods(uint8_t str[], int *iStr, uint8_t bitField[], int *iBit)
 }
 
 
-int pack(uint8_t str[], uint8_t bitField[]) {
+int pack(gs1_encoder *ctx, uint8_t str[], uint8_t bitField[]) {
 
 	struct encodeT encode;
 
@@ -1541,21 +1542,21 @@ int pack(uint8_t str[], uint8_t bitField[]) {
 						encode.bitField, &encode.iBit);
 	}
 	else {
-		encode.mode = doMethods(&encode);
+		encode.mode = doMethods(ctx, &encode);
 	}
 	while (encode.mode != FINI_MODE) {
 		switch (encode.mode) {
 
 		case NUM_MODE: {
-			encode.mode = procNUM(&encode);
+			encode.mode = procNUM(ctx, &encode);
 			break;
 		}
 		case ALNU_MODE: {
-			encode.mode = procALNU(&encode);
+			encode.mode = procALNU(ctx, &encode);
 			break;
 		}
 		case ISO_MODE: {
-			encode.mode = procISO(&encode);
+			encode.mode = procISO(ctx, &encode);
 			break;
 		}
 		default: {
@@ -1565,7 +1566,7 @@ int pack(uint8_t str[], uint8_t bitField[]) {
 		} } /* end of case */
 	}
 	if (linFlag == -1) { // CC-C
-		if (!insertPad(&encode)) { // will return false if error
+		if (!insertPad(ctx, &encode)) { // will return false if error
 			errMsg = "symbol too big";
 			errFlag = true;
 			return(-1);
@@ -1573,7 +1574,7 @@ int pack(uint8_t str[], uint8_t bitField[]) {
 		return(encode.iBit/8); // no error, return number of data bytes
 	}
 	else { // CC-A/B or RSS Exp
-		return(insertPad(&encode));
+		return(insertPad(ctx, &encode));
 	}
 }
 
@@ -1993,7 +1994,7 @@ static const int CC2Sizes[] = {	59,78,88,108,118,138,167,	// cca sizes
 				208,256,296,336,		// ccb sizes
 				0 };
 
-static void encCCA2(int size, uint8_t bitField[], uint16_t codeWords[],
+static void encCCA2(gs1_encoder *ctx, int size, uint8_t bitField[], uint16_t codeWords[],
 		uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
 
 	static const int dataCw[7] = { 6,8,9,11,12,14,17 };
@@ -2001,13 +2002,13 @@ static void encCCA2(int size, uint8_t bitField[], uint16_t codeWords[],
 
 	encode928(bitField, codeWords, CC2Sizes[size]);
 
-	genECC(dataCw[size], eccCw[size], codeWords);
+	genECC(ctx, dataCw[size], eccCw[size], codeWords);
 	imgCCA2(size, codeWords, pattern);
 	return;
 }
 
 
-static void encCCB2(int size, uint8_t bitField[], uint16_t codeWords[],
+static void encCCB2(gs1_encoder *ctx, int size, uint8_t bitField[], uint16_t codeWords[],
 		uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
 
 	static const int dataBytes[4] = { 26,32,37,42 };
@@ -2018,7 +2019,7 @@ static void encCCB2(int size, uint8_t bitField[], uint16_t codeWords[],
 	codeWords[1] =
 		(dataBytes[size] % 6 == 0) ? 924 : 901; // 924 iff even multiple of 6
 	encode900(bitField, &codeWords[2], dataBytes[size]);
-	genECC(dataCw[size], eccCw[size], codeWords);
+	genECC(ctx, dataCw[size], eccCw[size], codeWords);
 	imgCCB2(size, codeWords, pattern);
 	return;
 }
@@ -2028,20 +2029,20 @@ static const int CC3Sizes[] = {	78,98,118,138,167,		// cca sizes
 				208,304,416,536,648,768,	// ccb sizes
 				0 };
 
-static void encCCA3(int size, uint8_t bitField[], uint16_t codeWords[],
+static void encCCA3(gs1_encoder *ctx, int size, uint8_t bitField[], uint16_t codeWords[],
 		uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
 
 	static const int dataCw[5] = { 8,10,12,14,17 };
 	static const int eccCw[5] = { 4,5,6,7,7 };
 
 	encode928(bitField, codeWords, CC3Sizes[size]);
-	genECC(dataCw[size], eccCw[size], codeWords);
+	genECC(ctx, dataCw[size], eccCw[size], codeWords);
 	imgCCA3(size, codeWords, pattern);
 	return;
 }
 
 
-static void encCCB3(int size, uint8_t bitField[], uint16_t codeWords[],
+static void encCCB3(gs1_encoder *ctx, int size, uint8_t bitField[], uint16_t codeWords[],
 		uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
 
 	static const int dataBytes[6] = { 26,38,52,67,81,96 };
@@ -2052,7 +2053,7 @@ static void encCCB3(int size, uint8_t bitField[], uint16_t codeWords[],
 	codeWords[1] =
 		(dataBytes[size] % 6 == 0) ? 924 : 901; // 924 iff even multiple of 6
 	encode900(bitField, &codeWords[2], dataBytes[size]);
-	genECC(dataCw[size], eccCw[size], codeWords);
+	genECC(ctx, dataCw[size], eccCw[size], codeWords);
 	imgCCB3(size, codeWords, pattern);
 	return;
 }
@@ -2062,20 +2063,20 @@ static const int CC4Sizes[] = {	78,108,138,167,197, // cca sizes
 				208,264,352,496,672,840,1016,1184, // ccb sizes
 				0 };
 
-static void encCCA4(int size, uint8_t bitField[], uint16_t codeWords[],
+static void encCCA4(gs1_encoder *ctx, int size, uint8_t bitField[], uint16_t codeWords[],
 		uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
 
 	static const int dataCw[5] = { 8,11,14,17,20 };
 	static const int eccCw[5] = { 4,5,6,7,8 };
 
 	encode928(bitField, codeWords, CC4Sizes[size]);
-	genECC(dataCw[size], eccCw[size], codeWords);
+	genECC(ctx, dataCw[size], eccCw[size], codeWords);
 	imgCCA4(size, codeWords, pattern);
 	return;
 }
 
 
-static void encCCB4(int size, uint8_t bitField[], uint16_t codeWords[],
+static void encCCB4(gs1_encoder *ctx, int size, uint8_t bitField[], uint16_t codeWords[],
 		uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]) {
 
 	static const int dataBytes[8] = { 26,33,44,62,84,105,127,148 };
@@ -2086,13 +2087,13 @@ static void encCCB4(int size, uint8_t bitField[], uint16_t codeWords[],
 	codeWords[1] =
 		(dataBytes[size] % 6 == 0) ? 924 : 901; // 924 iff even multiple of 6
 	encode900(bitField, &codeWords[2], dataBytes[size]);
-	genECC(dataCw[size], eccCw[size], codeWords);
+	genECC(ctx, dataCw[size], eccCw[size], codeWords);
 	imgCCB4(size, codeWords, pattern);
 	return;
 }
 
 
-static void encCCC(int byteCnt, uint8_t bitField[], uint16_t codeWords[], uint8_t patCCC[]) {
+static void encCCC(gs1_encoder *ctx, int byteCnt, uint8_t bitField[], uint16_t codeWords[], uint8_t patCCC[]) {
 
 	int nonEccCwCnt;
 
@@ -2102,13 +2103,13 @@ static void encCCC(int byteCnt, uint8_t bitField[], uint16_t codeWords[], uint8_
 	codeWords[2] =
 		(byteCnt % 6 == 0) ? 924 : 901; // 924 iff even multiple of 6
 	encode900(bitField, &codeWords[3], byteCnt);
-	genECC(nonEccCwCnt, eccCnt, codeWords);
+	genECC(ctx, nonEccCwCnt, eccCnt, codeWords);
 	imgCCC(codeWords, patCCC);
 	return;
 }
 
 
-int CC2enc(uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS] ) {
+int CC2enc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS] ) {
 
 	static const int rows[11] = { 5,6,7,8,9,10,12,  17,20,23,26 }; // 7 CCA & 4 CCB row counts
 
@@ -2118,7 +2119,7 @@ int CC2enc(uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS] ) {
 	int i;
 
 	linFlag = 0;
-	CCSizes = CC2Sizes;
+	ctx->cc_CCSizes = CC2Sizes;
 	if ((i=check2DData(str)) != 0) {
 		sprintf(errMsg, "illegal character in 2D data = '%c'", str[i]);
 		errFlag = true;
@@ -2127,23 +2128,23 @@ int CC2enc(uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS] ) {
 #if PRNT
 	printf("%s\n", str);
 #endif
-	size = pack(str, bitField);
+	size = pack(ctx, str, bitField);
 	if (size < 0 || CC2Sizes[size] == 0) {
 		errMsg = "data error";
 		errFlag = true;
 		return(0);
 	}
 	if (size <= MAX_CCA2_SIZE) {
-		encCCA2(size, bitField, codeWords, pattern);
+		encCCA2(ctx, size, bitField, codeWords, pattern);
 	}
 	else {
-		encCCB2(size-MAX_CCA2_SIZE-1, bitField, codeWords, pattern);
+		encCCB2(ctx, size-MAX_CCA2_SIZE-1, bitField, codeWords, pattern);
 	}
 	return(rows[size]);
 }
 
 
-int CC3enc(uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS] ) {
+int CC3enc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS] ) {
 
 	static const int rows[11] = { 4,5,6,7,8,  15,20,26,32,38,44 }; // 5 CCA & 6 CCB row counts
 
@@ -2153,7 +2154,7 @@ int CC3enc(uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS] ) {
 	int i;
 
 	linFlag = 0;
-	CCSizes = CC3Sizes;
+	ctx->cc_CCSizes = CC3Sizes;
 	if ((i=check2DData(str)) != 0) {
 		sprintf(errMsg, "illegal character in 2D data = '%c'", str[i]);
 		errFlag = true;
@@ -2162,23 +2163,23 @@ int CC3enc(uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS] ) {
 #if PRNT
 	printf("%s\n", str);
 #endif
-	size = pack(str, bitField);
+	size = pack(ctx, str, bitField);
 	if (size < 0 || CC3Sizes[size] == 0) {
 		errMsg = "data error";
 		errFlag = true;
 		return(0);
 	}
 	if (size <= MAX_CCA3_SIZE) {
-		encCCA3(size, bitField, codeWords, pattern);
+		encCCA3(ctx, size, bitField, codeWords, pattern);
 	}
 	else {
-		encCCB3(size-MAX_CCA3_SIZE-1, bitField, codeWords, pattern);
+		encCCB3(ctx, size-MAX_CCA3_SIZE-1, bitField, codeWords, pattern);
 	}
 	return(rows[size]);
 }
 
 
-int CC4enc(uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS] ) {
+int CC4enc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS] ) {
 
 	static const int rows[13] = { 3,4,5,6,7,  10,12,15,20,26,32,38,44 }; // 5 CCA & 8 CCB row counts
 
@@ -2188,7 +2189,7 @@ int CC4enc(uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS] ) {
 	int i;
 
 	linFlag = 0;
-	CCSizes = CC4Sizes;
+	ctx->cc_CCSizes = CC4Sizes;
 	if ((i=check2DData(str)) != 0) {
 		sprintf(errMsg, "illegal character in 2D data = '%c'", str[i]);
 		errFlag = true;
@@ -2197,23 +2198,23 @@ int CC4enc(uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS] ) {
 #if PRNT
 	printf("%s\n", str);
 #endif
-	size = pack(str, bitField);
+	size = pack(ctx, str, bitField);
 	if (size < 0 || CC4Sizes[size] == 0) {
 		errMsg = "data error";
 		errFlag = true;
 		return(0);
 	}
 	if (size <= MAX_CCA4_SIZE) {
-		encCCA4(size, bitField, codeWords, pattern);
+		encCCA4(ctx, size, bitField, codeWords, pattern);
 	}
 	else {
-		encCCB4(size-MAX_CCA4_SIZE-1, bitField, codeWords, pattern);
+		encCCB4(ctx, size-MAX_CCA4_SIZE-1, bitField, codeWords, pattern);
 	}
 	return(rows[size]);
 }
 
 
-bool CCCenc(uint8_t str[], uint8_t patCCC[] ) {
+bool CCCenc(gs1_encoder *ctx, uint8_t str[], uint8_t patCCC[] ) {
 
 	uint8_t bitField[MAX_CCC_BYTES];
 	uint16_t codeWords[MAX_CCC_CW];
@@ -2226,11 +2227,11 @@ bool CCCenc(uint8_t str[], uint8_t patCCC[] ) {
 		errFlag = true;
 		return(false);
 	}
-	if((byteCnt = pack(str, bitField)) < 0) {
+	if((byteCnt = pack(ctx, str, bitField)) < 0) {
 		errMsg = "data error";
 		errFlag = true;
 		return(false);
 	}
-	encCCC(byteCnt, bitField, codeWords, patCCC);
+	encCCC(ctx, byteCnt, bitField, codeWords, patCCC);
 	return(true);
 }

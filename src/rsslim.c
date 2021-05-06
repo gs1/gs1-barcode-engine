@@ -353,7 +353,7 @@ void RSSLim(gs1_encoder *params) {
 	prints.whtFirst = true;
 	prints.reverse = false;
 	if (ccFlag) {
-		if (!((rows = CC3enc((uint8_t*)ccStr, ccPattern)) > 0) || errFlag) return;
+		if (!((rows = CC3enc(params, (uint8_t*)ccStr, ccPattern)) > 0) || errFlag) return;
 #if PRNT
 		{
 			int j;
