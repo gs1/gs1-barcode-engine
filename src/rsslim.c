@@ -31,23 +31,19 @@ extern int errFlag;
 extern int line1;
 extern uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
 
-
-// TODO move into context
-static struct sPrints prntSep;
-static uint8_t sepPattern[RSSLIM_SYM_W];
-
-
 static struct sPrints *separatorLim(gs1_encoder *params, struct sPrints *prints) {
 
 	int i, j, k;
+	uint8_t *sepPattern = params->rsslim_sepPattern;
+	struct sPrints *prntSep = &params->rsslim_prntSep;
 
-	prntSep.leftPad = prints->leftPad;
-	prntSep.rightPad = prints->rightPad;
-	prntSep.reverse = prints->reverse;
-	prntSep.pattern = sepPattern;
-	prntSep.height = params->sepHt;
-	prntSep.whtFirst = true;
-	prntSep.guards = false;
+	prntSep->leftPad = prints->leftPad;
+	prntSep->rightPad = prints->rightPad;
+	prntSep->reverse = prints->reverse;
+	prntSep->pattern = sepPattern;
+	prntSep->height = params->sepHt;
+	prntSep->whtFirst = true;
+	prntSep->guards = false;
 
 	sepPattern[0] = sepPattern[1] = 1;
 	sepPattern[RSSLIM_ELMNTS+2] = sepPattern[RSSLIM_ELMNTS+3] = 1;
@@ -77,8 +73,8 @@ static struct sPrints *separatorLim(gs1_encoder *params, struct sPrints *prints)
 		j++;
 		sepPattern[j] = (uint8_t)k;
 	}
-	prntSep.elmCnt = j+1;
-	return(&prntSep);
+	prntSep->elmCnt = j+1;
+	return(prntSep);
 }
 
 
