@@ -15,10 +15,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
     - uses: actions/checkout@v2
+
     - name: clang CI
+      working-directory: src
       run: |
-        cd src
         make lib CC=clang
         make app CC=clang
         LD_LIBRARY_PATH=. ./gs1encoders.bin --version
@@ -30,10 +32,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
     - uses: actions/checkout@v2
+
     - name: gcc CI
+      working-directory: src
       run: |
-        cd src
         make lib CC=gcc
         make app CC=gcc
         LD_LIBRARY_PATH=. ./gs1encoders.bin --version
@@ -45,12 +49,16 @@ jobs:
     runs-on: windows-latest
 
     steps:
+
     - uses: actions/checkout@v2
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v1
+
     - name: MSVC CI
       working-directory: src
-      run: msbuild /p:Configuration=release
+      run: |
+        msbuild /p:Configuration=release gs1encoders.sln
+        gs1encoders-app\x64\Release\gs1encoders-app.exe --version
 
 
   #
@@ -77,13 +85,32 @@ jobs:
 
     - name: Windows release build
       working-directory: src
-      run: msbuild /p:Configuration=release
+      run: |
+        msbuild /p:Configuration=release gs1encoders.sln
+        gs1encoders-app\x64\Release\gs1encoders-app.exe --version
 
-    - name: Store Windows build
+    - name: ZIP development libs
+      working-directory: src/x64/Release
+      run: |
+        7z a gs1encoders-windows-libs.zip gs1encoders.h gs1encoders.lib gs1encoders.dll
+
+    - name: ZIP application
+      working-directory: src/gs1encoders-app/x64/Release
+      run: |
+        7z a gs1encoders-windows-app.zip gs1encoders-app.exe gs1encoders.dll
+
+    - name: Store Windows development libs
       uses: actions/upload-artifact@v2
       with:
-        name: windows-build
-        path: src/x64/Release/gs1encoders.exe
+        name: windows-libs
+        path: src/x64/Release/gs1encoders-windows-libs.zip
+
+    - name: Store Windows app
+      uses: actions/upload-artifact@v2
+      with:
+        name: windows-app
+        path: src/gs1encoders-app/x64/Release/gs1encoders-windows-app.zip
+
 
   build-release-linux:
 
@@ -102,12 +129,14 @@ jobs:
 
     - name: Linux release build
       working-directory: src
-      run: make CC=clang
+      run: |
+        make CC=clang
+        ./gs1encoders-linux.bin --version
 
     - name: Store Linux build
       uses: actions/upload-artifact@v2
       with:
-        name: linux-build
+        name: linux-app
         path: src/gs1encoders-linux.bin
 
 
@@ -125,15 +154,20 @@ jobs:
 
     steps:
 
-    - name: Load Windows build
+    - name: Load Windows libs
       uses: actions/download-artifact@v2
       with:
-        name: windows-build
+        name: windows-libs
 
-    - name: Load Linux build
+    - name: Load Windows app
       uses: actions/download-artifact@v2
       with:
-        name: linux-build
+        name: windows-app
+
+    - name: Load Linux app
+      uses: actions/download-artifact@v2
+      with:
+        name: linux-app
 
     - name: Get version
       id: get_version
@@ -152,15 +186,25 @@ jobs:
         draft: false
         prerelease: false
 
-    - name: "Upload asset: Windows EXE"
+    - name: "Upload asset: Windows development libs"
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: gs1encoders.exe
-        asset_name: gs1encoders.exe
-        asset_content_type: application/vnd.microsoft.portable-executable
+        asset_path: gs1encoders-windows-libs.zip
+        asset_name: gs1encoders-windows-libs.zip
+        asset_content_type: application/zip
+
+    - name: "Upload asset: Windows application"
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: gs1encoders-windows-app.zip
+        asset_name: gs1encoders-windows-app.zip
+        asset_content_type: application/zip
 
     - name: "Upload asset: Linux bin"
       uses: actions/upload-release-asset@v1

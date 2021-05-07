@@ -60,9 +60,9 @@ The application can be rebuilt on Windows using MSVC.
 
 The project contains a solution file (.sln) compatible with recent versions of Microsoft Visual Studio. In the Visual Studio Installer you will need to ensure that MSVC is installed by selecting the "C++ workload".
 
-Alternatively, it can be built from the command line by opening a Developer Command Prompt, cloning this repository, changing to the `src` directory and building the project file (.proj) using:
+Alternatively, it can be built from the command line by opening a Developer Command Prompt, cloning this repository, changing to the `src` directory and building the solution using:
 
-    msbuild /p:Configuration=release
+    msbuild /p:Configuration=release gs1encoders.sln
 
 Or you can avoid using a toolchain by running the Microsoft C++ compiler tool directly as follows:
 
