@@ -385,11 +385,17 @@ static bool userInt(gs1_encoder *ctx) {
 
 int main(int argc, char *argv[]) {
 
-	// Silence compiler
-	(void)argc;
-	(void)argv;
-
 	gs1_encoder* ctx = gs1_encoder_init();
+	if (ctx == NULL) {
+		printf("Failed to initialise GS1 Encoders library!\n");
+		return 1;
+	}
+
+	if (argc == 2 && strcmp(argv[1],"--version") == 0) {
+		printf("Application version: " RELEASE "\n");
+		printf("Library version: %s\n", gs1_encoder_getVersion(ctx));
+		goto out;
+	}
 
 	while (userInt(ctx)) {
 		if (!gs1_encoder_encode(ctx)) {
@@ -399,6 +405,8 @@ int main(int argc, char *argv[]) {
 		}
 		printf("\n%s created.", gs1_encoder_getOutFile(ctx));
 	}
+
+out:
 
 	gs1_encoder_free(ctx);
 

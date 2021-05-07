@@ -37,6 +37,8 @@ gs1_encoder* gs1_encoder_init(void) {
 	gs1_encoder *ctx = malloc(sizeof(gs1_encoder));
 	if (ctx == NULL) return NULL;
 
+	strcpy(ctx->VERSION, __DATE__);
+
 	// Set default parameters
 	ctx->pixMult = 1;
 	ctx->Xundercut = 0;
@@ -62,6 +64,11 @@ void gs1_encoder_free(gs1_encoder *ctx) {
 	ctx = NULL;
 }
 
+
+char* gs1_encoder_getVersion(gs1_encoder *ctx) {
+	if (ctx == NULL) return NULL;
+	return ctx->VERSION;
+}
 
 int gs1_encoder_getSym(gs1_encoder *ctx) {
 	if (ctx == NULL) return -1;

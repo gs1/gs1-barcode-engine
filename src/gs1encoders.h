@@ -65,6 +65,7 @@ void gs1_encoder_free(gs1_encoder *ctx);
  */
 bool gs1_encoder_encode(gs1_encoder *ctx);
 
+char* gs1_encoder_getVersion(gs1_encoder *ctx);
 
 int gs1_encoder_getSym(gs1_encoder *ctx);
 void gs1_encoder_setSym(gs1_encoder *ctx, int sym);

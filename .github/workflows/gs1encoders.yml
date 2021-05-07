@@ -19,7 +19,11 @@ jobs:
     - name: clang CI
       run: |
         cd src
-        make CC=clang
+        make lib CC=clang
+        make app CC=clang
+        LD_LIBRARY_PATH=. ./gs1encoders.bin --version
+        make app-static CC=clang
+        ./gs1encoders-linux.bin --version
 
   ci-gcc:
 
@@ -30,7 +34,11 @@ jobs:
     - name: gcc CI
       run: |
         cd src
-        make CC=gcc
+        make lib CC=gcc
+        make app CC=gcc
+        LD_LIBRARY_PATH=. ./gs1encoders.bin --version
+        make app-static CC=gcc
+        ./gs1encoders-linux.bin --version
 
   ci-msvc:
 

@@ -66,6 +66,7 @@ struct gs1_encoder {
 	char dataFile[GS1_ENCODERS_MAX_FNAME+1];
 	char outFile[GS1_ENCODERS_MAX_FNAME+1];
 	char dataStr[GS1_ENCODERS_MAX_DATA+1];
+	char VERSION[16];
 
 	// per-instance globals
 	FILE *outfp;
