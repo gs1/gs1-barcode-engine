@@ -1,5 +1,9 @@
 *.o
+*.d
 *.bin
-rssenc
 tags
 .vs/*
+.*.swp
+lib*.a
+lib*.so
+lib*.so.*
