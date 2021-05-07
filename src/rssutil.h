@@ -22,6 +22,9 @@
 #define RSSUTIL_H
 
 #include "enc-private.h"
+#include "gs1encoders.h"
+
+struct sPrints;
 
 #define MAX_SEP_ELMNTS (11*21+4) // for 22 segment RSS Exp
 #define MAX_K 14

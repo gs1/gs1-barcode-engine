@@ -21,7 +21,7 @@
 #ifndef RSSEXP_H
 #define RSSEXP_H
 
-#include "enc-private.h"
+#include "gs1encoders.h"
 
 #define RSSEXP_ELMNTS		21	// 2-segments, no guard patterns
 #define RSSEXP_SYM_W		49	// 2-segment symbol width in modules, no guard patterns

@@ -24,6 +24,9 @@
 #include <stdio.h>
 
 #include "enc-private.h"
+#include "gs1encoders.h"
+
+struct sPrints;
 
 #define MAX_LINE 6032 // 10 inches wide at 600 dpi
 

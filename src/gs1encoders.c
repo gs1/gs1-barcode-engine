@@ -18,12 +18,18 @@
  *
  */
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include <stdint.h>
 #include <string.h>
 
 #include "enc-private.h"
+#include "gs1encoders.h"
+#include "ean.h"
+#include "rss14.h"
+#include "rssexp.h"
+#include "rsslim.h"
+#include "ucc128.h"
 
 
 gs1_encoder* gs1_encoder_init(void) {

@@ -22,8 +22,10 @@
 #define CC_H
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #include "enc-private.h"
+#include "gs1encoders.h"
 
 #define CCB2_WIDTH	57	// 2 column cca/b
 #define CCB2_ELMNTS	31	// includes qz's

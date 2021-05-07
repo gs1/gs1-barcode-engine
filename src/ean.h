@@ -21,7 +21,7 @@
 #ifndef EAN_H
 #define EAN_H
 
-#include "enc-private.h"
+#include "gs1encoders.h"
 
 void gs1_EAN13(gs1_encoder *ctx);
 void gs1_EAN8(gs1_encoder *ctx);
