@@ -26,6 +26,19 @@
 #define GS1_ENCODERS_MAX_FNAME 120
 #define GS1_ENCODERS_MAX_DATA (75+2361)
 
+
+#ifdef _WIN32
+#  define GS1_ENCODERS_API __declspec(dllexport)
+#else
+#  define GS1_ENCODERS_API
+#endif
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 enum {
 	sNONE = 0,	// none defined
 	sRSS14,		// RSS-14
@@ -51,59 +64,64 @@ typedef struct gs1_encoder gs1_encoder;
 /** @brief Initialise a gs1_encoder instance.
  *  @return gs1_encoder context on success, else NULL.
  */
-gs1_encoder* gs1_encoder_init(void);
+GS1_ENCODERS_API gs1_encoder* gs1_encoder_init(void);
 
 
 /** @brief Release a gs1_encoder instance.
  *  @param ctx Instance to free.
  */
-void gs1_encoder_free(gs1_encoder *ctx);
+GS1_ENCODERS_API void gs1_encoder_free(gs1_encoder *ctx);
 
 
 /** @brief Encode the barcode symbol.
  *  @param ctx gs1_encoder context.
  */
-bool gs1_encoder_encode(gs1_encoder *ctx);
+GS1_ENCODERS_API bool gs1_encoder_encode(gs1_encoder *ctx);
 
-char* gs1_encoder_getVersion(gs1_encoder *ctx);
+GS1_ENCODERS_API char* gs1_encoder_getVersion(gs1_encoder *ctx);
 
-int gs1_encoder_getSym(gs1_encoder *ctx);
-void gs1_encoder_setSym(gs1_encoder *ctx, int sym);
+GS1_ENCODERS_API int gs1_encoder_getSym(gs1_encoder *ctx);
+GS1_ENCODERS_API void gs1_encoder_setSym(gs1_encoder *ctx, int sym);
 
-int gs1_encoder_getInputFlag(gs1_encoder *ctx);
-void gs1_encoder_setInputFlag(gs1_encoder *ctx, int inputFlag);
+GS1_ENCODERS_API int gs1_encoder_getInputFlag(gs1_encoder *ctx);
+GS1_ENCODERS_API void gs1_encoder_setInputFlag(gs1_encoder *ctx, int inputFlag);
 
-int gs1_encoder_getPixMult(gs1_encoder *ctx);
-void gs1_encoder_setPixMult(gs1_encoder *ctx, int pixMult);
+GS1_ENCODERS_API int gs1_encoder_getPixMult(gs1_encoder *ctx);
+GS1_ENCODERS_API void gs1_encoder_setPixMult(gs1_encoder *ctx, int pixMult);
 
-int gs1_encoder_getXundercut(gs1_encoder *ctx);
-void gs1_encoder_setXundercut(gs1_encoder *ctx, int Xundercut);
+GS1_ENCODERS_API int gs1_encoder_getXundercut(gs1_encoder *ctx);
+GS1_ENCODERS_API void gs1_encoder_setXundercut(gs1_encoder *ctx, int Xundercut);
 
-int gs1_encoder_getYundercut(gs1_encoder *ctx);
-void gs1_encoder_setYundercut(gs1_encoder *ctx, int Yundercut);
+GS1_ENCODERS_API int gs1_encoder_getYundercut(gs1_encoder *ctx);
+GS1_ENCODERS_API void gs1_encoder_setYundercut(gs1_encoder *ctx, int Yundercut);
 
-int gs1_encoder_getSepHt(gs1_encoder *ctx);
-void gs1_encoder_setSepHt(gs1_encoder *ctx, int sepHt);
+GS1_ENCODERS_API int gs1_encoder_getSepHt(gs1_encoder *ctx);
+GS1_ENCODERS_API void gs1_encoder_setSepHt(gs1_encoder *ctx, int sepHt);
 
-int gs1_encoder_getSegWidth(gs1_encoder *ctx);
-void gs1_encoder_setSegWidth(gs1_encoder *ctx, int segWidth);
+GS1_ENCODERS_API int gs1_encoder_getSegWidth(gs1_encoder *ctx);
+GS1_ENCODERS_API void gs1_encoder_setSegWidth(gs1_encoder *ctx, int segWidth);
 
-int gs1_encoder_getBmp(gs1_encoder *ctx);
-void gs1_encoder_setBmp(gs1_encoder *ctx, int bmp);
+GS1_ENCODERS_API int gs1_encoder_getBmp(gs1_encoder *ctx);
+GS1_ENCODERS_API void gs1_encoder_setBmp(gs1_encoder *ctx, int bmp);
 
-int gs1_encoder_getLinHeight(gs1_encoder *ctx);
-void gs1_encoder_setLinHeight(gs1_encoder *ctx, int linHeight);
+GS1_ENCODERS_API int gs1_encoder_getLinHeight(gs1_encoder *ctx);
+GS1_ENCODERS_API void gs1_encoder_setLinHeight(gs1_encoder *ctx, int linHeight);
 
-char* gs1_encoder_getOutFile(gs1_encoder *ctx);
-void gs1_encoder_setOutFile(gs1_encoder *ctx, char* outFile);
+GS1_ENCODERS_API char* gs1_encoder_getOutFile(gs1_encoder *ctx);
+GS1_ENCODERS_API void gs1_encoder_setOutFile(gs1_encoder *ctx, char* outFile);
 
-//char* gs1_encoder_getDataStr(gs1_encoder *ctx);
-void gs1_encoder_setDataStr(gs1_encoder *ctx, char* dataStr);
+GS1_ENCODERS_API char* gs1_encoder_getDataStr(gs1_encoder *ctx);
+GS1_ENCODERS_API void gs1_encoder_setDataStr(gs1_encoder *ctx, char* dataStr);
 
-//char* gs1_encoder_getDataFile(gs1_encoder *ctx);
-void gs1_encoder_setDataFile(gs1_encoder *ctx, char* dataFile);
+GS1_ENCODERS_API char* gs1_encoder_getDataFile(gs1_encoder *ctx);
+GS1_ENCODERS_API void gs1_encoder_setDataFile(gs1_encoder *ctx, char* dataFile);
 
-char* gs1_encoder_getErrMsg(gs1_encoder *ctx);
+GS1_ENCODERS_API char* gs1_encoder_getErrMsg(gs1_encoder *ctx);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 
 #endif /* ENC_H */
