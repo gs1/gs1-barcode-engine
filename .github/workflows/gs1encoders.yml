@@ -58,7 +58,11 @@ jobs:
       working-directory: src
       run: |
         msbuild /p:Configuration=release /p:Platform="x64" gs1encoders.sln
-        gs1encoders-app\x64\Release\gs1encoders-app.exe --version
+
+    - name: Exercise applications
+      run: |
+        src/gs1encoders-app\x64\Release\gs1encoders-app.exe --version
+        gs1encoders-dotnet\bin\Release\gs1encoders-dotnet.exe --version
 
 
   #
@@ -87,7 +91,11 @@ jobs:
       working-directory: src
       run: |
         msbuild /p:Configuration=release /p:Platform="x64" gs1encoders.sln
-        gs1encoders-app\x64\Release\gs1encoders-app.exe --version
+
+    - name: Exercise applications
+      run: |
+        src/gs1encoders-app\x64\Release\gs1encoders-app.exe --version
+        gs1encoders-dotnet\bin\Release\gs1encoders-dotnet.exe --version
 
     - name: ZIP development libs
       working-directory: src/x64/Release
