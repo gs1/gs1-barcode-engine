@@ -57,7 +57,7 @@ jobs:
     - name: MSVC CI
       working-directory: src
       run: |
-        msbuild /p:Configuration=release gs1encoders.sln
+        msbuild /p:Configuration=release /p:Platform="x64" gs1encoders.sln
         gs1encoders-app\x64\Release\gs1encoders-app.exe --version
 
 
@@ -86,7 +86,7 @@ jobs:
     - name: Windows release build
       working-directory: src
       run: |
-        msbuild /p:Configuration=release gs1encoders.sln
+        msbuild /p:Configuration=release /p:Platform="x64" gs1encoders.sln
         gs1encoders-app\x64\Release\gs1encoders-app.exe --version
 
     - name: ZIP development libs
