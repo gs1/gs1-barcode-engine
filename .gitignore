@@ -2,8 +2,9 @@
 *.d
 *.bin
 tags
-.vs/*
+.vs/
 .*.swp
 lib*.a
 lib*.so
 lib*.so.*
+*.vcxproj.user

@@ -64,16 +64,12 @@ Alternatively, it can be built from the command line by opening a Developer Comm
 
     msbuild /p:Configuration=release gs1encoders.sln
 
-Or you can avoid using a toolchain by running the Microsoft C++ compiler tool directly as follows:
-
-    cl *.c /link /out:gs1encoders.exe
-
 
 ### Building on Linux
 
 The application can be rebuilt on any Linux system that has a C compiler (such as gcc or clang).
 
-To build using the default compiler change into the `src` directory and run:
+To build using the default compiler change into the `src/c-lib` directory and run:
 
     make
 

@@ -103,6 +103,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy /y /d "..\..\..\src\x64\$(Configuration)\gs1encoders.dll" "."</PostBuildEvent>
+    <PostBuildEvent>xcopy /y /d "..\..\..\c-lib\build\library\x64\$(Configuration)\gs1encoders.dll" "."</PostBuildEvent>
   </PropertyGroup>
 </Project>
