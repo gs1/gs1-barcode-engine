@@ -8,3 +8,6 @@ lib*.a
 lib*.so
 lib*.so.*
 *.vcxproj.user
+src/c-lib/build/
+src/dotnet/bin/
+src/dotnet/obj/
