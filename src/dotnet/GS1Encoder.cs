@@ -53,7 +53,7 @@ namespace gs1encoders_dotnet
 
         public bool setSym(int sym)
         {
-            gs1_encoder_setSym(ctx, sym);
+            return gs1_encoder_setSym(ctx, sym);
         }
 
         public int getSym()
