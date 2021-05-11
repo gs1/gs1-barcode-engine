@@ -40,15 +40,15 @@ GS1_ENCODERS_API gs1_encoder* gs1_encoder_init(void) {
 	strcpy(ctx->VERSION, __DATE__);
 
 	// Set default parameters
+	ctx->sym = sNONE;
 	ctx->pixMult = 1;
 	ctx->Xundercut = 0;
 	ctx->Yundercut = 0;
 	ctx->sepHt = 1;
-	ctx->bmp = false;
 	ctx->segWidth = 22;
 	ctx->linHeight = 25;
+	ctx->bmp = false;
 	strcpy(ctx->outFile, "out.tif");
-	ctx->sym = sNONE;
 	ctx->inputFlag = 0; // for kbd input
 	ctx->errFlag = false;
 	ctx->errMsg[0] = '\0';
@@ -73,9 +73,12 @@ GS1_ENCODERS_API int gs1_encoder_getSym(gs1_encoder *ctx) {
 	if (ctx == NULL) return -1;
 	return ctx->sym;
 }
-GS1_ENCODERS_API void gs1_encoder_setSym(gs1_encoder *ctx, int sym) {
-	if (ctx == NULL) return;
+GS1_ENCODERS_API bool gs1_encoder_setSym(gs1_encoder *ctx, int sym) {
+	if (ctx == NULL) return false;
+	if (sym < sNONE || sym >= sNUMSYMS)
+		return false;
 	ctx->sym = sym;
+	return true;
 }
 
 

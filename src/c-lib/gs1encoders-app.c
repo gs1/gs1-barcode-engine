@@ -35,7 +35,6 @@
 
 static const char* SYMBOLOGY_NAMES[] =
 {
-	"",  // Spacer
 	"GS1 DataBar",
 	"GS1 DataBar Truncated",
 	"GS1 DataBar Stacked",
@@ -55,7 +54,7 @@ static char* gets(char* in) {
 
 	char* s;
 
-	s = fgets(in,MAX_KEYDATA+1,stdin);
+	s = fgets(in,MAX_KEYDATA+1, stdin);
 	if (s != NULL) {
 		s[strcspn(s, "\r\n")] = 0;
 	}
@@ -66,27 +65,28 @@ static bool getSym(gs1_encoder *ctx) {
 
 	char inpStr[MAX_KEYDATA+1];
 	int i;
+	int sym;
 
 	while (true) {
 		printf("\nGS1 Encoders (Built " RELEASE "):");
 		printf("\n\nCopyright (c) 2020 GS1 AISBL. License: Apache-2.0");
 		printf("\n\nMAIN MENU:");
 		printf("\n 0)  Exit Program");
-		for (i = 1; i < sNUMSYMS; i += 2) {
+		for (i = 0; i < sNUMSYMS; i += 2) {
 			printf("\n%2d)  %-25s     %2d)  %-25s",
-				i, SYMBOLOGY_NAMES[i], i + 1, SYMBOLOGY_NAMES[i + 1]);
+				i+1, SYMBOLOGY_NAMES[i], i+2, SYMBOLOGY_NAMES[i + 1]);
 		}
 		printf("\n\nEnter symbology type or 0 to exit: ");
 		if (gets(inpStr) == NULL) {
-			printf("PLEASE ENTER 0 THROUGH 12.");
+			printf("PLEASE ENTER 0 THROUGH %d", sNUMSYMS);
 			continue;
 		}
-		gs1_encoder_setSym(ctx, atoi(inpStr));
-		if (gs1_encoder_getSym(ctx) == 0) {
+		sym = atoi(inpStr) - 1;
+		if (sym == sNONE) {
 			return(false);
 		}
-		if (gs1_encoder_getSym(ctx) > 12) {
-			printf("PLEASE ENTER 0 THROUGH 12.");
+		if (!gs1_encoder_setSym(ctx, sym)) {
+			printf("PLEASE ENTER 0 THROUGH %d", sNUMSYMS);
 			continue;
 		}
 		return(true);

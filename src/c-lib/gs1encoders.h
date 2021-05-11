@@ -40,7 +40,7 @@ extern "C" {
 
 
 enum {
-	sNONE = 0,	// none defined
+	sNONE = -1,	// none defined
 	sRSS14,		// RSS-14
 	sRSS14T,	// RSS-14 Truncated
 	sRSS14S,	// RSS-14 Stacked
@@ -81,7 +81,7 @@ GS1_ENCODERS_API bool gs1_encoder_encode(gs1_encoder *ctx);
 GS1_ENCODERS_API char* gs1_encoder_getVersion(gs1_encoder *ctx);
 
 GS1_ENCODERS_API int gs1_encoder_getSym(gs1_encoder *ctx);
-GS1_ENCODERS_API void gs1_encoder_setSym(gs1_encoder *ctx, int sym);
+GS1_ENCODERS_API bool gs1_encoder_setSym(gs1_encoder *ctx, int sym);
 
 GS1_ENCODERS_API int gs1_encoder_getInputFlag(gs1_encoder *ctx);
 GS1_ENCODERS_API void gs1_encoder_setInputFlag(gs1_encoder *ctx, int inputFlag);

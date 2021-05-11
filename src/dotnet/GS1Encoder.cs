@@ -15,7 +15,7 @@ namespace gs1encoders_dotnet
 
         /*
          *  Functions imported from gs1encoders.dll
-         * 
+         *
          */
         [DllImport(gs1_dll, EntryPoint = "gs1_encoder_init", CallingConvention = CallingConvention.Cdecl)]
         private static extern System.IntPtr gs1_encoder_init();
@@ -27,14 +27,14 @@ namespace gs1encoders_dotnet
         private static extern int gs1_encoder_getSym(IntPtr ctx);
 
         [DllImport(gs1_dll, EntryPoint = "gs1_encoder_setSym", CallingConvention = CallingConvention.Cdecl)]
-        private static extern void gs1_encoder_setSym(IntPtr ctx, int sym);
+        private static extern bool gs1_encoder_setSym(IntPtr ctx, int sym);
 
         [DllImport(gs1_dll, EntryPoint = "gs1_encoder_free", CallingConvention = CallingConvention.Cdecl)]
         private static extern void gs1_encoder_free(IntPtr ctx);
 
         /*
          *  Methods to provide an OO wrapper around the imported functional interface and to perform marshalling
-         * 
+         *
          */
         public GS1Encoder()
         {
@@ -42,16 +42,16 @@ namespace gs1encoders_dotnet
         }
 
         ~GS1Encoder()
-        {           
+        {
             gs1_encoder_free(ctx);
         }
 
         public string getVersion()
-        {           
-            return System.Runtime.InteropServices.Marshal.PtrToStringAnsi(gs1_encoder_getVersion(ctx));           
+        {
+            return System.Runtime.InteropServices.Marshal.PtrToStringAnsi(gs1_encoder_getVersion(ctx));
         }
 
-        public void setSym(int sym)
+        public bool setSym(int sym)
         {
             gs1_encoder_setSym(ctx, sym);
         }
@@ -59,7 +59,7 @@ namespace gs1encoders_dotnet
         public int getSym()
         {
             return gs1_encoder_getSym(ctx);
-        }        
+        }
 
     }
 }
