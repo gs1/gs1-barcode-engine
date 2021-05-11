@@ -5,6 +5,7 @@ VERSION := $(MAJOR).$(MINOR)
 NAME = gs1encoders
 APP = $(NAME).bin
 APP_STATIC = $(NAME)-linux.bin
+TEST_BIN = $(NAME)-test
 
 CFLAGS = -g -O2 -D_FORTIFY_SOURCE=2 -Wall -Wextra -Wconversion -Wformat -Wformat-security -pedantic -Werror -MMD -fPIC
 LDLIBS = -lc
@@ -17,19 +18,22 @@ LIBDIR = $(PREFIX)/lib
 APP_SRC = gs1encoders-app.c
 APP_OBJ = $(APP_SRC:.c=.o)
 
-SRCS = $(filter-out $(APP_SRC), $(wildcard *.c))
+TEST_SRC = gs1encoders-test.c
+TEST_OBJ = $(TEST_SRC:.c=.o)
+
+SRCS = $(filter-out $(APP_SRC) $(TEST_SRC), $(wildcard *.c))
 OBJS = $(SRCS:.c=.o)
 DEPS = $(OBJS:.o=.d)
 
 
-.PHONY: all clean app app-static lib libshared libstatic install install-static install-shared uninstall
+.PHONY: all clean app app-static lib libshared libstatic install install-static install-shared uninstall test
 
 all: lib app-static
-app: $(APP)
-app-static: $(APP_STATIC)
 lib: libshared libstatic
 libshared: lib$(NAME).so.$(VERSION) lib$(NAME).so lib$(NAME).so.$(MAJOR)
 libstatic: lib$(NAME).a
+app: $(APP)
+app-static: $(APP_STATIC)
 
 
 #
@@ -68,10 +72,23 @@ $(APP_STATIC): $(OBJS) $(APP_OBJ)
 
 
 #
+#  Test binary
+#
+$(TEST_OBJ): $(TEST_SRC)
+	$(CC) -c -o $(TEST_OBJ) $(TEST_SRC)
+
+$(TEST_BIN): $(OBJS) $(TEST_OBJ)
+	$(CC) $(OBJS) $(TEST_OBJ) -o $(TEST_BIN)
+
+
+#
 #  Utility targets
 #
+test: $(TEST_BIN)
+	./$(TEST_BIN) -v
+
 clean:
-	$(RM) $(OBJS) $(APP_OBJ) $(APP) $(APP_STATIC) *.so* *.a *.d
+	$(RM) $(OBJS) $(APP_OBJ) $(APP) $(APP_STATIC) $(TEST_BIN) $(TEST_OBJ) *.so* *.a *.d
 
 install: install-static install-shared
 
