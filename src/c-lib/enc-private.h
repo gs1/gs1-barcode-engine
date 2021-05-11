@@ -22,6 +22,7 @@
 #define ENC_PRIVATE_H
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #include "gs1encoders.h"
 
@@ -55,7 +56,7 @@ struct gs1_encoder {
 
 	// members with accessors
 	int sym;		// symbology type
-	int inputFlag;		// 1 = dataStr, 2 = dataFile
+	bool fileInputFlag;	// true is dataFile else dataStr
 	int pixMult;		// pixels per X
 	int Xundercut;		// X pixels to undercut
 	int Yundercut;		// Y pixels to undercut

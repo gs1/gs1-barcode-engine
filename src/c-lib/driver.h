@@ -30,6 +30,9 @@ struct sPrints;
 
 #define MAX_LINE 6032 // 10 inches wide at 600 dpi
 
+#define DEFAULT_BMP_FILE "out.bmp"
+#define DEFAULT_TIF_FILE "out.tif"
+
 #define min(X,Y) (((X) < (Y)) ? (X) : (Y))
 #define max(X,Y) (((X) > (Y)) ? (X) : (Y))
 

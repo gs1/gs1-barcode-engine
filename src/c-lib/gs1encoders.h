@@ -25,7 +25,9 @@
 
 #define GS1_ENCODERS_MAX_FNAME 120
 #define GS1_ENCODERS_MAX_DATA (75+2361)
-
+#define GS1_ENCODERS_MAX_PIXMULT 12
+#define GS1_ENCODERS_MAX_KEYDATA 120   // TODO update for 2D
+#define GS1_ENCODERS_MAX_LINHT 500     // max UCC/EAN-128 height in X
 
 #ifdef _WIN32
 #  define GS1_ENCODERS_API __declspec(dllexport)
@@ -40,20 +42,20 @@ extern "C" {
 
 
 enum {
-	sNONE = -1,	// none defined
-	sRSS14,		// RSS-14
-	sRSS14T,	// RSS-14 Truncated
-	sRSS14S,	// RSS-14 Stacked
-	sRSS14SO,	// RSS-14 Stacked Omnidirectional
-	sRSSLIM,	// RSS Limited
-	sRSSEXP,	// RSS Expanded
-	sUPCA,		// UPC-A
-	sUPCE,		// UPC-E
-	sEAN13,		// EAN-13
-	sEAN8,		// EAN-8
-	sUCC128_CCA,	// UCC/EAN-128 with CC-A or CC-B
-	sUCC128_CCC,	// UCC/EAN-128 with CC-C
-	sNUMSYMS,	// Number of symbologies
+	gs1_encoder_sNONE = -1,		// none defined
+	gs1_encoder_sRSS14,		// RSS-14
+	gs1_encoder_sRSS14T,		// RSS-14 Truncated
+	gs1_encoder_sRSS14S,		// RSS-14 Stacked
+	gs1_encoder_sRSS14SO,		// RSS-14 Stacked Omnidirectional
+	gs1_encoder_sRSSLIM,		// RSS Limited
+	gs1_encoder_sRSSEXP,		// RSS Expanded
+	gs1_encoder_sUPCA,		// UPC-A
+	gs1_encoder_sUPCE,		// UPC-E
+	gs1_encoder_sEAN13,		// EAN-13
+	gs1_encoder_sEAN8,		// EAN-8
+	gs1_encoder_sUCC128_CCA,	// UCC/EAN-128 with CC-A or CC-B
+	gs1_encoder_sUCC128_CCC,	// UCC/EAN-128 with CC-C
+	gs1_encoder_sNUMSYMS,		// Number of symbologies
 };
 
 
@@ -83,38 +85,38 @@ GS1_ENCODERS_API char* gs1_encoder_getVersion(gs1_encoder *ctx);
 GS1_ENCODERS_API int gs1_encoder_getSym(gs1_encoder *ctx);
 GS1_ENCODERS_API bool gs1_encoder_setSym(gs1_encoder *ctx, int sym);
 
-GS1_ENCODERS_API int gs1_encoder_getInputFlag(gs1_encoder *ctx);
-GS1_ENCODERS_API void gs1_encoder_setInputFlag(gs1_encoder *ctx, int inputFlag);
+GS1_ENCODERS_API bool gs1_encoder_getFileInputFlag(gs1_encoder *ctx);
+GS1_ENCODERS_API bool gs1_encoder_setFileInputFlag(gs1_encoder *ctx, bool fileInputFlag);
 
 GS1_ENCODERS_API int gs1_encoder_getPixMult(gs1_encoder *ctx);
-GS1_ENCODERS_API void gs1_encoder_setPixMult(gs1_encoder *ctx, int pixMult);
+GS1_ENCODERS_API bool gs1_encoder_setPixMult(gs1_encoder *ctx, int pixMult);
 
 GS1_ENCODERS_API int gs1_encoder_getXundercut(gs1_encoder *ctx);
-GS1_ENCODERS_API void gs1_encoder_setXundercut(gs1_encoder *ctx, int Xundercut);
+GS1_ENCODERS_API bool gs1_encoder_setXundercut(gs1_encoder *ctx, int Xundercut);
 
 GS1_ENCODERS_API int gs1_encoder_getYundercut(gs1_encoder *ctx);
-GS1_ENCODERS_API void gs1_encoder_setYundercut(gs1_encoder *ctx, int Yundercut);
+GS1_ENCODERS_API bool gs1_encoder_setYundercut(gs1_encoder *ctx, int Yundercut);
 
 GS1_ENCODERS_API int gs1_encoder_getSepHt(gs1_encoder *ctx);
-GS1_ENCODERS_API void gs1_encoder_setSepHt(gs1_encoder *ctx, int sepHt);
+GS1_ENCODERS_API bool gs1_encoder_setSepHt(gs1_encoder *ctx, int sepHt);
 
 GS1_ENCODERS_API int gs1_encoder_getSegWidth(gs1_encoder *ctx);
-GS1_ENCODERS_API void gs1_encoder_setSegWidth(gs1_encoder *ctx, int segWidth);
+GS1_ENCODERS_API bool gs1_encoder_setSegWidth(gs1_encoder *ctx, int segWidth);
 
-GS1_ENCODERS_API int gs1_encoder_getBmp(gs1_encoder *ctx);
-GS1_ENCODERS_API void gs1_encoder_setBmp(gs1_encoder *ctx, int bmp);
+GS1_ENCODERS_API bool gs1_encoder_getBmp(gs1_encoder *ctx);
+GS1_ENCODERS_API bool gs1_encoder_setBmp(gs1_encoder *ctx, bool bmp);
 
 GS1_ENCODERS_API int gs1_encoder_getLinHeight(gs1_encoder *ctx);
-GS1_ENCODERS_API void gs1_encoder_setLinHeight(gs1_encoder *ctx, int linHeight);
+GS1_ENCODERS_API bool gs1_encoder_setLinHeight(gs1_encoder *ctx, int linHeight);
 
 GS1_ENCODERS_API char* gs1_encoder_getOutFile(gs1_encoder *ctx);
-GS1_ENCODERS_API void gs1_encoder_setOutFile(gs1_encoder *ctx, char* outFile);
+GS1_ENCODERS_API bool gs1_encoder_setOutFile(gs1_encoder *ctx, char* outFile);
 
 GS1_ENCODERS_API char* gs1_encoder_getDataStr(gs1_encoder *ctx);
-GS1_ENCODERS_API void gs1_encoder_setDataStr(gs1_encoder *ctx, char* dataStr);
+GS1_ENCODERS_API bool gs1_encoder_setDataStr(gs1_encoder *ctx, char* dataStr);
 
 GS1_ENCODERS_API char* gs1_encoder_getDataFile(gs1_encoder *ctx);
-GS1_ENCODERS_API void gs1_encoder_setDataFile(gs1_encoder *ctx, char* dataFile);
+GS1_ENCODERS_API bool gs1_encoder_setDataFile(gs1_encoder *ctx, char* dataFile);
 
 GS1_ENCODERS_API char* gs1_encoder_getErrMsg(gs1_encoder *ctx);
 

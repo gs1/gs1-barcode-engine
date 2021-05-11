@@ -378,7 +378,7 @@ void gs1_RSS14(gs1_encoder *ctx) {
 	char *ccStr;
 	int symHt;
 
-	if (ctx->sym == sRSS14) {
+	if (ctx->sym == gs1_encoder_sRSS14) {
 		symHt = RSS14_SYM_H;
 	}
 	else {
