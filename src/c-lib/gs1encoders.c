@@ -61,7 +61,6 @@ GS1_ENCODERS_API gs1_encoder* gs1_encoder_init(void) {
 GS1_ENCODERS_API void gs1_encoder_free(gs1_encoder *ctx) {
 	if (ctx == NULL) return;
 	free(ctx);
-	ctx = NULL;
 }
 
 
