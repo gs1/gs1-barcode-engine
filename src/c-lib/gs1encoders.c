@@ -50,6 +50,8 @@ GS1_ENCODERS_API gs1_encoder* gs1_encoder_init(void) {
 	ctx->bmp = false;
 	strcpy(ctx->outFile, "out.tif");
 	ctx->inputFlag = 0; // for kbd input
+	strcpy(ctx->dataStr, "");
+	strcpy(ctx->dataFile, "data.txt");
 	ctx->errFlag = false;
 	ctx->errMsg[0] = '\0';
 
