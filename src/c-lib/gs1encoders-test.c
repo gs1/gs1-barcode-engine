@@ -23,7 +23,7 @@
 
 #include "acutest.h"
 
-#include "enc-private.h"
+#include "driver.h"
 #include "gs1encoders.h"
 
 
