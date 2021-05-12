@@ -19,9 +19,10 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: clang CI
-      working-directory: src
+      working-directory: src/c-lib
       run: |
         make lib CC=clang
+        make test CC=clang
         make app CC=clang
         LD_LIBRARY_PATH=. ./gs1encoders.bin --version
         make app-static CC=clang
@@ -36,9 +37,10 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: gcc CI
-      working-directory: src
+      working-directory: src/c-lib
       run: |
         make lib CC=gcc
+        make test CC=gcc
         make app CC=gcc
         LD_LIBRARY_PATH=. ./gs1encoders.bin --version
         make app-static CC=gcc
@@ -58,11 +60,9 @@ jobs:
       working-directory: src
       run: |
         msbuild /p:Configuration=release /p:Platform="x64" gs1encoders.sln
-
-    - name: Exercise applications
-      run: |
-        src/gs1encoders-app\x64\Release\gs1encoders-app.exe --version
-        gs1encoders-dotnet\bin\Release\gs1encoders-dotnet.exe --version
+        c-lib\build\test\x64\Release\gs1encoders-test.exe
+        c-lib\build\console-app\x64\Release\gs1encoders-app.exe --version
+        dotnet\bin\Release\gs1encoders-dotnet.exe --version
 
 
   #
@@ -94,16 +94,16 @@ jobs:
 
     - name: Exercise applications
       run: |
-        src/gs1encoders-app\x64\Release\gs1encoders-app.exe --version
-        gs1encoders-dotnet\bin\Release\gs1encoders-dotnet.exe --version
+        src\c-lib\build\console-app\x64\Release\gs1encoders-app.exe --version
+        src\dotnet\bin\Release\gs1encoders-dotnet.exe --version
 
     - name: ZIP development libs
-      working-directory: src/x64/Release
+      working-directory: src/c-lib/build/console-app/x64/Release
       run: |
         7z a gs1encoders-windows-libs.zip gs1encoders.h gs1encoders.lib gs1encoders.dll
 
     - name: ZIP application
-      working-directory: src/gs1encoders-app/x64/Release
+      working-directory: src/c-lib/build/console-app/x64/Release
       run: |
         7z a gs1encoders-windows-app.zip gs1encoders-app.exe gs1encoders.dll
 
@@ -111,13 +111,13 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: windows-libs
-        path: src/x64/Release/gs1encoders-windows-libs.zip
+        path: src/c-lib/build/console-app/x64/Release/gs1encoders-windows-libs.zip
 
     - name: Store Windows app
       uses: actions/upload-artifact@v2
       with:
         name: windows-app
-        path: src/gs1encoders-app/x64/Release/gs1encoders-windows-app.zip
+        path: src/c-lib/build/console-app/x64/Release/gs1encoders-windows-app.zip
 
 
   build-release-linux:
@@ -136,7 +136,7 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Linux release build
-      working-directory: src
+      working-directory: src/c-lib
       run: |
         make CC=clang
         ./gs1encoders-linux.bin --version
@@ -145,7 +145,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: linux-app
-        path: src/gs1encoders-linux.bin
+        path: src/c-lib/gs1encoders-linux.bin
 
 
   #
