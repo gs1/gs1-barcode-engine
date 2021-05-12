@@ -306,7 +306,8 @@ bool gs1_driverInit(gs1_encoder *ctx, long xdim, long ydim) {
 }
 
 
-bool gs1_driverAddRow(gs1_encoder *ctx, struct sPrints *prints) {
+// This is normally called with a wrapper
+bool gs1_doDriverAddRow(gs1_encoder *ctx, struct sPrints *prints) {
 
 	struct sPrints *row = &ctx->driver_rowBuffer[ctx->driver_numRows++];
 
