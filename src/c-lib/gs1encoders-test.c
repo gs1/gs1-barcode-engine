@@ -128,31 +128,42 @@ static void test_pixMult() {
 	TEST_CHECK(gs1_encoder_setPixMult(ctx, 2));
 	TEST_CHECK(gs1_encoder_getPixMult(ctx) == 2);
 
-	// Check these are reset under appropriate conditions
+	// Check X/Y undercut are reset under appropriate conditions
 	gs1_encoder_setPixMult(ctx, 4);
 	gs1_encoder_setXundercut(ctx, 1);
 	gs1_encoder_setYundercut(ctx, 1);
-	gs1_encoder_setSepHt(ctx, 5);
 	TEST_CHECK(gs1_encoder_getXundercut(ctx) == 1);
 	TEST_CHECK(gs1_encoder_getYundercut(ctx) == 1);
-	TEST_CHECK(gs1_encoder_getSepHt(ctx) == 5);
 	gs1_encoder_setPixMult(ctx, 1);
 	TEST_CHECK(gs1_encoder_getXundercut(ctx) == 0);
 	TEST_CHECK(gs1_encoder_getYundercut(ctx) == 0);
-	TEST_CHECK(gs1_encoder_getSepHt(ctx) == 1);
 
 	// But not reset otherwise
 	gs1_encoder_setPixMult(ctx, 4);
 	gs1_encoder_setXundercut(ctx, 1);
 	gs1_encoder_setYundercut(ctx, 1);
-	gs1_encoder_setSepHt(ctx, 4);
 	TEST_CHECK(gs1_encoder_getXundercut(ctx) == 1);
 	TEST_CHECK(gs1_encoder_getYundercut(ctx) == 1);
-	TEST_CHECK(gs1_encoder_getSepHt(ctx) == 4);
 	gs1_encoder_setPixMult(ctx, 3);
 	TEST_CHECK(gs1_encoder_getXundercut(ctx) == 1);
 	TEST_CHECK(gs1_encoder_getYundercut(ctx) == 1);
-	TEST_CHECK(gs1_encoder_getSepHt(ctx) == 4);
+
+	// Check sepHt is reset under appropriate conditions
+	gs1_encoder_setPixMult(ctx, 4);
+	gs1_encoder_setSepHt(ctx, 5);
+	TEST_CHECK(gs1_encoder_getSepHt(ctx) == 5);
+	gs1_encoder_setPixMult(ctx, 5);
+	TEST_CHECK(gs1_encoder_getSepHt(ctx) == 5);  // still valid
+	gs1_encoder_setPixMult(ctx, 6);
+	TEST_CHECK(gs1_encoder_getSepHt(ctx) == 6);  // must update
+
+	gs1_encoder_setPixMult(ctx, 4);
+	gs1_encoder_setSepHt(ctx, 6);
+	TEST_CHECK(gs1_encoder_getSepHt(ctx) == 6);
+	gs1_encoder_setPixMult(ctx, 3);
+	TEST_CHECK(gs1_encoder_getSepHt(ctx) == 6);  // still valid
+	gs1_encoder_setPixMult(ctx, 2);
+	TEST_CHECK(gs1_encoder_getSepHt(ctx) == 2);  // must update
 
 	gs1_encoder_free(ctx);
 

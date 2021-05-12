@@ -130,7 +130,7 @@ GS1_ENCODERS_API bool gs1_encoder_setPixMult(gs1_encoder *ctx, int pixMult) {
 		ctx->Xundercut = 0;
 	if (pixMult <= ctx->Yundercut)
 		ctx->Yundercut = 0;
-	if (pixMult * 2 < ctx->sepHt)
+	if (pixMult * 2 < ctx->sepHt || pixMult > ctx->sepHt)
 		ctx->sepHt = pixMult;
 	return true;
 }
