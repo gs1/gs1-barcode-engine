@@ -20,6 +20,7 @@
 
 
 #include <stdbool.h>
+#include <string.h>
 
 #include "acutest.h"
 

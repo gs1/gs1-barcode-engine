@@ -26,6 +26,7 @@
 
 #include "enc-private.h"
 #include "gs1encoders.h"
+#include "driver.h"
 #include "ean.h"
 #include "rss14.h"
 #include "rssexp.h"
