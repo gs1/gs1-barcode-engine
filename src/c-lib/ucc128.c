@@ -408,7 +408,7 @@ void gs1_U128A(gs1_encoder *ctx) {
 	prints.elmCnt = symChars*6+3;
 	prints.pattern = linPattern;
 	prints.guards = false;
-	prints.height = ctx->pixMult*ctx->linHeight;
+	prints.height = ctx->pixMult * ctx->linHeight;
 	prints.leftPad = 0;
 	prints.rightPad = 0;
 	prints.whtFirst = true;
@@ -439,75 +439,46 @@ void gs1_U128A(gs1_encoder *ctx) {
 		ccRpad = 10+2 + ((symChars-9)/2)*11;
 		ccLpad = symWidth - (CCB4_WIDTH + ccRpad);
 
-		if (ctx->bmp) {
-			// note: BMP is bottom to top inverted
-			gs1_bmpHeader(ctx->pixMult*symWidth,
-					ctx->pixMult*(rows*2+ctx->linHeight) + ctx->sepHt,
-						 ctx->outfp);
+		if (!gs1_driverInit(ctx, ctx->pixMult*symWidth,
+				ctx->pixMult*(rows*2+ctx->linHeight) + ctx->sepHt))
+			return;
 
-			// UCC-128
-			gs1_printElmnts(ctx, &prints);
-
-			// CC separator pattern
-			prints.elmCnt = symChars*6+1;
-			prints.pattern = &linPattern[1];
-			prints.height = ctx->sepHt;
-			prints.leftPad = 10;
-			prints.rightPad = 10;
-			gs1_printElmnts(ctx, &prints);
-
-			// CC-C
-			prints.elmCnt = CCB4_ELMNTS;
-			prints.height = ctx->pixMult*2;
-			prints.leftPad = ccLpad;
-			prints.rightPad = ccRpad;
-			for (i = rows-1; i >= 0; i--) {
-				prints.pattern = ccPattern[i];
-				gs1_printElmnts(ctx, &prints);
-			}
+		// CC-C
+		prints.elmCnt = CCB4_ELMNTS;
+		prints.height = ctx->pixMult*2;
+		prints.leftPad = ccLpad;
+		prints.rightPad = ccRpad;
+		for (i = 0; i < rows; i++) {
+			prints.pattern = ccPattern[i];
+			gs1_driverAddRow(ctx, &prints);
 		}
-		else {
-			gs1_tifHeader(ctx->pixMult*symWidth,
-					ctx->pixMult*(rows*2+ctx->linHeight) + ctx->sepHt,
-						 ctx->outfp);
 
-			// CC-C
-			prints.elmCnt = CCB4_ELMNTS;
-			prints.height = ctx->pixMult*2;
-			prints.leftPad = ccLpad;
-			prints.rightPad = ccRpad;
-			for (i = 0; i < rows; i++) {
-				prints.pattern = ccPattern[i];
-				gs1_printElmnts(ctx, &prints);
-			}
-
-			// CC separator pattern
-			prints.elmCnt = symChars*6+1;
-			prints.pattern = &linPattern[1];
-			prints.height = ctx->sepHt;
-			prints.leftPad = 10;
-			prints.rightPad = 10;
-			gs1_printElmnts(ctx, &prints);
-
-			// UCC-128
-			prints.elmCnt = symChars*6+3;
-			prints.pattern = linPattern;
-			prints.height = ctx->pixMult*ctx->linHeight;
-			prints.leftPad = 0;
-			prints.rightPad = 0;
-			gs1_printElmnts(ctx, &prints);
-		}
-	}
-	else { // primary only
-		if (ctx->bmp) {
-			gs1_bmpHeader(ctx->pixMult*(symChars*11+22), ctx->pixMult*ctx->linHeight, ctx->outfp);
-		}
-		else {
-			gs1_tifHeader(ctx->pixMult*(symChars*11+22), ctx->pixMult*ctx->linHeight, ctx->outfp);
-		}
+		// CC separator pattern
+		prints.elmCnt = symChars*6+1;
+		prints.pattern = &linPattern[1];
+		prints.height = ctx->sepHt;
+		prints.leftPad = 10;
+		prints.rightPad = 10;
+		gs1_driverAddRow(ctx, &prints);
 
 		// UCC-128
-		gs1_printElmnts(ctx, &prints);
+		prints.elmCnt = symChars*6+3;
+		prints.pattern = linPattern;
+		prints.height = ctx->pixMult*ctx->linHeight;
+		prints.leftPad = 0;
+		prints.rightPad = 0;
+		gs1_driverAddRow(ctx, &prints);
+
+		gs1_driverFinalise(ctx);
+	}
+	else { // primary only
+		if (!gs1_driverInit(ctx, ctx->pixMult*(symChars*11+22), ctx->pixMult*ctx->linHeight))
+			return;
+
+		// UCC-128
+		gs1_driverAddRow(ctx, &prints);
+
+		gs1_driverFinalise(ctx);
 	}
 	return;
 }
@@ -593,75 +564,47 @@ void gs1_U128C(gs1_encoder *ctx) {
 
 		symWidth = symChars*11+22;
 		ccRpad = symWidth - UCC128_L_PAD - ((ctx->colCnt+4)*17+5);
-		if (ctx->bmp) {
-			// note: BMP is bottom to top inverted
-			gs1_bmpHeader(ctx->pixMult*symWidth,
-					ctx->pixMult*(ctx->rowCnt*3+ctx->linHeight) + ctx->sepHt,
-						 ctx->outfp);
 
-			// UCC-128
-			gs1_printElmnts(ctx, &prints);
+		if (!gs1_driverInit(ctx, ctx->pixMult*symWidth,
+				ctx->pixMult*(ctx->rowCnt*3+ctx->linHeight) + ctx->sepHt))
+			return;
 
-			// CC separator pattern
-			prints.elmCnt = symChars*6+1;
-			prints.pattern = &linPattern[1];
-			prints.height = ctx->sepHt;
-			prints.leftPad = 10;
-			prints.rightPad = 10;
-			gs1_printElmnts(ctx, &prints);
-
-			// CC-C
-			prints.elmCnt = (ctx->colCnt+4)*8+3;
-			prints.height = ctx->pixMult*3;
-			prints.leftPad = UCC128_L_PAD;
-			prints.rightPad = ccRpad;
-			for (i = ctx->rowCnt-1; i >= 0; i--) {
-				prints.pattern = &patCCC[i*((ctx->colCnt+4)*8+3)];
-				gs1_printElmnts(ctx, &prints);
-			}
+		// CC-C
+		prints.elmCnt = (ctx->colCnt+4)*8+3;
+		prints.height = ctx->pixMult*3;
+		prints.leftPad = UCC128_L_PAD;
+		prints.rightPad = ccRpad;
+		for (i = 0; i < ctx->rowCnt; i++) {
+			prints.pattern = &patCCC[i*((ctx->colCnt+4)*8+3)];
+			gs1_driverAddRow(ctx, &prints);
 		}
-		else {
-			gs1_tifHeader(ctx->pixMult*symWidth,
-					ctx->pixMult*(ctx->rowCnt*3+ctx->linHeight) + ctx->sepHt,
-						 ctx->outfp);
 
-			// CC-C
-			prints.elmCnt = (ctx->colCnt+4)*8+3;
-			prints.height = ctx->pixMult*3;
-			prints.leftPad = UCC128_L_PAD;
-			prints.rightPad = ccRpad;
-			for (i = 0; i < ctx->rowCnt; i++) {
-				prints.pattern = &patCCC[i*((ctx->colCnt+4)*8+3)];
-				gs1_printElmnts(ctx, &prints);
-			}
-
-			// CC separator pattern
-			prints.elmCnt = symChars*6+1;
-			prints.pattern = &linPattern[1];
-			prints.height = ctx->sepHt;
-			prints.leftPad = 10;
-			prints.rightPad = 10;
-			gs1_printElmnts(ctx, &prints);
-
-			// UCC-128
-			prints.elmCnt = symChars*6+3;
-			prints.pattern = linPattern;
-			prints.height = ctx->pixMult*ctx->linHeight;
-			prints.leftPad = 0;
-			prints.rightPad = 0;
-			gs1_printElmnts(ctx, &prints);
-		}
-	}
-	else { // primary only
-		if (ctx->bmp) {
-			gs1_bmpHeader(ctx->pixMult*(symChars*11+22), ctx->pixMult*ctx->linHeight, ctx->outfp);
-		}
-		else {
-			gs1_tifHeader(ctx->pixMult*(symChars*11+22), ctx->pixMult*ctx->linHeight, ctx->outfp);
-		}
+		// CC separator pattern
+		prints.elmCnt = symChars*6+1;
+		prints.pattern = &linPattern[1];
+		prints.height = ctx->sepHt;
+		prints.leftPad = 10;
+		prints.rightPad = 10;
+		gs1_driverAddRow(ctx, &prints);
 
 		// UCC-128
-		gs1_printElmnts(ctx, &prints);
+		prints.elmCnt = symChars*6+3;
+		prints.pattern = linPattern;
+		prints.height = ctx->pixMult*ctx->linHeight;
+		prints.leftPad = 0;
+		prints.rightPad = 0;
+		gs1_driverAddRow(ctx, &prints);
+
+		gs1_driverFinalise(ctx);
+	}
+	else { // primary only
+		if (!gs1_driverInit(ctx, ctx->pixMult*(symChars*11+22), ctx->pixMult*ctx->linHeight))
+			return;
+
+		// UCC-128
+		gs1_driverAddRow(ctx, &prints);
+
+		gs1_driverFinalise(ctx);
 	}
 	return;
 }

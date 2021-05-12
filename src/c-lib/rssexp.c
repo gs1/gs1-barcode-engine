@@ -350,224 +350,115 @@ void gs1_RSSExp(gs1_encoder *ctx) {
 #endif
 	}
 
-	if (ctx->bmp) { // BMP version
-		// note: BMP is bottom to top inverted
-		if (ccFlag) {
-			gs1_bmpHeader(ctx->pixMult*(lMods),
-					ctx->pixMult*rows*2 + ctx->sepHt + lHeight, ctx->outfp);
-		}
-		else {
-			gs1_bmpHeader(ctx->pixMult*lMods, lHeight, ctx->outfp);
-		}
+	if (ccFlag) {
+		if (!gs1_driverInit(ctx, ctx->pixMult*(lMods),
+				ctx->pixMult*rows*2 + ctx->sepHt + lHeight))
+			return;
+	}
+	else {
+		if (!gs1_driverInit(ctx, ctx->pixMult*lMods, lHeight))
+			return;
+	}
 
-		// print RSS Exp component
-		i = 0;
-		evenRow = false; // start with odd
-		while (segs > i+ctx->segWidth) {
-			i += ctx->segWidth;
-			evenRow = !evenRow; // alternate row parity
-		}
-
-		// print last or only RSS Expanded row
-		lNdx1 = ((segs/2)*(8+5+8)+(segs&1)*(8+5)) - ((i/2)*(8+5+8)+(i&1)*8);
-		rPadl1 = lMods - 4 -
-			(((segs/2)*(17+15+17)+(segs&1)*(17+15)) - ((i/2)*(17+15+17)+(i&1)*17));
-		prints.elmCnt = lNdx1;
-		prints.pattern = &linPattern[(i/2)*(8+5+8)+(i&1)*8];
-		prints.guards = true;
-		prints.height = ctx->pixMult*RSSEXP_SYM_H;
-		prints.whtFirst = (i/2+1)&1;
-		rev = evenRow ^ ((i/2)&1);
-		if (rev && (((lNdx1-4)%8)&1)) {
-			// can't reverse odd # finders so offset it right by one
-			prints.leftPad = 1;
-			prints.rightPad = rPadl1-1;
-			prints.reverse = false;
-			// bottom right offset RSS E row
-			gs1_printElmnts(ctx, &prints);
-
-			// bottom complement separator
-			prntCnv = gs1_cnvSeparator(ctx, &prints);
-			gs1_printElmnts(ctx, prntCnv);
-
-			// chex pattern
-			gs1_printElmnts(ctx, &chexPrnts);
-		}
-		else {
-			// otherwise normal bottom or only RSS E row
-			prints.leftPad = 0;
-			prints.rightPad = rPadl1;
-			prints.reverse = rev;
-
-			// bottom or only RSS row
-			gs1_printElmnts(ctx, &prints);
-
-			if ((i > 0) || (ccFlag)) {
-				// CC or lower complement separator
-				prntCnv = gs1_cnvSeparator(ctx, &prints);
-				gs1_printElmnts(ctx, prntCnv);
-			}
-
-			if (i > 0) {
-				// chex pattern
-				gs1_printElmnts(ctx, &chexPrnts);
-			}
-		}
-		evenRow = !evenRow;
-
-		// print any remaining RSS Expanded rows
-		prints.elmCnt = lNdx;
-		prints.leftPad = 0;
-		prints.rightPad = 0;
-		for (i -= ctx->segWidth ; i >= 0; i -= ctx->segWidth) {
-			j = i + ctx->segWidth; // last segment number + 1 in this row
-			rev = evenRow ^ ((i/2)&1);
-			prints.pattern = &linPattern[(i/2)*(8+5+8)+(i&1)*8];
-			prints.whtFirst = (i/2+1)&1;
-			prints.reverse = rev;
-
-			// top complement separator
-			prntCnv = gs1_cnvSeparator(ctx, &prints);
-			gs1_printElmnts(ctx, prntCnv);
-
-			// upper RSS row
-			gs1_printElmnts(ctx, &prints);
-
-			if ((i > 0) || (ccFlag)) {
-				// CC or lower complement separator
-				prntCnv = gs1_cnvSeparator(ctx, &prints);
-				gs1_printElmnts(ctx, prntCnv);
-			}
-
-			if (i > 0) {
-				// chex pattern
-				gs1_printElmnts(ctx, &chexPrnts);
-			}
-			evenRow = !evenRow;
-		}
-
-		if (ccFlag) {
-			// print composite component
-			prints.elmCnt = CCB4_ELMNTS;
-			prints.guards = false;
-			prints.height = ctx->pixMult*2;
-			prints.leftPad = RSSEXP_L_PAD;
-			prints.rightPad = rPadcc;
-			prints.whtFirst = true;
-			prints.reverse = false;
-			for (i = rows-1; i >= 0; i--) {
-				prints.pattern = ccPattern[i];
-				gs1_printElmnts(ctx, &prints);
-			}
+	if (ccFlag) {
+		// print composite component
+		prints.elmCnt = CCB4_ELMNTS;
+		prints.guards = false;
+		prints.height = ctx->pixMult*2;
+		prints.leftPad = RSSEXP_L_PAD;
+		prints.rightPad = rPadcc;
+		prints.whtFirst = true;
+		prints.reverse = false;
+		for (i = 0; i < rows; i++) {
+			prints.pattern = ccPattern[i];
+			gs1_driverAddRow(ctx, &prints);
 		}
 	}
 
-	else { // TIFF version
-		if (ccFlag) {
-			gs1_tifHeader(ctx->pixMult*(lMods),
-					ctx->pixMult*rows*2 + ctx->sepHt + lHeight, ctx->outfp);
-		}
-		else {
-			gs1_tifHeader(ctx->pixMult*lMods, lHeight, ctx->outfp);
-		}
+	// print RSS Exp
+	evenRow = false; // start with 1st row
+	prints.elmCnt = lNdx;
+	prints.guards = true;
+	prints.height = ctx->pixMult*RSSEXP_SYM_H;
+	prints.leftPad = 0;
+	prints.rightPad = 0;
 
-		if (ccFlag) {
-			// print composite component
-			prints.elmCnt = CCB4_ELMNTS;
-			prints.guards = false;
-			prints.height = ctx->pixMult*2;
-			prints.leftPad = RSSEXP_L_PAD;
-			prints.rightPad = rPadcc;
-			prints.whtFirst = true;
-			prints.reverse = false;
-			for (i = 0; i < rows; i++) {
-				prints.pattern = ccPattern[i];
-				gs1_printElmnts(ctx, &prints);
-			}
-		}
+	for (i = 0; i < segs-ctx->segWidth; i += ctx->segWidth) {
+		j = i + ctx->segWidth; // last segment number + 1 in this row
 
-		// print RSS Exp
-		evenRow = false; // start with 1st row
-		prints.elmCnt = lNdx;
-		prints.guards = true;
-		prints.height = ctx->pixMult*RSSEXP_SYM_H;
-		prints.leftPad = 0;
-		prints.rightPad = 0;
-
-		for (i = 0; i < segs-ctx->segWidth; i += ctx->segWidth) {
-			j = i + ctx->segWidth; // last segment number + 1 in this row
-
-			rev = evenRow ^ ((i/2)&1);
-			prints.pattern = &linPattern[(i/2)*(8+5+8)+(i&1)*8];
-			prints.whtFirst = (i/2+1)&1;
-			prints.reverse = rev;
-
-			if (i > 0) {
-				// chex pattern
-				gs1_printElmnts(ctx, &chexPrnts);
-			}
-
-			if ((i > 0) || (ccFlag)) {
-				// CC or lower complement separator
-				prntCnv = gs1_cnvSeparator(ctx, &prints);
-				gs1_printElmnts(ctx, prntCnv);
-			}
-
-			// upper RSS row
-			gs1_printElmnts(ctx, &prints);
-
-			// upper complement separator
-			prntCnv = gs1_cnvSeparator(ctx, &prints);
-			gs1_printElmnts(ctx, prntCnv);
-
-			evenRow = !evenRow;
-		}
-
-		// print last or only RSS Expanded row
-		lNdx1 = ((segs/2)*(8+5+8)+(segs&1)*(8+5)) - ((i/2)*(8+5+8)+(i&1)*8);
-		rPadl1 = lMods - 4 -
-			(((segs/2)*(17+15+17)+(segs&1)*(17+15)) - ((i/2)*(17+15+17)+(i&1)*17));
-		prints.elmCnt = lNdx1;
+		rev = evenRow ^ ((i/2)&1);
 		prints.pattern = &linPattern[(i/2)*(8+5+8)+(i&1)*8];
 		prints.whtFirst = (i/2+1)&1;
-		rev = evenRow ^ ((i/2)&1);
-		if (rev && (((lNdx1-4)%8)&1)) {
-			// can't reverse odd # finders so offset it right by one
-			prints.leftPad = 1;
-			prints.rightPad = rPadl1-1;
-			prints.reverse = false;
+		prints.reverse = rev;
 
+		if (i > 0) {
 			// chex pattern
-			gs1_printElmnts(ctx, &chexPrnts);
+			gs1_driverAddRow(ctx, &chexPrnts);
+		}
 
-			// bottom complement separator
+		if ((i > 0) || (ccFlag)) {
+			// CC or lower complement separator
 			prntCnv = gs1_cnvSeparator(ctx, &prints);
-			gs1_printElmnts(ctx, prntCnv);
-
-			// bottom right offset RSS E row
-			gs1_printElmnts(ctx, &prints);
+			gs1_driverAddRow(ctx, prntCnv);
 		}
-		else {
-			// otherwise normal row
-			prints.leftPad = 0;
-			prints.rightPad = rPadl1;
-			prints.reverse = rev;
 
-			if (i > 0) {
-				// chex pattern
-				gs1_printElmnts(ctx, &chexPrnts);
-			}
+		// upper RSS row
+		gs1_driverAddRow(ctx, &prints);
 
-			if ((i > 0) || (ccFlag)) {
-				// CC or lower complement separator
-				prntCnv = gs1_cnvSeparator(ctx, &prints);
-				gs1_printElmnts(ctx, prntCnv);
-			}
+		// upper complement separator
+		prntCnv = gs1_cnvSeparator(ctx, &prints);
+		gs1_driverAddRow(ctx, prntCnv);
 
-			// bottom right offset RSS E row
-			gs1_printElmnts(ctx, &prints);
-		}
 		evenRow = !evenRow;
 	}
+
+	// print last or only RSS Expanded row
+	lNdx1 = ((segs/2)*(8+5+8)+(segs&1)*(8+5)) - ((i/2)*(8+5+8)+(i&1)*8);
+	rPadl1 = lMods - 4 -
+		(((segs/2)*(17+15+17)+(segs&1)*(17+15)) - ((i/2)*(17+15+17)+(i&1)*17));
+	prints.elmCnt = lNdx1;
+	prints.pattern = &linPattern[(i/2)*(8+5+8)+(i&1)*8];
+	prints.whtFirst = (i/2+1)&1;
+	rev = evenRow ^ ((i/2)&1);
+	if (rev && (((lNdx1-4)%8)&1)) {
+		// can't reverse odd # finders so offset it right by one
+		prints.leftPad = 1;
+		prints.rightPad = rPadl1-1;
+		prints.reverse = false;
+
+		// chex pattern
+		gs1_driverAddRow(ctx, &chexPrnts);
+
+		// bottom complement separator
+		prntCnv = gs1_cnvSeparator(ctx, &prints);
+		gs1_driverAddRow(ctx, prntCnv);
+
+		// bottom right offset RSS E row
+		gs1_driverAddRow(ctx, &prints);
+	}
+	else {
+		// otherwise normal row
+		prints.leftPad = 0;
+		prints.rightPad = rPadl1;
+		prints.reverse = rev;
+
+		if (i > 0) {
+			// chex pattern
+			gs1_driverAddRow(ctx, &chexPrnts);
+		}
+
+		if ((i > 0) || (ccFlag)) {
+			// CC or lower complement separator
+			prntCnv = gs1_cnvSeparator(ctx, &prints);
+			gs1_driverAddRow(ctx, prntCnv);
+		}
+
+		// bottom right offset RSS E row
+		gs1_driverAddRow(ctx, &prints);
+	}
+	evenRow = !evenRow;
+
+	gs1_driverFinalise(ctx);
+
 	return;
 }

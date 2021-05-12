@@ -35,8 +35,8 @@ struct sPrints;
 #define min(X,Y) (((X) < (Y)) ? (X) : (Y))
 #define max(X,Y) (((X) > (Y)) ? (X) : (Y))
 
-void gs1_bmpHeader(long xdim, long ydim, FILE *oFile);
-void gs1_tifHeader(long xdim, long ydim, FILE *oFile);
-void gs1_printElmnts(gs1_encoder *ctx, struct sPrints *prints);
+bool gs1_driverInit(gs1_encoder *ctx, long xdim, long ydim);
+bool gs1_driverAddRow(gs1_encoder *ctx, struct sPrints *prints);
+void gs1_driverFinalise(gs1_encoder *ctx);
 
 #endif /* UTIL_H */

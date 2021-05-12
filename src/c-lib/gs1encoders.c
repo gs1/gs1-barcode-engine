@@ -318,7 +318,7 @@ GS1_ENCODERS_API char* gs1_encoder_getErrMsg(gs1_encoder *ctx) {
 
 GS1_ENCODERS_API bool gs1_encoder_encode(gs1_encoder *ctx) {
 
-	FILE *iFile, *oFile;
+	FILE *iFile;
 
 	assert(ctx);
 	reset_error(ctx);
@@ -335,13 +335,6 @@ GS1_ENCODERS_API bool gs1_encoder_encode(gs1_encoder *ctx) {
 		ctx->dataStr[i] = '\0';
 		fclose(iFile);
 	}
-
-	if ((oFile = fopen(ctx->outFile, "wb")) == NULL) {
-		sprintf(ctx->errMsg, "UNABLE TO OPEN %s FILE", ctx->outFile);
-		ctx->errFlag = true;
-		return false;
-	}
-	ctx->outfp = oFile;
 
 	switch (ctx->sym) {
 
@@ -393,8 +386,6 @@ GS1_ENCODERS_API bool gs1_encoder_encode(gs1_encoder *ctx) {
 			break;
 
 	}
-
-	fclose(oFile);
 
 	return !ctx->errFlag;
 

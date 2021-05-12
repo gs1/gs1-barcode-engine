@@ -437,66 +437,42 @@ void gs1_RSS14(gs1_encoder *ctx) {
 			}
 		}
 #endif
-		if (ctx->bmp) {
-			// note: BMP is bottom to top inverted
-			gs1_bmpHeader(ctx->pixMult*CCB4_WIDTH,
-					ctx->pixMult*(rows*2+symHt) + ctx->sepHt, ctx->outfp);
+		if (!gs1_driverInit(ctx, ctx->pixMult*CCB4_WIDTH,
+				ctx->pixMult*(rows*2+symHt) + ctx->sepHt))
+			return;
 
-			// RSS-14
-			prints.leftPad = RSS14_L_PADR;
-			gs1_printElmnts(ctx, &prints);
-
-			// CC separator
-			prntCnv = gs1_cnvSeparator(ctx, &prints);
-			gs1_printElmnts(ctx, prntCnv);
-
-			// Composite Component
-			prints.elmCnt = CCB4_ELMNTS;
-			prints.guards = false;
-			prints.height = ctx->pixMult*2;
-			prints.leftPad = 0;
-			for (i = rows-1; i >= 0; i--) {
-				prints.pattern = ccPattern[i];
-				gs1_printElmnts(ctx, &prints);
-			}
+		// Composite Component
+		prints.elmCnt = CCB4_ELMNTS;
+		prints.guards = false;
+		prints.height = ctx->pixMult*2;
+		for (i = 0; i < rows; i++) {
+			prints.pattern = ccPattern[i];
+			gs1_driverAddRow(ctx, &prints);
 		}
-		else {
-			gs1_tifHeader(ctx->pixMult*CCB4_WIDTH,
-					ctx->pixMult*(rows*2+symHt) + ctx->sepHt, ctx->outfp);
 
-			// Composite Component
-			prints.elmCnt = CCB4_ELMNTS;
-			prints.guards = false;
-			prints.height = ctx->pixMult*2;
-			for (i = 0; i < rows; i++) {
-				prints.pattern = ccPattern[i];
-				gs1_printElmnts(ctx, &prints);
-			}
+		prints.elmCnt = RSS14_ELMNTS;
+		prints.pattern = linPattern;
+		prints.guards = true;
+		prints.height = ctx->pixMult*symHt;
+		prints.leftPad = RSS14_L_PADR;
 
-			prints.elmCnt = RSS14_ELMNTS;
-			prints.pattern = linPattern;
-			prints.guards = true;
-			prints.height = ctx->pixMult*symHt;
-			prints.leftPad = RSS14_L_PADR;
-
-			// CC separator
-			prntCnv = gs1_cnvSeparator(ctx, &prints);
-			gs1_printElmnts(ctx, prntCnv);
-
-			// RSS-14
-			gs1_printElmnts(ctx, &prints);
-		}
-	}
-	else { // primary only
-		if (ctx->bmp) {
-			gs1_bmpHeader(ctx->pixMult*RSS14_SYM_W, ctx->pixMult*symHt, ctx->outfp);
-		}
-		else {
-			gs1_tifHeader(ctx->pixMult*RSS14_SYM_W, ctx->pixMult*symHt, ctx->outfp);
-		}
+		// CC separator
+		prntCnv = gs1_cnvSeparator(ctx, &prints);
+		gs1_driverAddRow(ctx, prntCnv);
 
 		// RSS-14
-		gs1_printElmnts(ctx, &prints);
+		gs1_driverAddRow(ctx, &prints);
+
+		gs1_driverFinalise(ctx);
+	}
+	else { // primary only
+		if (!gs1_driverInit(ctx, ctx->pixMult*RSS14_SYM_W, ctx->pixMult*symHt))
+			return;
+
+		// RSS-14
+		gs1_driverAddRow(ctx, &prints);
+
+		gs1_driverFinalise(ctx);
 	}
 	return;
 }
@@ -569,119 +545,64 @@ void gs1_RSS14S(gs1_encoder *ctx) {
 		}
 #endif
 
-		if (ctx->bmp) {
-			// note: BMP is bottom to top inverted
-			gs1_bmpHeader(ctx->pixMult*(CCB2_WIDTH),
-				ctx->pixMult*(rows*2+RSS14_ROWS1_H+RSS14_ROWS2_H) + 2*ctx->sepHt, ctx->outfp);
+		if (!gs1_driverInit(ctx, ctx->pixMult*(CCB2_WIDTH),
+				ctx->pixMult*(rows*2+RSS14_ROWS1_H+RSS14_ROWS2_H) + 2*ctx->sepHt))
+			return;
 
-			// RSS14S lower row
-			prints.height = ctx->pixMult*RSS14_ROWS2_H;
-			prints.pattern = &linPattern[RSS14_ELMNTS/2];
-			prints.rightPad = RSS14_R_PADR;
-			prints.whtFirst = false;
-			gs1_printElmnts(ctx, &prints);
-
-			// RSS14S separator pattern
-			prints.pattern = linPattern;
-			prntCnv = separator14S(ctx, &prints);
-			gs1_printElmnts(ctx, prntCnv);
-
-			// RSS14S upper row
-			prints.whtFirst = true;
-			prints.height = ctx->pixMult*RSS14_ROWS1_H;
-			gs1_printElmnts(ctx, &prints);
-
-			// CC separator
-			prntCnv = gs1_cnvSeparator(ctx, &prints);
-			gs1_printElmnts(ctx, prntCnv);
-
-			// Composite Component
-			prints.elmCnt = CCB2_ELMNTS;
-			prints.guards = false;
-			prints.height = ctx->pixMult*2;
-			prints.rightPad = 0;
-			for (i = rows-1; i >= 0; i--) {
-				prints.pattern = ccPattern[i];
-				gs1_printElmnts(ctx, &prints);
-			}
+		// Composite Component
+		prints.elmCnt = CCB2_ELMNTS;
+		prints.guards = false;
+		prints.height = ctx->pixMult*2;
+		for (i = 0; i < rows; i++) {
+			prints.pattern = ccPattern[i];
+			gs1_driverAddRow(ctx, &prints);
 		}
-		else {
-			gs1_tifHeader(ctx->pixMult*(CCB2_WIDTH),
-					ctx->pixMult*(rows*2+RSS14_ROWS1_H+RSS14_ROWS2_H) + 2*ctx->sepHt, ctx->outfp);
 
-			// Composite Component
-			prints.elmCnt = CCB2_ELMNTS;
-			prints.guards = false;
-			prints.height = ctx->pixMult*2;
-			for (i = 0; i < rows; i++) {
-				prints.pattern = ccPattern[i];
-				gs1_printElmnts(ctx, &prints);
-			}
+		// CC separator
+		prints.elmCnt = RSS14_ELMNTS/2;
+		prints.pattern = linPattern;
+		prints.rightPad = RSS14_R_PADR;
+		prntCnv = gs1_cnvSeparator(ctx, &prints);
+		gs1_driverAddRow(ctx, prntCnv);
 
-			// CC separator
-			prints.elmCnt = RSS14_ELMNTS/2;
-			prints.pattern = linPattern;
-			prints.rightPad = RSS14_R_PADR;
-			prntCnv = gs1_cnvSeparator(ctx, &prints);
-			gs1_printElmnts(ctx, prntCnv);
+		// RSS14S upper row
+		prints.guards = true;
+		prints.height = ctx->pixMult*RSS14_ROWS1_H;
+		gs1_driverAddRow(ctx, &prints);
 
-			// RSS14S upper row
-			prints.guards = true;
-			prints.height = ctx->pixMult*RSS14_ROWS1_H;
-			gs1_printElmnts(ctx, &prints);
+		// RSS14S separator pattern
+		prntCnv = separator14S(ctx, &prints);
+		gs1_driverAddRow(ctx, prntCnv);
 
-			// RSS14S separator pattern
-			prntCnv = separator14S(ctx, &prints);
-			gs1_printElmnts(ctx, prntCnv);
+		// RSS14S lower row
+		prints.height = ctx->pixMult*RSS14_ROWS2_H;
+		prints.pattern = &linPattern[RSS14_ELMNTS/2];
+		prints.whtFirst = false;
+		gs1_driverAddRow(ctx, &prints);
 
-			// RSS14S lower row
-			prints.height = ctx->pixMult*RSS14_ROWS2_H;
-			prints.pattern = &linPattern[RSS14_ELMNTS/2];
-			prints.whtFirst = false;
-			gs1_printElmnts(ctx, &prints);
-		}
+		gs1_driverFinalise(ctx);
 	}
 	else { // primary only
-		if (ctx->bmp) {
-			gs1_bmpHeader(ctx->pixMult*(RSS14_SYM_W/2+2),
-				ctx->pixMult*(RSS14_ROWS1_H+RSS14_ROWS2_H) + ctx->sepHt, ctx->outfp);
+		if (!gs1_driverInit(ctx, ctx->pixMult*(RSS14_SYM_W/2+2),
+				ctx->pixMult*(RSS14_ROWS1_H+RSS14_ROWS2_H) + ctx->sepHt))
+			return;
 
+		// RSS14S upper row
+		prints.pattern = linPattern;
+		prints.height = ctx->pixMult*RSS14_ROWS1_H;
+		gs1_driverAddRow(ctx, &prints);
 
-			// RSS14S lower row
-			prints.height = ctx->pixMult*RSS14_ROWS2_H;
-			prints.pattern = &linPattern[RSS14_ELMNTS/2];
-			prints.whtFirst = false;
-			gs1_printElmnts(ctx, &prints);
+		// RSS14S separator pattern
+		prntCnv = separator14S(ctx, &prints);
+		gs1_driverAddRow(ctx, prntCnv);
 
-			// RSS14S separator pattern
-			prints.pattern = linPattern;
-			prntCnv = separator14S(ctx, &prints);
-			gs1_printElmnts(ctx, prntCnv);
+		// RSS14S lower row
+		prints.pattern = &linPattern[RSS14_ELMNTS/2];
+		prints.height = ctx->pixMult*RSS14_ROWS2_H;
+		prints.whtFirst = false;
+		gs1_driverAddRow(ctx, &prints);
 
-			// RSS14S upper row
-			prints.whtFirst = true;
-			prints.height = ctx->pixMult*RSS14_ROWS1_H;
-			gs1_printElmnts(ctx, &prints);
-		}
-		else {
-			gs1_tifHeader(ctx->pixMult*(RSS14_SYM_W/2+2),
-					ctx->pixMult*(RSS14_ROWS1_H+RSS14_ROWS2_H) + ctx->sepHt, ctx->outfp);
-
-			// RSS14S upper row
-			prints.pattern = linPattern;
-			prints.height = ctx->pixMult*RSS14_ROWS1_H;
-			gs1_printElmnts(ctx, &prints);
-
-			// RSS14S separator pattern
-			prntCnv = separator14S(ctx, &prints);
-			gs1_printElmnts(ctx, prntCnv);
-
-			// RSS14S lower row
-			prints.pattern = &linPattern[RSS14_ELMNTS/2];
-			prints.height = ctx->pixMult*RSS14_ROWS2_H;
-			prints.whtFirst = false;
-			gs1_printElmnts(ctx, &prints);
-		}
+		gs1_driverFinalise(ctx);
 	}
 	return;
 }
@@ -769,145 +690,78 @@ void gs1_RSS14SO(gs1_encoder *ctx) {
 		}
 #endif
 
-		if (ctx->bmp) {
-			// note: BMP is bottom to top inverted
-			gs1_bmpHeader(ctx->pixMult*(CCB2_WIDTH),
-				ctx->pixMult*(rows*2+RSS14_SYM_H*2) + 4*ctx->sepHt, ctx->outfp);
+		if (!gs1_driverInit(ctx, ctx->pixMult*(CCB2_WIDTH),
+			ctx->pixMult*(rows*2+RSS14_SYM_H*2) + 4*ctx->sepHt))
+			return;
 
-			// RSS14SO lower row
-			prints.height = ctx->pixMult*RSS14_SYM_H;
-			prints.pattern = &linPattern[RSS14_ELMNTS/2];
-			prints.rightPad = RSS14_R_PADR;
-			prints.whtFirst = false;
-			gs1_printElmnts(ctx, &prints);
-
-			// RSS14SO lower row separator pattern
-			prntCnv = gs1_cnvSeparator(ctx, &prints);
-			gs1_printElmnts(ctx, prntCnv);
-
-			// chex pattern
-			gs1_printElmnts(ctx, &chexPrnts);
-
-			// RSS14SO upper row separator pattern
-			prints.pattern = linPattern;
-			prints.whtFirst = true;
-			prntCnv = gs1_cnvSeparator(ctx, &prints);
-			gs1_printElmnts(ctx, prntCnv);
-
-			// RSS14SO upper row
-			gs1_printElmnts(ctx, &prints);
-
-			// CC separator
-			prntCnv = gs1_cnvSeparator(ctx, &prints);
-			gs1_printElmnts(ctx, prntCnv);
-
-			// Composite Component
-			prints.elmCnt = CCB2_ELMNTS;
-			prints.guards = false;
-			prints.height = ctx->pixMult*2;
-			prints.rightPad = 0;
-			for (i = rows-1; i >= 0; i--) {
-				prints.pattern = ccPattern[i];
-				gs1_printElmnts(ctx, &prints);
-			}
+		// Composite Component
+		prints.elmCnt = CCB2_ELMNTS;
+		prints.guards = false;
+		prints.height = ctx->pixMult*2;
+		for (i = 0; i < rows; i++) {
+			prints.pattern = ccPattern[i];
+			gs1_driverAddRow(ctx, &prints);
 		}
-		else {
-			gs1_tifHeader(ctx->pixMult*(CCB2_WIDTH),
-				ctx->pixMult*(rows*2+RSS14_SYM_H*2) + 4*ctx->sepHt, ctx->outfp);
 
-			// Composite Component
-			prints.elmCnt = CCB2_ELMNTS;
-			prints.guards = false;
-			prints.height = ctx->pixMult*2;
-			for (i = 0; i < rows; i++) {
-				prints.pattern = ccPattern[i];
-				gs1_printElmnts(ctx, &prints);
-			}
+		// CC separator
+		prints.elmCnt = RSS14_ELMNTS/2;
+		prints.pattern = linPattern;
+		prints.rightPad = RSS14_R_PADR;
+		prntCnv = gs1_cnvSeparator(ctx, &prints);
+		gs1_driverAddRow(ctx, prntCnv);
 
-			// CC separator
-			prints.elmCnt = RSS14_ELMNTS/2;
-			prints.pattern = linPattern;
-			prints.rightPad = RSS14_R_PADR;
-			prntCnv = gs1_cnvSeparator(ctx, &prints);
-			gs1_printElmnts(ctx, prntCnv);
+		// RSS14SO upper row
+		prints.guards = true;
+		prints.height = ctx->pixMult*RSS14_SYM_H;
+		gs1_driverAddRow(ctx, &prints);
 
-			// RSS14SO upper row
-			prints.guards = true;
-			prints.height = ctx->pixMult*RSS14_SYM_H;
-			gs1_printElmnts(ctx, &prints);
+		// RSS14SO upper row separator pattern
+		prntCnv = gs1_cnvSeparator(ctx, &prints);
+		gs1_driverAddRow(ctx, prntCnv);
 
-			// RSS14SO upper row separator pattern
-			prntCnv = gs1_cnvSeparator(ctx, &prints);
-			gs1_printElmnts(ctx, prntCnv);
+		// chex pattern
+		gs1_driverAddRow(ctx, &chexPrnts);
 
-			// chex pattern
-			gs1_printElmnts(ctx, &chexPrnts);
+		// RSS14SO lower row separator pattern
+		prints.pattern = &linPattern[RSS14_ELMNTS/2];
+		prints.whtFirst = false;
+		prntCnv = gs1_cnvSeparator(ctx, &prints);
+		gs1_driverAddRow(ctx, prntCnv);
 
-			// RSS14SO lower row separator pattern
-			prints.pattern = &linPattern[RSS14_ELMNTS/2];
-			prints.whtFirst = false;
-			prntCnv = gs1_cnvSeparator(ctx, &prints);
-			gs1_printElmnts(ctx, prntCnv);
+		// RSS14SO lower row
+		prints.height = ctx->pixMult*RSS14_SYM_H;
+		gs1_driverAddRow(ctx, &prints);
 
-			// RSS14SO lower row
-			prints.height = ctx->pixMult*RSS14_SYM_H;
-			gs1_printElmnts(ctx, &prints);
-		}
+		gs1_driverFinalise(ctx);
 	}
 	else { // primary only
-		if (ctx->bmp) {
-			gs1_bmpHeader(ctx->pixMult*(RSS14_SYM_W/2+2),
-				ctx->pixMult*(RSS14_SYM_H*2) + 3*ctx->sepHt, ctx->outfp);
+		if (!gs1_driverInit(ctx, ctx->pixMult*(RSS14_SYM_W/2+2),
+			ctx->pixMult*(RSS14_SYM_H*2) + 3*ctx->sepHt))
+			return;
 
-			// RSS14SO lower row
-			prints.height = ctx->pixMult*RSS14_SYM_H;
-			prints.pattern = &linPattern[RSS14_ELMNTS/2];
-			prints.whtFirst = false;
-			gs1_printElmnts(ctx, &prints);
+		// RSS14SO upper row
+		prints.pattern = linPattern;
+		prints.height = ctx->pixMult*RSS14_SYM_H;
+		gs1_driverAddRow(ctx, &prints);
 
-			// RSS14SO lower row separator pattern
-			prntCnv = gs1_cnvSeparator(ctx, &prints);
-			gs1_printElmnts(ctx, prntCnv);
+		// RSS14SO upper row separator pattern
+		prntCnv = gs1_cnvSeparator(ctx, &prints);
+		gs1_driverAddRow(ctx, prntCnv);
 
-			// chex pattern
-			gs1_printElmnts(ctx, &chexPrnts);
+		// chex pattern
+		gs1_driverAddRow(ctx, &chexPrnts);
 
-			// RSS14SO upper row separator pattern
-			prints.pattern = linPattern;
-			prints.whtFirst = true;
-			prntCnv = gs1_cnvSeparator(ctx, &prints);
-			gs1_printElmnts(ctx, prntCnv);
+		// RSS14SO lower row separator pattern
+		prints.pattern = &linPattern[RSS14_ELMNTS/2];
+		prints.whtFirst = false;
+		prntCnv = gs1_cnvSeparator(ctx, &prints);
+		gs1_driverAddRow(ctx, prntCnv);
 
-			// RSS14SO upper row
-			prints.height = ctx->pixMult*RSS14_SYM_H;
-			gs1_printElmnts(ctx, &prints);
-		}
-		else {
-			gs1_tifHeader(ctx->pixMult*(RSS14_SYM_W/2+2),
-				ctx->pixMult*(RSS14_SYM_H*2) + 3*ctx->sepHt, ctx->outfp);
+		// RSS14SO lower row
+		prints.height = ctx->pixMult*RSS14_SYM_H;
+		gs1_driverAddRow(ctx, &prints);
 
-			// RSS14SO upper row
-			prints.pattern = linPattern;
-			prints.height = ctx->pixMult*RSS14_SYM_H;
-			gs1_printElmnts(ctx, &prints);
-
-			// RSS14SO upper row separator pattern
-			prntCnv = gs1_cnvSeparator(ctx, &prints);
-			gs1_printElmnts(ctx, prntCnv);
-
-			// chex pattern
-			gs1_printElmnts(ctx, &chexPrnts);
-
-			// RSS14SO lower row separator pattern
-			prints.pattern = &linPattern[RSS14_ELMNTS/2];
-			prints.whtFirst = false;
-			prntCnv = gs1_cnvSeparator(ctx, &prints);
-			gs1_printElmnts(ctx, prntCnv);
-
-			// RSS14SO lower row
-			prints.height = ctx->pixMult*RSS14_SYM_H;
-			gs1_printElmnts(ctx, &prints);
-		}
+		gs1_driverFinalise(ctx);
 	}
 	return;
 }

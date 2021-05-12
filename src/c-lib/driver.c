@@ -20,13 +20,14 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "enc-private.h"
 #include "driver.h"
 
 
-void gs1_bmpHeader(long xdim, long ydim, FILE *oFile) {
+static void bmpHeader(long xdim, long ydim, FILE *oFile) {
 
 	uint8_t id[2] = {'B','M'};
 	struct b_hdr {
@@ -60,7 +61,7 @@ void gs1_bmpHeader(long xdim, long ydim, FILE *oFile) {
 }
 
 
-void gs1_tifHeader(long xdim, long ydim, FILE *oFile) {
+static void tifHeader(long xdim, long ydim, FILE *oFile) {
 
 	struct t_hdr {
 		uint8_t endian[2];
@@ -153,7 +154,7 @@ static void printElm(gs1_encoder *ctx, int width, int color, int *bits, int *ndx
 
 #define WHITE 0
 
-void gs1_printElmnts(gs1_encoder *ctx, struct sPrints *prints) {
+static void printElmnts(gs1_encoder *ctx, struct sPrints *prints) {
 
 	int i, bits, width, ndx, white;
 	uint8_t xorMsk;
@@ -267,4 +268,86 @@ void gs1_printElmnts(gs1_encoder *ctx, struct sPrints *prints) {
 		fwrite(line, sizeof(uint8_t), (size_t)ndx, ctx->outfp);
 	}
 	return;
+}
+
+bool gs1_driverInit(gs1_encoder *ctx, long xdim, long ydim) {
+
+	FILE* oFile;
+
+	if (ctx->bmp) {
+		if ((oFile = fopen(ctx->outFile, "wb")) == NULL) {
+			sprintf(ctx->errMsg, "Unable to open file: %s", ctx->outFile);
+			ctx->errFlag = true;
+			return false;
+		}
+		ctx->outfp = oFile;
+
+		if ((ctx->driver_rowBuffer = malloc((unsigned long)ydim * sizeof(struct sPrints))) == NULL) {
+			strcpy(ctx->errMsg, "Out of memory");
+			ctx->errFlag = true;
+			return false;
+		}
+		ctx->driver_numRows = 0;
+
+		bmpHeader(xdim, ydim, ctx->outfp);
+	} else {
+		if ((oFile = fopen(ctx->outFile, "wb")) == NULL) {
+			sprintf(ctx->errMsg, "Unable to open file: %s", ctx->outFile);
+			ctx->errFlag = true;
+			return false;
+		}
+		ctx->outfp = oFile;
+
+		tifHeader(xdim, ydim, ctx->outfp);
+	}
+
+	return true;
+
+}
+
+
+bool gs1_driverAddRow(gs1_encoder *ctx, struct sPrints *prints) {
+
+	struct sPrints *row = &ctx->driver_rowBuffer[ctx->driver_numRows++];
+
+	if (ctx->bmp) {
+
+		// Buffer the row and its pattern
+		memcpy(row, prints, sizeof(struct sPrints));
+		if ((row->pattern = malloc((unsigned int)prints->elmCnt * sizeof(uint8_t))) == NULL) {
+			strcpy(ctx->errMsg, "Out of memory");
+			ctx->errFlag = true;
+			return false;
+		}
+		memcpy(row->pattern, prints->pattern, (unsigned int)prints->elmCnt * sizeof(uint8_t));
+
+	} else {
+		// Directly emit the row
+		printElmnts(ctx, prints);
+	}
+
+	return true;
+
+}
+
+
+void gs1_driverFinalise(gs1_encoder *ctx) {
+
+	int i;
+
+	if (ctx->bmp) {
+		// Emit the rows in reverse, releasing their patterns
+		for (i = ctx->driver_numRows - 1; i >= 0; i--) {
+			printElmnts(ctx, &ctx->driver_rowBuffer[i]);
+			free(ctx->driver_rowBuffer[i].pattern);
+		}
+
+		free(ctx->driver_rowBuffer);
+		ctx->driver_rowBuffer = NULL;
+
+		fclose(ctx->outfp);
+	} else {
+		fclose(ctx->outfp);
+	}
+
 }

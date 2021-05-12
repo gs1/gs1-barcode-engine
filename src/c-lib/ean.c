@@ -33,8 +33,8 @@
 #define EAN13_W		109 	// includes 7X quiet zones
 #define EAN13_H		74	// total ht in x
 
-#define EAN13_L_PAD 3		// EAN-13 7-X qz - CCA-2 3 offset
-#define EAN13_R_PAD 5		// EAN-13 WIDTH - MAX_WIDTH - EAN13_L_PAD
+#define EAN13_L_PAD	3	// EAN-13 7-X qz - CCA-2 3 offset
+#define EAN13_R_PAD	5	// EAN-13 WIDTH - MAX_WIDTH - EAN13_L_PAD
 
 // call with str = 13-digit primary with check digit = 0
 static bool EAN13enc(uint8_t str[], uint8_t pattern[] ) {
@@ -174,69 +174,45 @@ void gs1_EAN13(gs1_encoder *ctx) {
 		}
 #endif
 
-		if (ctx->bmp) {
-			// note: BMP is bottom to top inverted
-			gs1_bmpHeader(ctx->pixMult*EAN13_W, ctx->pixMult*(rows*2 + 6 + EAN13_H), ctx->outfp);
+		if (!gs1_driverInit(ctx, ctx->pixMult*EAN13_W, ctx->pixMult*(rows*2 + 6 + EAN13_H)))
+			return;
 
-			// EAN-13
-			gs1_printElmnts(ctx, &prints);
-
-			// CC separator
-			gs1_printElmnts(ctx, &sepPrnt);
-			sepPrnt.pattern = sepPat2;
-			gs1_printElmnts(ctx, &sepPrnt);
-			sepPrnt.pattern = sepPat1;
-			gs1_printElmnts(ctx, &sepPrnt);
-
-			// Composite Component
-			prints.elmCnt = CCB4_ELMNTS;
-			prints.height = ctx->pixMult*2;
-			prints.leftPad = EAN13_L_PAD;
-			prints.rightPad = EAN13_R_PAD;
-			for (i = rows-1; i >= 0; i--) {
-				prints.pattern = ccPattern[i];
-				gs1_printElmnts(ctx, &prints);
-			}
+		// Composite Component
+		prints.elmCnt = CCB4_ELMNTS;
+		prints.height = ctx->pixMult*2;
+		prints.leftPad = EAN13_L_PAD;
+		prints.rightPad = EAN13_R_PAD;
+		for (i = 0; i < rows; i++) {
+			prints.pattern = ccPattern[i];
+			gs1_driverAddRow(ctx, &prints);
 		}
-		else {
-			gs1_tifHeader(ctx->pixMult*EAN13_W, ctx->pixMult*(rows*2 + 6 + EAN13_H), ctx->outfp);
 
-			// Composite Component
-			prints.elmCnt = CCB4_ELMNTS;
-			prints.height = ctx->pixMult*2;
-			prints.leftPad = EAN13_L_PAD;
-			prints.rightPad = EAN13_R_PAD;
-			for (i = 0; i < rows; i++) {
-				prints.pattern = ccPattern[i];
-				gs1_printElmnts(ctx, &prints);
-			}
-
-			// CC separator
-			gs1_printElmnts(ctx, &sepPrnt);
-			sepPrnt.pattern = sepPat2;
-			gs1_printElmnts(ctx, &sepPrnt);
-			sepPrnt.pattern = sepPat1;
-			gs1_printElmnts(ctx, &sepPrnt);
-
-			// EAN-13
-			prints.elmCnt = EAN13_ELMNTS;
-			prints.pattern = linPattern;
-			prints.height = ctx->pixMult*EAN13_H;
-			prints.leftPad = 0;
-			prints.rightPad = 0;
-			gs1_printElmnts(ctx, &prints);
-		}
-	}
-	else { // primary only
-		if (ctx->bmp) {
-			gs1_bmpHeader(ctx->pixMult*EAN13_W, ctx->pixMult*EAN13_H, ctx->outfp);
-		}
-		else {
-			gs1_tifHeader(ctx->pixMult*EAN13_W, ctx->pixMult*EAN13_H, ctx->outfp);
-		}
+		// CC separator
+		gs1_driverAddRow(ctx, &sepPrnt);
+		sepPrnt.pattern = sepPat2;
+		gs1_driverAddRow(ctx, &sepPrnt);
+		sepPrnt.pattern = sepPat1;
+		gs1_driverAddRow(ctx, &sepPrnt);
 
 		// EAN-13
-		gs1_printElmnts(ctx, &prints);
+		prints.elmCnt = EAN13_ELMNTS;
+		prints.pattern = linPattern;
+		prints.height = ctx->pixMult*EAN13_H;
+		prints.leftPad = 0;
+		prints.rightPad = 0;
+		gs1_driverAddRow(ctx, &prints);
+
+		gs1_driverFinalise(ctx);
+
+	}
+	else { // primary only
+		if (!gs1_driverInit(ctx, ctx->pixMult*EAN13_W, ctx->pixMult*EAN13_H))
+			return;
+
+		// EAN-13
+		gs1_driverAddRow(ctx, &prints);
+
+		gs1_driverFinalise(ctx);
 	}
 	return;
 }
@@ -392,69 +368,44 @@ void gs1_EAN8(gs1_encoder *ctx) {
 		}
 #endif
 
-		if (ctx->bmp) {
-			// note: BMP is bottom to top inverted
-			gs1_bmpHeader(ctx->pixMult*(EAN8_W+lpadEAN), ctx->pixMult*(rows*2 + 6 + EAN8_H), ctx->outfp);
+		if (!gs1_driverInit(ctx, ctx->pixMult*(EAN8_W+lpadEAN), ctx->pixMult*(rows*2 + 6 + EAN8_H)))
+			return;
 
-			// EAN-8
-			gs1_printElmnts(ctx, &prints);
-
-			// CC separator
-			gs1_printElmnts(ctx, &sepPrnt);
-			sepPrnt.pattern = sepPat2;
-			gs1_printElmnts(ctx, &sepPrnt);
-			sepPrnt.pattern = sepPat1;
-			gs1_printElmnts(ctx, &sepPrnt);
-
-			// Composite Component
-			prints.elmCnt = elmntsCC;
-			prints.height = ctx->pixMult*2;
-			prints.leftPad = lpadCC;
-			prints.rightPad = EAN8_R_PAD;
-			for (i = rows-1; i >= 0; i--) {
-				prints.pattern = ccPattern[i];
-				gs1_printElmnts(ctx, &prints);
-			}
+		// Composite Component
+		prints.elmCnt = elmntsCC;
+		prints.height = ctx->pixMult*2;
+		prints.leftPad = lpadCC;
+		prints.rightPad = EAN8_R_PAD;
+		for (i = 0; i < rows; i++) {
+			prints.pattern = ccPattern[i];
+			gs1_driverAddRow(ctx, &prints);
 		}
-		else {
-			gs1_tifHeader(ctx->pixMult*(EAN8_W+lpadEAN), ctx->pixMult*(rows*2 + 6 + EAN8_H), ctx->outfp);
 
-			// Composite Component
-			prints.elmCnt = elmntsCC;
-			prints.height = ctx->pixMult*2;
-			prints.leftPad = lpadCC;
-			prints.rightPad = EAN8_R_PAD;
-			for (i = 0; i < rows; i++) {
-				prints.pattern = ccPattern[i];
-				gs1_printElmnts(ctx, &prints);
-			}
-
-			// CC separator
-			gs1_printElmnts(ctx, &sepPrnt);
-			sepPrnt.pattern = sepPat2;
-			gs1_printElmnts(ctx, &sepPrnt);
-			sepPrnt.pattern = sepPat1;
-			gs1_printElmnts(ctx, &sepPrnt);
-
-			// EAN-8
-			prints.elmCnt = EAN8_ELMNTS;
-			prints.pattern = linPattern;
-			prints.height = ctx->pixMult*EAN8_H;
-			prints.leftPad = lpadEAN;
-			prints.rightPad = 0;
-			gs1_printElmnts(ctx, &prints);
-		}
-	}
-	else { // primary only
-		if (ctx->bmp) {
-			gs1_bmpHeader(ctx->pixMult*EAN8_W, ctx->pixMult*EAN8_H, ctx->outfp);
-		}
-		else {
-			gs1_tifHeader(ctx->pixMult*EAN8_W, ctx->pixMult*EAN8_H, ctx->outfp);
-		}
+		// CC separator
+		gs1_driverAddRow(ctx, &sepPrnt);
+		sepPrnt.pattern = sepPat2;
+		gs1_driverAddRow(ctx, &sepPrnt);
+		sepPrnt.pattern = sepPat1;
+		gs1_driverAddRow(ctx, &sepPrnt);
 
 		// EAN-8
-		gs1_printElmnts(ctx, &prints);
+		prints.elmCnt = EAN8_ELMNTS;
+		prints.pattern = linPattern;
+		prints.height = ctx->pixMult*EAN8_H;
+		prints.leftPad = lpadEAN;
+		prints.rightPad = 0;
+		gs1_driverAddRow(ctx, &prints);
+
+		gs1_driverFinalise(ctx);
+	}
+	else { // primary only
+		if (!gs1_driverInit(ctx, ctx->pixMult*EAN8_W, ctx->pixMult*EAN8_H))
+			return;
+
+		// EAN-8
+		gs1_driverAddRow(ctx, &prints);
+
+		gs1_driverFinalise(ctx);
 	}
 	return;
 }
@@ -637,69 +588,44 @@ void gs1_UPCE(gs1_encoder *ctx) {
 		}
 #endif
 
-		if (ctx->bmp) {
-			// note: BMP is bottom to top inverted
-			gs1_bmpHeader(ctx->pixMult*UPCE_W, ctx->pixMult*(rows*2 + 6 + UPCE_H), ctx->outfp);
+		if (!gs1_driverInit(ctx, ctx->pixMult*UPCE_W, ctx->pixMult*(rows*2 + 6 + UPCE_H)))
+			return;
 
-			// UPC-E
-			gs1_printElmnts(ctx, &prints);
-
-			// CC separator
-			gs1_printElmnts(ctx, &sepPrnt);
-			sepPrnt.pattern = sepPat2;
-			gs1_printElmnts(ctx, &sepPrnt);
-			sepPrnt.pattern = sepPat1;
-			gs1_printElmnts(ctx, &sepPrnt);
-
-			// Composite Component
-			prints.elmCnt = CCB2_ELMNTS;
-			prints.height = ctx->pixMult*2;
-			prints.leftPad = UPCE_L_PAD;
-			prints.rightPad = UPCE_R_PAD;
-			for (i = rows-1; i >= 0; i--) {
-				prints.pattern = ccPattern[i];
-				gs1_printElmnts(ctx, &prints);
-			}
+		// Composite Component
+		prints.elmCnt = CCB2_ELMNTS;
+		prints.height = ctx->pixMult*2;
+		prints.leftPad = UPCE_L_PAD;
+		prints.rightPad = UPCE_R_PAD;
+		for (i = 0; i < rows; i++) {
+			prints.pattern = ccPattern[i];
+			gs1_driverAddRow(ctx, &prints);
 		}
-		else {
-			gs1_tifHeader(ctx->pixMult*UPCE_W, ctx->pixMult*(rows*2 + 6 + UPCE_H), ctx->outfp);
 
-			// Composite Component
-			prints.elmCnt = CCB2_ELMNTS;
-			prints.height = ctx->pixMult*2;
-			prints.leftPad = UPCE_L_PAD;
-			prints.rightPad = UPCE_R_PAD;
-			for (i = 0; i < rows; i++) {
-				prints.pattern = ccPattern[i];
-				gs1_printElmnts(ctx, &prints);
-			}
-
-			// CC separator
-			gs1_printElmnts(ctx, &sepPrnt);
-			sepPrnt.pattern = sepPat2;
-			gs1_printElmnts(ctx, &sepPrnt);
-			sepPrnt.pattern = sepPat1;
-			gs1_printElmnts(ctx, &sepPrnt);
-
-			// UPC-E
-			prints.elmCnt = UPCE_ELMNTS;
-			prints.pattern = linPattern;
-			prints.height = ctx->pixMult*UPCE_H;
-			prints.leftPad = 0;
-			prints.rightPad = 0;
-			gs1_printElmnts(ctx, &prints);
-		}
-	}
-	else { // primary only
-		if (ctx->bmp) {
-			gs1_bmpHeader(ctx->pixMult*UPCE_W, ctx->pixMult*UPCE_H, ctx->outfp);
-		}
-		else {
-			gs1_tifHeader(ctx->pixMult*UPCE_W, ctx->pixMult*UPCE_H, ctx->outfp);
-		}
+		// CC separator
+		gs1_driverAddRow(ctx, &sepPrnt);
+		sepPrnt.pattern = sepPat2;
+		gs1_driverAddRow(ctx, &sepPrnt);
+		sepPrnt.pattern = sepPat1;
+		gs1_driverAddRow(ctx, &sepPrnt);
 
 		// UPC-E
-		gs1_printElmnts(ctx, &prints);
+		prints.elmCnt = UPCE_ELMNTS;
+		prints.pattern = linPattern;
+		prints.height = ctx->pixMult*UPCE_H;
+		prints.leftPad = 0;
+		prints.rightPad = 0;
+		gs1_driverAddRow(ctx, &prints);
+
+		gs1_driverFinalise(ctx);
+	}
+	else { // primary only
+		if (!gs1_driverInit(ctx, ctx->pixMult*UPCE_W, ctx->pixMult*UPCE_H))
+			return;
+
+		// UPC-E
+		gs1_driverAddRow(ctx, &prints);
+
+		gs1_driverFinalise(ctx);
 	}
 	return;
 }

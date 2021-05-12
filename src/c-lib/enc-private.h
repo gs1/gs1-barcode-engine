@@ -84,6 +84,8 @@ struct gs1_encoder {
 	int cc_gpa[512];
 	uint8_t driver_line[MAX_LINE/8 + 1];
 	uint8_t driver_lineUCut[MAX_LINE/8 + 1];
+	struct sPrints *driver_rowBuffer;
+	int driver_numRows;
 	struct sPrints rss14_prntSep;
 	uint8_t rss14_sepPattern[RSS14_SYM_W/2+2];
 	struct sPrints rsslim_prntSep;
