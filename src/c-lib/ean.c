@@ -174,8 +174,7 @@ void gs1_EAN13(gs1_encoder *ctx) {
 		}
 #endif
 
-		if (!gs1_driverInit(ctx, ctx->pixMult*EAN13_W, ctx->pixMult*(rows*2 + 6 + EAN13_H)))
-			return;
+		gs1_driverInit(ctx, ctx->pixMult*EAN13_W, ctx->pixMult*(rows*2 + 6 + EAN13_H));
 
 		// Composite Component
 		prints.elmCnt = CCB4_ELMNTS;
@@ -206,8 +205,7 @@ void gs1_EAN13(gs1_encoder *ctx) {
 
 	}
 	else { // primary only
-		if (!gs1_driverInit(ctx, ctx->pixMult*EAN13_W, ctx->pixMult*EAN13_H))
-			return;
+		gs1_driverInit(ctx, ctx->pixMult*EAN13_W, ctx->pixMult*EAN13_H);
 
 		// EAN-13
 		gs1_driverAddRow(ctx, &prints);
@@ -368,8 +366,7 @@ void gs1_EAN8(gs1_encoder *ctx) {
 		}
 #endif
 
-		if (!gs1_driverInit(ctx, ctx->pixMult*(EAN8_W+lpadEAN), ctx->pixMult*(rows*2 + 6 + EAN8_H)))
-			return;
+		gs1_driverInit(ctx, ctx->pixMult*(EAN8_W+lpadEAN), ctx->pixMult*(rows*2 + 6 + EAN8_H));
 
 		// Composite Component
 		prints.elmCnt = elmntsCC;
@@ -399,8 +396,7 @@ void gs1_EAN8(gs1_encoder *ctx) {
 		gs1_driverFinalise(ctx);
 	}
 	else { // primary only
-		if (!gs1_driverInit(ctx, ctx->pixMult*EAN8_W, ctx->pixMult*EAN8_H))
-			return;
+		gs1_driverInit(ctx, ctx->pixMult*EAN8_W, ctx->pixMult*EAN8_H);
 
 		// EAN-8
 		gs1_driverAddRow(ctx, &prints);
@@ -588,8 +584,7 @@ void gs1_UPCE(gs1_encoder *ctx) {
 		}
 #endif
 
-		if (!gs1_driverInit(ctx, ctx->pixMult*UPCE_W, ctx->pixMult*(rows*2 + 6 + UPCE_H)))
-			return;
+		gs1_driverInit(ctx, ctx->pixMult*UPCE_W, ctx->pixMult*(rows*2 + 6 + UPCE_H));
 
 		// Composite Component
 		prints.elmCnt = CCB2_ELMNTS;
@@ -619,8 +614,7 @@ void gs1_UPCE(gs1_encoder *ctx) {
 		gs1_driverFinalise(ctx);
 	}
 	else { // primary only
-		if (!gs1_driverInit(ctx, ctx->pixMult*UPCE_W, ctx->pixMult*UPCE_H))
-			return;
+		gs1_driverInit(ctx, ctx->pixMult*UPCE_W, ctx->pixMult*UPCE_H);
 
 		// UPC-E
 		gs1_driverAddRow(ctx, &prints);

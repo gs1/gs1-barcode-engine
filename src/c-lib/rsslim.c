@@ -366,9 +366,8 @@ void gs1_RSSLim(gs1_encoder *ctx) {
 #endif
 
 		if (rows <= MAX_CCA3_ROWS) { // CCA composite
-			if (!gs1_driverInit(ctx, ctx->pixMult*RSSLIM_SYM_W,
-					ctx->pixMult*(rows*2+RSSLIM_SYM_H) + ctx->sepHt))
-				return;
+			gs1_driverInit(ctx, ctx->pixMult*RSSLIM_SYM_W,
+					ctx->pixMult*(rows*2+RSSLIM_SYM_H) + ctx->sepHt);
 
 			// 2D composite
 			prints.elmCnt = CCA3_ELMNTS;
@@ -394,9 +393,8 @@ void gs1_RSSLim(gs1_encoder *ctx) {
 			gs1_driverFinalise(ctx);
 		}
 		else { // CCB composite, extends beyond RSS14L on left
-			if (!gs1_driverInit(ctx, ctx->pixMult*(RSSLIM_L_PADB+RSSLIM_SYM_W),
-					ctx->pixMult*(rows*2+RSSLIM_SYM_H) + ctx->sepHt))
-				return;
+			gs1_driverInit(ctx, ctx->pixMult*(RSSLIM_L_PADB+RSSLIM_SYM_W),
+					ctx->pixMult*(rows*2+RSSLIM_SYM_H) + ctx->sepHt);
 
 			// 2D composite
 			prints.elmCnt = CCB3_ELMNTS;
@@ -425,8 +423,7 @@ void gs1_RSSLim(gs1_encoder *ctx) {
 		}
 	}
 	else { // primary only
-		if (!gs1_driverInit(ctx, ctx->pixMult*RSSLIM_SYM_W, ctx->pixMult*RSSLIM_SYM_H))
-			return;
+		gs1_driverInit(ctx, ctx->pixMult*RSSLIM_SYM_W, ctx->pixMult*RSSLIM_SYM_H);
 
 		// RSS Limited row
 		gs1_driverAddRow(ctx, &prints);

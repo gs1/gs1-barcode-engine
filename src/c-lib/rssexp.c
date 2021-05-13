@@ -351,13 +351,11 @@ void gs1_RSSExp(gs1_encoder *ctx) {
 	}
 
 	if (ccFlag) {
-		if (!gs1_driverInit(ctx, ctx->pixMult*(lMods),
-				ctx->pixMult*rows*2 + ctx->sepHt + lHeight))
-			return;
+		gs1_driverInit(ctx, ctx->pixMult*(lMods),
+				ctx->pixMult*rows*2 + ctx->sepHt + lHeight);
 	}
 	else {
-		if (!gs1_driverInit(ctx, ctx->pixMult*lMods, lHeight))
-			return;
+		gs1_driverInit(ctx, ctx->pixMult*lMods, lHeight);
 	}
 
 	if (ccFlag) {

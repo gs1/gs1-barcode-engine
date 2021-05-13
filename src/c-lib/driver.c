@@ -271,7 +271,7 @@ static void printElmnts(gs1_encoder *ctx, struct sPrints *prints) {
 	return;
 }
 
-bool gs1_driverInit(gs1_encoder *ctx, long xdim, long ydim) {
+bool gs1_doDriverInit(gs1_encoder *ctx, long xdim, long ydim) {
 
 	FILE* oFile;
 
@@ -333,7 +333,7 @@ bool gs1_doDriverAddRow(gs1_encoder *ctx, struct sPrints *prints) {
 }
 
 
-void gs1_driverFinalise(gs1_encoder *ctx) {
+bool gs1_doDriverFinalise(gs1_encoder *ctx) {
 
 	int i;
 

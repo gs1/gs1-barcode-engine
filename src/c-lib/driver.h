@@ -36,13 +36,23 @@ struct sPrints;
 #define max(X,Y) (((X) > (Y)) ? (X) : (Y))
 
 // Syntactic sugar for return on failure
+#define gs1_driverInit(ctx, xdim, ydim) do {	\
+	if (!gs1_doDriverInit(ctx, xdim, ydim))	\
+		return;				\
+} while(0)
+
 #define gs1_driverAddRow(ctx, prints) do {	\
 	if (!gs1_doDriverAddRow(ctx, prints))	\
 		return;				\
 } while(0)
 
-bool gs1_driverInit(gs1_encoder *ctx, long xdim, long ydim);
+#define gs1_driverFinalise(ctx) do {	\
+	if (!gs1_doDriverFinalise(ctx))	\
+		return;			\
+} while(0)
+
+bool gs1_doDriverInit(gs1_encoder *ctx, long xdim, long ydim);
 bool gs1_doDriverAddRow(gs1_encoder *ctx, struct sPrints *prints);
-void gs1_driverFinalise(gs1_encoder *ctx);
+bool gs1_doDriverFinalise(gs1_encoder *ctx);
 
 #endif /* UTIL_H */

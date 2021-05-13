@@ -437,9 +437,8 @@ void gs1_RSS14(gs1_encoder *ctx) {
 			}
 		}
 #endif
-		if (!gs1_driverInit(ctx, ctx->pixMult*CCB4_WIDTH,
-				ctx->pixMult*(rows*2+symHt) + ctx->sepHt))
-			return;
+		gs1_driverInit(ctx, ctx->pixMult*CCB4_WIDTH,
+				ctx->pixMult*(rows*2+symHt) + ctx->sepHt);
 
 		// Composite Component
 		prints.elmCnt = CCB4_ELMNTS;
@@ -466,8 +465,7 @@ void gs1_RSS14(gs1_encoder *ctx) {
 		gs1_driverFinalise(ctx);
 	}
 	else { // primary only
-		if (!gs1_driverInit(ctx, ctx->pixMult*RSS14_SYM_W, ctx->pixMult*symHt))
-			return;
+		gs1_driverInit(ctx, ctx->pixMult*RSS14_SYM_W, ctx->pixMult*symHt);
 
 		// RSS-14
 		gs1_driverAddRow(ctx, &prints);
@@ -545,9 +543,8 @@ void gs1_RSS14S(gs1_encoder *ctx) {
 		}
 #endif
 
-		if (!gs1_driverInit(ctx, ctx->pixMult*(CCB2_WIDTH),
-				ctx->pixMult*(rows*2+RSS14_ROWS1_H+RSS14_ROWS2_H) + 2*ctx->sepHt))
-			return;
+		gs1_driverInit(ctx, ctx->pixMult*(CCB2_WIDTH),
+				ctx->pixMult*(rows*2+RSS14_ROWS1_H+RSS14_ROWS2_H) + 2*ctx->sepHt);
 
 		// Composite Component
 		prints.elmCnt = CCB2_ELMNTS;
@@ -583,9 +580,8 @@ void gs1_RSS14S(gs1_encoder *ctx) {
 		gs1_driverFinalise(ctx);
 	}
 	else { // primary only
-		if (!gs1_driverInit(ctx, ctx->pixMult*(RSS14_SYM_W/2+2),
-				ctx->pixMult*(RSS14_ROWS1_H+RSS14_ROWS2_H) + ctx->sepHt))
-			return;
+		gs1_driverInit(ctx, ctx->pixMult*(RSS14_SYM_W/2+2),
+				ctx->pixMult*(RSS14_ROWS1_H+RSS14_ROWS2_H) + ctx->sepHt);
 
 		// RSS14S upper row
 		prints.pattern = linPattern;
@@ -690,9 +686,8 @@ void gs1_RSS14SO(gs1_encoder *ctx) {
 		}
 #endif
 
-		if (!gs1_driverInit(ctx, ctx->pixMult*(CCB2_WIDTH),
-			ctx->pixMult*(rows*2+RSS14_SYM_H*2) + 4*ctx->sepHt))
-			return;
+		gs1_driverInit(ctx, ctx->pixMult*(CCB2_WIDTH),
+			ctx->pixMult*(rows*2+RSS14_SYM_H*2) + 4*ctx->sepHt);
 
 		// Composite Component
 		prints.elmCnt = CCB2_ELMNTS;
@@ -735,9 +730,8 @@ void gs1_RSS14SO(gs1_encoder *ctx) {
 		gs1_driverFinalise(ctx);
 	}
 	else { // primary only
-		if (!gs1_driverInit(ctx, ctx->pixMult*(RSS14_SYM_W/2+2),
-			ctx->pixMult*(RSS14_SYM_H*2) + 3*ctx->sepHt))
-			return;
+		gs1_driverInit(ctx, ctx->pixMult*(RSS14_SYM_W/2+2),
+			ctx->pixMult*(RSS14_SYM_H*2) + 3*ctx->sepHt);
 
 		// RSS14SO upper row
 		prints.pattern = linPattern;
