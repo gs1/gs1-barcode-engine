@@ -213,7 +213,7 @@ static void test_XYundercut() {
 }
 
 
-static void test_segHt() {
+static void test_sepHt() {
 
 	gs1_encoder* ctx;
 
@@ -438,7 +438,7 @@ TEST_LIST = {
     { "fileInputFlag", test_fileInputFlag },
     { "pixMult", test_pixMult },
     { "XYundercut", test_XYundercut },
-    { "segHt", test_segHt },
+    { "sepHt", test_sepHt },
     { "segWidth", test_segWidth },
     { "linHeight", test_linHeight },
     { "outFile", test_outFile },
