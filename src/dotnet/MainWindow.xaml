@@ -7,27 +7,44 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="326*"/>
+            <RowDefinition Height="93*"/>
+        </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="43*"/>
             <ColumnDefinition Width="47*"/>
             <ColumnDefinition Width="702*"/>
         </Grid.ColumnDefinitions>
-        <Image x:Name="barcodeImage" HorizontalAlignment="Left" Height="279" Margin="111,63,0,0" VerticalAlignment="Top" Width="562" Stretch="None" Grid.Column="2"/>
+        <Image x:Name="barcodeImage" HorizontalAlignment="Left" Height="279" Margin="146,115,0,0" VerticalAlignment="Top" Width="527" Stretch="None" Grid.Column="2" Grid.RowSpan="2"/>
         <TextBox x:Name="dataStrTextBox" HorizontalAlignment="Left" Height="26" Margin="167,23,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="341" Grid.Column="2"/>
         <Button x:Name="generateButton" Content="Generate Barcode" HorizontalAlignment="Left" Margin="517,23,0,0" VerticalAlignment="Top" Width="156" Click="generateButton_Click" Height="26" Grid.Column="2"/>
-        <TextBox x:Name="errorMessageTextBox" HorizontalAlignment="Left" Height="23" Margin="30,347,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="733" Grid.ColumnSpan="3"/>
-        <ComboBox x:Name="comboBox" HorizontalAlignment="Left" Margin="30,23,0,0" VerticalAlignment="Top" Width="222" Height="26" Grid.ColumnSpan="3"/>
-        <TextBox x:Name="pixMultTextBox" HorizontalAlignment="Left" Height="23" Margin="26,63,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="66" Grid.Column="2"/>
-        <Label x:Name="label" Content="X pixels" HorizontalAlignment="Left" Margin="39,58,0,0" VerticalAlignment="Top" Grid.ColumnSpan="3"/>
-        <TextBox x:Name="XundercutTextBox" HorizontalAlignment="Left" Height="23" Margin="26,98,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="66" Grid.Column="2"/>
-        <Label x:Name="label_Copy" Content="X shrink" HorizontalAlignment="Left" Margin="39,93,0,0" VerticalAlignment="Top" Grid.ColumnSpan="3"/>
-        <TextBox x:Name="YundercutTextBox" HorizontalAlignment="Left" Height="23" Margin="26,133,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="66" Grid.Column="2"/>
-        <Label x:Name="label_Copy1" Content="Y shrink" HorizontalAlignment="Left" Margin="39,128,0,0" VerticalAlignment="Top" Grid.ColumnSpan="3"/>
-        <TextBox x:Name="sepHtTextBox" HorizontalAlignment="Left" Height="23" Margin="26,168,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="66" Grid.Column="2"/>
-        <Label x:Name="label_Copy2" Content="Sep Ht" HorizontalAlignment="Left" Margin="39,163,0,0" VerticalAlignment="Top" Grid.ColumnSpan="3"/>
-        <TextBox x:Name="segWidthTextBox" HorizontalAlignment="Left" Height="23" Margin="26,202,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="66" Grid.Column="2"/>
-        <Label x:Name="label_Copy3" Content="Segments" HorizontalAlignment="Left" Margin="39,197,0,0" VerticalAlignment="Top" Grid.ColumnSpan="3"/>
-        <TextBox x:Name="linHeightTextBox" HorizontalAlignment="Left" Height="23" Margin="26,237,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="66" Grid.Column="2"/>
-        <Label x:Name="label_Copy4" Content="Lin Ht" HorizontalAlignment="Left" Margin="39,232,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2"/>
+        <ComboBox x:Name="symbologyComboBox" HorizontalAlignment="Left" Margin="30,23,0,0" VerticalAlignment="Top" Width="222" Height="26" Grid.ColumnSpan="3" SelectionChanged="symbologyComboBox_SelectionChanged">
+            <ComboBoxItem Content="GS1 DataBar" HorizontalAlignment="Left" Width="220"/>
+            <ComboBoxItem Content="GS1 DataBar Truncated" HorizontalAlignment="Left" Width="220"/>
+            <ComboBoxItem Content="GS1 DataBar Stacked" HorizontalAlignment="Left" Width="220"/>
+            <ComboBoxItem Content="GS1 DataBar Stacked Omni" HorizontalAlignment="Left" Width="220"/>
+            <ComboBoxItem Content="GS1 DataBar Limited" HorizontalAlignment="Left" Width="220"/>
+            <ComboBoxItem Content="GS1 DataBar Expanded" HorizontalAlignment="Left" Width="220"/>
+            <ComboBoxItem Content="UPC-A" HorizontalAlignment="Left" Width="220"/>
+            <ComboBoxItem Content="UPC-E" HorizontalAlignment="Left" Width="220"/>
+            <ComboBoxItem Content="EAN-13" HorizontalAlignment="Left" Width="220"/>
+            <ComboBoxItem Content="EAN-8" HorizontalAlignment="Left" Width="220"/>
+            <ComboBoxItem Content="GS1-128 with CC-A or CC-B" HorizontalAlignment="Left" Width="220"/>
+            <ComboBoxItem Content="GS1-128 with CC-C" HorizontalAlignment="Left" Width="220"/>
+        </ComboBox>
+        <TextBox x:Name="pixMultTextBox" HorizontalAlignment="Left" Height="23" Margin="26,115,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="66" Grid.Column="2"/>
+        <Label x:Name="label" Content="X pixels" HorizontalAlignment="Left" Margin="39,110,0,0" VerticalAlignment="Top" Grid.ColumnSpan="3"/>
+        <TextBox x:Name="XundercutTextBox" HorizontalAlignment="Left" Height="23" Margin="26,150,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="66" Grid.Column="2"/>
+        <Label x:Name="label_Copy" Content="X shrink" HorizontalAlignment="Left" Margin="39,145,0,0" VerticalAlignment="Top" Grid.ColumnSpan="3"/>
+        <TextBox x:Name="YundercutTextBox" HorizontalAlignment="Left" Height="23" Margin="26,185,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="66" Grid.Column="2"/>
+        <Label x:Name="label_Copy1" Content="Y shrink" HorizontalAlignment="Left" Margin="39,180,0,0" VerticalAlignment="Top" Grid.ColumnSpan="3"/>
+        <TextBox x:Name="sepHtTextBox" HorizontalAlignment="Left" Height="23" Margin="26,220,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="66" Grid.Column="2"/>
+        <Label x:Name="label_Copy2" Content="Sep Ht" HorizontalAlignment="Left" Margin="39,215,0,0" VerticalAlignment="Top" Grid.ColumnSpan="3"/>
+        <TextBox x:Name="segWidthTextBox" HorizontalAlignment="Left" Height="23" Margin="26,254,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="66" Grid.Column="2"/>
+        <Label x:Name="label_Copy3" Content="Segments" HorizontalAlignment="Left" Margin="39,249,0,0" VerticalAlignment="Top" Grid.ColumnSpan="3"/>
+        <TextBox x:Name="linHeightTextBox" HorizontalAlignment="Left" Height="23" Margin="26,289,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="66" Grid.Column="2"/>
+        <Label x:Name="label_Copy4" Content="Lin Ht" HorizontalAlignment="Left" Margin="39,284,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2"/>
+        <Label x:Name="errorMessageLabel" Content="" HorizontalAlignment="Center" Margin="1,68,14,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Height="37" Width="734" Grid.Column="1" FontWeight="Bold"/>
     </Grid>
 </Window>

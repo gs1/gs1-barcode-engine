@@ -28,6 +28,7 @@ namespace gs1encoders_dotnet
 
         public void LoadControls()
         {
+            symbologyComboBox.SelectedIndex = App.gs1Encoder.GetSym();
             dataStrTextBox.Text = App.gs1Encoder.GetDataStr();
             pixMultTextBox.Text = App.gs1Encoder.GetPixMult().ToString();
             XundercutTextBox.Text = App.gs1Encoder.GetXundercut().ToString();
@@ -42,7 +43,7 @@ namespace gs1encoders_dotnet
 
             try
             {
-                App.gs1Encoder.SetSym(9);  // TODO fixme
+                App.gs1Encoder.SetSym(symbologyComboBox.SelectedIndex);
                 App.gs1Encoder.SetDataStr(dataStrTextBox.Text);
                 int v;
                 if (Int32.TryParse(pixMultTextBox.Text, out v)) App.gs1Encoder.SetPixMult(v);
@@ -54,7 +55,7 @@ namespace gs1encoders_dotnet
             }
             catch (GS1EncoderParameterException E)
             {
-                errorMessageTextBox.Text = E.Message;
+                errorMessageLabel.Content = "Error: " + E.Message;
                 return;
             }      
 
@@ -78,5 +79,9 @@ namespace gs1encoders_dotnet
 
         }
 
+        private void symbologyComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
     }
 }
