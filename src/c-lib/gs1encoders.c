@@ -125,7 +125,7 @@ GS1_ENCODERS_API bool gs1_encoder_setPixMult(gs1_encoder *ctx, int pixMult) {
 	assert(ctx);
 	reset_error(ctx);
 	if (pixMult < 1 || pixMult > GS1_ENCODERS_MAX_PIXMULT) {
-		sprintf(ctx->errMsg, "Range 1 to %d", GS1_ENCODERS_MAX_PIXMULT);
+		sprintf(ctx->errMsg, "Valid X-dimension range is 1 to %d", GS1_ENCODERS_MAX_PIXMULT);
 		ctx->errFlag = true;
 		return false;
 	}
@@ -149,12 +149,12 @@ GS1_ENCODERS_API bool gs1_encoder_setXundercut(gs1_encoder *ctx, int Xundercut) 
 	assert(ctx);
 	reset_error(ctx);
 	if (Xundercut != 0 && ctx->pixMult == 1) {
-		strcpy(ctx->errMsg, "No undercut when 1 pixel per X");
+		strcpy(ctx->errMsg, "No X undercut available when 1 pixel per X");
 		ctx->errFlag = true;
 		return false;
 	}
 	if (Xundercut < 0 || Xundercut > ctx->pixMult - 1) {
-		sprintf(ctx->errMsg, "Range 1 to %d", ctx->pixMult - 1);
+		sprintf(ctx->errMsg, "Valid X undercut range is 1 to %d", ctx->pixMult - 1);
 		ctx->errFlag = true;
 		return false;
 	}
@@ -172,12 +172,12 @@ GS1_ENCODERS_API bool gs1_encoder_setYundercut(gs1_encoder *ctx, int Yundercut) 
 	assert(ctx);
 	reset_error(ctx);
 	if (Yundercut !=0 && ctx->pixMult == 1) {
-		strcpy(ctx->errMsg, "No undercut when 1 pixel per X");
+		strcpy(ctx->errMsg, "No Y undercut available when 1 pixel per X");
 		ctx->errFlag = true;
 		return false;
 	}
 	if (Yundercut < 0 || Yundercut > ctx->pixMult - 1) {
-		sprintf(ctx->errMsg, "Range 1 to %d", ctx->pixMult - 1);
+		sprintf(ctx->errMsg, "Valid Y undercut range is 1 to %d", ctx->pixMult - 1);
 		ctx->errFlag = true;
 		return false;
 	}
@@ -195,7 +195,7 @@ GS1_ENCODERS_API bool gs1_encoder_setSepHt(gs1_encoder *ctx, int sepHt) {
 	assert(ctx);
 	reset_error(ctx);
 	if (sepHt < ctx->pixMult || sepHt > 2 * ctx->pixMult) {
-		sprintf(ctx->errMsg, "Range %d to %d", ctx->pixMult, 2 * ctx->pixMult);
+		sprintf(ctx->errMsg, "Valid separator height range is %d to %d", ctx->pixMult, 2 * ctx->pixMult);
 		ctx->errFlag = true;
 		return false;
 	}
@@ -213,12 +213,12 @@ GS1_ENCODERS_API bool gs1_encoder_setSegWidth(gs1_encoder *ctx, int segWidth) {
 	assert(ctx);
 	reset_error(ctx);
 	if (segWidth < 2 || segWidth > 22) {
-		strcpy(ctx->errMsg, "Range 2 to 22");
+		strcpy(ctx->errMsg, "Valid number of segments range is 2 to 22");
 		ctx->errFlag = true;
 		return false;
 	}
 	if (segWidth & 1) {
-		strcpy(ctx->errMsg, "Must be even number");
+		strcpy(ctx->errMsg, "Number of segments must be even");
 		ctx->errFlag = true;
 		return false;
 	}
@@ -252,7 +252,7 @@ GS1_ENCODERS_API bool gs1_encoder_setLinHeight(gs1_encoder *ctx, int linHeight) 
 	assert(ctx);
 	reset_error(ctx);
 	if (linHeight < 1 || linHeight > GS1_ENCODERS_MAX_LINHT) {
-		sprintf(ctx->errMsg, "Range 1 to %d", GS1_ENCODERS_MAX_LINHT);
+		sprintf(ctx->errMsg, "Valid linear component height range is 1 to %d", GS1_ENCODERS_MAX_LINHT);
 		ctx->errFlag = true;
 		return false;
 	}
@@ -270,7 +270,7 @@ GS1_ENCODERS_API bool gs1_encoder_setOutFile(gs1_encoder *ctx, char* outFile) {
 	assert(ctx);
 	reset_error(ctx);
 	if (strlen(outFile) > GS1_ENCODERS_MAX_FNAME) {
-		sprintf(ctx->errMsg, "Maximum of %d characters", GS1_ENCODERS_MAX_FNAME);
+		sprintf(ctx->errMsg, "Maximum output file is %d characters", GS1_ENCODERS_MAX_FNAME);
 		ctx->errFlag = true;
 		return false;
 	}
@@ -288,7 +288,7 @@ GS1_ENCODERS_API bool gs1_encoder_setDataStr(gs1_encoder *ctx, char* dataStr) {
 	assert(ctx);
 	reset_error(ctx);
 	if (strlen(dataStr) > GS1_ENCODERS_MAX_KEYDATA) {
-		sprintf(ctx->errMsg, "Maximum %d characters", GS1_ENCODERS_MAX_KEYDATA);
+		sprintf(ctx->errMsg, "Maximum data length is %d characters", GS1_ENCODERS_MAX_KEYDATA);
 		ctx->errFlag = true;
 		return false;
 	}
@@ -306,7 +306,7 @@ GS1_ENCODERS_API bool gs1_encoder_setDataFile(gs1_encoder *ctx, char* dataFile) 
 	assert(ctx);
 	reset_error(ctx);
 	if (strlen(dataFile) < 1 || strlen(dataFile) > GS1_ENCODERS_MAX_FNAME) {
-		sprintf(ctx->errMsg, "Must be 1 to %d characters", GS1_ENCODERS_MAX_FNAME);
+		sprintf(ctx->errMsg, "Input file must be 1 to %d characters", GS1_ENCODERS_MAX_FNAME);
 		ctx->errFlag = true;
 		return false;
 	}
@@ -331,7 +331,7 @@ GS1_ENCODERS_API bool gs1_encoder_encode(gs1_encoder *ctx) {
 	if (ctx->fileInputFlag) {
 		size_t i;
 		if ((iFile = fopen(ctx->dataFile, "r")) == NULL) {
-			sprintf(ctx->errMsg, "UNABLE TO OPEN %s FILE", ctx->dataFile);
+			sprintf(ctx->errMsg, "Unable to open input file: %s", ctx->dataFile);
 			ctx->errFlag = true;
 			return false;
 		}
