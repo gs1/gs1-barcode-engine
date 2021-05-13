@@ -22,7 +22,14 @@
 #include <stdbool.h>
 #include <string.h>
 
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wgnu-folding-constant"
+#endif
 #include "acutest.h"
+#if defined(__clang__)
+#pragma clang diagnostic push
+#endif
 
 #include "driver.h"
 #include "gs1encoders.h"
