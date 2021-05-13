@@ -58,11 +58,13 @@ GS1_ENCODERS_API gs1_encoder* gs1_encoder_init(void) {
 	ctx->segWidth = 22;
 	ctx->linHeight = 25;
 	ctx->bmp = false;
-	strcpy(ctx->outFile, DEFAULT_TIF_FILE);
-	ctx->fileInputFlag = false; // for kbd input
 	strcpy(ctx->dataStr, "");
 	strcpy(ctx->dataFile, "data.txt");
-
+	ctx->fileInputFlag = false; // for kbd input
+	strcpy(ctx->outFile, DEFAULT_TIF_FILE);
+	ctx->buffer = NULL;
+	ctx->bufferSize = 0;
+	ctx->bufferCap = 0;
 	return ctx;
 
 }
@@ -71,6 +73,7 @@ GS1_ENCODERS_API gs1_encoder* gs1_encoder_init(void) {
 GS1_ENCODERS_API void gs1_encoder_free(gs1_encoder *ctx) {
 	assert(ctx);
 	reset_error(ctx);
+	free(ctx->buffer);
 	free(ctx);
 }
 
@@ -233,7 +236,8 @@ GS1_ENCODERS_API bool gs1_encoder_setBmp(gs1_encoder *ctx, bool bmp) {
 	assert(ctx);
 	reset_error(ctx);
 	if (ctx->bmp == bmp) return true;
-	strcpy(ctx->outFile, bmp ? DEFAULT_BMP_FILE : DEFAULT_TIF_FILE);
+	if (strcmp(ctx->outFile, "") != 0)
+		strcpy(ctx->outFile, bmp ? DEFAULT_BMP_FILE : DEFAULT_TIF_FILE);
 	ctx->bmp = bmp;
 	return true;
 }
@@ -265,8 +269,8 @@ GS1_ENCODERS_API char* gs1_encoder_getOutFile(gs1_encoder *ctx) {
 GS1_ENCODERS_API bool gs1_encoder_setOutFile(gs1_encoder *ctx, char* outFile) {
 	assert(ctx);
 	reset_error(ctx);
-	if (strlen(outFile) < 1 || strlen(outFile) > GS1_ENCODERS_MAX_FNAME) {
-		sprintf(ctx->errMsg, "Must be 1 to %d characters", GS1_ENCODERS_MAX_FNAME);
+	if (strlen(outFile) > GS1_ENCODERS_MAX_FNAME) {
+		sprintf(ctx->errMsg, "Maximum of %d characters", GS1_ENCODERS_MAX_FNAME);
 		ctx->errFlag = true;
 		return false;
 	}
@@ -390,4 +394,15 @@ GS1_ENCODERS_API bool gs1_encoder_encode(gs1_encoder *ctx) {
 
 	return !ctx->errFlag;
 
+}
+
+
+GS1_ENCODERS_API size_t gs1_encoder_getBuffer(gs1_encoder *ctx, void** out) {
+	assert(ctx);
+	if (!ctx->buffer) {
+		*out = NULL;
+		return 0;
+	}
+	*out = ctx->buffer;
+	return ctx->bufferSize;
 }

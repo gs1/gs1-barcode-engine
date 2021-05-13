@@ -283,7 +283,7 @@ static void test_outFile() {
 
 	TEST_CHECK(gs1_encoder_setOutFile(ctx, "test.file"));
 	TEST_CHECK(strcmp(gs1_encoder_getOutFile(ctx), "test.file") == 0);
-	TEST_CHECK(!gs1_encoder_setOutFile(ctx, ""));
+	TEST_CHECK(gs1_encoder_setOutFile(ctx, ""));
 	TEST_CHECK(gs1_encoder_setOutFile(ctx, "a"));
 
 	for (i = 0; i < GS1_ENCODERS_MAX_FNAME; i++) {
@@ -322,6 +322,16 @@ static void test_bmp() {
 	TEST_CHECK(gs1_encoder_setOutFile(ctx, "test.file"));
 	TEST_CHECK(gs1_encoder_setBmp(ctx, false));      // still tiff, change
 	TEST_CHECK(strcmp(gs1_encoder_getOutFile(ctx), "test.file") == 0);
+
+	TEST_CHECK(gs1_encoder_setBmp(ctx, true));       // bmp
+	TEST_CHECK(gs1_encoder_setOutFile(ctx, ""));
+	TEST_CHECK(gs1_encoder_setBmp(ctx, false));      // now tif, don't reset empty filename
+	TEST_CHECK(strcmp(gs1_encoder_getOutFile(ctx), "") == 0);
+
+	TEST_CHECK(gs1_encoder_setBmp(ctx, false));      // tif
+	TEST_CHECK(gs1_encoder_setOutFile(ctx, ""));
+	TEST_CHECK(gs1_encoder_setBmp(ctx, true));       // now bmp, don't reset empty filename
+	TEST_CHECK(strcmp(gs1_encoder_getOutFile(ctx), "") == 0);
 
 	gs1_encoder_free(ctx);
 
@@ -382,6 +392,38 @@ static void test_dataStr() {
 }
 
 
+static void test_getBuffer() {
+
+	gs1_encoder* ctx;
+	uint8_t* buf;
+	size_t size;
+	uint8_t test_tif[] = { 0x49, 0x49, 0x2A, 0x00 };
+	uint8_t test_bmp[] = { 0x42, 0x4D, 0xDE, 0x04 };
+
+	TEST_ASSERT((ctx = gs1_encoder_init()) != NULL);
+
+	TEST_CHECK(gs1_encoder_getBuffer(ctx, (void*)&buf) == 0);
+	TEST_CHECK(buf == NULL);
+
+	TEST_CHECK(gs1_encoder_setSym(ctx, gs1_encoder_sEAN13));
+	TEST_CHECK(gs1_encoder_setDataStr(ctx, "123456789012"));
+	TEST_CHECK(gs1_encoder_setOutFile(ctx, ""));
+
+	TEST_CHECK(gs1_encoder_setBmp(ctx, false));
+	TEST_CHECK(gs1_encoder_encode(ctx));
+	TEST_CHECK((size = gs1_encoder_getBuffer(ctx, (void*)&buf)) == 1234);  // Really!
+	TEST_CHECK(memcmp(buf, test_tif, sizeof(test_tif)) == 0);
+
+	TEST_CHECK(gs1_encoder_setBmp(ctx, true));
+	TEST_CHECK(gs1_encoder_encode(ctx));
+	TEST_CHECK((size = gs1_encoder_getBuffer(ctx, (void*)&buf)) == 1246);
+	TEST_CHECK(memcmp(buf, test_bmp, sizeof(test_bmp)) == 0);
+
+	gs1_encoder_free(ctx);
+
+}
+
+
 TEST_LIST = {
     { "getVersion", test_getVersion },
     { "defaults", test_defaults },
@@ -396,5 +438,6 @@ TEST_LIST = {
     { "dataFile", test_dataFile },
     { "dataStr", test_dataStr },
     { "bmp", test_bmp },
+    { "getBuffer", test_getBuffer },
     { NULL, NULL }
 };

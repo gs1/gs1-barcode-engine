@@ -120,6 +120,8 @@ GS1_ENCODERS_API bool gs1_encoder_setDataFile(gs1_encoder *ctx, char* dataFile);
 
 GS1_ENCODERS_API char* gs1_encoder_getErrMsg(gs1_encoder *ctx);
 
+GS1_ENCODERS_API size_t gs1_encoder_getBuffer(gs1_encoder *ctx, void** out);
+
 
 #ifdef __cplusplus
 }

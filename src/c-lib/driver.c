@@ -28,7 +28,33 @@
 #include "driver.h"
 
 
-static void bmpHeader(long xdim, long ydim, FILE *oFile) {
+static bool emitData(gs1_encoder *ctx, void *data, size_t len) {
+	uint8_t *buf;
+	if (strcmp(ctx->outFile, "") != 0) {
+		fwrite(data, len, 1, ctx->outfp);
+	} else {
+		if (ctx->bufferSize + len > ctx-> bufferCap) {
+			if ((buf = realloc(ctx->buffer, ctx->bufferCap * 2)) == NULL) {
+				free(ctx->buffer);
+				ctx->bufferCap = 0;
+				ctx->bufferSize = 0;
+				strcpy(ctx->errMsg, "Failed to expand buffer");
+				ctx->errFlag = true;
+				return false;
+			};
+			ctx->buffer = buf;
+			ctx->bufferCap *= 2;
+		}
+		memcpy(&ctx->buffer[ctx->bufferSize], data, len);
+		ctx->bufferSize += len;
+	}
+
+	return true;
+
+}
+
+
+static void bmpHeader(gs1_encoder *ctx, long xdim, long ydim) {
 
 	uint8_t id[2] = {'B','M'};
 	struct b_hdr {
@@ -57,12 +83,12 @@ static void bmpHeader(long xdim, long ydim, FILE *oFile) {
 	header.height = (uint32_t)ydim;
 	header.fileLength = (uint32_t)(0x3E + (((xdim+31)/32)*4) * ydim); // pad rows to 32-bit boundary
 
-	fwrite(&id, sizeof(id), 1, oFile);
-	fwrite(&header, sizeof(header), 1, oFile);
+	emitData(ctx, &id, sizeof(id));
+	emitData(ctx, &header, sizeof(header));
 }
 
 
-static void tifHeader(long xdim, long ydim, FILE *oFile) {
+static void tifHeader(gs1_encoder *ctx, long xdim, long ydim) {
 
 	struct t_hdr {
 		uint8_t endian[2];
@@ -106,25 +132,25 @@ static void tifHeader(long xdim, long ydim, FILE *oFile) {
 	xResData[1] = 1L; //reduce to 10 mils
 	yResData[1] = 1L; //reduce to 10 mils
 
-	fwrite(&header, sizeof(header), 1, oFile);
-	fwrite(&tagnum, sizeof(tagnum), 1, oFile);
-	fwrite(&type, sizeof(type), 1, oFile);
-	fwrite(&width, sizeof(width), 1, oFile);
-	fwrite(&height, sizeof(height), 1, oFile);
-	fwrite(&bitsPerSample, sizeof(bitsPerSample), 1, oFile);
-	fwrite(&compress, sizeof(compress), 1, oFile);
-	fwrite(&whiteIs, sizeof(whiteIs), 1, oFile);
-	fwrite(&thresholding, sizeof(thresholding), 1, oFile);
-	fwrite(&stripOffset, sizeof(stripOffset), 1, oFile);
-	fwrite(&samplesPerPix, sizeof(samplesPerPix), 1, oFile);
-	fwrite(&stripRows, sizeof(stripRows), 1, oFile);
-	fwrite(&stripBytes, sizeof(stripBytes), 1, oFile);
-	fwrite(&xRes, sizeof(xRes), 1, oFile);
-	fwrite(&yRes, sizeof(yRes), 1, oFile);
-	fwrite(&resUnit, sizeof(resUnit), 1, oFile);
-	fwrite(&nextdir, sizeof(nextdir), 1, oFile);
-	fwrite(&xResData, sizeof(xResData), 1, oFile);
-	fwrite(&yResData, sizeof(yResData), 1, oFile);
+	emitData(ctx, &header, sizeof(header));
+	emitData(ctx, &tagnum, sizeof(tagnum));
+	emitData(ctx, &type, sizeof(type));
+	emitData(ctx, &width, sizeof(width));
+	emitData(ctx, &height, sizeof(height));
+	emitData(ctx, &bitsPerSample, sizeof(bitsPerSample));
+	emitData(ctx, &compress, sizeof(compress));
+	emitData(ctx, &whiteIs, sizeof(whiteIs));
+	emitData(ctx, &thresholding, sizeof(thresholding));
+	emitData(ctx, &stripOffset, sizeof(stripOffset));
+	emitData(ctx, &samplesPerPix, sizeof(samplesPerPix));
+	emitData(ctx, &stripRows, sizeof(stripRows));
+	emitData(ctx, &stripBytes, sizeof(stripBytes));
+	emitData(ctx, &xRes, sizeof(xRes));
+	emitData(ctx, &yRes, sizeof(yRes));
+	emitData(ctx, &resUnit, sizeof(resUnit));
+	emitData(ctx, &nextdir, sizeof(nextdir));
+	emitData(ctx, &xResData, sizeof(xResData));
+	emitData(ctx, &yResData, sizeof(yResData));
 	return;
 }
 
@@ -263,26 +289,38 @@ static void printElmnts(gs1_encoder *ctx, struct sPrints *prints) {
 	}
 
 	for (i = 0; i < ctx->Yundercut; i++) {
-		fwrite(lineUCut, sizeof(uint8_t), (size_t)ndx, ctx->outfp);
+		emitData(ctx, lineUCut, (size_t)ndx * sizeof(uint8_t));
 	}
 	for ( ; i < prints->height; i++) {
-		fwrite(line, sizeof(uint8_t), (size_t)ndx, ctx->outfp);
+		emitData(ctx, line, (size_t)ndx * sizeof(uint8_t));
 	}
 	return;
 }
+
 
 bool gs1_doDriverInit(gs1_encoder *ctx, long xdim, long ydim) {
 
 	FILE* oFile;
 
-	if (ctx->bmp) {
+	if (strcmp(ctx->outFile, "") != 0) {
 		if ((oFile = fopen(ctx->outFile, "wb")) == NULL) {
 			sprintf(ctx->errMsg, "Unable to open file: %s", ctx->outFile);
 			ctx->errFlag = true;
 			return false;
 		}
 		ctx->outfp = oFile;
+	} else {
+		free(ctx->buffer);
+		if ((ctx->buffer = malloc(512 * sizeof(uint8_t))) == NULL) {
+			strcpy(ctx->errMsg, "Out of memory allocating output buffer");
+			ctx->errFlag = true;
+			return false;
+		}
+		ctx->bufferCap = 512;
+		ctx->bufferSize = 0;
+	}
 
+	if (ctx->bmp) {
 		if ((ctx->driver_rowBuffer = malloc((unsigned long)ydim * sizeof(struct sPrints))) == NULL) {
 			strcpy(ctx->errMsg, "Out of memory");
 			ctx->errFlag = true;
@@ -290,16 +328,9 @@ bool gs1_doDriverInit(gs1_encoder *ctx, long xdim, long ydim) {
 		}
 		ctx->driver_numRows = 0;
 
-		bmpHeader(xdim, ydim, ctx->outfp);
+		bmpHeader(ctx, xdim, ydim);
 	} else {
-		if ((oFile = fopen(ctx->outFile, "wb")) == NULL) {
-			sprintf(ctx->errMsg, "Unable to open file: %s", ctx->outFile);
-			ctx->errFlag = true;
-			return false;
-		}
-		ctx->outfp = oFile;
-
-		tifHeader(xdim, ydim, ctx->outfp);
+		tifHeader(ctx, xdim, ydim);
 	}
 
 	return true;
@@ -335,6 +366,7 @@ bool gs1_doDriverAddRow(gs1_encoder *ctx, struct sPrints *prints) {
 
 bool gs1_doDriverFinalise(gs1_encoder *ctx) {
 
+	uint8_t* buf;
 	int i;
 
 	if (ctx->bmp) {
@@ -346,10 +378,24 @@ bool gs1_doDriverFinalise(gs1_encoder *ctx) {
 
 		free(ctx->driver_rowBuffer);
 		ctx->driver_rowBuffer = NULL;
+	}
 
+	if (strcmp(ctx->outFile, "") != 0) {
 		fclose(ctx->outfp);
 	} else {
-		fclose(ctx->outfp);
+		// Shrink the buffer to fit the data
+		if ((buf = realloc(ctx->buffer, ctx->bufferSize * sizeof(uint8_t))) == NULL) {
+			free(ctx->buffer);
+			ctx->bufferCap = 0;
+			ctx->bufferSize = 0;
+			strcpy(ctx->errMsg, "Failed to shrink buffer");
+			ctx->errFlag = true;
+			return false;
+		};
+		ctx->buffer = buf;
+		ctx->bufferCap = ctx->bufferSize;
 	}
+
+	return true;
 
 }

@@ -65,13 +65,16 @@ struct gs1_encoder {
 	int segWidth;
 	int bmp;		// true is BMP else TIF file output
 	int linHeight;		// height of UCC/EAN-128 in X
+	char dataStr[GS1_ENCODERS_MAX_DATA+1];
 	char dataFile[GS1_ENCODERS_MAX_FNAME+1];
 	char outFile[GS1_ENCODERS_MAX_FNAME+1];
-	char dataStr[GS1_ENCODERS_MAX_DATA+1];
+	uint8_t *buffer;	// We may allocate an output buffer
 	char VERSION[16];
 
 	// per-instance globals
 	FILE *outfp;
+	size_t bufferCap;
+	size_t bufferSize;
 	int errFlag;
 	char errMsg[512];
 	int rowWidth;
