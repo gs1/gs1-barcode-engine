@@ -16,7 +16,7 @@ namespace gs1encoders_dotnet
     public partial class App : Application
     {
 
-        GS1Encoder gs1Encoder = new GS1Encoder();
+        public static GS1Encoder gs1Encoder = new GS1Encoder();
 
         /*
          *  Native functions so that we can write our version information to the console (for CI)
@@ -37,18 +37,30 @@ namespace gs1encoders_dotnet
             if (arguments.Length == 2 && arguments[1].Equals("--version"))
             {
                 AttachConsole(ATTACH_PARENT_PROCESS);
-                Console.WriteLine("pinvoked DLL version: " + gs1Encoder.getVersion());
+                Console.WriteLine("pinvoked DLL version: " + gs1Encoder.GetVersion());
                 FreeConsole();
                 Shutdown(0);
                 return;
             }
 
             MainWindow mw = new MainWindow();
-            mw.Title = "GS1 Encoders | Library release: " + gs1Encoder.getVersion();
+            mw.Title = "GS1 Encoders | Library release: " + gs1Encoder.GetVersion();
             mw.Show();
 
-        }
+            gs1Encoder.SetFileInputFlag(false);
+            gs1Encoder.SetOutFile("");
+            gs1Encoder.SetBmp(true);
 
+            gs1Encoder.SetSym(9);
+            gs1Encoder.SetDataStr("999999999999||99123456");
+
+            gs1Encoder.SetPixMult(2);
+            
+            mw.LoadControls();
+
+            mw.generateButton.RaiseEvent(new RoutedEventArgs(System.Windows.Controls.Button.ClickEvent));
+
+        }
 
     }
 
