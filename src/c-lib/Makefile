@@ -8,6 +8,7 @@ APP_STATIC = $(NAME)-linux.bin
 TEST_BIN = $(NAME)-test
 
 CFLAGS = -g -O2 -D_FORTIFY_SOURCE=2 -Wall -Wextra -Wconversion -Wformat -Wformat-security -pedantic -Werror -MMD -fPIC
+CFLAGS_TEST = -g -O2 -D_FORTIFY_SOURCE=2 -Wall -Wextra -Wformat -Wformat-security -pedantic -Werror -MMD -fPIC
 LDLIBS = -lc
 LDFLAGS = -Wl,--as-needed -Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,-z,now
 LDFLAGS_SO = -shared -Wl,-soname,lib$(NAME).so.$(MAJOR)
@@ -75,10 +76,10 @@ $(APP_STATIC): $(OBJS) $(APP_OBJ)
 #  Test binary
 #
 $(TEST_OBJ): $(TEST_SRC)
-	$(CC) -c -o $(TEST_OBJ) $(TEST_SRC)
+	$(CC) $(CFLAGS_TEST) -c -o $(TEST_OBJ) $(TEST_SRC)
 
 $(TEST_BIN): $(OBJS) $(TEST_OBJ)
-	$(CC) $(OBJS) $(TEST_OBJ) -o $(TEST_BIN)
+	$(CC) $(CFLAGS) $(OBJS) $(TEST_OBJ) -o $(TEST_BIN)
 
 
 #
