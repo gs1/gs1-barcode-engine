@@ -364,12 +364,15 @@ void gs1_U128A(gs1_encoder *ctx) {
 
 	uint8_t (*ccPattern)[CCB4_ELMNTS] = ctx->ccPattern;
 
+	char dataStr[GS1_ENCODERS_MAX_DATA+1];
+
 	int i;
 	int rows, ccFlag, symChars, symWidth, ccLpad, ccRpad;
 	char primaryStr[120+1];
 	char *ccStr;
 
-	ccStr = strchr(ctx->dataStr, '|');
+	strcpy(dataStr, ctx->dataStr);
+	ccStr = strchr(dataStr, '|');
 	if (ccStr == NULL) ccFlag = false;
 	else {
 		ccFlag = true;
@@ -377,20 +380,20 @@ void gs1_U128A(gs1_encoder *ctx) {
 		ccStr++; // point to secondary data
 	}
 
-	if (strlen(ctx->dataStr) > 48) {
+	if (strlen(dataStr) > 48) {
 		strcpy(ctx->errMsg, "primary data exceeds 48 characters");
 		ctx->errFlag = true;
 		return;
 	}
 
 	// insert leading FNC1 if not already there
-	if (ctx->dataStr[0] != '#') {
+	if (dataStr[0] != '#') {
 		strcpy(primaryStr, "#");
 	}
 	else {
 		primaryStr[0] = '\0';
 	}
-	strcat(primaryStr, ctx->dataStr);
+	strcat(primaryStr, dataStr);
 
 	symChars = enc128((uint8_t*)primaryStr, linPattern, (ccFlag) ? 1 : 0);
 
@@ -489,12 +492,15 @@ void gs1_U128C(gs1_encoder *ctx) {
 
 	uint8_t linPattern[(UCC128_SYMMAX*6)+3];
 
+	char dataStr[GS1_ENCODERS_MAX_DATA+1];
+
 	int i;
 	int ccFlag, symChars, symWidth, ccRpad;
 	char primaryStr[120+1];
 	char *ccStr;
 
-	ccStr = strchr(ctx->dataStr, '|');
+	strcpy(dataStr, ctx->dataStr);
+	ccStr = strchr(dataStr, '|');
 	if (ccStr == NULL) ccFlag = false;
 	else {
 		ccFlag = true;
@@ -502,20 +508,20 @@ void gs1_U128C(gs1_encoder *ctx) {
 		ccStr++; // point to secondary data
 	}
 
-	if (strlen(ctx->dataStr) > 48) {
+	if (strlen(dataStr) > 48) {
 		strcpy(ctx->errMsg, "primary data exceeds 48 characters");
 		ctx->errFlag = true;
 		return;
 	}
 
 	// insert leading FNC1 if not already there
-	if (ctx->dataStr[0] != '#') {
+	if (dataStr[0] != '#') {
 		strcpy(primaryStr, "#");
 	}
 	else {
 		primaryStr[0] = '\0';
 	}
-	strcat(primaryStr, ctx->dataStr);
+	strcat(primaryStr, dataStr);
 
 	symChars = enc128((uint8_t*)primaryStr, linPattern, (ccFlag) ? 2 : 0); // 2 for CCC
 

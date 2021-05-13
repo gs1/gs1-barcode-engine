@@ -298,6 +298,7 @@ void gs1_RSSLim(gs1_encoder *ctx) {
 
 	uint8_t (*ccPattern)[CCB4_ELMNTS] = ctx->ccPattern;
 
+	char dataStr[GS1_ENCODERS_MAX_DATA+1];
 	char primaryStr[14+1];
 	char tempStr[28+1];
 
@@ -305,7 +306,8 @@ void gs1_RSSLim(gs1_encoder *ctx) {
 	int rows, ccFlag;
 	char *ccStr;
 
-	ccStr = strchr(ctx->dataStr, '|');
+	strcpy(dataStr, ctx->dataStr);
+	ccStr = strchr(dataStr, '|');
 	if (ccStr == NULL) ccFlag = false;
 	else {
 		ccFlag = true;
@@ -313,14 +315,14 @@ void gs1_RSSLim(gs1_encoder *ctx) {
 		ccStr++; // point to secondary data
 	}
 
-	if (strlen(ctx->dataStr) > 13) {
+	if (strlen(dataStr) > 13) {
 		strcpy(ctx->errMsg, "primary data exceeds 13 digits");
 		ctx->errFlag = true;
 		return;
 	}
 
 	strcpy(tempStr, "000000000000");
-	strcat(tempStr, ctx->dataStr);
+	strcat(tempStr, dataStr);
 	strcpy(primaryStr, tempStr + strlen(tempStr) - 13);
 
 	if (!RSSLimEnc(ctx, (uint8_t*)primaryStr, linPattern, ccFlag) || ctx->errFlag) return;

@@ -256,6 +256,8 @@ void gs1_RSSExp(gs1_encoder *ctx) {
 
 	uint8_t (*ccPattern)[CCB4_ELMNTS] = ctx->ccPattern;
 
+	char dataStr[GS1_ENCODERS_MAX_DATA+1];
+
 	int i, j;
 	int rows = 0, ccFlag;
 	int segs, lNdx, lNdx1, lMods, lHeight;
@@ -270,7 +272,8 @@ void gs1_RSSExp(gs1_encoder *ctx) {
 	lHeight = 0;
 	rPadcc = 0;
 
-	ccStr = strchr(ctx->dataStr, '|');
+	strcpy(dataStr, ctx->dataStr);
+	ccStr = strchr(dataStr, '|');
 	if (ccStr == NULL) ccFlag = false;
 	else {
 		if (ctx->segWidth < 4) {
@@ -284,7 +287,7 @@ void gs1_RSSExp(gs1_encoder *ctx) {
 	}
 
 	ctx->rowWidth = ctx->segWidth; // save for getUnusedBitCnt
-	if (!((segs = RSS14Eenc(ctx, (uint8_t*)ctx->dataStr, dblPattern, ccFlag)) > 0) || ctx->errFlag) return;
+	if (!((segs = RSS14Eenc(ctx, (uint8_t*)dataStr, dblPattern, ccFlag)) > 0) || ctx->errFlag) return;
 
 	lNdx = 0;
 	for (i = 0; i < segs-1; i += 2) {
@@ -328,7 +331,7 @@ void gs1_RSSExp(gs1_encoder *ctx) {
 	rPadcc = lMods - RSSEXP_L_PAD - CCB4_WIDTH;
 
 #if PRNT
-	printf("\n%s", ctx->dataStr);
+	printf("\n%s", dataStr);
 	printf("\n");
 	for (i = 0; i < lNdx; i++) {
 		printf("%d", linPattern[i]);

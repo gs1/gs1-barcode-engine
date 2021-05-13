@@ -104,6 +104,7 @@ void gs1_EAN13(gs1_encoder *ctx) {
 
 	uint8_t (*ccPattern)[CCB4_ELMNTS] = ctx->ccPattern;
 
+	char dataStr[GS1_ENCODERS_MAX_DATA+1];
 	char primaryStr[14+1];
 	char tempStr[28+1];
 
@@ -111,7 +112,8 @@ void gs1_EAN13(gs1_encoder *ctx) {
 	int rows, ccFlag;
 	char *ccStr;
 
-	ccStr = strchr(ctx->dataStr, '|');
+	strcpy(dataStr, ctx->dataStr);
+	ccStr = strchr(dataStr, '|');
 	if (ccStr == NULL) ccFlag = false;
 	else {
 		ccFlag = true;
@@ -119,14 +121,14 @@ void gs1_EAN13(gs1_encoder *ctx) {
 		ccStr++; // point to secondary data
 	}
 
-	if (strlen(ctx->dataStr) > 12) {
+	if (strlen(dataStr) > 12) {
 		strcpy(ctx->errMsg, "primary data exceeds 12 digits");
 		ctx->errFlag = true;
 		return;
 	}
 
 	strcpy(tempStr, "000000000000");
-	strcat(tempStr, ctx->dataStr);
+	strcat(tempStr, dataStr);
 	strcat(tempStr, "0"); // check digit = 0 for now
 	strcpy(primaryStr, tempStr + strlen(tempStr) - 13);
 
@@ -283,6 +285,7 @@ void gs1_EAN8(gs1_encoder *ctx) {
 
 	uint8_t (*ccPattern)[CCB4_ELMNTS] = ctx->ccPattern;
 
+	char dataStr[GS1_ENCODERS_MAX_DATA+1];
 	char primaryStr[14+1];
 	char tempStr[28+1];
 
@@ -293,7 +296,8 @@ void gs1_EAN8(gs1_encoder *ctx) {
 	int lpadEAN;
 	int elmntsCC;
 
-	ccStr = strchr(ctx->dataStr, '|');
+	strcpy(dataStr, ctx->dataStr);
+	ccStr = strchr(dataStr, '|');
 	if (ccStr == NULL) ccFlag = false;
 	else {
 		ccFlag = true;
@@ -301,14 +305,14 @@ void gs1_EAN8(gs1_encoder *ctx) {
 		ccStr++; // point to secondary data
 	}
 
-	if (strlen(ctx->dataStr) > 12) {
+	if (strlen(dataStr) > 12) {
 		sprintf(ctx->errMsg, "primary data exceeds 12 digits");
 		ctx->errFlag = true;
 		return;
 	}
 
 	strcpy(tempStr, "000000000000");
-	strcat(tempStr, ctx->dataStr);
+	strcat(tempStr, dataStr);
 	strcat(tempStr, "0"); // check digit = 0 for now
 	strcpy(primaryStr, tempStr + strlen(tempStr) - 13);
 
@@ -514,6 +518,7 @@ void gs1_UPCE(gs1_encoder *ctx) {
 
 	uint8_t (*ccPattern)[CCB4_ELMNTS] = ctx->ccPattern;
 
+	char dataStr[GS1_ENCODERS_MAX_DATA+1];
 	char primaryStr[14+1];
 	char tempStr[28+1];
 
@@ -521,7 +526,8 @@ void gs1_UPCE(gs1_encoder *ctx) {
 	int rows, ccFlag;
 	char *ccStr;
 
-	ccStr = strchr(ctx->dataStr, '|');
+	strcpy(dataStr, ctx->dataStr);
+	ccStr = strchr(dataStr, '|');
 	if (ccStr == NULL) ccFlag = false;
 	else {
 		ccFlag = true;
@@ -529,14 +535,14 @@ void gs1_UPCE(gs1_encoder *ctx) {
 		ccStr++; // point to secondary data
 	}
 
-	if (strlen(ctx->dataStr) > 12) {
+	if (strlen(dataStr) > 12) {
 		sprintf(ctx->errMsg, "primary data exceeds 12 digits");
 		ctx->errFlag = true;
 		return;
 	}
 
 	strcpy(tempStr, "000000000000");
-	strcat(tempStr, ctx->dataStr);
+	strcat(tempStr, dataStr);
 	strcat(tempStr, "0"); // check digit = 0 for now
 	strcpy(primaryStr, tempStr + strlen(tempStr) - 13);
 

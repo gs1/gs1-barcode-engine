@@ -68,25 +68,12 @@ typedef struct gs1_encoder gs1_encoder;
  */
 GS1_ENCODERS_API gs1_encoder* gs1_encoder_init(void);
 
-
-/** @brief Release a gs1_encoder instance.
- *  @param ctx Instance to free.
- */
-GS1_ENCODERS_API void gs1_encoder_free(gs1_encoder *ctx);
-
-
-/** @brief Encode the barcode symbol.
- *  @param ctx gs1_encoder context.
- */
-GS1_ENCODERS_API bool gs1_encoder_encode(gs1_encoder *ctx);
-
 GS1_ENCODERS_API char* gs1_encoder_getVersion(gs1_encoder *ctx);
+
+GS1_ENCODERS_API char* gs1_encoder_getErrMsg(gs1_encoder *ctx);
 
 GS1_ENCODERS_API int gs1_encoder_getSym(gs1_encoder *ctx);
 GS1_ENCODERS_API bool gs1_encoder_setSym(gs1_encoder *ctx, int sym);
-
-GS1_ENCODERS_API bool gs1_encoder_getFileInputFlag(gs1_encoder *ctx);
-GS1_ENCODERS_API bool gs1_encoder_setFileInputFlag(gs1_encoder *ctx, bool fileInputFlag);
 
 GS1_ENCODERS_API int gs1_encoder_getPixMult(gs1_encoder *ctx);
 GS1_ENCODERS_API bool gs1_encoder_setPixMult(gs1_encoder *ctx, int pixMult);
@@ -103,14 +90,11 @@ GS1_ENCODERS_API bool gs1_encoder_setSepHt(gs1_encoder *ctx, int sepHt);
 GS1_ENCODERS_API int gs1_encoder_getSegWidth(gs1_encoder *ctx);
 GS1_ENCODERS_API bool gs1_encoder_setSegWidth(gs1_encoder *ctx, int segWidth);
 
-GS1_ENCODERS_API bool gs1_encoder_getBmp(gs1_encoder *ctx);
-GS1_ENCODERS_API bool gs1_encoder_setBmp(gs1_encoder *ctx, bool bmp);
-
 GS1_ENCODERS_API int gs1_encoder_getLinHeight(gs1_encoder *ctx);
 GS1_ENCODERS_API bool gs1_encoder_setLinHeight(gs1_encoder *ctx, int linHeight);
 
-GS1_ENCODERS_API char* gs1_encoder_getOutFile(gs1_encoder *ctx);
-GS1_ENCODERS_API bool gs1_encoder_setOutFile(gs1_encoder *ctx, char* outFile);
+GS1_ENCODERS_API bool gs1_encoder_getFileInputFlag(gs1_encoder *ctx);
+GS1_ENCODERS_API bool gs1_encoder_setFileInputFlag(gs1_encoder *ctx, bool fileInputFlag);
 
 GS1_ENCODERS_API char* gs1_encoder_getDataStr(gs1_encoder *ctx);
 GS1_ENCODERS_API bool gs1_encoder_setDataStr(gs1_encoder *ctx, char* dataStr);
@@ -118,9 +102,24 @@ GS1_ENCODERS_API bool gs1_encoder_setDataStr(gs1_encoder *ctx, char* dataStr);
 GS1_ENCODERS_API char* gs1_encoder_getDataFile(gs1_encoder *ctx);
 GS1_ENCODERS_API bool gs1_encoder_setDataFile(gs1_encoder *ctx, char* dataFile);
 
-GS1_ENCODERS_API char* gs1_encoder_getErrMsg(gs1_encoder *ctx);
+GS1_ENCODERS_API bool gs1_encoder_getBmp(gs1_encoder *ctx);
+GS1_ENCODERS_API bool gs1_encoder_setBmp(gs1_encoder *ctx, bool bmp);
+
+GS1_ENCODERS_API char* gs1_encoder_getOutFile(gs1_encoder *ctx);
+GS1_ENCODERS_API bool gs1_encoder_setOutFile(gs1_encoder *ctx, char* outFile);
+
+/** @brief Encode the barcode symbol.
+ *  @param ctx gs1_encoder context.
+ */
+GS1_ENCODERS_API bool gs1_encoder_encode(gs1_encoder *ctx);
 
 GS1_ENCODERS_API size_t gs1_encoder_getBuffer(gs1_encoder *ctx, void** out);
+
+/** @brief Release a gs1_encoder instance.
+ *  @param ctx Instance to free.
+ */
+GS1_ENCODERS_API void gs1_encoder_free(gs1_encoder *ctx);
+
 
 
 #ifdef __cplusplus

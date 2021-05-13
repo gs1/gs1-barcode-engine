@@ -426,6 +426,14 @@ static void test_getBuffer() {
 	TEST_CHECK((size = gs1_encoder_getBuffer(ctx, (void*)&buf)) == 1246);
 	TEST_CHECK(memcmp(buf, test_bmp, sizeof(test_bmp)) == 0);
 
+	// Check integrity of dataStr after encode
+	TEST_CHECK(gs1_encoder_setSym(ctx, gs1_encoder_sEAN13));
+	TEST_CHECK(gs1_encoder_setDataStr(ctx, "123456789012|99123456"));
+	TEST_CHECK(gs1_encoder_setOutFile(ctx, ""));
+	TEST_CHECK(gs1_encoder_setBmp(ctx, true));
+	TEST_CHECK(gs1_encoder_encode(ctx));
+	TEST_CHECK(strcmp(gs1_encoder_getDataStr(ctx),"123456789012|99123456") == 0);
+
 	gs1_encoder_free(ctx);
 
 }
