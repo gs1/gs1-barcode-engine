@@ -74,10 +74,8 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get -y --no-install-recommends install clang-tools
+        scan-build -o plist make -C src/c-lib -j `nproc` all CC=clang
         scan-build -o plist make -C src/c-lib -j `nproc` test CC=clang
-        scan-build -o plist make -C src/c-lib -j `nproc` lib CC=clang
-        scan-build -o plist make -C src/c-lib -j `nproc` app CC=clang
-        scan-build -o plist make -C src/c-lib -j `nproc` app-static CC=clang
         [ "$(find plist/ -name *.html)" = '' ];
 
     - name: "clang static analyzer: Store assets on failure"
