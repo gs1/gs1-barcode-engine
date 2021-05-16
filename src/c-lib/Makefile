@@ -7,10 +7,17 @@ APP = $(NAME).bin
 APP_STATIC = $(NAME)-linux.bin
 TEST_BIN = $(NAME)-test
 
-CFLAGS = -g -O2 -D_FORTIFY_SOURCE=2 -Wall -Wextra -Wconversion -Wformat -Wformat-security -pedantic -Werror -MMD -fPIC
-CFLAGS_TEST = -g -O2 -D_FORTIFY_SOURCE=2 -Wall -Wextra -Wformat -Wformat-security -pedantic -Werror -MMD -fPIC
+ifeq ($(SANITIZE),yes)
+CC=clang
+SAN_CFLAGS = -fsanitize=address,leak,undefined -fno-omit-frame-pointer -fno-optimize-sibling-calls -O1
+SAN_LDFLAGS = -fuse-ld=lld
+SAN_ENV = ASAN_OPTIONS="symbolize=1 detect_leaks=1" LSAN_OPTIONS="fast_unwind_on_malloc=0:malloc_context_size=50" ASAN_SYMBOLIZER_PATH="$(shell which llvm-symbolizer)"
+endif
+
+CFLAGS = -g -O2 -D_FORTIFY_SOURCE=2 -Wall -Wextra -Wconversion -Wformat -Wformat-security -pedantic -Werror -MMD -fPIC $(SAN_CFLAGS)
+CFLAGS_TEST = -g -O2 -D_FORTIFY_SOURCE=2 -Wall -Wextra -Wformat -Wformat-security -pedantic -Werror -MMD -fPIC $(SAN_CFLAGS)
 LDLIBS = -lc
-LDFLAGS = -Wl,--as-needed -Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,-z,now
+LDFLAGS = -Wl,--as-needed -Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,-z,now $(SAN_LDFLAGS)
 LDFLAGS_SO = -shared -Wl,-soname,lib$(NAME).so.$(MAJOR)
 
 PREFIX = /usr/local
@@ -86,7 +93,7 @@ $(TEST_BIN): $(OBJS) $(TEST_OBJ)
 #  Utility targets
 #
 test: $(TEST_BIN)
-	./$(TEST_BIN) -v
+	$(SAN_ENV) ./$(TEST_BIN) -v
 
 clean:
 	$(RM) $(OBJS) $(APP_OBJ) $(APP) $(APP_STATIC) $(TEST_BIN) $(TEST_OBJ) *.so* *.a *.d
