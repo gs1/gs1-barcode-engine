@@ -673,7 +673,6 @@ static int getUnusedBitCnt(gs1_encoder *ctx, int iBit, int *size) {
 		*size = false; // size used as error flag for CC-C
 		// calculate cwCnt from # of bits
 		byteCnt = (iBit+7)/8;
-		i = byteCnt/6;
 		cwCnt = (byteCnt/6)*5 + byteCnt%6;
 		// find # of ecc codewords
 		for (i = 0, ctx->eccCnt = 8; ctx->eccCnt <= 64; i++, ctx->eccCnt *= 2) {

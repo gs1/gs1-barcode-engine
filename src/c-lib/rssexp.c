@@ -266,12 +266,6 @@ void gs1_RSSExp(gs1_encoder *ctx) {
 	char *ccStr;
 	int rPadl1, rPadcc;
 
-	// Initialise to avoid compiler warnings
-	lNdx = 0;
-	lMods = 0;
-	lHeight = 0;
-	rPadcc = 0;
-
 	strcpy(dataStr, ctx->dataStr);
 	ccStr = strchr(dataStr, '|');
 	if (ccStr == NULL) ccFlag = false;
@@ -385,7 +379,6 @@ void gs1_RSSExp(gs1_encoder *ctx) {
 	prints.rightPad = 0;
 
 	for (i = 0; i < segs-ctx->segWidth; i += ctx->segWidth) {
-		j = i + ctx->segWidth; // last segment number + 1 in this row
 
 		rev = evenRow ^ ((i/2)&1);
 		prints.pattern = &linPattern[(i/2)*(8+5+8)+(i&1)*8];
@@ -457,7 +450,6 @@ void gs1_RSSExp(gs1_encoder *ctx) {
 		// bottom right offset RSS E row
 		gs1_driverAddRow(ctx, &prints);
 	}
-	evenRow = !evenRow;
 
 	gs1_driverFinalise(ctx);
 
