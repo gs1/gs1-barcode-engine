@@ -21,12 +21,12 @@ jobs:
     - name: clang CI
       working-directory: src/c-lib
       run: |
-        make lib CC=clang SANITIZE=yes
         make test CC=clang SANITIZE=yes
+        make lib CC=clang SANITIZE=yes
         make app CC=clang SANITIZE=yes
-        LD_LIBRARY_PATH=. ./gs1encoders.bin --version
+        LD_LIBRARY_PATH=build build/gs1encoders.bin --version
         make app-static CC=clang SANITIZE=yes
-        ./gs1encoders-linux.bin --version
+        build/gs1encoders-linux.bin --version
 
   ci-gcc:
 
@@ -39,12 +39,12 @@ jobs:
     - name: gcc CI
       working-directory: src/c-lib
       run: |
-        make lib CC=gcc
         make test CC=gcc
+        make lib CC=gcc
         make app CC=gcc
-        LD_LIBRARY_PATH=. ./gs1encoders.bin --version
+        LD_LIBRARY_PATH=build build/gs1encoders.bin --version
         make app-static CC=gcc
-        ./gs1encoders-linux.bin --version
+        build/gs1encoders-linux.bin --version
 
   ci-msvc:
 
@@ -139,13 +139,13 @@ jobs:
       working-directory: src/c-lib
       run: |
         make CC=clang
-        ./gs1encoders-linux.bin --version
+        build/gs1encoders-linux.bin --version
 
     - name: Store Linux build
       uses: actions/upload-artifact@v2
       with:
         name: linux-app
-        path: src/c-lib/gs1encoders-linux.bin
+        path: src/c-lib/build/gs1encoders-linux.bin
 
 
   #
