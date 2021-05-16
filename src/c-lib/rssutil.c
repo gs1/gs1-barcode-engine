@@ -149,7 +149,7 @@ struct sPrints *gs1_cnvSeparator(gs1_encoder *ctx, struct sPrints *prints)
 	}
 	for ( ; i < prints->elmCnt; i++, j++) {
 		sepPattern[j] = prints->pattern[i];
-		if (prints->pattern[i] + prints->pattern[i+1] + prints->pattern[i+2] == 13) {
+		if (i < prints->elmCnt - 2 && prints->pattern[i] + prints->pattern[i+1] + prints->pattern[i+2] == 13) {
 			if ((j&1)==1) {
 				// finder is light/dark/light
 				for (k = 0; k < prints->pattern[i]; k++) {
