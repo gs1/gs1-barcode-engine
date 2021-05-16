@@ -52,7 +52,8 @@ DEPS = $(addprefix $(BUILD_DIR)/, $(ALL_SRCS:.c=.d))
 
 .PHONY: all clean app app-static lib libshared libstatic install install-static install-shared uninstall test clean-test
 
-all: lib app-static
+default: lib app-static
+all: lib app app-static
 lib: libshared libstatic
 libshared: $(LIB_SHARED)
 libstatic: $(LIB_STATIC)
