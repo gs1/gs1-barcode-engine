@@ -19,14 +19,13 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: clang CI
-      working-directory: src/c-lib
       run: |
-        make test CC=clang SANITIZE=yes
-        make lib CC=clang SANITIZE=yes
-        make app CC=clang SANITIZE=yes
-        LD_LIBRARY_PATH=build build/gs1encoders.bin --version
-        make app-static CC=clang SANITIZE=yes
-        build/gs1encoders-linux.bin --version
+        make -C src/c-lib -j `nproc` test CC=clang SANITIZE=yes
+        make -C src/c-lib -j `nproc` lib CC=clang SANITIZE=yes
+        make -C src/c-lib -j `nproc` app CC=clang SANITIZE=yes
+        LD_LIBRARY_PATH=src/c-lib/build src/c-lib/build/gs1encoders.bin --version
+        make -C src/c-lib -j `nproc` app-static CC=clang SANITIZE=yes
+        src/c-lib/build/gs1encoders-linux.bin --version
 
   ci-gcc:
 
@@ -37,14 +36,13 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: gcc CI
-      working-directory: src/c-lib
       run: |
-        make test CC=gcc
-        make lib CC=gcc
-        make app CC=gcc
-        LD_LIBRARY_PATH=build build/gs1encoders.bin --version
-        make app-static CC=gcc
-        build/gs1encoders-linux.bin --version
+        make -C src/c-lib -j `nproc` test CC=gcc
+        make -C src/c-lib -j `nproc` lib CC=gcc
+        make -C src/c-lib -j `nproc` app CC=gcc
+        LD_LIBRARY_PATH=src/c-lib/build src/c-lib/build/gs1encoders.bin --version
+        make -C src/c-lib -j `nproc` app-static CC=gcc
+        src/c-lib/build/gs1encoders-linux.bin --version
 
   ci-msvc:
 
@@ -63,6 +61,32 @@ jobs:
         c-lib\build\test\x64\Release\gs1encoders-test.exe
         c-lib\build\console-app\x64\Release\gs1encoders-app.exe --version
         dotnet\bin\Release\gs1encoders-dotnet.exe --version
+
+  ci-scan-build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - uses: actions/checkout@v2
+
+    - name: clang static analyser CI
+      run: |
+        sudo apt-get update
+        sudo apt-get -y --no-install-recommends install clang-tools
+        scan-build -o plist make -C src/c-lib -j `nproc` test CC=clang
+        scan-build -o plist make -C src/c-lib -j `nproc` lib CC=clang
+        scan-build -o plist make -C src/c-lib -j `nproc` app CC=clang
+        scan-build -o plist make -C src/c-lib -j `nproc` app-static CC=clang
+        [ "$(find plist/ -name *.html)" = '' ];
+
+    - name: "clang static analyzer: Store assets on failure"
+      uses: actions/upload-artifact@v2
+      with:
+        name: clang-scan.tgz
+        path: plist/**/*.html
+        retention-days: 30
+      if: ${{ failure() }}
 
 
   #
@@ -136,10 +160,9 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Linux release build
-      working-directory: src/c-lib
       run: |
-        make CC=clang
-        build/gs1encoders-linux.bin --version
+        make -C src/c-lib -j `nproc` CC=clang
+        src/c-lib/build/gs1encoders-linux.bin --version
 
     - name: Store Linux build
       uses: actions/upload-artifact@v2
