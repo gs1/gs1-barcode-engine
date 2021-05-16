@@ -21,11 +21,11 @@ jobs:
     - name: clang CI
       working-directory: src/c-lib
       run: |
-        make lib CC=clang
-        make test CC=clang
-        make app CC=clang
+        make lib CC=clang SANITIZE=yes
+        make test CC=clang SANITIZE=yes
+        make app CC=clang SANITIZE=yes
         LD_LIBRARY_PATH=. ./gs1encoders.bin --version
-        make app-static CC=clang
+        make app-static CC=clang SANITIZE=yes
         ./gs1encoders-linux.bin --version
 
   ci-gcc:
