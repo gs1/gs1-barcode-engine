@@ -341,11 +341,12 @@ bool gs1_doDriverInit(gs1_encoder *ctx, long xdim, long ydim) {
 // This is normally called with a wrapper
 bool gs1_doDriverAddRow(gs1_encoder *ctx, struct sPrints *prints) {
 
-	struct sPrints *row = &ctx->driver_rowBuffer[ctx->driver_numRows++];
+	struct sPrints *row;
 
 	if (ctx->bmp) {
 
 		// Buffer the row and its pattern
+		row = &ctx->driver_rowBuffer[ctx->driver_numRows++];
 		memcpy(row, prints, sizeof(struct sPrints));
 		if ((row->pattern = malloc((unsigned int)prints->elmCnt * sizeof(uint8_t))) == NULL) {
 			strcpy(ctx->errMsg, "Out of memory");
