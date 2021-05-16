@@ -43,8 +43,11 @@ static const char* SYMBOLOGY_NAMES[] =
 	"GS1-128 with CC-C"
 };
 
+
 // Replacement for the deprecated gets(3) function
-static char* gets(char* in) {
+#define gets(i) _gets(i)
+
+static char* _gets(char* in) {
 
 	char* s;
 
@@ -54,6 +57,7 @@ static char* gets(char* in) {
 	}
 	return s;
 }
+
 
 static bool getSym(gs1_encoder *ctx) {
 
