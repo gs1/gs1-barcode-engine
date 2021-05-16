@@ -127,4 +127,24 @@ GS1_ENCODERS_API void gs1_encoder_free(gs1_encoder *ctx);
 #endif
 
 
+#ifdef UNIT_TESTS
+
+void test_api_getVersion();
+void test_api_defaults();
+void test_api_sym();
+void test_api_fileInputFlag();
+void test_api_pixMult();
+void test_api_XYundercut();
+void test_api_sepHt();
+void test_api_segWidth();
+void test_api_linHeight();
+void test_api_outFile();
+void test_api_dataFile();
+void test_api_dataStr();
+void test_api_bmp();
+void test_api_getBuffer();
+
+#endif
+
+
 #endif /* ENC_H */
