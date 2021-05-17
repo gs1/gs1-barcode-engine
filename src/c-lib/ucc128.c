@@ -315,7 +315,7 @@ static int enc128(uint8_t data[], uint8_t bars[], int link)
 	/* convert ASCII data to symbol characters */
 	/* loop until data or symchr array expires */
 
-	while ((data[di] != 0) && (si < UCC128_SYMMAX-2)) {
+	while ((data[di] != 0) && (si < UCC128_SYMMAX - 2 - (link > 0 ? 1:0))) {
 
 		switch (code) {
 
