@@ -60,6 +60,13 @@ enum {
 };
 
 
+enum {
+	gs1_encoder_dBMP = 0,		// BMP format
+	gs1_encoder_dTIF = 1,		// TIFF format
+	gs1_encoder_dRAW = 2,		// TIFF without header
+};
+
+
 /** @brief A gs1_encoder context.
  */
 typedef struct gs1_encoder gs1_encoder;
@@ -103,8 +110,8 @@ GS1_ENCODERS_API bool gs1_encoder_setDataStr(gs1_encoder *ctx, char* dataStr);
 GS1_ENCODERS_API char* gs1_encoder_getDataFile(gs1_encoder *ctx);
 GS1_ENCODERS_API bool gs1_encoder_setDataFile(gs1_encoder *ctx, char* dataFile);
 
-GS1_ENCODERS_API bool gs1_encoder_getBmp(gs1_encoder *ctx);
-GS1_ENCODERS_API bool gs1_encoder_setBmp(gs1_encoder *ctx, bool bmp);
+GS1_ENCODERS_API int gs1_encoder_getFormat(gs1_encoder *ctx);
+GS1_ENCODERS_API bool gs1_encoder_setFormat(gs1_encoder *ctx, int format);
 
 GS1_ENCODERS_API char* gs1_encoder_getOutFile(gs1_encoder *ctx);
 GS1_ENCODERS_API bool gs1_encoder_setOutFile(gs1_encoder *ctx, char* outFile);
@@ -142,7 +149,7 @@ void test_api_linHeight(void);
 void test_api_outFile(void);
 void test_api_dataFile(void);
 void test_api_dataStr(void);
-void test_api_bmp(void);
+void test_api_format(void);
 void test_api_getBuffer(void);
 
 #endif

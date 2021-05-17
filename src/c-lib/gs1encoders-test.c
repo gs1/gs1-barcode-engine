@@ -50,7 +50,7 @@ TEST_LIST = {
     { "api_outFile", test_api_outFile },
     { "api_dataFile", test_api_dataFile },
     { "api_dataStr", test_api_dataStr },
-    { "api_bmp", test_api_bmp },
+    { "api_format", test_api_format },
     { "api_getBuffer", test_api_getBuffer },
 
 

@@ -152,19 +152,19 @@ static bool userInt(gs1_encoder *ctx) {
 		printf("\n 1) Enter X pixels to undercut. Current value = %d", gs1_encoder_getXundercut(ctx));
 		printf("\n 2) Enter Y pixels to undercut. Current value = %d", gs1_encoder_getYundercut(ctx));
 		printf("\n 3) Enter %s output file name. Current name = %s",
-							 (gs1_encoder_getBmp(ctx)) ? "BMP":"TIF", gs1_encoder_getOutFile(ctx));
+							 (gs1_encoder_getFormat(ctx) == gs1_encoder_dBMP) ? "BMP":"TIF", gs1_encoder_getOutFile(ctx));
 		printf("\n 4) Select keyboard or file input source. Current = %s",
 							 (gs1_encoder_getFileInputFlag(ctx)) ? "file":"keyboard");
 		if (!gs1_encoder_getFileInputFlag(ctx)) { // for kbd input
 			printf("\n 5) Key enter data input string. %s output file will be created.",
-							 (gs1_encoder_getBmp(ctx)) ? "BMP":"TIF");
+							 (gs1_encoder_getFormat(ctx) == gs1_encoder_dBMP) ? "BMP":"TIF");
 		}
 		else {
 			printf("\n 5) Enter data input file name. %s output file will be created.",
-							 (gs1_encoder_getBmp(ctx)) ? "BMP":"TIF");
+							 (gs1_encoder_getFormat(ctx) == gs1_encoder_dBMP) ? "BMP":"TIF");
 		}
 		printf("\n 6) Select TIF or BMP format. Current = %s",
-							 (gs1_encoder_getBmp(ctx)) ? "BMP":"TIF");
+							 (gs1_encoder_getFormat(ctx) == gs1_encoder_dBMP) ? "BMP":"TIF");
 		if (gs1_encoder_getSym(ctx) == gs1_encoder_sRSSEXP) {
 			printf("\n 7) Select maximum segments per row. Current value = %d", gs1_encoder_getSegWidth(ctx));
 		}
@@ -221,7 +221,7 @@ static bool userInt(gs1_encoder *ctx) {
 				break;
 			case 3:
 				printf("\nEnter %s output file name with extension: ",
-							 (gs1_encoder_getBmp(ctx)) ? "BMP":"TIF");
+							 (gs1_encoder_getFormat(ctx) == gs1_encoder_dBMP) ? "BMP":"TIF");
 				if (gets(inpStr) == NULL)
 					return false;
 				if (!gs1_encoder_setOutFile(ctx, inpStr)) {
@@ -275,7 +275,7 @@ static bool userInt(gs1_encoder *ctx) {
 					printf("OUT OF RANGE. PLEASE ENTER 0 or 1");
 					continue;
 				}
-				if (!gs1_encoder_setBmp(ctx, i == 1)) {
+				if (!gs1_encoder_setFormat(ctx, (i == 1) ? gs1_encoder_dBMP : gs1_encoder_dTIF)) {
 					printf("\nERROR: %s\n", gs1_encoder_getErrMsg(ctx));
 					continue;
 				}

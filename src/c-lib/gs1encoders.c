@@ -58,7 +58,7 @@ GS1_ENCODERS_API gs1_encoder* gs1_encoder_init(void) {
 	ctx->sepHt = 1;
 	ctx->segWidth = 22;
 	ctx->linHeight = 25;
-	ctx->bmp = false;
+	ctx->format = gs1_encoder_dTIF;
 	strcpy(ctx->dataStr, "");
 	strcpy(ctx->dataFile, "data.txt");
 	ctx->fileInputFlag = false; // for kbd input
@@ -228,18 +228,31 @@ GS1_ENCODERS_API bool gs1_encoder_setSegWidth(gs1_encoder *ctx, int segWidth) {
 }
 
 
-GS1_ENCODERS_API bool gs1_encoder_getBmp(gs1_encoder *ctx) {
+GS1_ENCODERS_API int gs1_encoder_getFormat(gs1_encoder *ctx) {
 	assert(ctx);
 	reset_error(ctx);
-	return ctx->bmp;
+	return ctx->format;
 }
-GS1_ENCODERS_API bool gs1_encoder_setBmp(gs1_encoder *ctx, bool bmp) {
+GS1_ENCODERS_API bool gs1_encoder_setFormat(gs1_encoder *ctx, int format) {
 	assert(ctx);
 	reset_error(ctx);
-	if (ctx->bmp == bmp) return true;
-	if (strcmp(ctx->outFile, "") != 0)
-		strcpy(ctx->outFile, bmp ? DEFAULT_BMP_FILE : DEFAULT_TIF_FILE);
-	ctx->bmp = bmp;
+	if (ctx->format == format) return true;
+	if (strcmp(ctx->outFile, "") != 0) {
+		switch (format) {
+			case gs1_encoder_dBMP:
+				strcpy(ctx->outFile, DEFAULT_BMP_FILE);
+				break;
+			case gs1_encoder_dTIF:
+				strcpy(ctx->outFile, DEFAULT_TIF_FILE);
+				break;
+			case gs1_encoder_dRAW:
+				strcpy(ctx->outFile, "");
+				break;
+			default:     // No such format
+				return false;
+		}
+	}
+	ctx->format = format;
 	return true;
 }
 
@@ -444,7 +457,7 @@ void test_api_defaults(void) {
 	TEST_CHECK(gs1_encoder_getSepHt(ctx) == 1);
 	TEST_CHECK(gs1_encoder_getSegWidth(ctx) == 22);
 	TEST_CHECK(gs1_encoder_getLinHeight(ctx) == 25);
-	TEST_CHECK(gs1_encoder_getBmp(ctx) == false);    // tiff
+	TEST_CHECK(gs1_encoder_getFormat(ctx) == gs1_encoder_dTIF);
 	TEST_CHECK(strcmp(gs1_encoder_getOutFile(ctx), DEFAULT_TIF_FILE) == 0);
 	TEST_CHECK(gs1_encoder_getFileInputFlag(ctx) == false);    // dataStr
 	TEST_CHECK(strcmp(gs1_encoder_getDataStr(ctx), "") == 0);
@@ -688,38 +701,38 @@ void test_api_outFile(void) {
 }
 
 
-void test_api_bmp(void) {
+void test_api_format(void) {
 
 	gs1_encoder* ctx;
 
 	TEST_ASSERT((ctx = gs1_encoder_init()) != NULL);
 
-	TEST_CHECK(gs1_encoder_setBmp(ctx, false));      // tif
+	TEST_CHECK(gs1_encoder_setFormat(ctx, gs1_encoder_dTIF));
 	TEST_CHECK(gs1_encoder_setOutFile(ctx, "test.file"));
-	TEST_CHECK(gs1_encoder_setBmp(ctx, true));       // now bmp, reset filename
-	TEST_CHECK(gs1_encoder_getBmp(ctx) == true);
+	TEST_CHECK(gs1_encoder_setFormat(ctx, gs1_encoder_dBMP));       // reset filename
+	TEST_CHECK(gs1_encoder_getFormat(ctx) == gs1_encoder_dBMP);
 	TEST_CHECK(strcmp(gs1_encoder_getOutFile(ctx), DEFAULT_BMP_FILE) == 0);
 	TEST_CHECK(gs1_encoder_setOutFile(ctx, "test.file"));
-	TEST_CHECK(gs1_encoder_setBmp(ctx, true));       // still bmp, no change
+	TEST_CHECK(gs1_encoder_setFormat(ctx, gs1_encoder_dBMP));       // still bmp, no change
 	TEST_CHECK(strcmp(gs1_encoder_getOutFile(ctx), "test.file") == 0);
 
-	TEST_CHECK(gs1_encoder_setBmp(ctx, true));       // bmp
+	TEST_CHECK(gs1_encoder_setFormat(ctx, gs1_encoder_dBMP));
 	TEST_CHECK(gs1_encoder_setOutFile(ctx, "test.file"));
-	TEST_CHECK(gs1_encoder_setBmp(ctx, false));      // now tif, reset filename
-	TEST_CHECK(gs1_encoder_getBmp(ctx) == false);
+	TEST_CHECK(gs1_encoder_setFormat(ctx, gs1_encoder_dTIF));      // reset filename
+	TEST_CHECK(gs1_encoder_getFormat(ctx) == gs1_encoder_dTIF);
 	TEST_CHECK(strcmp(gs1_encoder_getOutFile(ctx), DEFAULT_TIF_FILE) == 0);
 	TEST_CHECK(gs1_encoder_setOutFile(ctx, "test.file"));
-	TEST_CHECK(gs1_encoder_setBmp(ctx, false));      // still tiff, change
+	TEST_CHECK(gs1_encoder_setFormat(ctx, gs1_encoder_dTIF));      // still tiff, change
 	TEST_CHECK(strcmp(gs1_encoder_getOutFile(ctx), "test.file") == 0);
 
-	TEST_CHECK(gs1_encoder_setBmp(ctx, true));       // bmp
+	TEST_CHECK(gs1_encoder_setFormat(ctx, gs1_encoder_dBMP));
 	TEST_CHECK(gs1_encoder_setOutFile(ctx, ""));
-	TEST_CHECK(gs1_encoder_setBmp(ctx, false));      // now tif, don't reset empty filename
+	TEST_CHECK(gs1_encoder_setFormat(ctx, gs1_encoder_dTIF));      // now tif, don't reset empty filename
 	TEST_CHECK(strcmp(gs1_encoder_getOutFile(ctx), "") == 0);
 
-	TEST_CHECK(gs1_encoder_setBmp(ctx, false));      // tif
+	TEST_CHECK(gs1_encoder_setFormat(ctx, gs1_encoder_dTIF));
 	TEST_CHECK(gs1_encoder_setOutFile(ctx, ""));
-	TEST_CHECK(gs1_encoder_setBmp(ctx, true));       // now bmp, don't reset empty filename
+	TEST_CHECK(gs1_encoder_setFormat(ctx, gs1_encoder_dBMP));       // now bmp, don't reset empty filename
 	TEST_CHECK(strcmp(gs1_encoder_getOutFile(ctx), "") == 0);
 
 	gs1_encoder_free(ctx);
@@ -800,13 +813,13 @@ void test_api_getBuffer(void) {
 	TEST_CHECK(gs1_encoder_setDataStr(ctx, "123456789012"));
 	TEST_CHECK(gs1_encoder_setOutFile(ctx, ""));
 
-	TEST_CHECK(gs1_encoder_setBmp(ctx, false));
+	TEST_CHECK(gs1_encoder_setFormat(ctx, gs1_encoder_dTIF));
 	TEST_CHECK(gs1_encoder_encode(ctx));
 	TEST_CHECK((size = gs1_encoder_getBuffer(ctx, (void*)&buf)) == 1234);  // Really!
 	assert(buf);
 	TEST_CHECK(memcmp(buf, test_tif, sizeof(test_tif)) == 0);
 
-	TEST_CHECK(gs1_encoder_setBmp(ctx, true));
+	TEST_CHECK(gs1_encoder_setFormat(ctx, gs1_encoder_dBMP));
 	TEST_CHECK(gs1_encoder_encode(ctx));
 	TEST_CHECK((size = gs1_encoder_getBuffer(ctx, (void*)&buf)) == 1246);
 	assert(buf);
@@ -816,7 +829,7 @@ void test_api_getBuffer(void) {
 	TEST_CHECK(gs1_encoder_setSym(ctx, gs1_encoder_sEAN13));
 	TEST_CHECK(gs1_encoder_setDataStr(ctx, "123456789012|99123456"));
 	TEST_CHECK(gs1_encoder_setOutFile(ctx, ""));
-	TEST_CHECK(gs1_encoder_setBmp(ctx, true));
+	TEST_CHECK(gs1_encoder_setFormat(ctx, gs1_encoder_dTIF));
 	TEST_CHECK(gs1_encoder_encode(ctx));
 	TEST_CHECK(strcmp(gs1_encoder_getDataStr(ctx),"123456789012|99123456") == 0);
 

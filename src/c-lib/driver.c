@@ -203,7 +203,7 @@ static void printElmnts(gs1_encoder *ctx, struct sPrints *prints) {
 		white = white^1; // invert if reversed even elements
 		undercut = -undercut;
 	}
-	xorMsk = ctx->bmp ? 0xFF : 0; // invert BMP bits
+	xorMsk = ctx->format == gs1_encoder_dBMP ? 0xFF : 0; // invert BMP bits
 	if (ctx->line1) {
 		for (i = 0; i < MAX_LINE/8; i++) {
 			line[i] = xorMsk;
@@ -277,7 +277,7 @@ static void printElmnts(gs1_encoder *ctx, struct sPrints *prints) {
 			return;
 		}
 	}
-	if (ctx->bmp) {
+	if (ctx->format == gs1_encoder_dBMP) {
 		while ((ndx & 3) != 0) {
 			line[ndx++] = 0xFF; // pad to long word boundary for .BMP
 			if (ndx >= MAX_LINE/8 + 1) {
@@ -320,7 +320,7 @@ bool gs1_doDriverInit(gs1_encoder *ctx, long xdim, long ydim) {
 		ctx->bufferSize = 0;
 	}
 
-	if (ctx->bmp) {
+	if (ctx->format == gs1_encoder_dBMP) {
 		if ((ctx->driver_rowBuffer = malloc((unsigned long)ydim * sizeof(struct sPrints))) == NULL) {
 			strcpy(ctx->errMsg, "Out of memory");
 			ctx->errFlag = true;
@@ -343,7 +343,7 @@ bool gs1_doDriverAddRow(gs1_encoder *ctx, struct sPrints *prints) {
 
 	struct sPrints *row;
 
-	if (ctx->bmp) {
+	if (ctx->format == gs1_encoder_dBMP) {
 
 		// Buffer the row and its pattern
 		row = &ctx->driver_rowBuffer[ctx->driver_numRows++];
@@ -370,7 +370,7 @@ bool gs1_doDriverFinalise(gs1_encoder *ctx) {
 	uint8_t* buf;
 	int i;
 
-	if (ctx->bmp) {
+	if (ctx->format == gs1_encoder_dBMP) {
 		// Emit the rows in reverse, releasing their patterns
 		for (i = ctx->driver_numRows - 1; i >= 0; i--) {
 			printElmnts(ctx, &ctx->driver_rowBuffer[i]);

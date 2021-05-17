@@ -63,7 +63,7 @@ struct gs1_encoder {
 	int Yundercut;		// Y pixels to undercut
 	int sepHt;		// separator row height
 	int segWidth;
-	int bmp;		// true is BMP else TIF file output
+	int format;		// BMP, TIF or RAW
 	int linHeight;		// height of UCC/EAN-128 in X
 	char dataStr[GS1_ENCODERS_MAX_DATA+1];
 	char dataFile[GS1_ENCODERS_MAX_FNAME+1];
