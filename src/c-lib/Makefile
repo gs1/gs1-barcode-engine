@@ -113,7 +113,7 @@ $(TEST_BIN): $(OBJS) $(TEST_OBJ)
 #  Utility targets
 #
 test: $(TEST_BIN)
-	$(SAN_ENV) ./$(TEST_BIN) -v
+	$(SAN_ENV) ./$(TEST_BIN)
 
 clean:
 	$(RM) $(OBJS) $(APP_OBJ) $(APP) $(APP_STATIC) $(TEST_BIN) $(TEST_OBJ) $(LIB_STATIC) $(LIB_SHARED) $(DEPS)
