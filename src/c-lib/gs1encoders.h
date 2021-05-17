@@ -123,6 +123,12 @@ GS1_ENCODERS_API bool gs1_encoder_encode(gs1_encoder *ctx);
 
 GS1_ENCODERS_API size_t gs1_encoder_getBuffer(gs1_encoder *ctx, void** out);
 
+GS1_ENCODERS_API int gs1_encoder_getBufferWidth(gs1_encoder *ctx);
+
+GS1_ENCODERS_API int gs1_encoder_getBufferHeight(gs1_encoder *ctx);
+
+GS1_ENCODERS_API size_t gs1_encoder_getBufferStrings(gs1_encoder *ctx, char*** out);
+
 /** @brief Release a gs1_encoder instance.
  *  @param ctx Instance to free.
  */

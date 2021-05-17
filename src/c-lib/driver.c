@@ -38,6 +38,8 @@ static bool emitData(gs1_encoder *ctx, void *data, size_t len) {
 				free(ctx->buffer);
 				ctx->bufferCap = 0;
 				ctx->bufferSize = 0;
+				ctx->bufferWidth = 0;
+				ctx->bufferHeight = 0;
 				strcpy(ctx->errMsg, "Failed to expand buffer");
 				ctx->errFlag = true;
 				return false;
@@ -318,6 +320,8 @@ bool gs1_doDriverInit(gs1_encoder *ctx, long xdim, long ydim) {
 		}
 		ctx->bufferCap = 512;
 		ctx->bufferSize = 0;
+		ctx->bufferWidth = (int)xdim;
+		ctx->bufferHeight = (int)ydim;
 	}
 
 	if (ctx->format == gs1_encoder_dBMP) {
@@ -329,7 +333,7 @@ bool gs1_doDriverInit(gs1_encoder *ctx, long xdim, long ydim) {
 		ctx->driver_numRows = 0;
 
 		bmpHeader(ctx, xdim, ydim);
-	} else {
+	} else if (ctx->format == gs1_encoder_dTIF) {
 		tifHeader(ctx, xdim, ydim);
 	}
 
@@ -338,7 +342,6 @@ bool gs1_doDriverInit(gs1_encoder *ctx, long xdim, long ydim) {
 }
 
 
-// This is normally called with a wrapper
 bool gs1_doDriverAddRow(gs1_encoder *ctx, struct sPrints *prints) {
 
 	struct sPrints *row;
@@ -355,7 +358,7 @@ bool gs1_doDriverAddRow(gs1_encoder *ctx, struct sPrints *prints) {
 		}
 		memcpy(row->pattern, prints->pattern, (unsigned int)prints->elmCnt * sizeof(uint8_t));
 
-	} else {
+	} else {  // TIF and RAW
 		// Directly emit the row
 		printElmnts(ctx, prints);
 	}

@@ -41,6 +41,19 @@ static void reset_error(gs1_encoder *ctx) {
 	ctx->errMsg[0] = '\0';
 }
 
+
+static void free_bufferStrings(gs1_encoder *ctx) {
+	int i = 0;
+	assert(ctx);
+	if (ctx->bufferStrings) {
+		while (ctx->bufferStrings[i])
+			free(ctx->bufferStrings[i++]);
+		free(ctx->bufferStrings);
+		ctx->bufferStrings = NULL;
+	}
+}
+
+
 GS1_ENCODERS_API gs1_encoder* gs1_encoder_init(void) {
 
 	gs1_encoder *ctx = malloc(sizeof(gs1_encoder));
@@ -66,6 +79,9 @@ GS1_ENCODERS_API gs1_encoder* gs1_encoder_init(void) {
 	ctx->buffer = NULL;
 	ctx->bufferSize = 0;
 	ctx->bufferCap = 0;
+	ctx->bufferWidth = 0;
+	ctx->bufferHeight = 0;
+	ctx->bufferStrings = NULL;
 	return ctx;
 
 }
@@ -74,6 +90,7 @@ GS1_ENCODERS_API gs1_encoder* gs1_encoder_init(void) {
 GS1_ENCODERS_API void gs1_encoder_free(gs1_encoder *ctx) {
 	assert(ctx);
 	reset_error(ctx);
+	free_bufferStrings(ctx);
 	free(ctx->buffer);
 	free(ctx);
 }
@@ -342,6 +359,10 @@ GS1_ENCODERS_API bool gs1_encoder_encode(gs1_encoder *ctx) {
 	assert(ctx);
 	reset_error(ctx);
 
+	free_bufferStrings(ctx);
+	ctx->bufferWidth = 0;
+	ctx->bufferHeight = 0;
+
 	if (ctx->fileInputFlag) {
 		size_t i;
 		if ((iFile = fopen(ctx->dataFile, "r")) == NULL) {
@@ -419,6 +440,55 @@ GS1_ENCODERS_API size_t gs1_encoder_getBuffer(gs1_encoder *ctx, void** out) {
 	}
 	*out = ctx->buffer;
 	return ctx->bufferSize;
+}
+
+
+GS1_ENCODERS_API size_t gs1_encoder_getBufferStrings(gs1_encoder *ctx, char*** out) {
+	assert(ctx);
+
+	uint8_t *buf;
+	char* string;
+	int w, h, bw, x, y;
+
+	if (!ctx->buffer) {
+		*out = NULL;
+		return 0;
+	}
+
+	if (ctx->bufferStrings) goto out;
+
+	buf = ctx->buffer;
+	w = ctx->bufferWidth;
+	h = ctx->bufferHeight;
+	bw = (w-1)/8+1;
+
+	ctx->bufferStrings = malloc((size_t)(h+1) * sizeof(char*));
+
+	for (y = 0; y < h; y++) {
+		string = malloc((size_t)(w+1) * sizeof(char*));
+		ctx->bufferStrings[y] = string;
+		for (x = 0; x < w; x++) {
+			string[x] = (char)('0' + (buf[bw*y + x/8] >> (7-x%8) & 1));
+		}
+		string[x] = '\0';
+	}
+	ctx->bufferStrings[y] = NULL;
+
+out:
+	*out = ctx->bufferStrings;
+	return (size_t)ctx->bufferHeight;
+}
+
+
+GS1_ENCODERS_API int gs1_encoder_getBufferWidth(gs1_encoder *ctx) {
+	assert(ctx);
+	return ctx->bufferWidth;
+}
+
+
+GS1_ENCODERS_API int gs1_encoder_getBufferHeight(gs1_encoder *ctx) {
+	assert(ctx);
+	return ctx->bufferHeight;
 }
 
 
@@ -803,10 +873,13 @@ void test_api_getBuffer(void) {
 	size_t size;
 	uint8_t test_tif[] = { 0x49, 0x49, 0x2A, 0x00 };
 	uint8_t test_bmp[] = { 0x42, 0x4D, 0xDE, 0x04 };
+	uint8_t test_raw[] = { 0x01, 0x49, 0xBD, 0x3A };
 
 	TEST_ASSERT((ctx = gs1_encoder_init()) != NULL);
 
 	TEST_CHECK(gs1_encoder_getBuffer(ctx, (void*)&buf) == 0);
+	TEST_CHECK(gs1_encoder_getBufferWidth(ctx) == 0);
+	TEST_CHECK(gs1_encoder_getBufferHeight(ctx) == 0);
 	TEST_CHECK(buf == NULL);
 
 	TEST_CHECK(gs1_encoder_setSym(ctx, gs1_encoder_sEAN13));
@@ -816,22 +889,34 @@ void test_api_getBuffer(void) {
 	TEST_CHECK(gs1_encoder_setFormat(ctx, gs1_encoder_dTIF));
 	TEST_CHECK(gs1_encoder_encode(ctx));
 	TEST_CHECK((size = gs1_encoder_getBuffer(ctx, (void*)&buf)) == 1234);  // Really!
+	TEST_CHECK(gs1_encoder_getBufferWidth(ctx) == 109);
+	TEST_CHECK(gs1_encoder_getBufferHeight(ctx) == 74);
 	assert(buf);
 	TEST_CHECK(memcmp(buf, test_tif, sizeof(test_tif)) == 0);
 
 	TEST_CHECK(gs1_encoder_setFormat(ctx, gs1_encoder_dBMP));
 	TEST_CHECK(gs1_encoder_encode(ctx));
 	TEST_CHECK((size = gs1_encoder_getBuffer(ctx, (void*)&buf)) == 1246);
+	TEST_CHECK(gs1_encoder_getBufferWidth(ctx) == 109);
+	TEST_CHECK(gs1_encoder_getBufferHeight(ctx) == 74);
 	assert(buf);
 	TEST_CHECK(memcmp(buf, test_bmp, sizeof(test_bmp)) == 0);
+
+	TEST_CHECK(gs1_encoder_setFormat(ctx, gs1_encoder_dRAW));
+	TEST_CHECK(gs1_encoder_encode(ctx));
+	TEST_CHECK((size = gs1_encoder_getBuffer(ctx, (void*)&buf)) == 1036);
+	TEST_CHECK(gs1_encoder_getBufferWidth(ctx) == 109);
+	TEST_CHECK(gs1_encoder_getBufferHeight(ctx) == 74);
+	assert(buf);
+	TEST_CHECK(memcmp(buf, test_raw, sizeof(test_raw)) == 0);
 
 	// Check integrity of dataStr after encode
 	TEST_CHECK(gs1_encoder_setSym(ctx, gs1_encoder_sEAN13));
 	TEST_CHECK(gs1_encoder_setDataStr(ctx, "123456789012|99123456"));
 	TEST_CHECK(gs1_encoder_setOutFile(ctx, ""));
-	TEST_CHECK(gs1_encoder_setFormat(ctx, gs1_encoder_dTIF));
+	TEST_CHECK(gs1_encoder_setFormat(ctx, gs1_encoder_dRAW));
 	TEST_CHECK(gs1_encoder_encode(ctx));
-	TEST_CHECK(strcmp(gs1_encoder_getDataStr(ctx),"123456789012|99123456") == 0);
+	TEST_CHECK(strcmp(gs1_encoder_getDataStr(ctx), "123456789012|99123456") == 0);
 
 	gs1_encoder_free(ctx);
 

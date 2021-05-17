@@ -69,6 +69,9 @@ struct gs1_encoder {
 	char dataFile[GS1_ENCODERS_MAX_FNAME+1];
 	char outFile[GS1_ENCODERS_MAX_FNAME+1];
 	uint8_t *buffer;	// We may allocate an output buffer
+	int bufferWidth;	// Width of a raw format buffer
+	int bufferHeight;	// Height of a raw format buffer
+	char **bufferStrings;	// We may allocate output as a set of strings
 	char VERSION[16];
 
 	// per-instance globals
