@@ -802,13 +802,13 @@ void test_api_getBuffer() {
 	TEST_CHECK(gs1_encoder_setBmp(ctx, false));
 	TEST_CHECK(gs1_encoder_encode(ctx));
 	TEST_CHECK((size = gs1_encoder_getBuffer(ctx, (void*)&buf)) == 1234);  // Really!
-	TEST_ASSERT(buf != NULL);
+	assert(buf);
 	TEST_CHECK(memcmp(buf, test_tif, sizeof(test_tif)) == 0);
 
 	TEST_CHECK(gs1_encoder_setBmp(ctx, true));
 	TEST_CHECK(gs1_encoder_encode(ctx));
 	TEST_CHECK((size = gs1_encoder_getBuffer(ctx, (void*)&buf)) == 1246);
-	TEST_ASSERT(buf != NULL);
+	assert(buf);
 	TEST_CHECK(memcmp(buf, test_bmp, sizeof(test_bmp)) == 0);
 
 	// Check integrity of dataStr after encode
