@@ -28,8 +28,75 @@
 #endif
 
 #include <stddef.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <string.h>
+
+#include "enc-private.h"
 #include "gs1encoders.h"
 #include "cc.h"
+#include "ucc128.h"
+
+
+void test_print_strings(gs1_encoder *ctx) {
+
+	char **strings;
+
+	gs1_encoder_getBufferStrings(ctx, &strings);
+
+	printf("\n\n");
+
+	int i = 0;
+	while (strings[i]) {
+		printf("%s\n", strings[i++]);
+	}
+
+	printf("\n");
+
+}
+
+
+bool test_encode(gs1_encoder *ctx, char* dataStr, char** expect) {
+
+	char **strings;
+	char *tail;
+	int i = 0;
+
+	TEST_CHECK(gs1_encoder_setDataStr(ctx, dataStr));
+	TEST_CHECK(gs1_encoder_encode(ctx));
+	TEST_CHECK(gs1_encoder_getBufferStrings(ctx, &strings) > 0);
+
+	while (strings[i] && expect[i] &&
+			strcmp(expect[i], "...") != 0 &&
+			strcmp(expect[i], "vvv") != 0) {
+		if (strcmp(strings[i], expect[i]) != 0)
+			return false;
+		i++;
+	}
+
+	if (!expect[i] && !strings[i])
+		return true;   // Matched to the end
+
+	if (!strings[i])
+		return false;  // Symbol too short
+
+	if (expect[i] && strcmp(expect[i], "...") == 0)
+		return true;   // Matched all provided
+
+	if (!expect[i] || strcmp(expect[i], "vvv") != 0)
+		return false;
+
+	// "vvv" provided so we expect same rows all the way down
+	tail = expect[i-1];
+	while (strings[i]) {
+		if (strcmp(strings[i], tail) != 0)
+			return false;
+		i++;
+	}
+
+	return true;
+
+}
 
 
 TEST_LIST = {
@@ -59,6 +126,13 @@ TEST_LIST = {
      *
      */
     { "cc_encode928", test_cc_encode928 },
+
+
+    /*
+     * ucc128.c
+     *
+     */
+    { "ucc128_encode", test_ucc128_encode },
 
     { NULL, NULL }
 };

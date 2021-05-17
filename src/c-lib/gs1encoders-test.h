@@ -18,28 +18,12 @@
  *
  */
 
-#ifndef UCC128_H
-#define UCC128_H
+#ifndef GS1_ENCODERS_TEST_H
+#define GS1_ENCODERS_TEST_H
 
 
-#define UCC128_SYMMAX		53	// UCC/EAN-128 48 symbol chars + strt,FNC1,link,chk & stop max
-#define UCC128_MAX_PAT		10574	// 928*8 + 90*(4*8 + 3) for max codewords and 90 rows
-#define UCC128_L_PAD		(10-9)	// CCC starts -9X from 1st start bar
+void test_print_strings(gs1_encoder *ctx);
+bool test_encode(gs1_encoder *ctx, char* dataStr, char** expect);
 
 
-#include "enc-private.h"
-#include "gs1encoders.h"
-
-
-void gs1_U128A(gs1_encoder *ctx);
-void gs1_U128C(gs1_encoder *ctx);
-
-
-#ifdef UNIT_TESTS
-
-void test_ucc128_encode(void);
-
-#endif
-
-
-#endif
+#endif  /* GS1_ENCODERS_TEST_H */
