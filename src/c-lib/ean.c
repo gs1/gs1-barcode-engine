@@ -75,7 +75,7 @@ static bool EAN13enc(uint8_t str[], uint8_t pattern[] ) {
 			bars = upcTblB[str[sNdx++]-'0'];
 		}
 		for (j = 12; j >= 0; j -= 4) {
-			pattern[pNdx++] = (bars >> j) & 0xf;
+			pattern[pNdx++] = (uint8_t)((bars >> j) & 0xf);
 		}
 	}
 	for (i = 0; i < 5; i++) {
@@ -84,7 +84,7 @@ static bool EAN13enc(uint8_t str[], uint8_t pattern[] ) {
 	for (i = 0; i < 6; i++) {
 		bars = upcTblA[str[sNdx++]-'0'];
 		for (j = 12; j >= 0; j -= 4) {
-			pattern[pNdx++] = (bars >> j) & 0xf;
+			pattern[pNdx++] = (uint8_t)((bars >> j) & 0xf);
 		}
 	}
 	for (i = 0; i < 4; i++) {
@@ -256,7 +256,7 @@ static bool EAN8enc(uint8_t str[], uint8_t pattern[] ) {
 	for (i = 0; i < 4; i++) {
 		bars = upcTblA[str[sNdx++]-'0'];
 		for (j = 12; j >= 0; j -= 4) {
-			pattern[pNdx++] = (bars >> j) & 0xf;
+			pattern[pNdx++] = (uint8_t)((bars >> j) & 0xf);
 		}
 	}
 	for (i = 0; i < 5; i++) {
@@ -265,7 +265,7 @@ static bool EAN8enc(uint8_t str[], uint8_t pattern[] ) {
 	for (i = 0; i < 4; i++) {
 		bars = upcTblA[str[sNdx++]-'0'];
 		for (j = 12; j >= 0; j -= 4) {
-			pattern[pNdx++] = (bars >> j) & 0xf;
+			pattern[pNdx++] = (uint8_t)((bars >> j) & 0xf);
 		}
 	}
 	for (i = 0; i < 4; i++) {
@@ -498,7 +498,7 @@ static bool UPCEenc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[] ) {
 			bars = upcTblB[data6[sNdx++]-'0'];
 		}
 		for (j = 12; j >= 0; j -= 4) {
-			pattern[pNdx++] = (bars >> j) & 0xf;
+			pattern[pNdx++] = (uint8_t)((bars >> j) & 0xf);
 		}
 	}
 	for (i = 0; i < 7; i++) {

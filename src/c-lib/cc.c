@@ -1635,22 +1635,22 @@ static void imgCCA2(int size, uint16_t codeWords[], uint8_t pattern[MAX_CCB4_ROW
 		bars = barRap[0][rapL]; // left rap
 		for (j = 0; j < 6; j++) {
 			// get 6 3-bit widths left to right:
-			pattern[i][1+j] = (uint8_t)(bars >> ((5-j)*3)) & 7;
+			pattern[i][1+j] = (uint8_t)((bars >> ((5-j)*3)) & 7);
 		}
 		bars = barData[rapL%3][codeWords[i*2]]; // data1 in row's cluster
 		for (j = 0; j < 8; j++) {
 			// get 8 3-bit widths left to right:
-			pattern[i][1+6+j] = (uint8_t)(bars >> ((7-j)*3)) & 7;
+			pattern[i][1+6+j] = (uint8_t)((bars >> ((7-j)*3)) & 7);
 		}
 		bars = barData[rapL%3][codeWords[i*2+1]]; // data2 in row's cluster
 		for (j = 0; j < 8; j++) {
 			// get 8 3-bit widths left to right:
-			pattern[i][1+6+8+j] = (uint8_t)(bars >> ((7-j)*3)) & 7;
+			pattern[i][1+6+8+j] = (uint8_t)((bars >> ((7-j)*3)) & 7);
 		}
 		bars = barRap[0][(rapL+32)%52]; // right rap (rotation 32)
 		for (j = 0; j < 6; j++) {
 			// get 6 3-bit widths left to right:
-			pattern[i][1+6+8+8+j] = (uint8_t)(bars >> ((5-j)*3)) & 7;
+			pattern[i][1+6+8+8+j] = (uint8_t)((bars >> ((5-j)*3)) & 7);
 		}
 		pattern[i][1+6+8+8+6] = 1; // right guard
 		pattern[i][1+6+8+8+6+1] = 1; // qz
@@ -1677,22 +1677,22 @@ static void imgCCB2(int size, uint16_t codeWords[], uint8_t pattern[MAX_CCB4_ROW
 		bars = barRap[0][rapL]; // left rap
 		for (j = 0; j < 6; j++) {
 			// get 6 3-bit widths left to right:
-			pattern[i][1+j] = (uint8_t)(bars >> ((5-j)*3)) & 7;
+			pattern[i][1+j] = (uint8_t)((bars >> ((5-j)*3)) & 7);
 		}
 		bars = barData[rapL%3][codeWords[i*2]]; // data1 in row's cluster
 		for (j = 0; j < 8; j++) {
 			// get 8 3-bit widths left to right:
-			pattern[i][1+6+j] = (uint8_t)(bars >> ((7-j)*3)) & 7;
+			pattern[i][1+6+j] = (uint8_t)((bars >> ((7-j)*3)) & 7);
 		}
 		bars = barData[rapL%3][codeWords[i*2+1]]; // data2 in row's cluster
 		for (j = 0; j < 8; j++) {
 			// get 8 3-bit widths left to right:
-			pattern[i][1+6+8+j] = (uint8_t)(bars >> ((7-j)*3)) & 7;
+			pattern[i][1+6+8+j] = (uint8_t)((bars >> ((7-j)*3)) & 7);
 		}
 		bars = barRap[0][(rapL+rotate[size])%52]; // right rap (rotation 0 or 8)
 		for (j = 0; j < 6; j++) {
 			// get 6 3-bit widths left to right:
-			pattern[i][1+6+8+8+j] = (uint8_t)(bars >> ((5-j)*3)) & 7;
+			pattern[i][1+6+8+8+j] = (uint8_t)((bars >> ((5-j)*3)) & 7);
 		}
 		pattern[i][1+6+8+8+6] = 1; // right guard
 		pattern[i][1+6+8+8+6+1] = 1; // qz
@@ -1717,27 +1717,27 @@ static void imgCCA3(int size, uint16_t codeWords[], uint8_t pattern[MAX_CCB4_ROW
 		bars = barData[rapL%3][codeWords[i*3]]; // data1 in row's cluster
 		for (j = 0; j < 8; j++) {
 			// get 8 3-bit widths left to right:
-			pattern[i][1  +j] = (uint8_t)(bars >> ((7-j)*3)) & 7;
+			pattern[i][1  +j] = (uint8_t)((bars >> ((7-j)*3)) & 7);
 		}
 		bars = barRap[1][(rapL+32)%52]; // center rap (rotation 32)
 		for (j = 0; j < 6; j++) {
 			// get 6 3-bit widths left to right:
-			pattern[i][1  +8+j] = (uint8_t)(bars >> ((5-j)*3)) & 7;
+			pattern[i][1  +8+j] = (uint8_t)((bars >> ((5-j)*3)) & 7);
 		}
 		bars = barData[rapL%3][codeWords[i*3+1]]; // data2 in row's cluster
 		for (j = 0; j < 8; j++) {
 			// get 8 3-bit widths left to right:
-			pattern[i][1  +8+6+j] = (uint8_t)(bars >> ((7-j)*3)) & 7;
+			pattern[i][1  +8+6+j] = (uint8_t)((bars >> ((7-j)*3)) & 7);
 		}
 		bars = barData[rapL%3][codeWords[i*3+2]]; // data3 in row's cluster
 		for (j = 0; j < 8; j++) {
 			// get 8 3-bit widths left to right:
-			pattern[i][1  +8+6+8+j] = (uint8_t)(bars >> ((7-j)*3)) & 7;
+			pattern[i][1  +8+6+8+j] = (uint8_t)((bars >> ((7-j)*3)) & 7);
 		}
 		bars = barRap[0][(rapL+32+32)%52]; // right rap (rotation 64)
 		for (j = 0; j < 6; j++) {
 			// get 6 3-bit widths left to right:
-			pattern[i][1  +8+6+8+8+j] = (uint8_t)(bars >> ((5-j)*3)) & 7;
+			pattern[i][1  +8+6+8+8+j] = (uint8_t)((bars >> ((5-j)*3)) & 7);
 		}
 		pattern[i][1  +8+6+8+8+6] = 1; // right guard
 		pattern[i][1  +8+6+8+8+6+1] = 1; // qz
@@ -1764,32 +1764,32 @@ static void imgCCB3(int size, uint16_t codeWords[], uint8_t pattern[MAX_CCB4_ROW
 		bars = barRap[0][rapL]; // left rap
 		for (j = 0; j < 6; j++) {
 			// get 6 3-bit widths left to right:
-			pattern[i][1+j] = (uint8_t)(bars >> ((5-j)*3)) & 7;
+			pattern[i][1+j] = (uint8_t)((bars >> ((5-j)*3)) & 7);
 		}
 		bars = barData[rapL%3][codeWords[i*3]]; // data1 in row's cluster
 		for (j = 0; j < 8; j++) {
 			// get 8 3-bit widths left to right:
-			pattern[i][1+6+j] = (uint8_t)(bars >> ((7-j)*3)) & 7;
+			pattern[i][1+6+j] = (uint8_t)((bars >> ((7-j)*3)) & 7);
 		}
 		bars = barRap[1][(rapL+rotate[size])%52]; // center rap (rotation 0,8,16, or 24)
 		for (j = 0; j < 6; j++) {
 			// get 6 3-bit widths left to right:
-			pattern[i][1+6+8+j] = (uint8_t)(bars >> ((5-j)*3)) & 7;
+			pattern[i][1+6+8+j] = (uint8_t)((bars >> ((5-j)*3)) & 7);
 		}
 		bars = barData[rapL%3][codeWords[i*3+1]]; // data2 in row's cluster
 		for (j = 0; j < 8; j++) {
 			// get 8 3-bit widths left to right:
-			pattern[i][1+6+8+6+j] = (uint8_t)(bars >> ((7-j)*3)) & 7;
+			pattern[i][1+6+8+6+j] = (uint8_t)((bars >> ((7-j)*3)) & 7);
 		}
 		bars = barData[rapL%3][codeWords[i*3+2]]; // data3 in row's cluster
 		for (j = 0; j < 8; j++) {
 			// get 8 3-bit widths left to right:
-			pattern[i][1+6+8+6+8+j] = (uint8_t)(bars >> ((7-j)*3)) & 7;
+			pattern[i][1+6+8+6+8+j] = (uint8_t)((bars >> ((7-j)*3)) & 7);
 		}
 		bars = barRap[0][(rapL+rotate[size]*2)%52]; // right rap (double rotation)
 		for (j = 0; j < 6; j++) {
 			// get 6 3-bit widths left to right:
-			pattern[i][1+6+8+6+8+8+j] = (uint8_t)(bars >> ((5-j)*3)) & 7;
+			pattern[i][1+6+8+6+8+8+j] = (uint8_t)((bars >> ((5-j)*3)) & 7);
 		}
 		pattern[i][1+6+8+6+8+8+6] = 1; // right guard
 		pattern[i][1+6+8+6+8+8+6+1] = 1; // qz
@@ -1815,37 +1815,37 @@ static void imgCCA4(int size, uint16_t codeWords[], uint8_t pattern[MAX_CCB4_ROW
 		bars = barRap[0][rapL]; // left rap
 		for (j = 0; j < 6; j++) {
 			// get 6 3-bit widths left to right:
-			pattern[i][1+j] = (uint8_t)(bars >> ((5-j)*3)) & 7;
+			pattern[i][1+j] = (uint8_t)((bars >> ((5-j)*3)) & 7);
 		}
 		bars = barData[rapL%3][codeWords[i*4]]; // data1 in row's cluster
 		for (j = 0; j < 8; j++) {
 			// get 8 3-bit widths left to right:
-			pattern[i][1+6+j] = (uint8_t)(bars >> ((7-j)*3)) & 7;
+			pattern[i][1+6+j] = (uint8_t)((bars >> ((7-j)*3)) & 7);
 		}
 		bars = barData[rapL%3][codeWords[i*4+1]]; // data1 in row's cluster
 		for (j = 0; j < 8; j++) {
 			// get 8 3-bit widths left to right:
-			pattern[i][1+6+8+j] = (uint8_t)(bars >> ((7-j)*3)) & 7;
+			pattern[i][1+6+8+j] = (uint8_t)((bars >> ((7-j)*3)) & 7);
 		}
 		bars = barRap[1][(rapL+32)%52]; // center rap (rotation 32)
 		for (j = 0; j < 6; j++) {
 			// get 6 3-bit widths left to right:
-			pattern[i][1+6+8+8+j] = (uint8_t)(bars >> ((5-j)*3)) & 7;
+			pattern[i][1+6+8+8+j] = (uint8_t)((bars >> ((5-j)*3)) & 7);
 		}
 		bars = barData[rapL%3][codeWords[i*4+2]]; // data2 in row's cluster
 		for (j = 0; j < 8; j++) {
 			// get 8 3-bit widths left to right:
-			pattern[i][1+6+8+8+6+j] = (uint8_t)(bars >> ((7-j)*3)) & 7;
+			pattern[i][1+6+8+8+6+j] = (uint8_t)((bars >> ((7-j)*3)) & 7);
 		}
 		bars = barData[rapL%3][codeWords[i*4+3]]; // data3 in row's cluster
 		for (j = 0; j < 8; j++) {
 			// get 8 3-bit widths left to right:
-			pattern[i][1+6+8+8+6+8+j] = (uint8_t)(bars >> ((7-j)*3)) & 7;
+			pattern[i][1+6+8+8+6+8+j] = (uint8_t)((bars >> ((7-j)*3)) & 7);
 		}
 		bars = barRap[0][(rapL+32+32)%52]; // right rap (double rotation)
 		for (j = 0; j < 6; j++) {
 			// get 6 3-bit widths left to right:
-			pattern[i][1+6+8+8+6+8+8+j] = (uint8_t)(bars >> ((5-j)*3)) & 7;
+			pattern[i][1+6+8+8+6+8+8+j] = (uint8_t)((bars >> ((5-j)*3)) & 7);
 		}
 		pattern[i][1+6+8+8+6+8+8+6] = 1; // right guard
 		pattern[i][1+6+8+8+6+8+8+6+1] = 1; // qz
@@ -1872,37 +1872,37 @@ static void imgCCB4(int size, uint16_t codeWords[], uint8_t pattern[MAX_CCB4_ROW
 		bars = barRap[0][rapL]; // left rap
 		for (j = 0; j < 6; j++) {
 			// get 6 3-bit widths left to right:
-			pattern[i][1+j] = (uint8_t)(bars >> ((5-j)*3)) & 7;
+			pattern[i][1+j] = (uint8_t)((bars >> ((5-j)*3)) & 7);
 		}
 		bars = barData[rapL%3][codeWords[i*4]]; // data1 in row's cluster
 		for (j = 0; j < 8; j++) {
 			// get 8 3-bit widths left to right:
-			pattern[i][1+6+j] = (uint8_t)(bars >> ((7-j)*3)) & 7;
+			pattern[i][1+6+j] = (uint8_t)((bars >> ((7-j)*3)) & 7);
 		}
 		bars = barData[rapL%3][codeWords[i*4+1]]; // data1 in row's cluster
 		for (j = 0; j < 8; j++) {
 			// get 8 3-bit widths left to right:
-			pattern[i][1+6+8+j] = (uint8_t)(bars >> ((7-j)*3)) & 7;
+			pattern[i][1+6+8+j] = (uint8_t)((bars >> ((7-j)*3)) & 7);
 		}
 		bars = barRap[1][(rapL+rotate[size])%52]; // center rap (rotation 0,8,16, or 24)
 		for (j = 0; j < 6; j++) {
 			// get 6 3-bit widths left to right:
-			pattern[i][1+6+8+8+j] = (uint8_t)(bars >> ((5-j)*3)) & 7;
+			pattern[i][1+6+8+8+j] = (uint8_t)((bars >> ((5-j)*3)) & 7);
 		}
 		bars = barData[rapL%3][codeWords[i*4+2]]; // data2 in row's cluster
 		for (j = 0; j < 8; j++) {
 			// get 8 3-bit widths left to right:
-			pattern[i][1+6+8+8+6+j] = (uint8_t)(bars >> ((7-j)*3)) & 7;
+			pattern[i][1+6+8+8+6+j] = (uint8_t)((bars >> ((7-j)*3)) & 7);
 		}
 		bars = barData[rapL%3][codeWords[i*4+3]]; // data3 in row's cluster
 		for (j = 0; j < 8; j++) {
 			// get 8 3-bit widths left to right:
-			pattern[i][1+6+8+8+6+8+j] = (uint8_t)(bars >> ((7-j)*3)) & 7;
+			pattern[i][1+6+8+8+6+8+j] = (uint8_t)((bars >> ((7-j)*3)) & 7);
 		}
 		bars = barRap[0][(rapL+rotate[size]*2)%52]; // right rap (double rotation)
 		for (j = 0; j < 6; j++) {
 			// get 6 3-bit widths left to right:
-			pattern[i][1+6+8+8+6+8+8+j] = (uint8_t)(bars >> ((5-j)*3)) & 7;
+			pattern[i][1+6+8+8+6+8+8+j] = (uint8_t)((bars >> ((5-j)*3)) & 7);
 		}
 		pattern[i][1+6+8+8+6+8+8+6] = 1; // right guard
 		pattern[i][1+6+8+8+6+8+8+6+1] = 1; // qz
@@ -1941,14 +1941,14 @@ static void imgCCC(gs1_encoder *ctx, uint16_t codeWords[], uint8_t patCCC[]) {
 		bars = barData[cluster][rowFactor + leftRowBase[cluster]]; // left R.I.
 		for (bar = 0; bar < 8; bar++) {
 			// get 8 3-bit widths left to right:
-			patCCC[row*((ctx->colCnt+4)*8+3) + bar+offset] = (uint8_t)(bars >> ((7-bar)*3)) & 7;
+			patCCC[row*((ctx->colCnt+4)*8+3) + bar+offset] = (uint8_t)((bars >> ((7-bar)*3)) & 7);
 		}
 		offset += bar;
 		for (col = 0; col < ctx->colCnt; col++) {
 			bars = barData[cluster][codeWords[cwNdx++]]; // codeword
 			for (bar = 0; bar < 8; bar++) {
 				// get 8 3-bit widths left to right:
-				patCCC[row*((ctx->colCnt+4)*8+3) + bar+offset] = (uint8_t)(bars >> ((7-bar)*3)) & 7;
+				patCCC[row*((ctx->colCnt+4)*8+3) + bar+offset] = (uint8_t)((bars >> ((7-bar)*3)) & 7);
 			}
 			offset += bar;
 		}
@@ -1956,7 +1956,7 @@ static void imgCCC(gs1_encoder *ctx, uint16_t codeWords[], uint8_t patCCC[]) {
 		bars = barData[cluster][rowFactor + leftRowBase[(cluster+2)%3]]; // right R.I.
 		for (bar = 0; bar < 8; bar++) {
 			// get 8 3-bit widths left to right:
-			patCCC[row*((ctx->colCnt+4)*8+3) + bar+offset] = (uint8_t)(bars >> ((7-bar)*3)) & 7;
+			patCCC[row*((ctx->colCnt+4)*8+3) + bar+offset] = (uint8_t)((bars >> ((7-bar)*3)) & 7);
 		}
 		offset += bar;
 		// left qz and start
@@ -2091,7 +2091,7 @@ int gs1_CC2enc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][C
 
 	static const int rows[11] = { 5,6,7,8,9,10,12,  17,20,23,26 }; // 7 CCA & 4 CCB row counts
 
-	uint8_t bitField[MAX_CCB4_BYTES];
+	uint8_t bitField[MAX_CCB4_BYTES] = { 0 };
 	uint16_t codeWords[MAX_CCB4_CW];
 	int size;
 	int i;
@@ -2126,7 +2126,7 @@ int gs1_CC3enc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][C
 
 	static const int rows[11] = { 4,5,6,7,8,  15,20,26,32,38,44 }; // 5 CCA & 6 CCB row counts
 
-	uint8_t bitField[MAX_CCB4_BYTES];
+	uint8_t bitField[MAX_CCB4_BYTES] = { 0 };
 	uint16_t codeWords[MAX_CCB4_CW];
 	int size;
 	int i;
@@ -2161,7 +2161,7 @@ int gs1_CC4enc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][C
 
 	static const int rows[13] = { 3,4,5,6,7,  10,12,15,20,26,32,38,44 }; // 5 CCA & 8 CCB row counts
 
-	uint8_t bitField[MAX_CCB4_BYTES];
+	uint8_t bitField[MAX_CCB4_BYTES] = { 0 };
 	uint16_t codeWords[MAX_CCB4_CW];
 	int size;
 	int i;
@@ -2194,7 +2194,7 @@ int gs1_CC4enc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][C
 
 bool gs1_CCCenc(gs1_encoder *ctx, uint8_t str[], uint8_t patCCC[] ) {
 
-	uint8_t bitField[MAX_CCC_BYTES];
+	uint8_t bitField[MAX_CCC_BYTES] = { 0 };
 	uint16_t codeWords[MAX_CCC_CW];
 	int byteCnt;
 	int i;
