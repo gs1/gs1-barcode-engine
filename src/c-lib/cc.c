@@ -2222,7 +2222,7 @@ bool gs1_CCCenc(gs1_encoder *ctx, uint8_t str[], uint8_t patCCC[] ) {
 #include "acutest.h"
 
 
-void test_cc_encode928() {
+void test_cc_encode928(void) {
 
 	uint16_t codeWords[MAX_CCC_CW];
 

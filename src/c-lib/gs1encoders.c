@@ -416,7 +416,7 @@ GS1_ENCODERS_API size_t gs1_encoder_getBuffer(gs1_encoder *ctx, void** out) {
 #include "acutest.h"
 
 
-void test_api_getVersion() {
+void test_api_getVersion(void) {
 
 	gs1_encoder* ctx;
 	char* version;
@@ -431,7 +431,7 @@ void test_api_getVersion() {
 }
 
 
-void test_api_defaults() {
+void test_api_defaults(void) {
 
 	gs1_encoder* ctx;
 
@@ -455,7 +455,7 @@ void test_api_defaults() {
 }
 
 
-void test_api_sym() {
+void test_api_sym(void) {
 
 	gs1_encoder* ctx;
 
@@ -490,7 +490,7 @@ void test_api_sym() {
 }
 
 
-void test_api_fileInputFlag() {
+void test_api_fileInputFlag(void) {
 
 	gs1_encoder* ctx;
 
@@ -504,7 +504,7 @@ void test_api_fileInputFlag() {
 }
 
 
-void test_api_pixMult() {
+void test_api_pixMult(void) {
 
 	gs1_encoder* ctx;
 
@@ -559,7 +559,7 @@ void test_api_pixMult() {
 }
 
 
-void test_api_XYundercut() {
+void test_api_XYundercut(void) {
 
 	gs1_encoder* ctx;
 
@@ -594,7 +594,7 @@ void test_api_XYundercut() {
 }
 
 
-void test_api_sepHt() {
+void test_api_sepHt(void) {
 
 	gs1_encoder* ctx;
 
@@ -623,7 +623,7 @@ void test_api_sepHt() {
 }
 
 
-void test_api_segWidth() {
+void test_api_segWidth(void) {
 
 	gs1_encoder* ctx;
 
@@ -644,7 +644,7 @@ void test_api_segWidth() {
 }
 
 
-void test_api_linHeight() {
+void test_api_linHeight(void) {
 
 	gs1_encoder* ctx;
 
@@ -660,7 +660,7 @@ void test_api_linHeight() {
 }
 
 
-void test_api_outFile() {
+void test_api_outFile(void) {
 
 	gs1_encoder* ctx;
 
@@ -688,7 +688,7 @@ void test_api_outFile() {
 }
 
 
-void test_api_bmp() {
+void test_api_bmp(void) {
 
 	gs1_encoder* ctx;
 
@@ -727,7 +727,7 @@ void test_api_bmp() {
 }
 
 
-void test_api_dataFile() {
+void test_api_dataFile(void) {
 
 	gs1_encoder* ctx;
 
@@ -755,7 +755,7 @@ void test_api_dataFile() {
 }
 
 
-void test_api_dataStr() {
+void test_api_dataStr(void) {
 
 	gs1_encoder* ctx;
 
@@ -783,7 +783,7 @@ void test_api_dataStr() {
 }
 
 
-void test_api_getBuffer() {
+void test_api_getBuffer(void) {
 
 	gs1_encoder* ctx;
 	uint8_t* buf;

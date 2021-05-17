@@ -65,7 +65,7 @@ void gs1_putBits(gs1_encoder *ctx, uint8_t bitField[], int bitPos, int length, u
 
 #ifdef UNIT_TESTS
 
-void test_cc_encode928();
+void test_cc_encode928(void);
 
 #endif
 
