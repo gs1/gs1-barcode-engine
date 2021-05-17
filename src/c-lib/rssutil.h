@@ -21,13 +21,16 @@
 #ifndef RSSUTIL_H
 #define RSSUTIL_H
 
-#include "enc-private.h"
-#include "gs1encoders.h"
-
-struct sPrints;
 
 #define MAX_SEP_ELMNTS (11*21+4) // for 22 segment RSS Exp
 #define MAX_K 14
+
+
+#include "enc-private.h"
+#include "gs1encoders.h"
+
+
+struct sPrints;
 
 int *gs1_getRSSwidths(gs1_encoder *ctx, int val, int n, int elements, int maxWidth, int noNarrow);
 struct sPrints *gs1_cnvSeparator(gs1_encoder *ctx, struct sPrints *prints);

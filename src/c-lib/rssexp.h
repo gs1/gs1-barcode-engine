@@ -21,13 +21,16 @@
 #ifndef RSSEXP_H
 #define RSSEXP_H
 
-#include "gs1encoders.h"
 
 #define RSSEXP_ELMNTS		21	// 2-segments, no guard patterns
 #define RSSEXP_SYM_W		49	// 2-segment symbol width in modules, no guard patterns
 #define RSSEXP_SYM_H		34	// height
 #define RSSEXP_MAX_DBL_SEGS	12	// max double segments
 #define RSSEXP_L_PAD		1	// CC left offset
+
+
+#include "gs1encoders.h"
+
 
 void gs1_RSSExp(gs1_encoder *ctx);
 

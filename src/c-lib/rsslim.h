@@ -21,13 +21,16 @@
 #ifndef RSSLIM_H
 #define RSSLIM_H
 
-#include "enc-private.h"
-#include "gs1encoders.h"
 
 #define RSSLIM_ELMNTS	(46-4)	// not including guard bars
 #define RSSLIM_SYM_W	74	// symbol width in modules including any quiet zones
 #define RSSLIM_SYM_H	10	// total pixel ht of RSS14L
 #define RSSLIM_L_PADB	10	// RSS Limited left pad for ccb
+
+
+#include "enc-private.h"
+#include "gs1encoders.h"
+
 
 void gs1_RSSLim(gs1_encoder *ctx);
 

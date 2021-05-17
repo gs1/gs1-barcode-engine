@@ -22,6 +22,7 @@
 #define ENC_H
 
 #include <stdbool.h>
+#include <stddef.h>
 
 #define GS1_ENCODERS_MAX_FNAME 120
 #define GS1_ENCODERS_MAX_DATA (75+2361)

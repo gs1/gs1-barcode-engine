@@ -24,8 +24,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "enc-private.h"
-#include "gs1encoders.h"
 
 #define CCB2_WIDTH	57	// 2 column cca/b
 #define CCB2_ELMNTS	31	// includes qz's
@@ -50,6 +48,10 @@
 #define MAX_CCA2_SIZE	6	// index to 167 in CC2Sizes
 #define MAX_CCA3_SIZE	4	// index to 167 in CC3Sizes
 #define MAX_CCA4_SIZE	4	// index to 197 in CC4Sizes
+
+
+#include "enc-private.h"
+#include "gs1encoders.h"
 
 int gs1_CC2enc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
 int gs1_CC3enc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
