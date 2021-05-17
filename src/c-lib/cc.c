@@ -2213,3 +2213,72 @@ bool gs1_CCCenc(gs1_encoder *ctx, uint8_t str[], uint8_t patCCC[] ) {
 	encCCC(ctx, byteCnt, bitField, codeWords, patCCC);
 	return(true);
 }
+
+
+
+#ifdef UNIT_TESTS
+
+#define TEST_NO_MAIN
+#include "acutest.h"
+
+
+void test_cc_encode928() {
+
+	uint16_t codeWords[MAX_CCC_CW];
+
+	uint8_t bits10101010[] = { 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA };
+	uint8_t bits00000000[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+	uint8_t bits11111111[] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+
+	TEST_CHECK(encode928(bits00000000, codeWords, 1) == 1);
+	TEST_CHECK(memcmp(codeWords, (uint16_t[]){ 0 }, 1 * sizeof(uint16_t)) == 0);
+
+	TEST_CHECK(encode928(bits10101010, codeWords, 1) == 1);
+	TEST_CHECK(memcmp(codeWords, (uint16_t[]){ 1 }, 1 * sizeof(uint16_t)) == 0);
+
+	TEST_CHECK(encode928(bits00000000, codeWords, 2) == 1);
+	TEST_CHECK(memcmp(codeWords, (uint16_t[]){ 0 }, 1 * sizeof(uint16_t)) == 0);
+
+	TEST_CHECK(encode928(bits10101010, codeWords, 2) == 1);
+	TEST_CHECK(memcmp(codeWords, (uint16_t[]){ 2 }, 1 * sizeof(uint16_t)) == 0);
+
+	TEST_CHECK(encode928(bits11111111, codeWords, 2) == 1);
+	TEST_CHECK(memcmp(codeWords, (uint16_t[]){ 3 }, 1) * sizeof(uint16_t) == 0);
+
+	TEST_CHECK(encode928(bits00000000, codeWords, 9) == 1);
+	TEST_CHECK(memcmp(codeWords, (uint16_t[]){ 0 }, 1 * sizeof(uint16_t)) == 0);
+
+	TEST_CHECK(encode928(bits10101010, codeWords, 9) == 1);
+	TEST_CHECK(memcmp(codeWords, (uint16_t[]){ 341 }, 1 * sizeof(uint16_t)) == 0);
+
+	TEST_CHECK(encode928(bits11111111, codeWords, 9) == 1);
+	TEST_CHECK(memcmp(codeWords, (uint16_t[]){ 511 }, 1 * sizeof(uint16_t)) == 0);
+
+	// Length rollover
+	TEST_CHECK(encode928(bits00000000, codeWords, 10) == 2);
+	TEST_CHECK(memcmp(codeWords, (uint16_t[]){ 0, 0 }, 2 * sizeof(uint16_t)) == 0);
+
+	TEST_CHECK(encode928(bits10101010, codeWords, 10) == 2);
+	TEST_CHECK(memcmp(codeWords, (uint16_t[]){ 0, 682 }, 2 * sizeof(uint16_t)) == 0);
+
+	TEST_CHECK(encode928(bits11111111, codeWords, 10) == 2);
+	TEST_CHECK(memcmp(codeWords, (uint16_t[]){ 1, 95 }, 2 * sizeof(uint16_t)) == 0);
+
+	// Size rollover
+	TEST_CHECK(encode928((uint8_t[]){ 231, 192 }, codeWords, 10) == 2);
+	TEST_CHECK(memcmp(codeWords, (uint16_t[]){ 0, 927 }, 2 * sizeof(uint16_t)) == 0);
+
+	TEST_CHECK(encode928((uint8_t[]){ 232, 0 }, codeWords, 10) == 2);
+	TEST_CHECK(memcmp(codeWords, (uint16_t[]){ 1, 0 }, 2 * sizeof(uint16_t)) == 0);
+
+	// Batch rollover
+	TEST_CHECK(encode928(bits11111111, codeWords, 69) == 7);
+	TEST_CHECK(memcmp(codeWords, (uint16_t[]){ 924, 216, 890, 405, 200, 520, 767 }, 7 * sizeof(uint16_t)) == 0);
+
+	TEST_CHECK(encode928(bits11111111, codeWords, 70) == 8);
+	TEST_CHECK(memcmp(codeWords, (uint16_t[]){ 924, 216, 890, 405, 200, 520, 767, 1 }, 8 * sizeof(uint16_t)) == 0);
+
+}
+
+
+#endif  /* UNIT_TESTS */

@@ -56,5 +56,12 @@ TEST_LIST = {
     { "api_bmp", test_api_bmp },
     { "api_getBuffer", test_api_getBuffer },
 
+
+    /*
+     * cc.c
+     *
+     */
+    { "cc_encode928", test_cc_encode928 },
+
     { NULL, NULL }
 };

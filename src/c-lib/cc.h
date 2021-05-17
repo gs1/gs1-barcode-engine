@@ -60,4 +60,12 @@ int gs1_check2DData(uint8_t dataStr[]);
 int gs1_pack(gs1_encoder *ctx, uint8_t str[], uint8_t bitField[]);
 void gs1_putBits(gs1_encoder *ctx, uint8_t bitField[], int bitPos, int length, uint16_t bits);
 
+
+#ifdef UNIT_TESTS
+
+void test_cc_encode928();
+
+#endif
+
+
 #endif /* CC_H */
