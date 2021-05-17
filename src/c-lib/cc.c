@@ -25,6 +25,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+#include "assert.h"
 #include "enc-private.h"
 #include "cc.h"
 #include "driver.h"
@@ -1574,6 +1575,7 @@ static int encode928(uint8_t bitString[], uint16_t codeWords[], int bitLng) {
 			}
 		}
 		for (i = cwCnt-1; i > 0; i--) {
+			assert(cwNdx+i < MAX_CCB4_CW);
 			/* add "carries" */
 			codeWords[cwNdx+i-1] = (uint16_t)(codeWords[cwNdx+i-1] + codeWords[cwNdx+i]/928);
 			codeWords[cwNdx+i] %= 928;
