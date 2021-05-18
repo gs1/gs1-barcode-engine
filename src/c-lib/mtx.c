@@ -37,7 +37,7 @@ void gs1_mtxPutBit(uint8_t *mtx, int cols, int x, int y, uint8_t bit) {
 }
 
 
-int gs1_mtxGetBit(uint8_t *mtx, int cols, int x, int y) {
+uint8_t gs1_mtxGetBit(uint8_t *mtx, int cols, int x, int y) {
 
 	int p = ((cols-1)/8+1)*y + x/8;
 
@@ -49,7 +49,7 @@ int gs1_mtxGetBit(uint8_t *mtx, int cols, int x, int y) {
 // Runlength encode the matrix to a set of patterns
 void gs1_mtxToPatterns(uint8_t* mtx, int cols, int rows, struct patternLength *pats) {
 
-	int r, c, patPos, last;
+	uint8_t r, c, patPos, last;
 
 	for (r = 0; r < rows; r++) {
 		patPos = 0;
@@ -65,7 +65,7 @@ void gs1_mtxToPatterns(uint8_t* mtx, int cols, int rows, struct patternLength *p
 				last ^= 1;
 			}
 		}
-		pats[r].length = (uint8_t)patPos+1;
+		pats[r].length = (uint8_t)(patPos+1);
 	}
 
 }

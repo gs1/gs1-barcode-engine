@@ -40,7 +40,7 @@ static int QRenc(gs1_encoder *ctx, uint8_t string[], struct patternLength *pats)
 	for (int i = 0 ; i<rows; i++) {
 
 	for (int j=0; j<cols; j++) {
-		gs1_mtxPutBit(mtx, cols, j, i, (i+j)%2);
+		gs1_mtxPutBit(mtx, cols, j, i, (uint8_t)((i+j)%2));
 	}
 	}
 

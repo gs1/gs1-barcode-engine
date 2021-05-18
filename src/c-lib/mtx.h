@@ -30,12 +30,12 @@
 
 struct patternLength {
 	bool whtFirst;
-	uint8_t pattern[200];  // Sufficient for MAX_QR_ELMNTS
+	uint8_t pattern[UINT8_MAX];  // Sufficient for MAX_QR_ELMNTS
 	uint8_t length;
 };
 
 void gs1_mtxPutBit(uint8_t *mtx, int cols, int x, int y, uint8_t bit);
-int gs1_mtxGetBit(uint8_t *mtx, int cols, int x, int y);
+uint8_t gs1_mtxGetBit(uint8_t *mtx, int cols, int x, int y);
 void gs1_mtxToPatterns(uint8_t* mtx, int w, int h, struct patternLength *pats);
 
 
