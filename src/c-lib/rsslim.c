@@ -76,8 +76,8 @@ static struct sPrints *separatorLim(gs1_encoder *ctx, struct sPrints *prints) {
 }
 
 
-#define	N	26
-#define	K	7
+#define	NN	26
+#define	KK	7
 #define PARITY_MOD 89
 #define SUPL_VAL 2015133531096.
 
@@ -189,8 +189,8 @@ static bool RSSLimEnc(gs1_encoder *ctx, uint8_t string[], uint8_t bars[], int cc
 		 2, 1, 1, 1, 1, 1, 1, 1, 2, 2, 1, 2, 1, 1,
 	 };
 
-	static const int leftWeights[2*K] = {1,3,9,27,81,65,17,51,64,14,42,37,22,66};
-	static const int rightWeights[2*K] = {20,60,2,6,18,54,73,41,34,13,39,28,84,74};
+	static const int leftWeights[2*KK] = {1,3,9,27,81,65,17,51,64,14,42,37,22,66};
+	static const int rightWeights[2*KK] = {20,60,2,6,18,54,73,41,34,13,39,28,84,74};
 
 	double data;
 
@@ -223,9 +223,9 @@ static bool RSSLimEnc(gs1_encoder *ctx, uint8_t string[], uint8_t bars[], int cc
 	longNum = value = (int)(chrValue / oddEvenTbl[iIndex+4]);
 
 	// generate and store odd element widths:
-	widths = gs1_getRSSwidths(ctx, value, elementN, K, elementMax, 1);
+	widths = gs1_getRSSwidths(ctx, value, elementN, KK, elementMax, 1);
 	parity = 0l;
-	for (i = 0; i < K; i++) {
+	for (i = 0; i < KK; i++) {
 		bars[(i*2)] = (uint8_t)widths[i];
 		parity += leftWeights[i * 2] * widths[i];
 		parity = parity % PARITY_MOD;
@@ -237,8 +237,8 @@ static bool RSSLimEnc(gs1_encoder *ctx, uint8_t string[], uint8_t bars[], int cc
 	elementMax = (int)oddEvenTbl[iIndex+3];
 
 	// generate and store even element widths:
-	widths = gs1_getRSSwidths(ctx, value, elementN, K, elementMax, 0);
-	for (i = 0; i < K; i++) {
+	widths = gs1_getRSSwidths(ctx, value, elementN, KK, elementMax, 0);
+	for (i = 0; i < KK; i++) {
 		bars[(i*2)+1] = (uint8_t)widths[i];
 		parity += leftWeights[(i * 2) + 1] * widths[i];
 		parity = parity % PARITY_MOD;
@@ -260,8 +260,8 @@ static bool RSSLimEnc(gs1_encoder *ctx, uint8_t string[], uint8_t bars[], int cc
 	longNum = value = (int)(chrValue / oddEvenTbl[iIndex+4]);
 
 	// generate and store odd element widths:
-	widths = gs1_getRSSwidths(ctx, value, elementN, K, elementMax, 1);
-	for (i = 0; i < K; i++) {
+	widths = gs1_getRSSwidths(ctx, value, elementN, KK, elementMax, 1);
+	for (i = 0; i < KK; i++) {
 		bars[(i*2)+28] = (uint8_t)widths[i];
 		parity += rightWeights[i * 2] * widths[i];
 		parity = parity % PARITY_MOD;
@@ -273,8 +273,8 @@ static bool RSSLimEnc(gs1_encoder *ctx, uint8_t string[], uint8_t bars[], int cc
 	elementMax = (int)oddEvenTbl[iIndex+3];
 
 	// generate and store even element widths:
-	widths = gs1_getRSSwidths(ctx, value, elementN, K, elementMax, 0);
-	for (i = 0; i < K; i++) {
+	widths = gs1_getRSSwidths(ctx, value, elementN, KK, elementMax, 0);
+	for (i = 0; i < KK; i++) {
 		bars[(i*2)+1+28] = (uint8_t)widths[i];
 		parity += rightWeights[(i * 2) + 1] * widths[i];
 		parity = parity % PARITY_MOD;
