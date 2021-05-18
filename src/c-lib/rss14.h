@@ -40,4 +40,15 @@ void gs1_RSS14(gs1_encoder *ctx);
 void gs1_RSS14S(gs1_encoder *ctx);
 void gs1_RSS14SO(gs1_encoder *ctx);
 
+
+#ifdef UNIT_TESTS
+
+void test_rss14_RSS14_encode(void);
+void test_rss14_RSS14T_encode(void);
+void test_rss14_RSS14S_encode(void);
+void test_rss14_RSS14SO_encode(void);
+
+#endif
+
+
 #endif

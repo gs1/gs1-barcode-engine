@@ -56,12 +56,14 @@ void test_print_strings(gs1_encoder *ctx) {
 }
 
 
-bool test_encode(gs1_encoder *ctx, char* dataStr, char** expect) {
+bool test_encode(gs1_encoder *ctx, int sym, char* dataStr, char** expect) {
 
 	char **strings;
 	char *tail;
 	int i = 0;
 
+	TEST_CHECK(gs1_encoder_setFormat(ctx, gs1_encoder_dRAW));
+	TEST_CHECK(gs1_encoder_setSym(ctx, sym));
 	TEST_CHECK(gs1_encoder_setDataStr(ctx, dataStr));
 	TEST_CHECK(gs1_encoder_encode(ctx));
 	TEST_CHECK(gs1_encoder_getBufferStrings(ctx, &strings) > 0);
@@ -129,10 +131,46 @@ TEST_LIST = {
 
 
     /*
+     * ean.c
+     *
+     */
+    { "ean_EAN13_encode", test_ean_EAN13_encode },
+    { "ean_EAN8_encode", test_ean_EAN8_encode },
+    { "ean_UPCA_encode", test_ean_UPCA_encode },
+    { "ean_UPCE_encode", test_ean_UPCE_encode },
+
+
+    /*
+     * rss.c
+     *
+     */
+    { "rss14_RSS14_encode", test_rss14_RSS14_encode },
+    { "rss14_RSS14T_encode", test_rss14_RSS14T_encode },
+    { "rss14_RSS14S_encode", test_rss14_RSS14S_encode },
+    { "rss14_RSS14SO_encode", test_rss14_RSS14SO_encode },
+
+
+    /*
+     * rsslim.c
+     *
+     */
+    { "rsslim_RSSLIM_encode", test_rsslim_RSSLIM_encode },
+
+
+    /*
+     * rssexp.c
+     *
+     */
+    { "rssexp_RSSEXP_encode", test_rssexp_RSSEXP_encode },
+
+
+    /*
      * ucc128.c
      *
      */
-    { "ucc128_encode", test_ucc128_encode },
+    { "ucc_UCC128A_encode", test_ucc_UCC128A_encode },
+    { "ucc_UCC128C_encode", test_ucc_UCC128C_encode },
+
 
     { NULL, NULL }
 };

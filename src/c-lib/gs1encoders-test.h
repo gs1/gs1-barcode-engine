@@ -23,7 +23,7 @@
 
 
 void test_print_strings(gs1_encoder *ctx);
-bool test_encode(gs1_encoder *ctx, char* dataStr, char** expect);
+bool test_encode(gs1_encoder *ctx, int sym, char* dataStr, char** expect);
 
 
 #endif  /* GS1_ENCODERS_TEST_H */

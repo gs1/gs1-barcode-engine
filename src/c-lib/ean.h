@@ -27,4 +27,15 @@ void gs1_EAN13(gs1_encoder *ctx);
 void gs1_EAN8(gs1_encoder *ctx);
 void gs1_UPCE(gs1_encoder *ctx);
 
+
+#ifdef UNIT_TESTS
+
+void test_ean_EAN13_encode(void);
+void test_ean_EAN8_encode(void);
+void test_ean_UPCA_encode(void);
+void test_ean_UPCE_encode(void);
+
+#endif
+
+
 #endif

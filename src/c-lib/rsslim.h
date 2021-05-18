@@ -34,4 +34,12 @@
 
 void gs1_RSSLim(gs1_encoder *ctx);
 
+
+#ifdef UNIT_TESTS
+
+void test_rsslim_RSSLIM_encode(void);
+
+#endif
+
+
 #endif

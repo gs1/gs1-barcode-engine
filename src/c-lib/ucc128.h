@@ -37,7 +37,8 @@ void gs1_U128C(gs1_encoder *ctx);
 
 #ifdef UNIT_TESTS
 
-void test_ucc128_encode(void);
+void test_ucc_UCC128A_encode(void);
+void test_ucc_UCC128C_encode(void);
 
 #endif
 

@@ -34,4 +34,12 @@
 
 void gs1_RSSExp(gs1_encoder *ctx);
 
+
+#ifdef UNIT_TESTS
+
+void test_rssexp_RSSEXP_encode(void);
+
+#endif
+
+
 #endif
