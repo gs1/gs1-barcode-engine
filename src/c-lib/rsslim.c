@@ -447,11 +447,11 @@ void gs1_RSSLim(gs1_encoder *ctx) {
 
 void test_rsslim_RSSLIM_encode(void) {
 
-        char** expect;
+	char** expect;
 
-        gs1_encoder* ctx = gs1_encoder_init();
+	gs1_encoder* ctx = gs1_encoder_init();
 
-        expect = (char*[]){
+	expect = (char*[]){
 "01000110011000110110101001110100101011010011010010010110001101110011001101",
 "01000110011000110110101001110100101011010011010010010110001101110011001101",
 "01000110011000110110101001110100101011010011010010010110001101110011001101",
@@ -463,10 +463,10 @@ void test_rsslim_RSSLIM_encode(void) {
 "01000110011000110110101001110100101011010011010010010110001101110011001101",
 "01000110011000110110101001110100101011010011010010010110001101110011001101",
 NULL
-        };
-        TEST_CHECK(test_encode(ctx, gs1_encoder_sRSSLIM, "1501234567890", expect));
+	};
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sRSSLIM, "1501234567890", expect));
 
-        gs1_encoder_free(ctx);
+	gs1_encoder_free(ctx);
 
 }
 
