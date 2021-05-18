@@ -465,7 +465,7 @@ GS1_ENCODERS_API size_t gs1_encoder_getBufferStrings(gs1_encoder *ctx, char*** o
 	ctx->bufferStrings = malloc((size_t)(h+1) * sizeof(char*));
 
 	for (y = 0; y < h; y++) {
-		string = malloc((size_t)(w+1) * sizeof(char*));
+		string = malloc((size_t)(w+1) * sizeof(char));
 		ctx->bufferStrings[y] = string;
 		for (x = 0; x < w; x++) {
 			string[x] = (char)('0' + (buf[bw*y + x/8] >> (7-x%8) & 1));
