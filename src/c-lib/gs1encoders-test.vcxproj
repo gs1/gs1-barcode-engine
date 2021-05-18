@@ -153,6 +153,7 @@
     <ClInclude Include="driver.h" />
     <ClInclude Include="ean.h" />
     <ClInclude Include="enc-private.h" />
+    <ClInclude Include="gs1encoders-test.h" />
     <ClInclude Include="gs1encoders.h" />
     <ClInclude Include="rss14.h" />
     <ClInclude Include="rssexp.h" />
