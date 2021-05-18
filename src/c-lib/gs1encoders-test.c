@@ -35,7 +35,9 @@
 #include "enc-private.h"
 #include "gs1encoders.h"
 #include "cc.h"
+#include "dm.h"
 #include "ean.h"
+#include "qr.h"
 #include "rss14.h"
 #include "rssexp.h"
 #include "rsslim.h"
@@ -166,6 +168,13 @@ TEST_LIST = {
      *
      */
     { "rssexp_RSSEXP_encode", test_rssexp_RSSEXP_encode },
+
+
+    /*
+     * qr.c
+     *
+     */
+    { "qr_QR_encode", test_qr_QR_encode },
 
 
     /*

@@ -28,11 +28,13 @@
 #include "enc-private.h"
 #include "gs1encoders.h"
 #include "driver.h"
+#include "dm.h"
 #include "ean.h"
 #include "rss14.h"
 #include "rssexp.h"
 #include "rsslim.h"
 #include "ucc128.h"
+#include "qr.h"
 
 
 static void reset_error(gs1_encoder *ctx) {
@@ -420,6 +422,14 @@ GS1_ENCODERS_API bool gs1_encoder_encode(gs1_encoder *ctx) {
 			gs1_U128C(ctx);
 			break;
 
+		case gs1_encoder_sQR:
+			gs1_QR(ctx);
+			break;
+
+		case gs1_encoder_sDM:
+			gs1_DM(ctx);
+			break;
+
 		default:
 			sprintf(ctx->errMsg, "Unknown symbology type %d", ctx->sym);
 			ctx->errFlag = true;
@@ -566,7 +576,7 @@ void test_api_sym(void) {
 	TEST_CHECK(gs1_encoder_setSym(ctx, gs1_encoder_sUPCA));
 	TEST_CHECK(gs1_encoder_getSym(ctx) == gs1_encoder_sUPCA);
 
-	TEST_CHECK(gs1_encoder_sNUMSYMS == 12);  // Remember to add new symbologies
+	TEST_CHECK(gs1_encoder_sNUMSYMS == 14);  // Remember to add new symbologies
 
 	gs1_encoder_free(ctx);
 

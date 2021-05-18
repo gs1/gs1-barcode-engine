@@ -40,7 +40,9 @@ static const char* SYMBOLOGY_NAMES[] =
 	"EAN-13",
 	"EAN-8",
 	"GS1-128 with CC-A or CC-B",
-	"GS1-128 with CC-C"
+	"GS1-128 with CC-C",
+	"GS1 QR Code",
+	"GS1 Data Matrix",
 };
 
 
@@ -138,6 +140,11 @@ static bool userInt(gs1_encoder *ctx) {
 			case gs1_encoder_sUCC128_CCC:
 				printf("\n Code 128 data starts with 1st AI. Only interior FNC1s are necessary.");
 				printf("\n 2D component data starts with 1st AI. Only interior FNC1s are necessary.");
+				break;
+			case gs1_encoder_sQR:
+			case gs1_encoder_sDM:
+				printf("\n Data starts with 1st AI. Only interior FNC1s are needed.");
+				printf("\nSpecial data input characters:");
 				break;
 			default:
 				printf("\nSYMBOL TYPE ERROR.");

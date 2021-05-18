@@ -56,6 +56,8 @@ enum {
 	gs1_encoder_sEAN8,		// EAN-8
 	gs1_encoder_sUCC128_CCA,	// UCC/EAN-128 with CC-A or CC-B
 	gs1_encoder_sUCC128_CCC,	// UCC/EAN-128 with CC-C
+	gs1_encoder_sQR,		// QR Code
+	gs1_encoder_sDM,		// Data Matrix
 	gs1_encoder_sNUMSYMS,		// Number of symbologies
 };
 
