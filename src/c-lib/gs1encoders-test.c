@@ -35,6 +35,10 @@
 #include "enc-private.h"
 #include "gs1encoders.h"
 #include "cc.h"
+#include "ean.h"
+#include "rss14.h"
+#include "rssexp.h"
+#include "rsslim.h"
 #include "ucc128.h"
 
 
