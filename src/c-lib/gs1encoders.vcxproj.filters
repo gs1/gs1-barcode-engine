@@ -42,6 +42,15 @@
     <ClCompile Include="driver.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="dm.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mtx.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="qr.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cc.h">
@@ -72,6 +81,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="rssexp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mtx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="qr.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

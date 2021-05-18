@@ -150,11 +150,14 @@
   <ItemGroup>
     <ClInclude Include="acutest.h" />
     <ClInclude Include="cc.h" />
+    <ClInclude Include="dm.h" />
     <ClInclude Include="driver.h" />
     <ClInclude Include="ean.h" />
     <ClInclude Include="enc-private.h" />
     <ClInclude Include="gs1encoders-test.h" />
     <ClInclude Include="gs1encoders.h" />
+    <ClInclude Include="mtx.h" />
+    <ClInclude Include="qr.h" />
     <ClInclude Include="rss14.h" />
     <ClInclude Include="rssexp.h" />
     <ClInclude Include="rsslim.h" />
@@ -163,10 +166,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cc.c" />
+    <ClCompile Include="dm.c" />
     <ClCompile Include="driver.c" />
     <ClCompile Include="ean.c" />
     <ClCompile Include="gs1encoders-test.c" />
     <ClCompile Include="gs1encoders.c" />
+    <ClCompile Include="mtx.c" />
+    <ClCompile Include="qr.c" />
     <ClCompile Include="rss14.c" />
     <ClCompile Include="rssexp.c" />
     <ClCompile Include="rsslim.c" />
