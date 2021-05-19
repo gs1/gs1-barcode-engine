@@ -22,13 +22,24 @@
 #define DM_H
 
 
-#define MAX_DM_MTX_BYTES	2592
+#define MAX_DM_COLS	146     // include qz
+#define MAX_DM_ROWS	146     // include qz
+#define MAX_DM_ELMNTS	146     // accept checkerboard pattern
+#define MAX_DM_BYTES	2774
 
-#include "enc-private.h"
+
 #include "gs1encoders.h"
 
 
 void gs1_DM(gs1_encoder *ctx);
+
+
+#ifdef UNIT_TESTS
+
+void test_dm_DM_encode(void);
+void test_dm_DM_encode(void);
+
+#endif
 
 
 #endif  /* DM_H */

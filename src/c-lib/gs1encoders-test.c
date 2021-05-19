@@ -137,6 +137,13 @@ TEST_LIST = {
 
 
     /*
+     * dm.c
+     *
+     */
+    { "dm_DM_encode", test_dm_DM_encode },
+
+
+    /*
      * ean.c
      *
      */
