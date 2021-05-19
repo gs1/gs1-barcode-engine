@@ -2245,7 +2245,7 @@ void test_cc_encode928(void) {
 	TEST_CHECK(memcmp(codeWords, (uint16_t[]){ 2 }, 1 * sizeof(uint16_t)) == 0);
 
 	TEST_CHECK(encode928(bits11111111, codeWords, 2) == 1);
-	TEST_CHECK(memcmp(codeWords, (uint16_t[]){ 3 }, 1) * sizeof(uint16_t) == 0);
+	TEST_CHECK(memcmp(codeWords, (uint16_t[]){ 3 }, 1 * sizeof(uint16_t)) == 0);
 
 	TEST_CHECK(encode928(bits00000000, codeWords, 9) == 1);
 	TEST_CHECK(memcmp(codeWords, (uint16_t[]){ 0 }, 1 * sizeof(uint16_t)) == 0);
