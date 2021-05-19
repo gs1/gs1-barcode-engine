@@ -4,17 +4,12 @@ VERSION := $(MAJOR).$(MINOR)
 
 NAME = gs1encoders
 
-
 BUILD_DIR = build
-CFLAGS = -g -O2 -D_FORTIFY_SOURCE=2 -Wall -Wextra -Wconversion -Wformat -Wformat-security -pedantic -Werror -MMD -fPIC $(SAN_CFLAGS)
-LDLIBS = -lc
-LDFLAGS = -Wl,--as-needed -Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,-z,now $(SAN_LDFLAGS)
-LDFLAGS_SO = -shared -Wl,-soname,lib$(NAME).so.$(MAJOR)
 
 
 ifeq ($(MAKECMDGOALS),test)
 BUILD_DIR = test
-CFLAGS = -g -O2 -D_FORTIFY_SOURCE=2 -Wall -Wextra -Wformat -Wformat-security -pedantic -Werror -MMD -fPIC $(SAN_CFLAGS) -DUNIT_TESTS
+UNIT_TESTS = -DUNIT_TESTS
 endif
 
 ifeq ($(MAKECMDGOALS),clean-test)
@@ -28,6 +23,11 @@ SAN_LDFLAGS = -fuse-ld=lld
 SAN_ENV = ASAN_OPTIONS="symbolize=1 detect_leaks=1" LSAN_OPTIONS="fast_unwind_on_malloc=0:malloc_context_size=50" ASAN_SYMBOLIZER_PATH="$(shell which llvm-symbolizer)"
 endif
 
+
+CFLAGS = -g -O2 -D_FORTIFY_SOURCE=2 -Wall -Wextra -Wconversion -Wformat -Wformat-security -pedantic -Werror -MMD -fPIC $(SAN_CFLAGS) $(UNIT_TESTS)
+LDLIBS = -lc
+LDFLAGS = -Wl,--as-needed -Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,-z,now $(SAN_LDFLAGS)
+LDFLAGS_SO = -shared -Wl,-soname,lib$(NAME).so.$(MAJOR)
 
 APP = $(BUILD_DIR)/$(NAME).bin
 APP_STATIC = $(BUILD_DIR)/$(NAME)-linux.bin
