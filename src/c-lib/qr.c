@@ -201,9 +201,9 @@ static int QRenc(gs1_encoder *ctx, uint8_t string[], struct patternLength *pats)
 
 (void)algnpat;
 
-	gs1_mtxToPatterns(mtx, size, size, pats);
+	gs1_mtxToPatterns(mtx, m->size, m->size, pats);
 
-	return size;
+	return m->size;
 }
 
 
