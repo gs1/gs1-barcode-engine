@@ -201,7 +201,7 @@ static int QRenc(gs1_encoder *ctx, uint8_t string[], struct patternLength *pats)
 	uint8_t mtx[MAX_QR_BYTES] = { 0 };
 	int i, j;
 
-	uint8_t size = 177;
+	uint8_t size = 69;
 
 	const struct metric *m = NULL;
 
@@ -330,10 +330,11 @@ void gs1_QR(gs1_encoder *ctx) {
 
 void test_qr_QR_encode(void) {
 
-	char** expect;
+//	char** expect;
 
 	gs1_encoder* ctx = gs1_encoder_init();
 
+/*
 	expect = (char*[]){
 "01010101010101010101",
 "10101010101010101010",
@@ -357,7 +358,12 @@ void test_qr_QR_encode(void) {
 "10101010101010101010",
 NULL
 	};
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sQR, "1501234567890", expect));
+*/
+
+        TEST_CHECK(gs1_encoder_setFormat(ctx, gs1_encoder_dRAW));
+        TEST_CHECK(gs1_encoder_setSym(ctx, gs1_encoder_sQR));
+        TEST_CHECK(gs1_encoder_setDataStr(ctx, "1501234567890"));
+        TEST_CHECK(gs1_encoder_encode(ctx));
 
 	test_print_strings(ctx);
 

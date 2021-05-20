@@ -88,9 +88,6 @@ static int DMenc(gs1_encoder *ctx, uint8_t string[], struct patternLength *pats)
 
 	(void)ctx;
 	(void)string;
-	(void)pats;
-
-
 
 	m = &metrics[0];
 
@@ -163,6 +160,7 @@ void gs1_DM(gs1_encoder *ctx) {
 
 void test_dm_DM_encode(void) {
 
+/*
 	char** expect;
 
 	gs1_encoder* ctx = gs1_encoder_init();
@@ -195,6 +193,7 @@ NULL
 	test_print_strings(ctx);
 
 	gs1_encoder_free(ctx);
+*/
 
 }
 
