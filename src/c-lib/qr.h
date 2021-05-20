@@ -26,6 +26,9 @@
 #define MAX_QR_ELMNTS	MAX_QR_SIZE		// to accept a checkerboard test pattern
 #define MAX_QR_BYTES	((MAX_QR_SIZE-1)/8+1) * MAX_QR_SIZE
 
+#define MAX_QR_DATA_BITS	23648
+#define MAX_QR_DATA_BYTES	(MAX_QR_DATA_BITS-1)/8+1
+
 
 #include "gs1encoders.h"
 

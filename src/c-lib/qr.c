@@ -18,9 +18,11 @@
  *
  */
 
+#include <assert.h>
 #include <string.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 #include "enc-private.h"
 #include "qr.h"
@@ -129,7 +131,7 @@ static const uint8_t algnpat[5][5] = {
 
 
 	/*
-	 * Our coordinate system is indexed with (1,1) at top-left.  Negative
+	 * Coordinate system is indexed with (1,1) at top-left.  Negative
 	 * cooridinates wrap around to the other extent of the same row/column,
 	 * such that (-1,-1) is at bottom-right. The coordinate system is
 	 * oblivious to the quiet zone.
@@ -176,57 +178,233 @@ static const uint32_t versionvals[34] = {
 };
 
 
-// Syntactic sugar to include qz offset and wrap around processing
-#define putBit(x, y, b) do {					\
-	gs1_mtxPutBit(mtx, m->size + 2*QR_QZ,			\
-		x > 0 ? x + QR_QZ - 1 : m->size + QR_QZ + x,	\
-		y > 0 ? y + QR_QZ - 1 : m->size + QR_QZ + y,	\
-		b);						\
-} while(0)
-
-#define putAlign(x, y) do {		\
-	doPutAlign(mtx, m, x, y);	\
-} while(0)
-
-static void doPutAlign(uint8_t *mtx, const struct metric *m, int x, int y) {
-	int i, j;
-	for (i = 0; i < (int)sizeof(algnpat[0]); i++)
-		for (j = 0; j < (int)sizeof(algnpat[0]); j++)
-			putBit(x+i, y+j, algnpat[i][j]);
+static inline uint8_t mask1(uint8_t i, uint8_t j) {
+	return (i+j)%2 == 0;
 }
 
+static inline uint8_t mask2(uint8_t i, uint8_t j) {
+	(void)i;
+	return j%2 == 0;
+}
+
+static inline uint8_t mask3(uint8_t i, uint8_t j) {
+	(void)j;
+	return i%3 == 0;
+}
+
+static inline uint8_t mask4(uint8_t i, uint8_t j) {
+	return (i+j)%3 == 0;
+}
+
+static inline uint8_t mask5(uint8_t i, uint8_t j) {
+	return (j/2+i/3)%2 == 0;
+}
+
+static inline uint8_t mask6(uint8_t i, uint8_t j) {
+	return (i*j)%2+(i*j)%3 == 0;
+}
+
+static inline uint8_t mask7(uint8_t i, uint8_t j) {
+	return ((i*j)%2+(i*j)%3)%2 == 0;
+}
+
+static inline uint8_t mask8(uint8_t i, uint8_t j) {
+	return ((i*j)%3+(i+j)%2)%2 == 0;
+}
+
+static uint8_t (*const maskfun[8]) (uint8_t x, uint8_t y) = {
+	mask1, mask2, mask3, mask4, mask5, mask6, mask7, mask8
+};
+
+
+// Syntactic sugar to include qz offset and wrap around processing
+#define putBit(d, x, y, b) do {							\
+	assert( x != 0 && y != 0 && abs(x) <= m->size && abs(y) <= m->size );	\
+	gs1_mtxPutBit(d, m->size + 2*QR_QZ,					\
+		x > 0 ? x + QR_QZ - 1 : m->size + QR_QZ + x,			\
+		y > 0 ? y + QR_QZ - 1 : m->size + QR_QZ + y,			\
+		b);								\
+} while(0)
+
+#define getBit(s, x, y)								\
+	gs1_mtxGetBit(s, m->size + 2*QR_QZ,					\
+		x > 0 ? x + QR_QZ - 1 : m->size + QR_QZ + x,			\
+		y > 0 ? y + QR_QZ - 1 : m->size + QR_QZ + y)
+
+#define putFixtureBit(x, y, b) do {						\
+	putBit(mtx, x, y, b);							\
+	putBit(fix, x, y, 1);							\
+} while(0)
+
+#define putAlign(x, y) do {							\
+	doPutAlign(mtx, fix, m, x, y);						\
+} while(0)
+
+
+static void doPutAlign(uint8_t *mtx, uint8_t *fix, const struct metric *m, int x, int y) {
+
+	int i, j;
+
+	for (i = 0; i < (int)sizeof(algnpat[0]); i++)
+		for (j = 0; j < (int)sizeof(algnpat[0]); j++)
+			putFixtureBit(x+i, y+j, algnpat[i][j]);
+
+}
+
+
+static void applyMask(uint8_t *dest, uint8_t *src,
+		      uint8_t (*maskfun)(uint8_t x, uint8_t y), uint8_t *fix, const struct metric *m) {
+
+	int i, j;
+	for (i = 1; i <= m->size; i++) {
+		for (j = 1; j <= m->size; j++) {
+			putBit(dest, i, j, (uint8_t)(getBit(src, i, j) ^ (
+				(!getBit(fix, i, j)) &
+				((*maskfun) ((uint8_t)(i-1), (uint8_t)(j-1))))
+			));
+		}
+	}
+
+}
+
+
+static int evaln1n3(uint8_t *rle) {
+
+	uint8_t *s = rle;
+	int n1 = 0, n3 = 0;
+	int i, len;
+
+	// Detect runs of 5 or more like modules
+	do {
+		if (*rle >= 5) n1 += *rle - 2;
+	} while (*++rle);
+	len = (int)(rle -s);
+	rle = s;
+
+	// Detect 1:1:3:1:1 ratio next to 4 modules of whitespace
+	for (i = 3; i <= len - 3; i += 2) {
+		if (rle[i] % 3 == 0					&&	// Multiple of 3 black modules
+			(rle[i-2] == rle[i-1] && rle[i-1] == rle[i+1]	&&	// in the ratio 1:1:3:1:1
+			 rle[i+1] == rle[i+2] && rle[i+2] == rle[i]/3)	&& (
+			(i == 3 || (i + 4 >= len)) || 				// at either extent of run
+			(rle[i-3] >= 4 || rle[i+3] >= 4)			// or bounded by dark modules
+		    ) )
+			n3 += 40;
+	}
+
+	return n1 + n3;
+}
+
+
+static uint32_t evalMask(uint8_t *mtx, const struct metric *m) {
+
+	int i, j, k, p;
+	uint8_t size = m->size;
+	uint8_t pairsa[size], pairsb[size];
+	uint8_t rlec[size], rler[size];
+	uint8_t lastc, lastr, qc, qr;
+	int now, last;
+	int n1n3 = 0, n2 = 0, n4 = 0;
+	uint8_t *lastpairs = &pairsa[0], *thispairs = &pairsb[0], *tmppairs;
+
+	for (k = 1; k <= m->size; k++) {
+
+		// RLE columns and rows, 0:..:.. when starting in white
+		qc = lastc = getBit(mtx, k, 1);
+		rlec[0] = lastc ^ 1;
+		rlec[1] = 1;
+		qr = lastr = getBit(mtx, 1, k);
+		rler[0] = lastr ^ 1;
+		rler[1] = 1;
+		for (p = 2; p <= size; p++) {
+			if (getBit(mtx, k, p) == lastc) {
+				rlec[qc]++;
+			}
+			else {
+				rlec[++qc] = 1;
+				lastc ^= 1;
+			}
+			if (getBit(mtx, p, k) == lastr) {
+				rler[qr]++;
+			}
+			else {
+				rler[++qr] = 1;
+				lastr ^= 1;
+			}
+		}
+		rlec[++qc] = rler[++qr] = 0;
+		n1n3 += evaln1n3(rlec);
+		n1n3 += evaln1n3(rler);
+
+		// Count and score same coloured blocks
+		tmppairs = lastpairs;
+		lastpairs = thispairs;
+		thispairs = tmppairs;
+
+		last = getBit(mtx, 1, k) ^ 1;
+		for (i = 1; i <= size; i++) {
+			now = getBit(mtx, i, k);
+			thispairs[i-1] = (uint8_t)(now + last);
+			last = now;
+		}
+		if (k > 1)
+			for (int i = size-1; i>=0; i--)
+				if (((thispairs[i] + lastpairs[i]) & 3) == 0)
+					n2 += 3;
+	}
+
+	// Dark/light balance
+	for (i = 1; i <= size; i++)
+		for (j = 1; j <= size; j++)
+			n4 += getBit(mtx, i, j) == 1;
+	n4 = abs(n4*100/(size*size)-50)/5*10;
+
+	return (uint32_t)(n1n3+n2+n4);
+}
 
 static int QRenc(gs1_encoder *ctx, uint8_t string[], struct patternLength *pats) {
 
 	uint8_t mtx[MAX_QR_BYTES] = { 0 };
-	int i, j;
-
-	uint8_t size = 69;
-
+	uint8_t fix[MAX_QR_BYTES] = { 0 };	// 1 indicates fixed pattern
+	uint8_t tmp[MAX_QR_BYTES] = { 0 };	// Used for mask evaluation
+	int i, j, k, col, dir;
+	uint8_t mask = 0;			// Satisfy compiler
+	uint32_t formatval, versionval;
+	uint32_t bestScore = UINT32_MAX, score;
 	const struct metric *m = NULL;
+
+	uint8_t bitstream[MAX_QR_DATA_BYTES];
+	uint16_t bitpos = 0;
+
+
+(void)bitstream;
+(void)bitpos;
 
 (void) ctx;
 (void) string;
 
-	// Lookup AP positions
-	for (i = 0; i<40; i++) {
-		m = &(metrics[i]);
-		if (m->size == size)
-			break;
-	}
+	int ver = 10 -1;
+
+	m = &(metrics[ver]);
+	int ncws = m->modules/7;
+
+	uint8_t cws[] = {16,17,236,17,236,8,236,17,236,17,30,17,236,17,236,217,236,17,236,17,196,17,236,17,236,64,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,247,98,243,98,6,133,126,129,126,92,214,230,240,230,222,204,110,153,110,156,156,218,51,218,198,112,220,193,220,177,233,62,91,62,9,66,213,251,213,148,144,82,21,82,181,132,111,153,111,242,14,241,38,241,235,3,250,184,250,118,1,184,179,184,103,39,236,71,236,70,55,68,20,68,170,129,24,168,24,204,119,70,52,70,103,130,54,177,54,164,206,248,47,248,104,31,69,184,69,218,140,21,87,21,9,112,223,93,223,219,208,254,25,254,139,63,222,144,222,90,156,255,118,255,140,186,115,229,115,145};  // TODO dummy
+
+
+
 
 	// Plot timing patterns
 	for (i = sizeof(finder[0]); i <= (int)(m->size - sizeof(finder[0]) - 1); i++) {
-		putBit(i+1, 7, (uint8_t)(i+1)%2);
-		putBit(7, i+1, (uint8_t)(i+1)%2);
+		putFixtureBit(i+1, 7, (uint8_t)(i+1)%2);
+		putFixtureBit(7, i+1, (uint8_t)(i+1)%2);
 	}
 
 	// Plot finder patterns
 	for (i = 0; i < (int)sizeof(finder[0]); i++) {
 		for (j = 0; j < (int)sizeof(finder[0]); j++) {
-			putBit(i+1, j+1, finder[i][j]);
-			putBit(-i-1, j+1, finder[i][j]);
-			putBit(i+1, -j-1, finder[i][j]);
+			putFixtureBit( i+1,  j+1, finder[i][j]);
+			putFixtureBit(-i-1,  j+1, finder[i][j]);
+			putFixtureBit( i+1, -j-1, finder[i][j]);
 		}
 	}
 
@@ -242,26 +420,88 @@ static int QRenc(gs1_encoder *ctx, uint8_t string[], struct patternLength *pats)
 	}
 
 	// Reserve the format information modules
-	for (i = 0; i < (int)(sizeof(formatmap)/sizeof(formatmap[0])); i++) {
-		putBit(formatmap[i][0][0], formatmap[i][0][1], 1);
-		putBit(formatmap[i][1][0], formatmap[i][1][1], 1);
+	for (i = 0; i < (int)(sizeof(formatmap) / sizeof(formatmap[0])); i++) {
+		putFixtureBit(formatmap[i][0][0], formatmap[i][0][1], 1);
+		putFixtureBit(formatmap[i][1][0], formatmap[i][1][1], 1);
 	}
 
 	// Reserve the version information modules
 	if (m->size >= 45) {
-		for (i = 0; i < (int)(sizeof(versionmap)/sizeof(versionmap[0])); i++) {
-			putBit(versionmap[i][0][0], versionmap[i][0][1], 1);
-			putBit(versionmap[i][1][0], versionmap[i][1][1], 1);
+		for (i = 0; i < (int)(sizeof(versionmap) / sizeof(versionmap[0])); i++) {
+			putFixtureBit(versionmap[i][0][0], versionmap[i][0][1], 0);
+			putFixtureBit(versionmap[i][1][0], versionmap[i][1][1], 0);
 		}
 	}
 
 	// Reserve the solitary dark module
-	putBit(9, -8, 1);
+	putFixtureBit(9, -8, 0);
 
+	// Walk the symbol placing the bitstream avoiding fixed patterns
+	i = j = m->size;
+	dir = -1;   // -1 updates; 1 downwards
+	col = 1;    // 0 is left bit; 1 is right bit
+	for (k = 0; i >= 1 && k/8 < ncws; )
+	{
+		if (!getBit(fix, i, j)) {
+			putBit(mtx, i, j, (cws[k/8] & (0x80>>(k%8))) != 0);
+			k++;
+		}
+		if (col == 1) {
+			col = 0;
+			i--;
+			continue;
+		}
+		col = 1;
+		i++;
+		j += dir;
+		if (j >= 1 && j <= m->size)
+			continue;
+		// Turn around at top and bottom
+		dir *= -1;
+		i -= 2;
+		j += dir;
+		if (i == 7)  // Hop over the timing pattern
+			i--;
+	}
+	assert(i == 0 && k == m->modules);  // Filled the symbol and out of data
 
-(void)formatvals;
-(void)versionvals;
+	// Evaluate the masked symbols to find the most suitable
+	for (k = 0; k < (int)(sizeof(maskfun) / sizeof(maskfun[0])); k++) {
+		applyMask(tmp, mtx, maskfun[k], fix, m);
+		score = evalMask(tmp, m);
+		if (score < bestScore) {
+			mask = (uint8_t)k;
+			bestScore = score;
+		}
+	}
+	applyMask(mtx, mtx, maskfun[mask], fix, m);
 
+	// Set the solitary dark module
+	putBit(mtx, 9, -8, 1);
+
+	// Plot the format information
+	switch (ctx->qrEClevel) {
+		case gs1_encoder_qrEClevelL: formatval = formatvals[ 8 + mask]; break;
+		case gs1_encoder_qrEClevelM: formatval = formatvals[ 0 + mask]; break;
+		case gs1_encoder_qrEClevelQ: formatval = formatvals[24 + mask]; break;
+		case gs1_encoder_qrEClevelH: formatval = formatvals[16 + mask]; break;
+		default:
+			assert(true);
+			return -1;  // Satisfy compiler
+	}
+	for (i = 0; i < (int)(sizeof(formatmap) / sizeof(formatmap[0])); i++) {
+		putBit(mtx, formatmap[i][0][0], formatmap[i][0][1], (formatval >> (14-i)) & 1);
+		putBit(mtx, formatmap[i][1][0], formatmap[i][1][1], (formatval >> (14-i)) & 1);
+	}
+
+	// Plot the version information modules
+	versionval = versionvals[(m->size-17)/4-7];
+	if (m->size >= 45) {
+		for (i = 0; i < (int)(sizeof(versionmap) / sizeof(versionmap[0])); i++) {
+			putBit(mtx, versionmap[i][0][0], versionmap[i][0][1], (versionval >> (17-i)) & 1);
+			putBit(mtx, versionmap[i][1][0], versionmap[i][1][1], (versionval >> (17-i)) & 1);
+		}
+	}
 
 	gs1_mtxToPatterns(mtx, m->size + 2*QR_QZ, m->size + 2*QR_QZ, pats);
 
