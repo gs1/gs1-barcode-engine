@@ -73,6 +73,7 @@ GS1_ENCODERS_API gs1_encoder* gs1_encoder_init(void) {
 	ctx->sepHt = 1;
 	ctx->segWidth = 22;
 	ctx->linHeight = 25;
+	ctx->qrEClevel = gs1_encoder_qrEClevelM;
 	ctx->format = gs1_encoder_dTIF;
 	strcpy(ctx->dataStr, "");
 	strcpy(ctx->dataFile, "data.txt");
@@ -243,6 +244,30 @@ GS1_ENCODERS_API bool gs1_encoder_setSegWidth(gs1_encoder *ctx, int segWidth) {
 		return false;
 	}
 	ctx->segWidth = segWidth;
+	return true;
+}
+
+
+GS1_ENCODERS_API int gs1_encoder_getQrEClevel(gs1_encoder *ctx) {
+	assert(ctx);
+	reset_error(ctx);
+	return ctx->segWidth;
+}
+GS1_ENCODERS_API bool gs1_encoder_setQrEClevel(gs1_encoder *ctx, int ecLevel) {
+	assert(ctx);
+	reset_error(ctx);
+	switch (ecLevel) {
+		case gs1_encoder_qrEClevelL:
+		case gs1_encoder_qrEClevelM:
+		case gs1_encoder_qrEClevelQ:
+		case gs1_encoder_qrEClevelH:
+ 			ctx->qrEClevel = ecLevel;
+			break;
+		default:
+			strcpy(ctx->errMsg, "Valid number of segments range is 2 to 22");
+			ctx->errFlag = true;
+			return false;
+	}
 	return true;
 }
 

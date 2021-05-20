@@ -69,6 +69,14 @@ enum {
 };
 
 
+enum {
+	gs1_encoder_qrEClevelL = 0,
+	gs1_encoder_qrEClevelM,
+	gs1_encoder_qrEClevelQ,
+	gs1_encoder_qrEClevelH,
+};
+
+
 /** @brief A gs1_encoder context.
  */
 typedef struct gs1_encoder gs1_encoder;
@@ -102,6 +110,9 @@ GS1_ENCODERS_API bool gs1_encoder_setSegWidth(gs1_encoder *ctx, int segWidth);
 
 GS1_ENCODERS_API int gs1_encoder_getLinHeight(gs1_encoder *ctx);
 GS1_ENCODERS_API bool gs1_encoder_setLinHeight(gs1_encoder *ctx, int linHeight);
+
+GS1_ENCODERS_API int gs1_encoder_getQrEClevel(gs1_encoder *ctx);
+GS1_ENCODERS_API bool gs1_encoder_setQrEClevel(gs1_encoder *ctx, int ecLevel);
 
 GS1_ENCODERS_API bool gs1_encoder_getFileInputFlag(gs1_encoder *ctx);
 GS1_ENCODERS_API bool gs1_encoder_setFileInputFlag(gs1_encoder *ctx, bool fileInputFlag);
