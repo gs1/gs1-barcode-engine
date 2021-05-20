@@ -21,11 +21,10 @@
 #ifndef QR_H
 #define QR_H
 
-
-#define MAX_QR_COLS	185	// include qz
-#define MAX_QR_ROWS	185	// include qz
-#define MAX_QR_ELMNTS	185	// accept checkerboard pattern
-#define MAX_QR_BYTES	((MAX_QR_COLS-1)/8+1) * MAX_QR_ROWS
+#define QR_QZ		4
+#define MAX_QR_SIZE	(177 + 2*QR_QZ)
+#define MAX_QR_ELMNTS	MAX_QR_SIZE		// to accept a checkerboard test pattern
+#define MAX_QR_BYTES	((MAX_QR_SIZE-1)/8+1) * MAX_QR_SIZE
 
 
 #include "gs1encoders.h"

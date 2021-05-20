@@ -106,6 +106,7 @@ static const struct metric metrics[40] = {
 	METRIC(3,  177,  30, 58,   29648,  750, 1372, 2040, 2430,  19,  6, 18, 31, 34, 34, 20, 61),   // v40
 };
 
+
 static const uint8_t finder[8][8] = {
 	{ 1,1,1,1,1,1,1,0 },
 	{ 1,0,0,0,0,0,1,0 },
@@ -117,6 +118,7 @@ static const uint8_t finder[8][8] = {
 	{ 0,0,0,0,0,0,0,0 },
 };
 
+
 static const uint8_t algnpat[5][5] = {
 	{ 1,1,1,1,1 },
 	{ 1,0,0,0,1 },
@@ -126,10 +128,60 @@ static const uint8_t algnpat[5][5] = {
 };
 
 
-// Syntactic sugar
+	/*
+	 * Our coordinate system is indexed with (1,1) at top-left.  Negative
+	 * cooridinates wrap around to the other extent of the same row/column,
+	 * such that (-1,-1) is at bottom-right. The coordinate system is
+	 * oblivious to the quiet zone.
+	 *
+	 */
 
-#define putBit(x, y, b) do {			\
-	gs1_mtxPutBit(mtx, m->size, x, y, b);	\
+
+static const int8_t formatmap[15][2][2] = {
+	{ {  1, 9 }, {  9,-1 } },  { {  2, 9 }, {  9,-2 } },  { {  3, 9 }, {  9,-3 } },
+	{ {  4, 9 }, {  9,-4 } },  { {  5, 9 }, {  9,-5 } },  { {  6, 9 }, {  9,-6 } },
+	{ {  8, 9 }, {  9,-7 } },  { {  9, 9 }, { -8, 9 } },  { {  9, 8 }, { -7, 9 } },
+	{ {  9, 6 }, { -6, 9 } },  { {  9, 5 }, { -5, 9 } },  { {  9, 4 }, { -4, 9 } },
+	{ {  9, 3 }, { -3, 9 } },  { {  9, 2 }, { -2, 9 } },  { {  9, 1 }, { -1, 9 } },
+};
+
+
+static const uint16_t formatvals[32] = {
+	0x5412, 0x5125, 0x5e7c, 0x5b4b, 0x45f9, 0x40ce, 0x4f97, 0x4aa0,
+	0x77c4, 0x72f3, 0x7daa, 0x789d, 0x662f, 0x6318, 0x6c41, 0x6976,
+	0x1689, 0x13be, 0x1ce7, 0x19d0, 0x0762, 0x0255, 0x0d0c, 0x083b,
+	0x355f, 0x3068, 0x3f31, 0x3a06, 0x24b4, 0x2183, 0x2eda, 0x2bed,
+};
+
+
+static const int8_t versionmap[18][2][2] = {
+	{ {  -9,  6 }, {  6, -9 } },  { { -10,  6 }, {  6,-10 } },
+	{ { -11,  6 }, {  6,-11 } },  { {  -9,  5 }, {  5, -9 } },
+	{ { -10,  5 }, {  5,-10 } },  { { -11,  5 }, {  5,-11 } },
+	{ {  -9,  4 }, {  4, -9 } },  { { -10,  4 }, {  4,-10 } },
+	{ { -11,  4 }, {  4,-11 } },  { {  -9,  3 }, {  3, -9 } },
+	{ { -10,  3 }, {  3,-10 } },  { { -11,  3 }, {  3,-11 } },
+	{ {  -9,  2 }, {  2, -9 } },  { { -10,  2 }, {  2,-10 } },
+	{ { -11,  2 }, {  2,-11 } },  { {  -9,  1 }, {  1, -9 } },
+	{ { -10,  1 }, {  1,-10 } },  { { -11,  1 }, {  1,-11 } },
+};
+
+
+static const uint32_t versionvals[34] = {
+	0x07c94, 0x085bc, 0x09a99, 0x0a4d3, 0x0bbf6, 0x0c762, 0x0d847,
+	0x0e60d, 0x0f928, 0x10b78, 0x1145d, 0x12a17, 0x13532, 0x149a6,
+	0x15683, 0x168c9, 0x177ec, 0x18ec4, 0x191e1, 0x1afab, 0x1b08e,
+	0x1cc1a, 0x1d33f, 0x1ed75, 0x1f250, 0x209d5, 0x216fd, 0x228ba,
+	0x2379f, 0x24b0b, 0x2542e, 0x26a64, 0x27541, 0x28c69,
+};
+
+
+// Syntactic sugar to include qz offset and wrap around processing
+#define putBit(x, y, b) do {					\
+	gs1_mtxPutBit(mtx, m->size + 2*QR_QZ,			\
+		x > 0 ? x + QR_QZ - 1 : m->size + QR_QZ + x,	\
+		y > 0 ? y + QR_QZ - 1 : m->size + QR_QZ + y,	\
+		b);						\
 } while(0)
 
 #define putAlign(x, y) do {		\
@@ -163,54 +215,64 @@ static int QRenc(gs1_encoder *ctx, uint8_t string[], struct patternLength *pats)
 			break;
 	}
 
-	/*
-	 *  Plot timing patterns
-	 *
-	 */
+	// Plot timing patterns
 	for (i = sizeof(finder[0]); i <= (int)(m->size - sizeof(finder[0]) - 1); i++) {
-		putBit(i, 6, (uint8_t)(i+1)%2);
-		putBit(6, i, (uint8_t)(i+1)%2);
+		putBit(i+1, 7, (uint8_t)(i+1)%2);
+		putBit(7, i+1, (uint8_t)(i+1)%2);
 	}
 
-	/*
-	 *  Plot finder patterns
-	 *
-	 */
+	// Plot finder patterns
 	for (i = 0; i < (int)sizeof(finder[0]); i++) {
 		for (j = 0; j < (int)sizeof(finder[0]); j++) {
-			putBit(i, j, finder[i][j]);
-			putBit(m->size-i-1, j, finder[i][j]);
-			putBit(i, m->size-j-1, finder[i][j]);
+			putBit(i+1, j+1, finder[i][j]);
+			putBit(-i-1, j+1, finder[i][j]);
+			putBit(i+1, -j-1, finder[i][j]);
 		}
 	}
 
-	/*
-	 *  Plot alignment patterns
-	 *
-	 */
+	// Plot alignment patterns
 	for (i = m->align2 - 2; i <= m->size - 13; i += m->align3 - m->align2) {
-		putAlign(i, 4);
-		putAlign(4, i);
+		putAlign(i+1, 5);
+		putAlign(5, i+1);
 	}
 	for (i = m->align2 - 2; i <= m->size - 9; i += m->align3 - m->align2) {
 		for (j = m->align2 - 2; j <= m->size - 9; j += m->align3 - m->align2) {
-			putAlign(i, j);
+			putAlign(i+1, j+1);
 		}
 	}
 
+	// Reserve the format information modules
+	for (i = 0; i < (int)(sizeof(formatmap)/sizeof(formatmap[0])); i++) {
+		putBit(formatmap[i][0][0], formatmap[i][0][1], 1);
+		putBit(formatmap[i][1][0], formatmap[i][1][1], 1);
+	}
 
-(void)algnpat;
+	// Reserve the version information modules
+	if (m->size >= 45) {
+		for (i = 0; i < (int)(sizeof(versionmap)/sizeof(versionmap[0])); i++) {
+			putBit(versionmap[i][0][0], versionmap[i][0][1], 1);
+			putBit(versionmap[i][1][0], versionmap[i][1][1], 1);
+		}
+	}
 
-	gs1_mtxToPatterns(mtx, m->size, m->size, pats);
+	// Reserve the solitary dark module
+	putBit(9, -8, 1);
 
-	return m->size;
+
+(void)formatvals;
+(void)versionvals;
+
+
+	gs1_mtxToPatterns(mtx, m->size + 2*QR_QZ, m->size + 2*QR_QZ, pats);
+
+	return m->size + 2*QR_QZ;
 }
 
 
 void gs1_QR(gs1_encoder *ctx) {
 
 	struct sPrints prints;
-	struct patternLength pats[MAX_QR_ROWS];
+	struct patternLength pats[MAX_QR_SIZE];
 	char* dataStr = ctx->dataStr;
 	int rows, cols, i;
 
