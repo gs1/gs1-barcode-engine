@@ -74,6 +74,7 @@ GS1_ENCODERS_API gs1_encoder* gs1_encoder_init(void) {
 	ctx->segWidth = 22;
 	ctx->linHeight = 25;
 	ctx->qrEClevel = gs1_encoder_qrEClevelM;
+	ctx->qrVersion = 0;  // Automatic
 	ctx->format = gs1_encoder_dTIF;
 	strcpy(ctx->dataStr, "");
 	strcpy(ctx->dataFile, "data.txt");
@@ -248,10 +249,28 @@ GS1_ENCODERS_API bool gs1_encoder_setSegWidth(gs1_encoder *ctx, int segWidth) {
 }
 
 
+GS1_ENCODERS_API int gs1_encoder_getQrVersion(gs1_encoder *ctx) {
+	assert(ctx);
+	reset_error(ctx);
+	return ctx->qrVersion;
+}
+GS1_ENCODERS_API bool gs1_encoder_setQrVersion(gs1_encoder *ctx, int version) {
+	assert(ctx);
+	reset_error(ctx);
+	if (version < 0 || version > 40) {
+		strcpy(ctx->errMsg, "Valid QR Code version 1 to 40, or 0");
+		ctx->errFlag = true;
+		return false;
+	}
+	ctx->qrVersion = version;
+	return true;
+}
+
+
 GS1_ENCODERS_API int gs1_encoder_getQrEClevel(gs1_encoder *ctx) {
 	assert(ctx);
 	reset_error(ctx);
-	return ctx->segWidth;
+	return ctx->qrEClevel;
 }
 GS1_ENCODERS_API bool gs1_encoder_setQrEClevel(gs1_encoder *ctx, int ecLevel) {
 	assert(ctx);
@@ -735,6 +754,61 @@ void test_api_sepHt(void) {
 	TEST_CHECK(!gs1_encoder_setSepHt(ctx, GS1_ENCODERS_MAX_PIXMULT - 1));
 	TEST_CHECK(gs1_encoder_setSepHt(ctx, 2 * GS1_ENCODERS_MAX_PIXMULT));
 	TEST_CHECK(!gs1_encoder_setSepHt(ctx, 2 * GS1_ENCODERS_MAX_PIXMULT + 1));
+
+	gs1_encoder_free(ctx);
+
+}
+
+
+void test_api_qrVersion(void) {
+
+	gs1_encoder* ctx;
+
+	TEST_ASSERT((ctx = gs1_encoder_init()) != NULL);
+
+	TEST_CHECK(gs1_encoder_getQrVersion(ctx) == 0);  // Default
+
+	// Extents
+	TEST_CHECK(gs1_encoder_setQrVersion(ctx, 1));
+	TEST_CHECK(gs1_encoder_getQrVersion(ctx) == 1);
+	TEST_CHECK(gs1_encoder_setQrVersion(ctx, 40));
+	TEST_CHECK(gs1_encoder_getQrVersion(ctx) == 40);
+
+	// Invalid
+	TEST_CHECK(!gs1_encoder_setQrVersion(ctx, -1));
+	TEST_CHECK(!gs1_encoder_setQrVersion(ctx, 41));
+
+	// Back to automatic
+	TEST_CHECK(gs1_encoder_setQrVersion(ctx, 0));
+	TEST_CHECK(gs1_encoder_getQrVersion(ctx) == 0);
+
+	gs1_encoder_free(ctx);
+
+}
+
+
+void test_api_qrEClevel(void) {
+
+	gs1_encoder* ctx;
+
+	TEST_ASSERT((ctx = gs1_encoder_init()) != NULL);
+
+	TEST_CHECK(gs1_encoder_getQrEClevel(ctx) == gs1_encoder_qrEClevelM);  // Default
+
+	TEST_CHECK(gs1_encoder_setQrEClevel(ctx, gs1_encoder_qrEClevelL));
+	TEST_CHECK(gs1_encoder_getQrEClevel(ctx) == gs1_encoder_qrEClevelL);
+
+	TEST_CHECK(gs1_encoder_setQrEClevel(ctx, gs1_encoder_qrEClevelM));
+	TEST_CHECK(gs1_encoder_getQrEClevel(ctx) == gs1_encoder_qrEClevelM);
+
+	TEST_CHECK(gs1_encoder_setQrEClevel(ctx, gs1_encoder_qrEClevelQ));
+	TEST_CHECK(gs1_encoder_getQrEClevel(ctx) == gs1_encoder_qrEClevelQ);
+
+	TEST_CHECK(gs1_encoder_setQrEClevel(ctx, gs1_encoder_qrEClevelH));
+	TEST_CHECK(gs1_encoder_getQrEClevel(ctx) == gs1_encoder_qrEClevelH);
+
+	TEST_CHECK(!gs1_encoder_setQrEClevel(ctx, gs1_encoder_qrEClevelL - 1));
+	TEST_CHECK(!gs1_encoder_setQrEClevel(ctx, gs1_encoder_qrEClevelH + 1));
 
 	gs1_encoder_free(ctx);
 

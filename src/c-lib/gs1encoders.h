@@ -111,6 +111,9 @@ GS1_ENCODERS_API bool gs1_encoder_setSegWidth(gs1_encoder *ctx, int segWidth);
 GS1_ENCODERS_API int gs1_encoder_getLinHeight(gs1_encoder *ctx);
 GS1_ENCODERS_API bool gs1_encoder_setLinHeight(gs1_encoder *ctx, int linHeight);
 
+GS1_ENCODERS_API int gs1_encoder_getQrVersion(gs1_encoder *ctx);
+GS1_ENCODERS_API bool gs1_encoder_setQrVersion(gs1_encoder *ctx, int version);
+
 GS1_ENCODERS_API int gs1_encoder_getQrEClevel(gs1_encoder *ctx);
 GS1_ENCODERS_API bool gs1_encoder_setQrEClevel(gs1_encoder *ctx, int ecLevel);
 

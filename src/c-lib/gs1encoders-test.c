@@ -130,6 +130,8 @@ TEST_LIST = {
     { "api_sepHt", test_api_sepHt },
     { "api_segWidth", test_api_segWidth },
     { "api_linHeight", test_api_linHeight },
+    { "api_qrVersion", test_api_qrVersion },
+    { "api_qrEClevel", test_api_qrEClevel },
     { "api_outFile", test_api_outFile },
     { "api_dataFile", test_api_dataFile },
     { "api_dataStr", test_api_dataStr },

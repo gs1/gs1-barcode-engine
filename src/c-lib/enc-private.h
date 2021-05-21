@@ -65,6 +65,7 @@ struct gs1_encoder {
 	int segWidth;
 	int format;		// BMP, TIF or RAW
 	int linHeight;		// height of UCC/EAN-128 in X
+	int qrVersion;		// QR Code symbol version
 	int qrEClevel;		// QR Code error correction level
 	char dataStr[GS1_ENCODERS_MAX_DATA+1];
 	char dataFile[GS1_ENCODERS_MAX_FNAME+1];
@@ -117,6 +118,8 @@ void test_api_XYundercut(void);
 void test_api_sepHt(void);
 void test_api_segWidth(void);
 void test_api_linHeight(void);
+void test_api_qrVersion(void);
+void test_api_qrEClevel(void);
 void test_api_outFile(void);
 void test_api_dataFile(void);
 void test_api_dataStr(void);

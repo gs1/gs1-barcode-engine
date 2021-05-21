@@ -448,6 +448,7 @@ static int QRenc(gs1_encoder *ctx, uint8_t string[], struct patternLength *pats)
 //	uint8_t cws[MAX_QR_CWS];
 	uint8_t tmpcws[MAX_QR_CWS];
 	int eclevel = ctx->qrEClevel;
+	int version = ctx->qrVersion;
 
 	uint8_t coeffs[MAX_QR_ECC_CWS_PER_BLK+1];
 
@@ -463,6 +464,7 @@ static int QRenc(gs1_encoder *ctx, uint8_t string[], struct patternLength *pats)
 	assert(eclevel >= gs1_encoder_qrEClevelL && eclevel <= gs1_encoder_qrEClevelH);
 
 
+(void)version;
 (void)bitstream;
 (void)bitpos;
 
