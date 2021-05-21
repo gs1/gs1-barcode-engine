@@ -307,6 +307,8 @@ static uint32_t evalMask(uint8_t *mtx, const struct metric *m) {
 	int n1n3 = 0, n2 = 0, n4 = 0;
 	uint8_t *lastpairs = &pairsa[0], *thispairs = &pairsb[0], *tmppairs;
 
+	assert(size >= 21);  // Satisfy static analyser (div by 0)
+
 	for (k = 1; k <= m->size; k++) {
 
 		// RLE columns and rows, 0:..:.. when starting with dark module
