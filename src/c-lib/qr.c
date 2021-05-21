@@ -120,13 +120,13 @@ static const uint8_t algnpat[5][5] = {
 };
 
 
-	/*
-	 * Coordinate system is indexed with (1,1) at top-left.  Negative
-	 * cooridinates wrap around to the other extent of the same row/column,
-	 * such that (-1,-1) is at bottom-right. The coordinate system is
-	 * oblivious to the quiet zone.
-	 *
-	 */
+/*
+ * Coordinate system (i,j) is indexed with (1,1) at top-left.  Negative
+ * cooridinates wrap around to the other extent of the same row/column, such
+ * that (-1,-1) is at bottom-right. The coordinate system is oblivious to the
+ * quiet zone.
+ *
+ */
 
 
 static const int8_t formatmap[15][2][2] = {
@@ -165,6 +165,47 @@ static const uint32_t versionvals[34] = {
 	0x15683, 0x168c9, 0x177ec, 0x18ec4, 0x191e1, 0x1afab, 0x1b08e,
 	0x1cc1a, 0x1d33f, 0x1ed75, 0x1f250, 0x209d5, 0x216fd, 0x228ba,
 	0x2379f, 0x24b0b, 0x2542e, 0x26a64, 0x27541, 0x28c69,
+};
+
+
+static const uint8_t rslog[256] = {
+	  0,    // undefined
+	     255,   1,  25,   2,  50,  26, 198,   3, 223,  51, 238,  27, 104, 199,  75,
+	  4, 100, 224,  14,  52, 141, 239, 129,  28, 193, 105, 248, 200,   8,  76, 113,
+	  5, 138, 101,  47, 225,  36,  15,  33,  53, 147, 142, 218, 240,  18, 130,  69,
+	 29, 181, 194, 125, 106,  39, 249, 185, 201, 154,   9, 120,  77, 228, 114, 166,
+	  6, 191, 139,  98, 102, 221,  48, 253, 226, 152,  37, 179,  16, 145,  34, 136,
+	 54, 208, 148, 206, 143, 150, 219, 189, 241, 210,  19,  92, 131,  56,  70,  64,
+	 30,  66, 182, 163, 195,  72, 126, 110, 107,  58,  40,  84, 250, 133, 186,  61,
+	202,  94, 155, 159,  10,  21, 121,  43,  78, 212, 229, 172, 115, 243, 167,  87,
+	  7, 112, 192, 247, 140, 128,  99,  13, 103,  74, 222, 237,  49, 197, 254,  24,
+	227, 165, 153, 119,  38, 184, 180, 124,  17,  68, 146, 217,  35,  32, 137,  46,
+	 55,  63, 209,  91, 149, 188, 207, 205, 144, 135, 151, 178, 220, 252, 190,  97,
+	242,  86, 211, 171,  20,  42,  93, 158, 132,  60,  57,  83,  71, 109,  65, 162,
+	 31,  45,  67, 216, 183, 123, 164, 118, 196,  23,  73, 236, 127,  12, 111, 246,
+	108, 161,  59,  82,  41, 157,  85, 170, 251,  96, 134, 177, 187, 204,  62,  90,
+	203,  89,  95, 176, 156, 169, 160,  81,  11, 245,  22, 235, 122, 117,  44, 215,
+	 79, 174, 213, 233, 230, 231, 173, 232, 116, 214, 244, 234, 168,  80,  88, 175,
+};
+
+
+static const uint8_t rsalog[256] = {
+	  1,   2,   4,   8,  16,  32,  64, 128,  29,  58, 116, 232, 205, 135,  19,  38,
+	 76, 152,  45,  90, 180, 117, 234, 201, 143,   3,   6,  12,  24,  48,  96, 192,
+	157,  39,  78, 156,  37,  74, 148,  53, 106, 212, 181, 119, 238, 193, 159,  35,
+	 70, 140,   5,  10,  20,  40,  80, 160,  93, 186, 105, 210, 185, 111, 222, 161,
+	 95, 190,  97, 194, 153,  47,  94, 188, 101, 202, 137,  15,  30,  60, 120, 240,
+	253, 231, 211, 187, 107, 214, 177, 127, 254, 225, 223, 163,  91, 182, 113, 226,
+	217, 175,  67, 134,  17,  34,  68, 136,  13,  26,  52, 104, 208, 189, 103, 206,
+	129,  31,  62, 124, 248, 237, 199, 147,  59, 118, 236, 197, 151,  51, 102, 204,
+	133,  23,  46,  92, 184, 109, 218, 169,  79, 158,  33,  66, 132,  21,  42,  84,
+	168,  77, 154,  41,  82, 164,  85, 170,  73, 146,  57, 114, 228, 213, 183, 115,
+	230, 209, 191,  99, 198, 145,  63, 126, 252, 229, 215, 179, 123, 246, 241, 255,
+	227, 219, 171,  75, 150,  49,  98, 196, 149,  55, 110, 220, 165,  87, 174,  65,
+	130,  25,  50, 100, 200, 141,   7,  14,  28,  56, 112, 224, 221, 167,  83, 166,
+	 81, 162,  89, 178, 121, 242, 249, 239, 195, 155,  43,  86, 172,  69, 138,   9,
+	 18,  36,  72, 144,  61, 122, 244, 245, 247, 243, 251, 235, 203, 139,  11,  22,
+	 44,  88, 176, 125, 250, 233, 207, 131,  27,  54, 108, 216, 173,  71, 142,   1,
 };
 
 
@@ -242,10 +283,48 @@ static void doPutAlign(uint8_t *mtx, uint8_t *fix, const struct metric *m, int x
 }
 
 
+// Reed Solomon product in the field
+static inline uint8_t rsprod(uint8_t a, uint8_t b) {
+	return a && b ? rsalog[ (rslog[a] + rslog[b]) % 255 ] : 0;
+}
+
+
+// Generate Reed Solomon coefficients
+static void rscoeffs(int size, uint8_t *coeffs) {
+
+	int i, j;
+
+	coeffs[0] = 1;
+	for (i = 0; i < size; i++) {
+		coeffs[i+1] = coeffs[i];
+		for (j = i; j > 0; j--)
+			coeffs[j] = coeffs[j-1] ^ rsprod(coeffs[j], rsalog[i]);
+		coeffs[0] = rsprod(coeffs[0], rsalog[i]);
+	}
+}
+
+
+static void rsencode(uint8_t* datcws, int datlen, uint8_t* ecccws, int ecclen, uint8_t* coeffs) {
+
+	int i, j;
+	uint8_t tmp[MAX_QR_DAT_CWS_PER_BLK + MAX_QR_ECC_CWS_PER_BLK] = { 0 };
+
+	memcpy(tmp, datcws, (size_t)datlen);
+
+	for (i = 0; i < datlen; i++)
+		for (j = 0; j < ecclen; j++)
+			tmp[i+j+1] = rsprod(coeffs[ecclen-j-1], tmp[i]) ^ tmp[i+j+1];
+
+	memcpy(ecccws, tmp + datlen, (size_t)ecclen);
+
+}
+
+
 static void applyMask(uint8_t *dest, uint8_t *src,
 		      uint8_t (*maskfun)(uint8_t x, uint8_t y), uint8_t *fix, const struct metric *m) {
 
 	int i, j;
+
 	for (i = 1; i <= m->size; i++) {
 		for (j = 1; j <= m->size; j++) {
 			putBit(dest, i, j, (uint8_t)(getBit(src, i, j) ^ (
@@ -257,7 +336,13 @@ static void applyMask(uint8_t *dest, uint8_t *src,
 
 }
 
-
+/*
+ *  rle is a zero-terminated runlength encoding of an entire row or column.
+ *
+ *  rle will beging with a non-terminating 0 in the case of a row or columns
+ *  starting with a dark module.
+ *
+ */
 static int evaln1n3(uint8_t *rle) {
 
 	uint8_t *s = rle;
@@ -358,7 +443,14 @@ static int QRenc(gs1_encoder *ctx, uint8_t string[], struct patternLength *pats)
 
 	uint8_t mtx[MAX_QR_BYTES] = { 0 };
 	uint8_t fix[MAX_QR_BYTES] = { 0 };	// 1 indicates fixed pattern
-	uint8_t tmp[MAX_QR_BYTES] = { 0 };	// Used for mask evaluation
+	uint8_t tmp[MAX_QR_BYTES];		// Used for mask evaluation
+
+//	uint8_t cws[MAX_QR_CWS];
+	uint8_t tmpcws[MAX_QR_CWS];
+	int eclevel = ctx->qrEClevel;
+
+	uint8_t coeffs[MAX_QR_ECC_CWS_PER_BLK+1];
+
 	int i, j, k, col, dir;
 	uint8_t mask = 0;			// Satisfy compiler
 	uint32_t formatval, versionval;
@@ -367,6 +459,8 @@ static int QRenc(gs1_encoder *ctx, uint8_t string[], struct patternLength *pats)
 
 	uint8_t bitstream[MAX_QR_DATA_BYTES];
 	uint16_t bitpos = 0;
+
+	assert(eclevel >= gs1_encoder_qrEClevelL && eclevel <= gs1_encoder_qrEClevelH);
 
 
 (void)bitstream;
@@ -378,12 +472,61 @@ static int QRenc(gs1_encoder *ctx, uint8_t string[], struct patternLength *pats)
 	int ver = 10 -1;
 
 	m = &(metrics[ver]);
-	int ncws = m->modules/7;
 
-	uint8_t cws[] = {16,17,236,17,236,8,236,17,236,17,30,17,236,17,236,217,236,17,236,17,196,17,236,17,236,64,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,247,98,243,98,6,133,126,129,126,92,214,230,240,230,222,204,110,153,110,156,156,218,51,218,198,112,220,193,220,177,233,62,91,62,9,66,213,251,213,148,144,82,21,82,181,132,111,153,111,242,14,241,38,241,235,3,250,184,250,118,1,184,179,184,103,39,236,71,236,70,55,68,20,68,170,129,24,168,24,204,119,70,52,70,103,130,54,177,54,164,206,248,47,248,104,31,69,184,69,218,140,21,87,21,9,112,223,93,223,219,208,254,25,254,139,63,222,144,222,90,156,255,118,255,140,186,115,229,115,145};  // TODO dummy
+	int ncws = m->modules/8;		// Total number of codewords
+	int rbit = m->modules%8;		// Number of remainder bit
+	int ecws = m->ecc_cws[eclevel];		// Number of error correction codewords
+	int dcws = ncws - ecws;			// Number of data codeword
+	int dmod = dcws*8;			// Number of data modules
+	int ecb1 = m->ecc_blks[eclevel][0];	// First error correction blocks
+	int ecb2 = m->ecc_blks[eclevel][1];	// First error correction blocks
+
+	// After symbol selection
+	int dcpb = dcws/(ecb1+ecb2);		// Base data codewords per block
+	int ecpb = ncws/(ecb1+ecb2) - dcpb;	// Error correction codewords per block
+
+	assert(dcpb <= MAX_QR_DAT_CWS_PER_BLK);
+	assert(ecpb <= MAX_QR_ECC_CWS_PER_BLK);
+
+
+(void)dmod;
+
+
+	uint8_t cws[MAX_QR_CWS] = {16,8,30,217,196,64,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17};  // TODO dummy
 
 
 
+	// Generate coefficients
+	rscoeffs(ecpb, coeffs);
+
+	// Calculate the error correction codewords in two groups of blocks
+	memcpy(tmpcws, cws, (size_t)dcws);
+	for (i = 0; i < ecb1; i++)
+		rsencode(cws + i*dcpb, dcpb, tmpcws + dcws + i*ecpb, ecpb, coeffs);
+	for (i = 0; i < ecb2; i++)
+		rsencode(cws + ecb1*dcpb + i*(dcpb+1), dcpb + 1, tmpcws + dcws + (i+ecb1)*ecpb, ecpb, coeffs);
+
+	// Reassemble the codewords by interleaving the data and ECC blocks
+	uint8_t *p = &(cws[0]);
+	for (i = 0; i < dcpb+1; i++)
+		for (j = 0; j < ecb1 + ecb2; j++)
+			if ( i < dcpb || j >= ecb1)	// First block group is shorter
+				*p++ = tmpcws[j*dcpb + i];
+	for (i = 0; i < ecpb; i++)
+		for (j = 0; j < ecb1 + ecb2; j++)
+			*p++ = tmpcws[dcws + j*ecpb + i];
+
+	// Extend codewords by one if there are remainder bits
+	if (rbit != 0)
+		cws[ncws++] = 0;
+
+/*
+printf("\n");
+for (int i = 0 ; i < ncws; i++ ) {
+	printf("%d ", cws[i]);
+}
+printf("\n");
+*/
 
 	// Plot timing patterns
 	for (i = sizeof(finder[0]); i <= (int)(m->size - sizeof(finder[0]) - 1); i++) {
@@ -405,11 +548,9 @@ static int QRenc(gs1_encoder *ctx, uint8_t string[], struct patternLength *pats)
 		putAlign(i+1, 5);
 		putAlign(5, i+1);
 	}
-	for (i = m->align2 - 2; i <= m->size - 9; i += m->align3 - m->align2) {
-		for (j = m->align2 - 2; j <= m->size - 9; j += m->align3 - m->align2) {
+	for (i = m->align2 - 2; i <= m->size - 9; i += m->align3 - m->align2)
+		for (j = m->align2 - 2; j <= m->size - 9; j += m->align3 - m->align2)
 			putAlign(i+1, j+1);
-		}
-	}
 
 	// Reserve the format information modules
 	for (i = 0; i < (int)(sizeof(formatmap) / sizeof(formatmap[0])); i++) {
@@ -432,7 +573,7 @@ static int QRenc(gs1_encoder *ctx, uint8_t string[], struct patternLength *pats)
 	i = j = m->size;
 	dir = -1;   // -1 updates; 1 downwards
 	col = 1;    // 0 is left bit; 1 is right bit
-	for (k = 0; i >= 1 && k/8 < ncws; )
+	for (k = 0; i >= 1; )
 	{
 		if (!getBit(fix, i, j)) {
 			putBit(mtx, i, j, (cws[k/8] & (0x80>>(k%8))) != 0);
@@ -455,7 +596,7 @@ static int QRenc(gs1_encoder *ctx, uint8_t string[], struct patternLength *pats)
 		if (i == 7)  // Hop over the timing pattern
 			i--;
 	}
-	assert(i == 0 && k == m->modules);  // Filled the symbol and out of data
+	assert(k == m->modules);  // Filled the symbol
 
 	// Evaluate the masked symbols to find the most suitable
 	for (k = 0; k < (int)(sizeof(maskfun) / sizeof(maskfun[0])); k++) {
