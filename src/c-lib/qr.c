@@ -300,8 +300,8 @@ static uint32_t evalMask(uint8_t *mtx, const struct metric *m) {
 
 	int i, j, k, p;
 	uint8_t size = m->size;
-	uint8_t pairsa[size], pairsb[size];
-	uint8_t rlec[size], rler[size];
+	uint8_t pairsa[MAX_QR_SIZE], pairsb[MAX_QR_SIZE];
+	uint8_t rlec[MAX_QR_SIZE], rler[MAX_QR_SIZE];
 	uint8_t lastc, lastr, qc, qr;
 	int now, last;
 	int n1n3 = 0, n2 = 0, n4 = 0;
@@ -309,7 +309,7 @@ static uint32_t evalMask(uint8_t *mtx, const struct metric *m) {
 
 	for (k = 1; k <= m->size; k++) {
 
-		// RLE columns and rows, 0:..:.. when starting in white
+		// RLE columns and rows, 0:..:.. when starting with dark module
 		qc = lastc = getBit(mtx, k, 1);
 		rlec[0] = lastc ^ 1;
 		rlec[1] = 1;
