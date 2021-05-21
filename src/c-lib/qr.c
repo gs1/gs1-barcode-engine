@@ -31,14 +31,14 @@
 
 
 
-#define METRIC(vg, s, a2, a3, m, el, em, eq, eh, l1, l2, m1, m2, q1, q2, h1, h2)	\
-	{ .vergrp = vg, .size = s,							\
-	   .align2 = a2, .align3 = a3, .modules = m,					\
-	   .ecc_cws_l = el, .ecc_cws_m = em, .ecc_cws_q = eq, .ecc_cws_h = eh,		\
-	   .ecc_blk_l1 = l1, .ecc_blk_l2 = l2,						\
-	   .ecc_blk_m1 = m1, .ecc_blk_m2 = m2,						\
-	   .ecc_blk_q1 = q1, .ecc_blk_q2 = q2,						\
-	   .ecc_blk_h1 = h1, .ecc_blk_h2 = h2,						\
+#define METRIC(vg, s, a2, a3, m, el, em, eq, eh, l1, l2, m1, m2, q1, q2, h1, h2) {	\
+	   .vergrp = vg,								\
+	   .size = s,									\
+	   .align2 = a2,								\
+	   .align3 = a3,								\
+	   .modules = m,								\
+	   .ecc_cws = { el, em, eq, eh }, 						\
+	   .ecc_blks = { {l1,l2}, {m1,m2}, {q1,q2}, {h1,h2} },				\
 	}
 
 
@@ -48,18 +48,8 @@ struct metric {
 	uint8_t align2;
 	uint8_t align3;
 	uint16_t modules;
-	uint16_t ecc_cws_l;
-	uint16_t ecc_cws_m;
-	uint16_t ecc_cws_q;
-	uint16_t ecc_cws_h;
-	uint8_t ecc_blk_l1;
-	uint8_t ecc_blk_l2;
-	uint8_t ecc_blk_m1;
-	uint8_t ecc_blk_m2;
-	uint8_t ecc_blk_q1;
-	uint8_t ecc_blk_q2;
-	uint8_t ecc_blk_h1;
-	uint8_t ecc_blk_h2;
+	uint16_t ecc_cws[4];
+	uint8_t ecc_blks[4][2];
 };
 
 
