@@ -41,7 +41,7 @@ uint8_t gs1_mtxGetBit(uint8_t *mtx, int cols, int x, int y) {
 
 	int p = ((cols-1)/8+1)*y + x/8;
 
-	return (mtx[p] & (0x80 >> x%8)) != 0 ? 1:0;
+	return (uint8_t)((mtx[p] >> (7-x%8)) & 1);
 
 }
 

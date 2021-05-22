@@ -658,7 +658,7 @@ static int QRenc(gs1_encoder *ctx, uint8_t string[], struct patternLength *pats)
 	for (k = 0; i >= 1; )
 	{
 		if (!getBit(fix, i, j)) {
-			putBit(mtx, i, j, (cws[k/8] & (0x80>>(k%8))) != 0);
+			putBit(mtx, i, j, (uint8_t)((cws[k/8] >> (7-k%8)) & 1));
 			k++;
 		}
 		if (col == 1) {
