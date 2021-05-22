@@ -191,6 +191,8 @@ TEST_LIST = {
      * qr.c
      *
      */
+    { "qr_QR_fixtures", test_qr_QR_fixtures },
+    { "qr_QR_versions", test_qr_QR_versions },
     { "qr_QR_encode", test_qr_QR_encode },
 
 

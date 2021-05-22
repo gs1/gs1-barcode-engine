@@ -330,6 +330,54 @@ static void rsencode(uint8_t* datcws, int datlen, uint8_t* ecccws, int ecclen, u
 }
 
 
+static void plotFixtures(uint8_t *mtx, uint8_t *fix, const struct metric *m) {
+
+	int i, j;
+
+	// Plot timing patterns
+	for (i = sizeof(finder[0]); i <= (int)(m->size - sizeof(finder[0]) - 1); i++) {
+		putFixtureBit(i+1, 7, (uint8_t)(i+1)%2);
+		putFixtureBit(7, i+1, (uint8_t)(i+1)%2);
+	}
+
+	// Plot finder patterns
+	for (i = 0; i < (int)sizeof(finder[0]); i++) {
+		for (j = 0; j < (int)sizeof(finder[0]); j++) {
+			putFixtureBit( i+1,  j+1, finder[i][j]);
+			putFixtureBit(-i-1,  j+1, finder[i][j]);
+			putFixtureBit( i+1, -j-1, finder[i][j]);
+		}
+	}
+
+	// Plot alignment patterns
+	for (i = m->align2 - 2; i <= m->size - 13; i += m->align3 - m->align2) {
+		putAlign(i+1, 5);
+		putAlign(5, i+1);
+	}
+	for (i = m->align2 - 2; i <= m->size - 9; i += m->align3 - m->align2)
+		for (j = m->align2 - 2; j <= m->size - 9; j += m->align3 - m->align2)
+			putAlign(i+1, j+1);
+
+	// Reserve the format information modules
+	for (i = 0; i < (int)(sizeof(formatmap) / sizeof(formatmap[0])); i++) {
+		putFixtureBit(formatmap[i][0][0], formatmap[i][0][1], 1);
+		putFixtureBit(formatmap[i][1][0], formatmap[i][1][1], 1);
+	}
+
+	// Reserve the version information modules
+	if (m->size >= 45) {
+		for (i = 0; i < (int)(sizeof(versionmap) / sizeof(versionmap[0])); i++) {
+			putFixtureBit(versionmap[i][0][0], versionmap[i][0][1], 0);
+			putFixtureBit(versionmap[i][1][0], versionmap[i][1][1], 0);
+		}
+	}
+
+	// Reserve the solitary dark module
+	putFixtureBit(9, -8, 0);
+
+}
+
+
 static void applyMask(uint8_t *dest, uint8_t *src,
 		      uint8_t (*maskfun)(uint8_t x, uint8_t y), uint8_t *fix, const struct metric *m) {
 
@@ -596,7 +644,8 @@ static int QRenc(gs1_encoder *ctx, uint8_t string[], struct patternLength *pats)
 	for (i = 0; i < ecb1; i++)
 		rsencode(cws + i*dcpb, dcpb, tmpcws + dcws + i*ecpb, ecpb, coeffs);
 	for (i = 0; i < ecb2; i++)
-		rsencode(cws + ecb1*dcpb + i*(dcpb+1), dcpb + 1, tmpcws + dcws + (i+ecb1)*ecpb, ecpb, coeffs);
+		rsencode(cws + ecb1*dcpb + i*(dcpb+1), dcpb + 1,
+			 tmpcws + dcws + (i+ecb1)*ecpb, ecpb, coeffs);
 
 	// Reassemble the codewords by interleaving the data and ECC blocks
 	p = &(cws[0]);
@@ -612,46 +661,9 @@ static int QRenc(gs1_encoder *ctx, uint8_t string[], struct patternLength *pats)
 	if (rbit != 0)
 		cws[ncws++] = 0;
 
-	// Plot timing patterns
-	for (i = sizeof(finder[0]); i <= (int)(m->size - sizeof(finder[0]) - 1); i++) {
-		putFixtureBit(i+1, 7, (uint8_t)(i+1)%2);
-		putFixtureBit(7, i+1, (uint8_t)(i+1)%2);
-	}
-
-	// Plot finder patterns
-	for (i = 0; i < (int)sizeof(finder[0]); i++) {
-		for (j = 0; j < (int)sizeof(finder[0]); j++) {
-			putFixtureBit( i+1,  j+1, finder[i][j]);
-			putFixtureBit(-i-1,  j+1, finder[i][j]);
-			putFixtureBit( i+1, -j-1, finder[i][j]);
-		}
-	}
-
-	// Plot alignment patterns
-	for (i = m->align2 - 2; i <= m->size - 13; i += m->align3 - m->align2) {
-		putAlign(i+1, 5);
-		putAlign(5, i+1);
-	}
-	for (i = m->align2 - 2; i <= m->size - 9; i += m->align3 - m->align2)
-		for (j = m->align2 - 2; j <= m->size - 9; j += m->align3 - m->align2)
-			putAlign(i+1, j+1);
-
-	// Reserve the format information modules
-	for (i = 0; i < (int)(sizeof(formatmap) / sizeof(formatmap[0])); i++) {
-		putFixtureBit(formatmap[i][0][0], formatmap[i][0][1], 1);
-		putFixtureBit(formatmap[i][1][0], formatmap[i][1][1], 1);
-	}
-
-	// Reserve the version information modules
-	if (m->size >= 45) {
-		for (i = 0; i < (int)(sizeof(versionmap) / sizeof(versionmap[0])); i++) {
-			putFixtureBit(versionmap[i][0][0], versionmap[i][0][1], 0);
-			putFixtureBit(versionmap[i][1][0], versionmap[i][1][1], 0);
-		}
-	}
-
-	// Reserve the solitary dark module
-	putFixtureBit(9, -8, 0);
+	// Plot fixtures, including reservation of format and version
+	// information
+	plotFixtures(mtx, fix, m);
 
 	// Walk the symbol placing the bitstream avoiding fixed patterns
 	i = j = m->size;
@@ -784,6 +796,58 @@ void gs1_QR(gs1_encoder *ctx) {
 
 #include "gs1encoders-test.h"
 
+
+void test_qr_QR_fixtures(void) {
+
+	int v, i, j, cnt;
+	const struct metric *m;
+	uint8_t mtx[MAX_QR_BYTES];
+	uint8_t fix[MAX_QR_BYTES];
+	char casename[4];
+
+	// Check that the modules available after plotting the fixtures matches
+	// the values provided by the specification
+	for (v = 1; v <= 40; v++) {
+		m = &(metrics[v]);
+		memset(mtx, 0, MAX_QR_BYTES);
+		memset(fix, 0, MAX_QR_BYTES);
+		plotFixtures(mtx, fix, m);
+		for (i = 1, cnt = 0; i <= m->size; i++)
+			for (j = 1; j <= m->size; j++)
+				cnt += getBit(fix, i, j) ^ 1;
+		sprintf(casename, "V%d", v);
+		TEST_CASE(casename);
+		TEST_CHECK(cnt == m->modules);
+		TEST_MSG("Expected %d; Got %d", m->modules, cnt);
+	}
+
+}
+
+
+void test_qr_QR_versions(void) {
+
+	int v, ec;
+	char casename[6];
+
+	gs1_encoder* ctx = gs1_encoder_init();
+
+	gs1_encoder_setFormat(ctx, gs1_encoder_dRAW);
+	gs1_encoder_setSym(ctx, gs1_encoder_sQR);
+	gs1_encoder_setDataStr(ctx, "ABC123");
+
+	for (v = 1; v <= 40; v++) {
+		for (ec = 0; ec <= 3; ec++) {
+			gs1_encoder_setQrVersion(ctx, v);
+			gs1_encoder_setQrEClevel(ctx, ec);
+			sprintf(casename, "V%d-%d", v, ec);
+			TEST_CASE(casename);
+			TEST_CHECK(gs1_encoder_encode(ctx));
+		}
+	}
+
+	gs1_encoder_free(ctx);
+
+}
 
 void test_qr_QR_encode(void) {
 

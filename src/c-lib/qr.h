@@ -42,7 +42,8 @@ void gs1_QR(gs1_encoder *ctx);
 
 #ifdef UNIT_TESTS
 
-void test_qr_QR_encode(void);
+void test_qr_QR_fixtures(void);
+void test_qr_QR_versions(void);
 void test_qr_QR_encode(void);
 
 #endif
