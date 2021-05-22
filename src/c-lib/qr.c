@@ -785,41 +785,49 @@ void gs1_QR(gs1_encoder *ctx) {
 
 void test_qr_QR_encode(void) {
 
-//	char** expect;
+	char** expect;
 
 	gs1_encoder* ctx = gs1_encoder_init();
 
-/*
 	expect = (char*[]){
-"01010101010101010101",
-"10101010101010101010",
-"01010101010101010101",
-"10101010101010101010",
-"01010101010101010101",
-"10101010101010101010",
-"01010101010101010101",
-"10101010101010101010",
-"01010101010101010101",
-"10101010101010101010",
-"01010101010101010101",
-"10101010101010101010",
-"01010101010101010101",
-"10101010101010101010",
-"01010101010101010101",
-"10101010101010101010",
-"01010101010101010101",
-"10101010101010101010",
-"01010101010101010101",
-"10101010101010101010",
+"                             ",
+"                             ",
+"                             ",
+"                             ",
+"    XXXXXXX  X XX XXXXXXX    ",
+"    X     X  X  X X     X    ",
+"    X XXX X XXX X X XXX X    ",
+"    X XXX X X     X XXX X    ",
+"    X XXX X XXXXX X XXX X    ",
+"    X     X XX  X X     X    ",
+"    XXXXXXX X X X XXXXXXX    ",
+"            X XXX            ",
+"    X XXXXX  XX X XXXXX      ",
+"      XX X X X  X  X  X      ",
+"    XXXX XXX  XX X  X  X     ",
+"     XXX   X X     XXXXX     ",
+"      X   XX  XX X  X X      ",
+"            X XXXXXX  X      ",
+"    XXXXXXX   X X XX X X     ",
+"    X     X X  XXXX X X X    ",
+"    X XXX X X X X  X X X     ",
+"    X XXX X XXX X   X X      ",
+"    X XXX X XXXX X X XX      ",
+"    X     X  XX    XX X      ",
+"    XXXXXXX XX X X X X X     ",
+"                             ",
+"                             ",
+"                             ",
+"                             ",
 NULL
 	};
-*/
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sQR, "ABC123", expect));
 
-        TEST_CHECK(gs1_encoder_setFormat(ctx, gs1_encoder_dRAW));
-        TEST_CHECK(gs1_encoder_setSym(ctx, gs1_encoder_sQR));
-        TEST_CHECK(gs1_encoder_setDataStr(ctx, "1501234567890"));
-        TEST_CHECK(gs1_encoder_encode(ctx));
 
+	TEST_CHECK(gs1_encoder_setFormat(ctx, gs1_encoder_dRAW));
+	TEST_CHECK(gs1_encoder_setSym(ctx, gs1_encoder_sQR));
+	TEST_CHECK(gs1_encoder_setDataStr(ctx, "ABC123"));
+	TEST_CHECK(gs1_encoder_encode(ctx));
 	test_print_strings(ctx);
 
 	gs1_encoder_free(ctx);
