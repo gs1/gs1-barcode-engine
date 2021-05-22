@@ -220,37 +220,37 @@ static const uint8_t rsalog[256] = {
 
 
 static inline uint8_t mask1(uint8_t i, uint8_t j) {
-	return (i+j)%2 == 0;
+	return (uint8_t)((i+j)%2 == 0);
 }
 
 static inline uint8_t mask2(uint8_t i, uint8_t j) {
 	(void)i;
-	return j%2 == 0;
+	return (uint8_t)(j%2 == 0);
 }
 
 static inline uint8_t mask3(uint8_t i, uint8_t j) {
 	(void)j;
-	return i%3 == 0;
+	return (uint8_t)(i%3 == 0);
 }
 
 static inline uint8_t mask4(uint8_t i, uint8_t j) {
-	return (i+j)%3 == 0;
+	return (uint8_t)((i+j)%3 == 0);
 }
 
 static inline uint8_t mask5(uint8_t i, uint8_t j) {
-	return (j/2+i/3)%2 == 0;
+	return (uint8_t)((j/2+i/3)%2 == 0);
 }
 
 static inline uint8_t mask6(uint8_t i, uint8_t j) {
-	return (i*j)%2+(i*j)%3 == 0;
+	return (uint8_t)((i*j)%2+(i*j)%3 == 0);
 }
 
 static inline uint8_t mask7(uint8_t i, uint8_t j) {
-	return ((i*j)%2+(i*j)%3)%2 == 0;
+	return (uint8_t)(((i*j)%2+(i*j)%3)%2 == 0);
 }
 
 static inline uint8_t mask8(uint8_t i, uint8_t j) {
-	return ((i*j)%3+(i+j)%2)%2 == 0;
+	return (uint8_t)(((i*j)%3+(i+j)%2)%2 == 0);
 }
 
 static uint8_t (*const maskfun[8]) (uint8_t x, uint8_t y) = {
@@ -487,7 +487,7 @@ static int QRenc(gs1_encoder *ctx, uint8_t string[], struct patternLength *pats)
 	uint8_t fix[MAX_QR_BYTES] = { 0 };	// 1 indicates fixed pattern
 	uint8_t tmp[MAX_QR_BYTES];		// Used for mask evaluation
 
-	uint8_t cws_v[3][MAX_QR_CWS];		// vergrp specific encodings
+	uint8_t cws_v[3][MAX_QR_CWS] = { 0 };	// vergrp specific encodings
 	uint16_t bitLength_v[3] = { 0 }, bits;	// vergrp specific encoding length
 	int ccLen;
 
@@ -705,16 +705,16 @@ static int QRenc(gs1_encoder *ctx, uint8_t string[], struct patternLength *pats)
 			return -1;  // Satisfy compiler
 	}
 	for (i = 0; i < (int)(sizeof(formatmap) / sizeof(formatmap[0])); i++) {
-		putBit(mtx, formatmap[i][0][0], formatmap[i][0][1], (formatval >> (14-i)) & 1);
-		putBit(mtx, formatmap[i][1][0], formatmap[i][1][1], (formatval >> (14-i)) & 1);
+		putBit(mtx, formatmap[i][0][0], formatmap[i][0][1], (uint8_t)((formatval >> (14-i)) & 1));
+		putBit(mtx, formatmap[i][1][0], formatmap[i][1][1], (uint8_t)((formatval >> (14-i)) & 1));
 	}
 
 	// Plot the version information modules
 	if (m->size >= 45) {
 		versionval = versionvals[(m->size-17)/4-7];
 		for (i = 0; i < (int)(sizeof(versionmap) / sizeof(versionmap[0])); i++) {
-			putBit(mtx, versionmap[i][0][0], versionmap[i][0][1], (versionval >> (17-i)) & 1);
-			putBit(mtx, versionmap[i][1][0], versionmap[i][1][1], (versionval >> (17-i)) & 1);
+			putBit(mtx, versionmap[i][0][0], versionmap[i][0][1], (uint8_t)((versionval >> (17-i)) & 1));
+			putBit(mtx, versionmap[i][1][0], versionmap[i][1][1], (uint8_t)((versionval >> (17-i)) & 1));
 		}
 	}
 
