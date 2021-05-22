@@ -453,9 +453,11 @@ static uint32_t evalMask(uint8_t *mtx, const struct metric *m) {
 static void addBits(gs1_encoder *ctx, uint8_t bitField[], uint16_t* bitPos, int length, uint16_t bits, int max_length, bool truncate) {
 	int i;
 
-	assert(length <= 16);
+	assert(length >= 0 && length <= (int)(sizeof(bits)*8));
+	assert(*bitPos <= max_length);
 
-	if (max_length == 0) max_length = MAX_QR_CWS;
+	if (length == 0)
+		return;
 
 	if (!truncate && (*bitPos + length > max_length)) {
 		strcpy(ctx->errMsg, "Data too long to encode");
@@ -524,20 +526,20 @@ static int QRenc(gs1_encoder *ctx, uint8_t string[], struct patternLength *pats)
 
 		// 0101 FNC1 in first
 		if (false)
-			addBits(ctx, cws_v[i], &bitLength_v[i], 4, 0x05, 0, false);
+			addBits(ctx, cws_v[i], &bitLength_v[i], 4, 0x05, MAX_QR_DATA_BITS, false);
 
 		// 0100 Enter byte mode
-		addBits(ctx, cws_v[i], &bitLength_v[i], 4, 0x04, 0, false);
+		addBits(ctx, cws_v[i], &bitLength_v[i], 4, 0x04, MAX_QR_DATA_BITS, false);
 
 		// Character count indicator
 		ccLen = cclens[i][2];
 		addBits(ctx, cws_v[i], &bitLength_v[i], ccLen,
-			(uint16_t)strlen((char *)string), 0, false);	// Character count
+			(uint16_t)strlen((char *)string), MAX_QR_DATA_BITS, false);	// Character count
 
 		// Byte per character
 		p = &string[0];
 		while (*p)
-			addBits(ctx, cws_v[i], &bitLength_v[i], 8, *p++, 0, false);
+			addBits(ctx, cws_v[i], &bitLength_v[i], 8, *p++, MAX_QR_DATA_BITS, false);
 
 	}
 
@@ -577,7 +579,7 @@ static int QRenc(gs1_encoder *ctx, uint8_t string[], struct patternLength *pats)
 
 	// Complete the message bits by adding the terminator, truncated if neccessary
 	cws = &(cws_v[vgrp][0]);
-	addBits(ctx, cws, &bits, 4, 0x00, dmod, true);  // 0000 or shorter at end
+	addBits(ctx, cws, &bits, 4, 0x00, dmod, true);  // 0000, or shorter at end
 
 	// Expand the message bits by adding padding as necessary
 	while (bits < dmod) {
