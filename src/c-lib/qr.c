@@ -394,6 +394,7 @@ static void applyMask(uint8_t *dest, uint8_t *src,
 
 }
 
+
 /*
  *  rle is a zero-terminated runlength encoding of an entire row or column.
  *
@@ -498,18 +499,17 @@ static uint32_t evalMask(uint8_t *mtx, const struct metric *m) {
 }
 
 
-static void addBits(gs1_encoder *ctx, uint8_t bitField[], uint16_t* bitPos, int length, uint16_t bits, int max_length, bool truncate) {
+static void addBits(uint8_t bitField[], uint16_t* bitPos, int length, uint16_t bits, int max_length, bool truncate) {
 	int i;
+
+	if (length == 0 || *bitPos == UINT16_MAX)
+		return;
 
 	assert(length >= 0 && length <= (int)(sizeof(bits)*8));
 	assert(*bitPos <= max_length);
 
-	if (length == 0)
-		return;
-
 	if (!truncate && (*bitPos + length > max_length)) {
-		strcpy(ctx->errMsg, "Data too long to encode");
-		ctx->errFlag = true;
+		*bitPos = UINT16_MAX;   // Indicate bust
 		return;
 	}
 
@@ -531,36 +531,12 @@ static void addBits(gs1_encoder *ctx, uint8_t bitField[], uint16_t* bitPos, int 
 }
 
 
-static int QRenc(gs1_encoder *ctx, uint8_t string[], struct patternLength *pats) {
+static void createCodewords(gs1_encoder *ctx, uint8_t *string, uint8_t cws_v[3][MAX_QR_CWS], uint16_t bits_v[3]) {
 
-	uint8_t mtx[MAX_QR_BYTES] = { 0 };
-	uint8_t fix[MAX_QR_BYTES] = { 0 };	// 1 indicates fixed pattern
-	uint8_t tmp[MAX_QR_BYTES];		// Used for mask evaluation
-
-	uint8_t cws_v[3][MAX_QR_CWS] = { 0 };	// vergrp specific encodings
-	uint16_t bitLength_v[3] = { 0 }, bits;	// vergrp specific encoding length
-	int ccLen;
-
-	uint8_t* cws;
-	uint8_t tmpcws[MAX_QR_CWS];
-
-	int eclevel = ctx->qrEClevel;
-	int version = ctx->qrVersion;
-
-	int vgrp, ncws, rbit, ecws, dcws, dmod, ecb1, ecb2, dcpb, ecpb;
-	bool okay;
-
+	int i;
 	uint8_t *p;
-	uint8_t coeffs[MAX_QR_ECC_CWS_PER_BLK+1];
 
-	int i, j, k, col, dir;
-	uint8_t mask = 0;			// Satisfy compiler
-	uint32_t formatval, versionval;
-	uint32_t bestScore = UINT32_MAX, score;
-	const struct metric *m = NULL;
-
-	assert(eclevel >= gs1_encoder_qrEClevelL && eclevel <= gs1_encoder_qrEClevelH);
-	assert(version >= 0 && version <= 40);
+	(void) ctx;
 
 	/*
 	 * Elements of the encoded message have differing lengths based on the
@@ -574,67 +550,84 @@ static int QRenc(gs1_encoder *ctx, uint8_t string[], struct patternLength *pats)
 
 		// 0101 FNC1 in first
 		if (false)
-			addBits(ctx, cws_v[i], &bitLength_v[i], 4, 0x05, MAX_QR_DATA_BITS, false);
+			addBits(cws_v[i], &bits_v[i], 4, 0x05, MAX_QR_DATA_BITS, false);
 
 		// 0100 Enter byte mode
-		addBits(ctx, cws_v[i], &bitLength_v[i], 4, 0x04, MAX_QR_DATA_BITS, false);
+		addBits(cws_v[i], &bits_v[i], 4, 0x04, MAX_QR_DATA_BITS, false);
 
 		// Character count indicator
-		ccLen = cclens[i][2];
-		addBits(ctx, cws_v[i], &bitLength_v[i], ccLen,
+		addBits(cws_v[i], &bits_v[i], cclens[i][2],
 			(uint16_t)strlen((char *)string), MAX_QR_DATA_BITS, false);	// Character count
 
 		// Byte per character
 		p = &string[0];
 		while (*p)
-			addBits(ctx, cws_v[i], &bitLength_v[i], 8, *p++, MAX_QR_DATA_BITS, false);
+			addBits(cws_v[i], &bits_v[i], 8, *p++, MAX_QR_DATA_BITS, false);
 
 	}
 
-	// Don't proceed if message encoding failed
-	if (ctx->errFlag)
-		return 0;
+}
+
+
+static const struct metric* selectVersion(gs1_encoder *ctx, uint16_t bits_v[3]) {
+
+	const struct metric *m = NULL;
+	int vers, ncws, ecws, dcws, dmod;
+	uint16_t bits;
+	bool okay;
 
 	// Select a suitable symbol
-	for (i = 1; i < (int)(sizeof(metrics) / sizeof(metrics[0])); i++) {
-		m = &metrics[i];
-		vgrp = m->vergrp;			// Version group
+	for (vers = 1; vers < (int)(sizeof(metrics) / sizeof(metrics[0])); vers++) {
+		m = &metrics[vers];
 		ncws = m->modules/8;			// Total number of codewords
-		rbit = m->modules%8;			// Number of remainder bit
-		ecws = m->ecc_cws[eclevel];		// Number of error correction codewords
+		ecws = m->ecc_cws[ctx->qrEClevel];	// Number of error correction codewords
 		dcws = ncws - ecws;			// Number of data codeword
 		dmod = dcws*8;				// Number of data modules
-		ecb1 = m->ecc_blks[eclevel][0];		// First error correction blocks
-		ecb2 = m->ecc_blks[eclevel][1];		// First error correction blocks
-		dcpb = dcws/(ecb1+ecb2);		// Base data codewords per block
-		ecpb = ncws/(ecb1+ecb2) - dcpb;		// Error correction codewords per block
 		okay = true;
-		bits = bitLength_v[vgrp];
-		if (version != 0 && version != i) okay = false;
-		if (!bits) okay = false;
+		bits = bits_v[m->vergrp];
+		if (ctx->qrVersion != 0 && ctx->qrVersion != vers) okay = false;
 		if (bits > dmod) okay = false;
 		if (okay) break;
 	}
 
-	if (!okay) {
-		strcpy(ctx->errMsg, "No suitable symbol found");
-		ctx->errFlag = true;
-		return 0;
-	}
+	return okay ? m : NULL;
+
+}
+
+
+static void finaliseCodewords(gs1_encoder *ctx, uint8_t *cws, uint16_t *bits, const struct metric *m) {
+
+	uint8_t tmpcws[MAX_QR_CWS];
+
+	uint8_t coeffs[MAX_QR_ECC_CWS_PER_BLK+1];
+
+	int ncws, rbit, ecws, dcws, dmod, ecb1, ecb2, dcpb, ecpb;
+
+	uint8_t *p;
+	int i, j;
+
+	ncws = m->modules/8;				// Total number of codewords
+	rbit = m->modules%8;				// Number of remainder bit
+	ecws = m->ecc_cws[ctx->qrEClevel];		// Number of error correction codewords
+	dcws = ncws - ecws;				// Number of data codeword
+	dmod = dcws*8;					// Number of data modules
+	ecb1 = m->ecc_blks[ctx->qrEClevel][0];		// First error correction blocks
+	ecb2 = m->ecc_blks[ctx->qrEClevel][1];		// First error correction blocks
+	dcpb = dcws/(ecb1+ecb2);			// Base data codewords per block
+	ecpb = ncws/(ecb1+ecb2) - dcpb;			// Error correction codewords per block
 
 	assert(dcpb <= MAX_QR_DAT_CWS_PER_BLK);
 	assert(ecpb <= MAX_QR_ECC_CWS_PER_BLK);
 
 	// Complete the message bits by adding the terminator, truncated if neccessary
-	cws = &(cws_v[vgrp][0]);
-	addBits(ctx, cws, &bits, 4, 0x00, dmod, true);  // 0000, or shorter at end
+	addBits(cws, bits, 4, 0x00, dmod, true);  // 0000, or shorter at end
 
 	// Expand the message bits by adding padding as necessary
-	while (bits < dmod) {
-		addBits(ctx, cws, &bits, 8, 0xEC, dmod, true);   // 11101100
-		addBits(ctx, cws, &bits, 8, 0x11, dmod, true);   // 00010001
+	while (*bits < dmod) {
+		addBits(cws, bits, 8, 0xEC, dmod, true);   // 11101100
+		addBits(cws, bits, 8, 0x11, dmod, true);   // 00010001
 	}
-	assert(bits == dmod);
+	assert(*bits == dmod);
 
 	// Generate coefficients
 	rscoeffs(ecpb, coeffs);
@@ -659,7 +652,21 @@ static int QRenc(gs1_encoder *ctx, uint8_t string[], struct patternLength *pats)
 
 	// Extend codewords by one if there are remainder bits
 	if (rbit != 0)
-		cws[ncws++] = 0;
+		cws[ncws] = 0;
+
+}
+
+
+static void createMatrix(gs1_encoder *ctx, uint8_t *mtx, uint8_t *cws, const struct metric *m) {
+
+	uint8_t fix[MAX_QR_BYTES] = { 0 };	// 1 indicates fixed pattern
+	uint8_t msk[MAX_QR_BYTES];		// Used for mask evaluation
+
+	uint8_t mask = 0;			// Satisfy compiler
+	uint32_t formatval, versionval;
+	uint32_t bestScore = UINT32_MAX, score;
+
+	int i, j, k, col, dir;
 
 	// Plot fixtures, including reservation of format and version
 	// information
@@ -696,8 +703,8 @@ static int QRenc(gs1_encoder *ctx, uint8_t string[], struct patternLength *pats)
 
 	// Evaluate the masked symbols to find the most suitable
 	for (k = 0; k < (int)(sizeof(maskfun) / sizeof(maskfun[0])); k++) {
-		applyMask(tmp, mtx, maskfun[k], fix, m);
-		score = evalMask(tmp, m);
+		applyMask(msk, mtx, maskfun[k], fix, m);
+		score = evalMask(msk, m);
 		if (score < bestScore) {
 			mask = (uint8_t)k;
 			bestScore = score;
@@ -716,7 +723,7 @@ static int QRenc(gs1_encoder *ctx, uint8_t string[], struct patternLength *pats)
 		case gs1_encoder_qrEClevelH: formatval = formatvals[16 + mask]; break;
 		default:
 			assert(true);
-			return -1;  // Satisfy compiler
+			return;
 	}
 	for (i = 0; i < (int)(sizeof(formatmap) / sizeof(formatmap[0])); i++) {
 		putBit(mtx, formatmap[i][0][0], formatmap[i][0][1], (uint8_t)((formatval >> (14-i)) & 1));
@@ -732,9 +739,35 @@ static int QRenc(gs1_encoder *ctx, uint8_t string[], struct patternLength *pats)
 		}
 	}
 
+}
+
+
+static int QRenc(gs1_encoder *ctx, uint8_t string[], struct patternLength *pats) {
+
+	uint8_t mtx[MAX_QR_BYTES] = { 0 };
+	uint8_t cws_v[3][MAX_QR_CWS] = { 0 };	// vergrp specific encodings
+	uint16_t bits_v[3] = { 0 };
+	const struct metric *m;
+
+	assert(ctx->qrEClevel >= gs1_encoder_qrEClevelL && ctx->qrEClevel <= gs1_encoder_qrEClevelH);
+	assert(ctx->qrVersion >= 0 && ctx->qrVersion <= 40);
+
+	createCodewords(ctx, string, cws_v, bits_v);
+
+	m = selectVersion(ctx, bits_v);
+	if (!m) {
+		strcpy(ctx->errMsg, "No suitable symbol found");
+		ctx->errFlag = true;
+		return 0;
+	}
+
+	finaliseCodewords(ctx, cws_v[m->vergrp], &bits_v[m->vergrp], m);
+	createMatrix(ctx, mtx, cws_v[m->vergrp], m);
+
 	gs1_mtxToPatterns(mtx, m->size + 2*QR_QZ, m->size + 2*QR_QZ, pats);
 
 	return m->size + 2*QR_QZ;
+
 }
 
 
