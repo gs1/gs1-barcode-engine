@@ -933,13 +933,13 @@ void test_api_dataFile(void) {
 	TEST_CHECK(!gs1_encoder_setDataFile(ctx, ""));
 	TEST_CHECK(gs1_encoder_setDataFile(ctx, "a"));
 
-	for (i = 0; i < GS1_ENCODERS_MAX_FNAME; i++) {
+	for (i = 0; i <= GS1_ENCODERS_MAX_FNAME; i++) {
 		longfname[i]='a';
 	}
-	longfname[i+1]='\0';
+	longfname[GS1_ENCODERS_MAX_FNAME+1]='\0';
 	TEST_CHECK(!gs1_encoder_setDataFile(ctx, longfname));  // Too long
 
-	longfname[i]='\0';
+	longfname[GS1_ENCODERS_MAX_FNAME]='\0';
 	TEST_CHECK(gs1_encoder_setDataFile(ctx, longfname));   // Maximun length
 
 	gs1_encoder_free(ctx);
@@ -951,7 +951,7 @@ void test_api_dataStr(void) {
 
 	gs1_encoder* ctx;
 
-	char longfname[GS1_ENCODERS_MAX_KEYDATA+2];
+	char longdata[GS1_ENCODERS_MAX_KEYDATA+2];
 	int i;
 
 	TEST_ASSERT((ctx = gs1_encoder_init()) != NULL);
@@ -961,14 +961,14 @@ void test_api_dataStr(void) {
 	TEST_CHECK(gs1_encoder_setDataStr(ctx, ""));
 	TEST_CHECK(gs1_encoder_setDataStr(ctx, "a"));
 
-	for (i = 0; i < GS1_ENCODERS_MAX_KEYDATA; i++) {
-		longfname[i]='a';
+	for (i = 0; i <= GS1_ENCODERS_MAX_KEYDATA; i++) {
+		longdata[i]='a';
 	}
-	longfname[i+1]='\0';
-	TEST_CHECK(!gs1_encoder_setDataStr(ctx, longfname));  // Too long
+	longdata[GS1_ENCODERS_MAX_KEYDATA+1]='\0';
+	TEST_CHECK(!gs1_encoder_setDataStr(ctx, longdata));  // Too long
 
-	longfname[i]='\0';
-	TEST_CHECK(gs1_encoder_setDataStr(ctx, longfname));   // Maximun length
+	longdata[GS1_ENCODERS_MAX_KEYDATA]='\0';
+	TEST_CHECK(gs1_encoder_setDataStr(ctx, longdata));   // Maximun length
 
 	gs1_encoder_free(ctx);
 
