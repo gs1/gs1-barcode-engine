@@ -630,8 +630,8 @@ printf("\n");
 	}
 
 	// Plot the version information modules
-	versionval = versionvals[(m->size-17)/4-7];
 	if (m->size >= 45) {
+		versionval = versionvals[(m->size-17)/4-7];
 		for (i = 0; i < (int)(sizeof(versionmap) / sizeof(versionmap[0])); i++) {
 			putBit(mtx, versionmap[i][0][0], versionmap[i][0][1], (versionval >> (17-i)) & 1);
 			putBit(mtx, versionmap[i][1][0], versionmap[i][1][1], (versionval >> (17-i)) & 1);
