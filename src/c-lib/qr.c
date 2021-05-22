@@ -98,6 +98,14 @@ static const struct metric metrics[41] = {
 	METRIC(2,  173,  26, 54,   28256,  720, 1316, 1950, 2310,  20,  4, 40,  7, 43, 22, 10, 67),   // v39
 	METRIC(2,  177,  30, 58,   29648,  750, 1372, 2040, 2430,  19,  6, 18, 31, 34, 34, 20, 61),   // v40
 };
+
+
+// Character count length for each mode in each group
+static const uint8_t cclens[3][4] = {
+//         N   A   B   K     Version group
+	{ 10,  9,  8,  8 },    //  1-9
+	{ 12, 11, 16, 10 },    // 10-26
+	{ 14, 13, 16, 12 },    // 27-40
 };
 
 
@@ -441,17 +449,58 @@ static uint32_t evalMask(uint8_t *mtx, const struct metric *m) {
 	return (uint32_t)(n1n3+n2+n4);
 }
 
+
+static void addBits(gs1_encoder *ctx, uint8_t bitField[], uint16_t* bitPos, int length, uint16_t bits, int max_length, bool truncate) {
+	int i;
+
+	assert(length <= 16);
+
+	if (max_length == 0) max_length = MAX_QR_CWS;
+
+	if (!truncate && (*bitPos + length > max_length)) {
+		strcpy(ctx->errMsg, "Data too long to encode");
+		ctx->errFlag = true;
+		return;
+	}
+
+	if (*bitPos + length > max_length)
+		length = max_length - *bitPos;
+
+	for (i = length-1; i >= 0; i--) {
+		if ((bits & 1) != 0) {
+			bitField[(*bitPos+i)/8] = (uint8_t)(bitField[(*bitPos+i)/8] | (0x80 >> ((*bitPos+i)%8)));
+		}
+		else {
+			bitField[(*bitPos+i)/8] = (uint8_t)(bitField[(*bitPos+i)/8] & (~(0x80 >> ((*bitPos+i)%8))));
+		}
+		bits >>= 1;
+	}
+	*bitPos = (uint16_t)(*bitPos + length);
+
+	return;
+}
+
+
 static int QRenc(gs1_encoder *ctx, uint8_t string[], struct patternLength *pats) {
 
 	uint8_t mtx[MAX_QR_BYTES] = { 0 };
 	uint8_t fix[MAX_QR_BYTES] = { 0 };	// 1 indicates fixed pattern
 	uint8_t tmp[MAX_QR_BYTES];		// Used for mask evaluation
 
-//	uint8_t cws[MAX_QR_CWS];
+	uint8_t cws_v[3][MAX_QR_CWS];		// vergrp specific encodings
+	uint16_t bitLength_v[3] = { 0 }, bits;	// vergrp specific encoding length
+	int ccLen;
+
+	uint8_t* cws;
 	uint8_t tmpcws[MAX_QR_CWS];
+
 	int eclevel = ctx->qrEClevel;
 	int version = ctx->qrVersion;
 
+	int vgrp, ncws, rbit, ecws, dcws, dmod, ecb1, ecb2, dcpb, ecpb;
+	bool okay;
+
+	uint8_t *p;
 	uint8_t coeffs[MAX_QR_ECC_CWS_PER_BLK+1];
 
 	int i, j, k, col, dir;
@@ -460,45 +509,82 @@ static int QRenc(gs1_encoder *ctx, uint8_t string[], struct patternLength *pats)
 	uint32_t bestScore = UINT32_MAX, score;
 	const struct metric *m = NULL;
 
-	uint8_t bitstream[MAX_QR_DATA_BYTES];
-	uint16_t bitpos = 0;
-
 	assert(eclevel >= gs1_encoder_qrEClevelL && eclevel <= gs1_encoder_qrEClevelH);
+	assert(version >= 0 && version <= 40);
 
+	/*
+	 * Elements of the encoded message have differing lengths based on the
+	 * resulting symbol size. The symbol sizes with different element
+	 * lengths are batched into vergrps. To pick the smallest symbol that
+	 * holds our content we encode the message according to each available
+	 * vergrp, based on the format of symbol.
+	 *
+	 */
+	for (i = 0; i < 3; i++) {
 
-(void)version;
-(void)bitstream;
-(void)bitpos;
+		// 0101 FNC1 in first
+		if (false)
+			addBits(ctx, cws_v[i], &bitLength_v[i], 4, 0x05, 0, false);
 
-(void) ctx;
-(void) string;
+		// 0100 Enter byte mode
+		addBits(ctx, cws_v[i], &bitLength_v[i], 4, 0x04, 0, false);
 
-	int ver = 10 -1;
+		// Character count indicator
+		ccLen = cclens[i][2];
+		addBits(ctx, cws_v[i], &bitLength_v[i], ccLen,
+			(uint16_t)strlen((char *)string), 0, false);	// Character count
 
-	m = &(metrics[ver]);
+		// Byte per character
+		p = &string[0];
+		while (*p)
+			addBits(ctx, cws_v[i], &bitLength_v[i], 8, *p++, 0, false);
 
-	int ncws = m->modules/8;		// Total number of codewords
-	int rbit = m->modules%8;		// Number of remainder bit
-	int ecws = m->ecc_cws[eclevel];		// Number of error correction codewords
-	int dcws = ncws - ecws;			// Number of data codeword
-	int dmod = dcws*8;			// Number of data modules
-	int ecb1 = m->ecc_blks[eclevel][0];	// First error correction blocks
-	int ecb2 = m->ecc_blks[eclevel][1];	// First error correction blocks
+	}
 
-	// After symbol selection
-	int dcpb = dcws/(ecb1+ecb2);		// Base data codewords per block
-	int ecpb = ncws/(ecb1+ecb2) - dcpb;	// Error correction codewords per block
+	// Don't proceed if message encoding failed
+	if (ctx->errFlag)
+		return 0;
+
+	// Select a suitable symbol
+	for (i = 1; i < (int)(sizeof(metrics) / sizeof(metrics[0])); i++) {
+		m = &metrics[i];
+		vgrp = m->vergrp;			// Version group
+		ncws = m->modules/8;			// Total number of codewords
+		rbit = m->modules%8;			// Number of remainder bit
+		ecws = m->ecc_cws[eclevel];		// Number of error correction codewords
+		dcws = ncws - ecws;			// Number of data codeword
+		dmod = dcws*8;				// Number of data modules
+		ecb1 = m->ecc_blks[eclevel][0];		// First error correction blocks
+		ecb2 = m->ecc_blks[eclevel][1];		// First error correction blocks
+		dcpb = dcws/(ecb1+ecb2);		// Base data codewords per block
+		ecpb = ncws/(ecb1+ecb2) - dcpb;		// Error correction codewords per block
+		okay = true;
+		bits = bitLength_v[vgrp];
+		if (version != 0 && version != i) okay = false;
+		if (!bits) okay = false;
+		if (bits > dmod) okay = false;
+		if (okay) break;
+	}
+
+	if (!okay) {
+		strcpy(ctx->errMsg, "No suitable symbol found");
+		ctx->errFlag = true;
+		return 0;
+	}
 
 	assert(dcpb <= MAX_QR_DAT_CWS_PER_BLK);
 	assert(ecpb <= MAX_QR_ECC_CWS_PER_BLK);
 
+	// Complete the message bits by adding the terminator, truncated if neccessary
+	cws = &(cws_v[vgrp][0]);
+	addBits(ctx, cws, &bits, 4, 0x00, dmod, true);  // 0000 or shorter at end
 
-(void)dmod;
-
-
-	uint8_t cws[MAX_QR_CWS] = {16,8,30,217,196,64,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17,236,17};  // TODO dummy
-
-
+	// Expand the message bits by adding padding as necessary
+	while (bits < dmod) {
+		addBits(ctx, cws, &bits, 8, 0xEC, dmod, true);   // 11101100
+		addBits(ctx, cws, &bits, 8, 0x11, dmod, true);   // 00010001
+	}
+	assert(bits == dmod);
 
 	// Generate coefficients
 	rscoeffs(ecpb, coeffs);
@@ -511,7 +597,7 @@ static int QRenc(gs1_encoder *ctx, uint8_t string[], struct patternLength *pats)
 		rsencode(cws + ecb1*dcpb + i*(dcpb+1), dcpb + 1, tmpcws + dcws + (i+ecb1)*ecpb, ecpb, coeffs);
 
 	// Reassemble the codewords by interleaving the data and ECC blocks
-	uint8_t *p = &(cws[0]);
+	p = &(cws[0]);
 	for (i = 0; i < dcpb+1; i++)
 		for (j = 0; j < ecb1 + ecb2; j++)
 			if ( i < dcpb || j >= ecb1)	// First block group is shorter
@@ -523,14 +609,6 @@ static int QRenc(gs1_encoder *ctx, uint8_t string[], struct patternLength *pats)
 	// Extend codewords by one if there are remainder bits
 	if (rbit != 0)
 		cws[ncws++] = 0;
-
-/*
-printf("\n");
-for (int i = 0 ; i < ncws; i++ ) {
-	printf("%d ", cws[i]);
-}
-printf("\n");
-*/
 
 	// Plot timing patterns
 	for (i = sizeof(finder[0]); i <= (int)(m->size - sizeof(finder[0]) - 1); i++) {
