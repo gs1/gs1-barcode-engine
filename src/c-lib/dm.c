@@ -21,6 +21,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 #include "enc-private.h"
 #include "dm.h"
@@ -102,9 +103,16 @@ static int DMenc(gs1_encoder *ctx, uint8_t string[], struct patternLength *pats)
 void gs1_DM(gs1_encoder *ctx) {
 
 	struct sPrints prints;
-	struct patternLength pats[MAX_DM_ROWS];
+	struct patternLength *pats;
 	char* dataStr = ctx->dataStr;
 	int rows, cols, i;
+
+	pats = malloc(MAX_DM_ROWS * sizeof(struct patternLength));
+	if (!pats) {
+		strcpy(ctx->errMsg, "Out of memory allocating patterns");
+		ctx->errFlag = true;
+		return;
+	}
 
 	if (!(rows = DMenc(ctx, (uint8_t*)dataStr, pats)) || ctx->errFlag) return;
 
@@ -144,6 +152,8 @@ void gs1_DM(gs1_encoder *ctx) {
 	}
 
 	gs1_driverFinalise(ctx);
+
+	free(pats);
 
 	return;
 
