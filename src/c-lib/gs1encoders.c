@@ -509,6 +509,9 @@ GS1_ENCODERS_API size_t gs1_encoder_getBufferStrings(gs1_encoder *ctx, char*** o
 		return 0;
 	}
 
+	assert(ctx->bufferHeight > 0);
+	assert(ctx->bufferWidth > 0);
+
 	if (ctx->bufferStrings) goto out;
 
 	buf = ctx->buffer;
@@ -517,16 +520,23 @@ GS1_ENCODERS_API size_t gs1_encoder_getBufferStrings(gs1_encoder *ctx, char*** o
 	bw = (w-1)/8+1;
 
 	ctx->bufferStrings = malloc((size_t)(h+1) * sizeof(char*));
+	if (!ctx->bufferStrings)
+		return 0;
 
 	for (y = 0; y < h; y++) {
+		ctx->bufferStrings[y+1] = NULL;  // Null the next entry in case we fail to allocate
 		string = malloc((size_t)(w+1) * sizeof(char));
+		if (!string) {
+			free_bufferStrings(ctx);
+			return 0;
+		}
 		ctx->bufferStrings[y] = string;
 		for (x = 0; x < w; x++) {
 			string[x] = (buf[bw*y + x/8] >> (7-x%8) & 1) ? 'X' : ' ';
 		}
 		string[x] = '\0';
 	}
-	ctx->bufferStrings[y] = NULL;
+	ctx->bufferStrings[h] = NULL;
 
 out:
 	*out = ctx->bufferStrings;
@@ -978,7 +988,7 @@ void test_api_dataStr(void) {
 void test_api_getBuffer(void) {
 
 	gs1_encoder* ctx;
-	uint8_t* buf;
+	uint8_t* buf = NULL;
 	size_t size;
 	uint8_t test_tif[] = { 0x49, 0x49, 0x2A, 0x00 };
 	uint8_t test_bmp[] = { 0x42, 0x4D, 0xDE, 0x04 };

@@ -1632,6 +1632,7 @@ static void imgCCA2(int size, uint16_t codeWords[], uint8_t pattern[MAX_CCB4_ROW
 
 	rowCnt = rows[size];
 	rapL = raps[size]-1; // -1 to map to 0-51 array index
+	assert(rapL % 3 < 3); // Satisfy static analyser
 	for (i = 0; i < rowCnt; i++) {
 		pattern[i][0] = 1; // qz
 		bars = barRap[0][rapL]; // left rap
@@ -1674,6 +1675,7 @@ static void imgCCB2(int size, uint16_t codeWords[], uint8_t pattern[MAX_CCB4_ROW
 
 	rowCnt = rows[size];
 	rapL = raps[size]-1; // -1 to map to 0-51 array index
+	assert(rapL % 3 < 3); // Satisfy static analyser
 	for (i = 0; i < rowCnt; i++) {
 		pattern[i][0] = 1; // qz
 		bars = barRap[0][rapL]; // left rap
@@ -1714,6 +1716,7 @@ static void imgCCA3(int size, uint16_t codeWords[], uint8_t pattern[MAX_CCB4_ROW
 
 	rowCnt = rows[size];
 	rapL = raps[size]-1; // -1 to map to 0-51 array index
+	assert(rapL % 3 < 3); // Satisfy static analyser
 	for (i = 0; i < rowCnt; i++) {
 		pattern[i][0] = 1; // qz
 		bars = barData[rapL%3][codeWords[i*3]]; // data1 in row's cluster
@@ -1761,6 +1764,7 @@ static void imgCCB3(int size, uint16_t codeWords[], uint8_t pattern[MAX_CCB4_ROW
 
 	rowCnt = rows[size];
 	rapL = raps[size]-1; // -1 to map to 0-51 array index
+	assert(rapL % 3 < 3); // Satisfy static analyser
 	for (i = 0; i < rowCnt; i++) {
 		pattern[i][0] = 1; // qz
 		bars = barRap[0][rapL]; // left rap
@@ -1812,6 +1816,7 @@ static void imgCCA4(int size, uint16_t codeWords[], uint8_t pattern[MAX_CCB4_ROW
 
 	rowCnt = rows[size];
 	rapL = raps[size]-1; // -1 to map to 0-51 array index
+	assert(rapL % 3 < 3); // Satisfy static analyser
 	for (i = 0; i < rowCnt; i++) {
 		pattern[i][0] = 1; // qz
 		bars = barRap[0][rapL]; // left rap
@@ -1869,6 +1874,7 @@ static void imgCCB4(int size, uint16_t codeWords[], uint8_t pattern[MAX_CCB4_ROW
 
 	rowCnt = rows[size];
 	rapL = raps[size]-1; // -1 to map to 0-51 array index
+	assert(rapL % 3 < 3); // Satisfy static analyser
 	for (i = 0; i < rowCnt; i++) {
 		pattern[i][0] = 1; // qz
 		bars = barRap[0][rapL]; // left rap
