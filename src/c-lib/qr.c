@@ -334,6 +334,9 @@ static void rsEncode(uint8_t* datcws, int datlen, uint8_t* ecccws, int ecclen, u
 	int i, j;
 	uint8_t tmp[MAX_QR_DAT_CWS_PER_BLK + MAX_QR_ECC_CWS_PER_BLK] = { 0 };
 
+	assert(datlen <= MAX_QR_DAT_CWS_PER_BLK);
+	assert(ecclen <= MAX_QR_ECC_CWS_PER_BLK);
+
 	memcpy(tmp, datcws, (size_t)datlen);
 
 	for (i = 0; i < datlen; i++)
@@ -805,9 +808,16 @@ static int QRenc(gs1_encoder *ctx, uint8_t string[], struct patternLength *pats)
 void gs1_QR(gs1_encoder *ctx) {
 
 	struct sPrints prints;
-	struct patternLength pats[MAX_QR_SIZE];
+	struct patternLength *pats;
 	char* dataStr = ctx->dataStr;
 	int rows, cols, i;
+
+	pats = malloc(MAX_QR_SIZE * sizeof(struct patternLength));
+	if (!pats) {
+		strcpy(ctx->errMsg, "Out of memory allocating patterns");
+		ctx->errFlag = true;
+		return;
+	}
 
 	if (!(rows = QRenc(ctx, (uint8_t*)dataStr, pats)) || ctx->errFlag) return;
 
@@ -847,6 +857,8 @@ void gs1_QR(gs1_encoder *ctx) {
 	}
 
 	gs1_driverFinalise(ctx);
+
+	free(pats);
 
 	return;
 }
