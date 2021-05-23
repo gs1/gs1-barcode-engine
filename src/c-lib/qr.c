@@ -819,7 +819,8 @@ void gs1_QR(gs1_encoder *ctx) {
 		return;
 	}
 
-	if (!(rows = QRenc(ctx, (uint8_t*)dataStr, pats)) || ctx->errFlag) return;
+	if (!(rows = QRenc(ctx, (uint8_t*)dataStr, pats)) || ctx->errFlag)
+		goto out;
 
 #if PRNT
 	{
@@ -857,6 +858,8 @@ void gs1_QR(gs1_encoder *ctx) {
 	}
 
 	gs1_driverFinalise(ctx);
+
+out:
 
 	free(pats);
 

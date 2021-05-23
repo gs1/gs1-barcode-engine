@@ -114,7 +114,8 @@ void gs1_DM(gs1_encoder *ctx) {
 		return;
 	}
 
-	if (!(rows = DMenc(ctx, (uint8_t*)dataStr, pats)) || ctx->errFlag) return;
+	if (!(rows = DMenc(ctx, (uint8_t*)dataStr, pats)) || ctx->errFlag)
+		goto out;
 
 #if PRNT
 	{
@@ -152,6 +153,8 @@ void gs1_DM(gs1_encoder *ctx) {
 	}
 
 	gs1_driverFinalise(ctx);
+
+out:
 
 	free(pats);
 
