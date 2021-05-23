@@ -30,12 +30,15 @@
 #include "driver.h"
 
 
+/*
+ *  Definition of the symbol properties for each version
+ *
+ */
 
 #define METRIC(vg, s, a2, a3, m, el, em, eq, eh, l1, l2, m1, m2, q1, q2, h1, h2) {	\
 	   .vergrp = vg,								\
 	   .size = s,									\
-	   .align2 = a2,								\
-	   .align3 = a3,								\
+	   .align = { a2, a3 },								\
 	   .modules = m,								\
 	   .ecc_cws = { el, em, eq, eh }, 						\
 	   .ecc_blks = { {l1,l2}, {m1,m2}, {q1,q2}, {h1,h2} },				\
@@ -43,20 +46,20 @@
 
 
 struct metric {
-	uint8_t vergrp;
-	uint8_t size;
-	uint8_t align2;
-	uint8_t align3;
-	uint16_t modules;
-	uint16_t ecc_cws[4];
-	uint8_t ecc_blks[4][2];
+	uint8_t vergrp;			// Version group: Data encoding differs between sizes
+	uint8_t size;			// Length of a side
+	uint8_t align[2];		// Position of the second and third alignment patterns
+	uint16_t modules;		// Total number of modules for data and ECC
+	uint16_t ecc_cws[4];		// Number of ECC codewords for each ECC level
+	uint8_t ecc_blks[4][2];		// Number of ECC blocks in two groups for each ECC level
 };
 
 
 static const struct metric metrics[41] = {
-	{0},  // spacer
-	//   grp  size    align  modules       error codewords         error correction blocks
-	//               A2  A3              L     M     Q     H   L1  L2  M1  M2  Q1  Q2  H1  H2
+	{0},  // spacer so that metrics are indexed at version number
+
+	// vergrp size    align  modules           ecc_cws                    ecc_blks
+	//                                   L     M     Q     H   L1  L2  M1  M2  Q1  Q2  H1  H2
 	METRIC(0,   21,  98, 99,     208,    7,   10,   13,   17,   1,  0,  1,  0,  1,  0,  1,  0),   // v1
 	METRIC(0,   25,  18, 99,     359,   10,   16,   22,   28,   1,  0,  1,  0,  1,  0,  1,  0),   // v2
 	METRIC(0,   29,  22, 99,     567,   15,   26,   36,   44,   1,  0,  1,  0,  2,  0,  2,  0),   // v3
@@ -100,15 +103,16 @@ static const struct metric metrics[41] = {
 };
 
 
-// Character count length for each mode in each group
+// Character count length for each mode within each group
 static const uint8_t cclens[3][4] = {
-//         N   A   B   K     Version group
+//         N   A   B   K         vergrp
 	{ 10,  9,  8,  8 },    //  1-9
 	{ 12, 11, 16, 10 },    // 10-26
 	{ 14, 13, 16, 12 },    // 27-40
 };
 
 
+// Finder pattern bitmap
 static const uint8_t finder[8][8] = {
 	{ 1,1,1,1,1,1,1,0 },
 	{ 1,0,0,0,0,0,1,0 },
@@ -121,6 +125,7 @@ static const uint8_t finder[8][8] = {
 };
 
 
+// Alignment pattern bitmap
 static const uint8_t algnpat[5][5] = {
 	{ 1,1,1,1,1 },
 	{ 1,0,0,0,1 },
@@ -139,7 +144,8 @@ static const uint8_t algnpat[5][5] = {
  */
 
 
-static const int8_t formatmap[15][2][2] = {
+// Position of the format information modules
+static const int8_t formatpos[15][2][2] = {
 	{ {  1, 9 }, {  9,-1 } },  { {  2, 9 }, {  9,-2 } },  { {  3, 9 }, {  9,-3 } },
 	{ {  4, 9 }, {  9,-4 } },  { {  5, 9 }, {  9,-5 } },  { {  6, 9 }, {  9,-6 } },
 	{ {  8, 9 }, {  9,-7 } },  { {  9, 9 }, { -8, 9 } },  { {  9, 8 }, { -7, 9 } },
@@ -148,15 +154,8 @@ static const int8_t formatmap[15][2][2] = {
 };
 
 
-static const uint16_t formatvals[32] = {
-	0x5412, 0x5125, 0x5e7c, 0x5b4b, 0x45f9, 0x40ce, 0x4f97, 0x4aa0,
-	0x77c4, 0x72f3, 0x7daa, 0x789d, 0x662f, 0x6318, 0x6c41, 0x6976,
-	0x1689, 0x13be, 0x1ce7, 0x19d0, 0x0762, 0x0255, 0x0d0c, 0x083b,
-	0x355f, 0x3068, 0x3f31, 0x3a06, 0x24b4, 0x2183, 0x2eda, 0x2bed,
-};
-
-
-static const int8_t versionmap[18][2][2] = {
+// Position of the version information modules
+static const int8_t versionpos[18][2][2] = {
 	{ {  -9,  6 }, {  6, -9 } },  { { -10,  6 }, {  6,-10 } },
 	{ { -11,  6 }, {  6,-11 } },  { {  -9,  5 }, {  5, -9 } },
 	{ { -10,  5 }, {  5,-10 } },  { { -11,  5 }, {  5,-11 } },
@@ -169,15 +168,26 @@ static const int8_t versionmap[18][2][2] = {
 };
 
 
-static const uint32_t versionvals[34] = {
-	0x07c94, 0x085bc, 0x09a99, 0x0a4d3, 0x0bbf6, 0x0c762, 0x0d847,
-	0x0e60d, 0x0f928, 0x10b78, 0x1145d, 0x12a17, 0x13532, 0x149a6,
-	0x15683, 0x168c9, 0x177ec, 0x18ec4, 0x191e1, 0x1afab, 0x1b08e,
-	0x1cc1a, 0x1d33f, 0x1ed75, 0x1f250, 0x209d5, 0x216fd, 0x228ba,
-	0x2379f, 0x24b0b, 0x2542e, 0x26a64, 0x27541, 0x28c69,
+// Map of the format information value to (15,5) BCH code result.
+static const uint16_t formatmap[32] = {
+	0x5412, 0x5125, 0x5e7c, 0x5b4b, 0x45f9, 0x40ce, 0x4f97, 0x4aa0,
+	0x77c4, 0x72f3, 0x7daa, 0x789d, 0x662f, 0x6318, 0x6c41, 0x6976,
+	0x1689, 0x13be, 0x1ce7, 0x19d0, 0x0762, 0x0255, 0x0d0c, 0x083b,
+	0x355f, 0x3068, 0x3f31, 0x3a06, 0x24b4, 0x2183, 0x2eda, 0x2bed,
 };
 
 
+// Map of version information value to (18,6) Golay code result.
+static const uint32_t versionmap[34] = {
+	0x07c94, 0x085bc, 0x09a99, 0x0a4d3, 0x0bbf6, 0x0c762, 0x0d847,   //  v7-13
+	0x0e60d, 0x0f928, 0x10b78, 0x1145d, 0x12a17, 0x13532, 0x149a6,   // v14-20
+	0x15683, 0x168c9, 0x177ec, 0x18ec4, 0x191e1, 0x1afab, 0x1b08e,   // v21-27
+	0x1cc1a, 0x1d33f, 0x1ed75, 0x1f250, 0x209d5, 0x216fd, 0x228ba,   // v28-34
+	0x2379f, 0x24b0b, 0x2542e, 0x26a64, 0x27541, 0x28c69,            // v35-40
+};
+
+
+// Reed Solomon log table in GF(256)
 static const uint8_t rslog[256] = {
 	  0,    // undefined
 	     255,   1,  25,   2,  50,  26, 198,   3, 223,  51, 238,  27, 104, 199,  75,
@@ -199,6 +209,7 @@ static const uint8_t rslog[256] = {
 };
 
 
+// Reed Solomon anti-log table in GF(256)
 static const uint8_t rsalog[256] = {
 	  1,   2,   4,   8,  16,  32,  64, 128,  29,  58, 116, 232, 205, 135,  19,  38,
 	 76, 152,  45,  90, 180, 117, 234, 201, 143,   3,   6,  12,  24,  48,  96, 192,
@@ -219,6 +230,7 @@ static const uint8_t rsalog[256] = {
 };
 
 
+// Mask functions
 static inline uint8_t mask1(uint8_t i, uint8_t j) {
 	return (uint8_t)((i+j)%2 == 0);
 }
@@ -282,6 +294,7 @@ static uint8_t (*const maskfun[8]) (uint8_t x, uint8_t y) = {
 } while(0)
 
 
+// Place alignment pattern at a coordinate and mark as a fixture module
 static void doPutAlign(uint8_t *mtx, uint8_t *fix, const struct metric *m, int x, int y) {
 
 	int i, j;
@@ -293,14 +306,14 @@ static void doPutAlign(uint8_t *mtx, uint8_t *fix, const struct metric *m, int x
 }
 
 
-// Reed Solomon product in the field
+// Reed Solomon product in GF(256)
 static inline uint8_t rsprod(uint8_t a, uint8_t b) {
 	return a && b ? rsalog[ (rslog[a] + rslog[b]) % 255 ] : 0;
 }
 
 
-// Generate Reed Solomon coefficients
-static void rscoeffs(int size, uint8_t *coeffs) {
+// Generate Reed Solomon coefficients using a generator 2
+static void rsGenerateCoeffs(int size, uint8_t *coeffs) {
 
 	int i, j;
 
@@ -311,10 +324,12 @@ static void rscoeffs(int size, uint8_t *coeffs) {
 			coeffs[j] = coeffs[j-1] ^ rsprod(coeffs[j], rsalog[i]);
 		coeffs[0] = rsprod(coeffs[0], rsalog[i]);
 	}
+
 }
 
 
-static void rsencode(uint8_t* datcws, int datlen, uint8_t* ecccws, int ecclen, uint8_t* coeffs) {
+// Perform Reed Solomon ECC codeword calculation
+static void rsEncode(uint8_t* datcws, int datlen, uint8_t* ecccws, int ecclen, uint8_t* coeffs) {
 
 	int i, j;
 	uint8_t tmp[MAX_QR_DAT_CWS_PER_BLK + MAX_QR_ECC_CWS_PER_BLK] = { 0 };
@@ -330,6 +345,8 @@ static void rsencode(uint8_t* datcws, int datlen, uint8_t* ecccws, int ecclen, u
 }
 
 
+// Plot all of the fixed-position artifacts and reserve space for the format
+// and version information
 static void plotFixtures(uint8_t *mtx, uint8_t *fix, const struct metric *m) {
 
 	int i, j;
@@ -350,25 +367,25 @@ static void plotFixtures(uint8_t *mtx, uint8_t *fix, const struct metric *m) {
 	}
 
 	// Plot alignment patterns
-	for (i = m->align2 - 2; i <= m->size - 13; i += m->align3 - m->align2) {
+	for (i = m->align[0] - 2; i <= m->size - 13; i += m->align[1] - m->align[0]) {
 		putAlign(i+1, 5);
 		putAlign(5, i+1);
 	}
-	for (i = m->align2 - 2; i <= m->size - 9; i += m->align3 - m->align2)
-		for (j = m->align2 - 2; j <= m->size - 9; j += m->align3 - m->align2)
+	for (i = m->align[0] - 2; i <= m->size - 9; i += m->align[1] - m->align[0])
+		for (j = m->align[0] - 2; j <= m->size - 9; j += m->align[1] - m->align[0])
 			putAlign(i+1, j+1);
 
 	// Reserve the format information modules
-	for (i = 0; i < (int)(sizeof(formatmap) / sizeof(formatmap[0])); i++) {
-		putFixtureBit(formatmap[i][0][0], formatmap[i][0][1], 1);
-		putFixtureBit(formatmap[i][1][0], formatmap[i][1][1], 1);
+	for (i = 0; i < (int)(sizeof(formatpos) / sizeof(formatpos[0])); i++) {
+		putFixtureBit(formatpos[i][0][0], formatpos[i][0][1], 1);
+		putFixtureBit(formatpos[i][1][0], formatpos[i][1][1], 1);
 	}
 
 	// Reserve the version information modules
 	if (m->size >= 45) {
-		for (i = 0; i < (int)(sizeof(versionmap) / sizeof(versionmap[0])); i++) {
-			putFixtureBit(versionmap[i][0][0], versionmap[i][0][1], 0);
-			putFixtureBit(versionmap[i][1][0], versionmap[i][1][1], 0);
+		for (i = 0; i < (int)(sizeof(versionpos) / sizeof(versionpos[0])); i++) {
+			putFixtureBit(versionpos[i][0][0], versionpos[i][0][1], 0);
+			putFixtureBit(versionpos[i][1][0], versionpos[i][1][1], 0);
 		}
 	}
 
@@ -378,6 +395,7 @@ static void plotFixtures(uint8_t *mtx, uint8_t *fix, const struct metric *m) {
 }
 
 
+// Apply a mask function to the non-fixture modules of a matrix
 static void applyMask(uint8_t *dest, uint8_t *src,
 		      uint8_t (*maskfun)(uint8_t x, uint8_t y), uint8_t *fix, const struct metric *m) {
 
@@ -396,10 +414,10 @@ static void applyMask(uint8_t *dest, uint8_t *src,
 
 
 /*
- *  rle is a zero-terminated runlength encoding of an entire row or column.
+ *  Calculate the n1 + n3 score for a runlength encoded row or column
  *
- *  rle will beging with a non-terminating 0 in the case of a row or columns
- *  starting with a dark module.
+ *  rle is zero-terminated and will begin with a non-terminating 0 in the case
+ *  of a row or columns starting with a dark module.
  *
  */
 static int evaln1n3(uint8_t *rle) {
@@ -430,6 +448,7 @@ static int evaln1n3(uint8_t *rle) {
 }
 
 
+// Evaluate a mask returning its total score
 static uint32_t evalMask(uint8_t *mtx, const struct metric *m) {
 
 	int i, j, k, p;
@@ -445,7 +464,13 @@ static uint32_t evalMask(uint8_t *mtx, const struct metric *m) {
 
 	for (k = 1; k <= m->size; k++) {
 
-		// RLE columns and rows, 0:..:.. when starting with dark module
+		/*
+		 *  Runlength encode a column and row to enable efficient
+		 *  calculation of the n1 and n3 scores.
+		 *
+		 *  Generates {0, ...} when starting with dark module
+		 *
+		 */
 		qc = lastc = getBit(mtx, k, 1);
 		rlec[0] = lastc ^ 1;
 		rlec[1] = 1;
@@ -472,11 +497,10 @@ static uint32_t evalMask(uint8_t *mtx, const struct metric *m) {
 		n1n3 += evaln1n3(rlec);
 		n1n3 += evaln1n3(rler);
 
-		// Count and score same coloured blocks
+		// Score same coloured blocks
 		tmppairs = lastpairs;
 		lastpairs = thispairs;
 		thispairs = tmppairs;
-
 		last = getBit(mtx, 1, k) ^ 1;
 		for (i = 1; i <= size; i++) {
 			now = getBit(mtx, i, k);
@@ -489,7 +513,7 @@ static uint32_t evalMask(uint8_t *mtx, const struct metric *m) {
 					n2 += 3;
 	}
 
-	// Dark/light balance
+	// Score dark/light balance
 	for (i = 1; i <= size; i++)
 		for (j = 1; j <= size; j++)
 			n4 += getBit(mtx, i, j) == 1;
@@ -499,13 +523,14 @@ static uint32_t evalMask(uint8_t *mtx, const struct metric *m) {
 }
 
 
+// Append bits to a byte-encoded sequence
 static void addBits(uint8_t bitField[], uint16_t* bitPos, int length, uint16_t bits, int max_length, bool truncate) {
 	int i;
 
 	if (length == 0 || *bitPos == UINT16_MAX)
 		return;
 
-	assert(length >= 0 && length <= (int)(sizeof(bits)*8));
+	assert(length > 0 && length <= (int)(sizeof(bits)*8));
 	assert(*bitPos <= max_length);
 
 	if (!truncate && (*bitPos + length > max_length)) {
@@ -513,6 +538,7 @@ static void addBits(uint8_t bitField[], uint16_t* bitPos, int length, uint16_t b
 		return;
 	}
 
+	// Truncate is enabled so clamp to maximum length
 	if (*bitPos + length > max_length)
 		length = max_length - *bitPos;
 
@@ -531,6 +557,7 @@ static void addBits(uint8_t bitField[], uint16_t* bitPos, int length, uint16_t b
 }
 
 
+// Generate the bitstream that represents the data message as a sequence of 8-bit codewords and length
 static void createCodewords(gs1_encoder *ctx, uint8_t *string, uint8_t cws_v[3][MAX_QR_CWS], uint16_t bits_v[3]) {
 
 	int i;
@@ -541,9 +568,9 @@ static void createCodewords(gs1_encoder *ctx, uint8_t *string, uint8_t cws_v[3][
 	/*
 	 * Elements of the encoded message have differing lengths based on the
 	 * resulting symbol size. The symbol sizes with different element
-	 * lengths are batched into vergrps. To pick the smallest symbol that
-	 * holds our content we encode the message according to each available
-	 * vergrp, based on the format of symbol.
+	 * lengths are batched into vergrps. To later pick the smallest symbol
+	 * that holds our content we encode the message according to each
+	 * available vergrp, based on the format of symbol.
 	 *
 	 */
 	for (i = 0; i < 3; i++) {
@@ -557,7 +584,7 @@ static void createCodewords(gs1_encoder *ctx, uint8_t *string, uint8_t cws_v[3][
 
 		// Character count indicator
 		addBits(cws_v[i], &bits_v[i], cclens[i][2],
-			(uint16_t)strlen((char *)string), MAX_QR_DATA_BITS, false);	// Character count
+			(uint16_t)strlen((char *)string), MAX_QR_DATA_BITS, false);
 
 		// Byte per character
 		p = &string[0];
@@ -569,6 +596,7 @@ static void createCodewords(gs1_encoder *ctx, uint8_t *string, uint8_t cws_v[3][
 }
 
 
+// Select a symbol version that is sufficent to hold the encoded bitstream
 static const struct metric* selectVersion(gs1_encoder *ctx, uint16_t bits_v[3]) {
 
 	const struct metric *m = NULL;
@@ -579,14 +607,15 @@ static const struct metric* selectVersion(gs1_encoder *ctx, uint16_t bits_v[3]) 
 	// Select a suitable symbol
 	for (vers = 1; vers < (int)(sizeof(metrics) / sizeof(metrics[0])); vers++) {
 		m = &metrics[vers];
-		ncws = m->modules/8;			// Total number of codewords
-		ecws = m->ecc_cws[ctx->qrEClevel];	// Number of error correction codewords
-		dcws = ncws - ecws;			// Number of data codeword
-		dmod = dcws*8;				// Number of data modules
+		ncws = m->modules/8;				// Total number of codewords
+		ecws = m->ecc_cws[ctx->qrEClevel];		// Number of error correction codewords
+		dcws = ncws - ecws;				// Number of data codeword
+		dmod = dcws*8;					// Number of data modules
 		okay = true;
 		bits = bits_v[m->vergrp];
-		if (ctx->qrVersion != 0 && ctx->qrVersion != vers) okay = false;
-		if (bits > dmod) okay = false;
+		if (ctx->qrVersion != 0 &&
+		    ctx->qrVersion != vers) okay = false; 	// User specified version
+		if (bits > dmod) okay = false;			// Bitstream must fit capacity of symbol
 		if (okay) break;
 	}
 
@@ -595,6 +624,7 @@ static const struct metric* selectVersion(gs1_encoder *ctx, uint16_t bits_v[3]) 
 }
 
 
+// Add terminator and padding to the bitstream then perform Reed Solomon Error Correction
 static void finaliseCodewords(gs1_encoder *ctx, uint8_t *cws, uint16_t *bits, const struct metric *m) {
 
 	uint8_t tmpcws[MAX_QR_CWS];
@@ -630,14 +660,14 @@ static void finaliseCodewords(gs1_encoder *ctx, uint8_t *cws, uint16_t *bits, co
 	assert(*bits == dmod);
 
 	// Generate coefficients
-	rscoeffs(ecpb, coeffs);
+	rsGenerateCoeffs(ecpb, coeffs);
 
 	// Calculate the error correction codewords in two groups of blocks
 	memcpy(tmpcws, cws, (size_t)dcws);
 	for (i = 0; i < ecb1; i++)
-		rsencode(cws + i*dcpb, dcpb, tmpcws + dcws + i*ecpb, ecpb, coeffs);
+		rsEncode(cws + i*dcpb, dcpb, tmpcws + dcws + i*ecpb, ecpb, coeffs);
 	for (i = 0; i < ecb2; i++)
-		rsencode(cws + ecb1*dcpb + i*(dcpb+1), dcpb + 1,
+		rsEncode(cws + ecb1*dcpb + i*(dcpb+1), dcpb + 1,
 			 tmpcws + dcws + (i+ecb1)*ecpb, ecpb, coeffs);
 
 	// Reassemble the codewords by interleaving the data and ECC blocks
@@ -657,6 +687,7 @@ static void finaliseCodewords(gs1_encoder *ctx, uint8_t *cws, uint16_t *bits, co
 }
 
 
+// Create a symbol that holds the given bitstream
 static void createMatrix(gs1_encoder *ctx, uint8_t *mtx, uint8_t *cws, const struct metric *m) {
 
 	uint8_t fix[MAX_QR_BYTES] = { 0 };	// 1 indicates fixed pattern
@@ -717,25 +748,25 @@ static void createMatrix(gs1_encoder *ctx, uint8_t *mtx, uint8_t *cws, const str
 
 	// Plot the format information
 	switch (ctx->qrEClevel) {
-		case gs1_encoder_qrEClevelL: formatval = formatvals[ 8 + mask]; break;
-		case gs1_encoder_qrEClevelM: formatval = formatvals[ 0 + mask]; break;
-		case gs1_encoder_qrEClevelQ: formatval = formatvals[24 + mask]; break;
-		case gs1_encoder_qrEClevelH: formatval = formatvals[16 + mask]; break;
+		case gs1_encoder_qrEClevelL: formatval = formatmap[ 8 + mask]; break;
+		case gs1_encoder_qrEClevelM: formatval = formatmap[ 0 + mask]; break;
+		case gs1_encoder_qrEClevelQ: formatval = formatmap[24 + mask]; break;
+		case gs1_encoder_qrEClevelH: formatval = formatmap[16 + mask]; break;
 		default:
 			assert(true);
 			return;
 	}
-	for (i = 0; i < (int)(sizeof(formatmap) / sizeof(formatmap[0])); i++) {
-		putBit(mtx, formatmap[i][0][0], formatmap[i][0][1], (uint8_t)((formatval >> (14-i)) & 1));
-		putBit(mtx, formatmap[i][1][0], formatmap[i][1][1], (uint8_t)((formatval >> (14-i)) & 1));
+	for (i = 0; i < (int)(sizeof(formatpos) / sizeof(formatpos[0])); i++) {
+		putBit(mtx, formatpos[i][0][0], formatpos[i][0][1], (uint8_t)((formatval >> (14-i)) & 1));
+		putBit(mtx, formatpos[i][1][0], formatpos[i][1][1], (uint8_t)((formatval >> (14-i)) & 1));
 	}
 
 	// Plot the version information modules
 	if (m->size >= 45) {
-		versionval = versionvals[(m->size-17)/4-7];
-		for (i = 0; i < (int)(sizeof(versionmap) / sizeof(versionmap[0])); i++) {
-			putBit(mtx, versionmap[i][0][0], versionmap[i][0][1], (uint8_t)((versionval >> (17-i)) & 1));
-			putBit(mtx, versionmap[i][1][0], versionmap[i][1][1], (uint8_t)((versionval >> (17-i)) & 1));
+		versionval = versionmap[(m->size-17)/4-7];
+		for (i = 0; i < (int)(sizeof(versionpos) / sizeof(versionpos[0])); i++) {
+			putBit(mtx, versionpos[i][0][0], versionpos[i][0][1], (uint8_t)((versionval >> (17-i)) & 1));
+			putBit(mtx, versionpos[i][1][0], versionpos[i][1][1], (uint8_t)((versionval >> (17-i)) & 1));
 		}
 	}
 
