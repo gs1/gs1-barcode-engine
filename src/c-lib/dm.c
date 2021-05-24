@@ -289,7 +289,7 @@ static void finaliseCodewords(gs1_encoder *ctx, uint8_t *cws, uint16_t *cwslen, 
 	int i, j;
 	uint8_t *p;
 
-(void)ctx;
+	(void)ctx;
 
 	ncws = *cwslen;		// Data codewords
 	rscw = m->rscw;		// Error correction codewords
@@ -307,7 +307,7 @@ static void finaliseCodewords(gs1_encoder *ctx, uint8_t *cws, uint16_t *cwslen, 
 
 		rsEncode(tmpcws, (int)(p-tmpcws), p, rscw/rsbl, coeffs);
 
-		int offset = m->rscw == 620 ? ( i < 8 ? 2 : -8) : 0;
+		int offset = m->rscw == 620 ? (i<8 ? 2:-8) : 0;
 		for (j = i; j < rscw; j += rsbl)
 			cws[ncws+j+offset] = *p++;
 
@@ -316,19 +316,164 @@ static void finaliseCodewords(gs1_encoder *ctx, uint8_t *cws, uint16_t *cwslen, 
 }
 
 
+#define putTimingModule(cx,rx,b) do {							\
+	gs1_mtxPutModule(mtx, m->cols + 2*DM_QZ,					\
+			 DM_QZ + cx, DM_QZ + rx,					\
+			 b);								\
+} while(0)
+
+
+// Place a data module, handling wrapping and QZ, jumping occtures and mark it
+// as reserved
+#define putModule(cx,rx,b) do {								\
+	int cc = cx; int rr = rx;							\
+	if (rr < 0)      { rr += mrows; cc += 4-(mrows+4)%8; }				\
+	if (cc < 0)      { cc += mcols; rr += 4-(mcols+4)%8; }				\
+	if (rr >= mrows) { rr -= mrows;                      }				\
+	gs1_mtxPutModule(occ, mcols, cc, rr, 1);					\
+	gs1_mtxPutModule(mtx, m->cols + 2*DM_QZ,					\
+			 DM_QZ + cc + 2*(cc/(mcols/m->regv)) + 1,			\
+			 DM_QZ + rr + 2*(rr/(mrows/m->regh)) + 1,			\
+			 b);								\
+} while(0)
+
+
+#define plotCodeword(c1,r1,c2,r2,c3,r3,c4,r4,c5,r5,c6,r6,c7,r7,c8,r8) do {		\
+	putModule(c1, r1, *cws >>7 & 1);						\
+	putModule(c2, r2, *cws >>6 & 1);						\
+	putModule(c3, r3, *cws >>5 & 1);						\
+	putModule(c4, r4, *cws >>4 & 1);						\
+	putModule(c5, r5, *cws >>3 & 1);						\
+	putModule(c6, r6, *cws >>2 & 1);						\
+	putModule(c7, r7, *cws >>1 & 1);						\
+	putModule(c8, r8, *cws >>0 & 1);						\
+	cws++;										\
+} while(0)
+
+
+#define plotCodewordCorner(c1,r1,c2,r2,c3,r3,c4,r4,c5,r5,c6,r6,c7,r7,c8,r8) do {	\
+	plotCodeword(c1 >= 0 ? c1 : c1+mcols, r1 >= 0 ? r1 : r1+mrows,			\
+		     c2 >= 0 ? c2 : c2+mcols, r2 >= 0 ? r2 : r2+mrows,			\
+		     c3 >= 0 ? c3 : c3+mcols, r3 >= 0 ? r3 : r3+mrows,			\
+		     c4 >= 0 ? c4 : c4+mcols, r4 >= 0 ? r4 : r4+mrows,			\
+		     c5 >= 0 ? c5 : c5+mcols, r5 >= 0 ? r5 : r5+mrows,			\
+		     c6 >= 0 ? c6 : c6+mcols, r6 >= 0 ? r6 : r6+mrows,			\
+		     c7 >= 0 ? c7 : c7+mcols, r7 >= 0 ? r7 : r7+mrows,			\
+		     c8 >= 0 ? c8 : c8+mcols, r8 >= 0 ? r8 : r8+mrows);			\
+} while(0)
+
+
 static void createMatrix(gs1_encoder *ctx, uint8_t *mtx, uint8_t *cws, const struct metric *m) {
 
-	uint8_t mmtx[MAX_DM_BYTES] = { 0 };
+	uint8_t occ[MAX_DM_BYTES] = { 0 };  // Matrix to indicate occupied positions
+	int i, j;
+	int mrows, mcols;
 
-(void)ctx;
-(void)mtx;
-(void)cws;
-(void)m;
-(void)mmtx;
+	(void)ctx;
+
+	mrows = m->rows - 2*m->regh;  // Rows excluding timing patterns
+	mcols = m->cols - 2*m->regv;  // Columns excluding timing patterns
+
+	// Plot timing patterns
+	for (i = 0; i < m->cols+1; i += mcols/m->regv + 2) {
+		for (j = 0; j < m->rows; j++) {
+			if (i > 0)
+				putTimingModule(i-1, j, (uint8_t)(j%2));
+			if (i < m->cols)
+				putTimingModule(i, j, 1);
+		}
+	}
+	for (j = 0; j < m->rows+1; j += mrows/m->regh + 2) {
+		for (i = 0; i < m->cols; i++) {
+			if (j > 0)
+				putTimingModule(i, j-1, 1);
+			if (j < m->rows)
+				putTimingModule(i, j, (uint8_t)(1-i%2));
+		}
+	}
 
 
+	// Place the modules between the timing patterns
+	i = 0; j = 4;
+
+	do {
+
+		if (i == 0 && j == mrows)
+			plotCodewordCorner(
+				0,-1,	1,-1,	2,-1,	/**/
+				/***********************/  /****************/
+				/***********************/  /****************/
+							/**/	-2,0,	-1,0,
+							/**/	-1,1,
+							/**/	-1,2,
+							/**/	-1,3
+			);
+		if (i == 0 && j == mrows-2 && mcols%4 != 0)
+			plotCodewordCorner(
+				0,-3,	/**/
+				0,-2,	/**/
+				0,-1,	/**/
+				/*******/  /********************************/
+				/*******/  /********************************/
+					/**/	-4,0,	-3,0,	-2,0,	-1,0,
+					/**/				-1,1
+			);
+		if (i == 0 && j == mrows-2 && mcols%8 == 4)
+			plotCodewordCorner(
+				0,-3,	/**/
+				0,-2,	/**/
+				0,-1,	/**/
+				/*******/  /****************/
+				/*******/  /****************/
+					/**/	-2,0,	-1,0,
+					/**/		-1,1,
+					/**/		-1,2,
+					/**/		-1,3
+			);
+		if (i == 2 && j == mrows+4 && mcols%8 == 0)
+			plotCodewordCorner(
+				0,-1,	/**/			-1,-1,
+				/*******/  /*************************/
+				/*******/  /*************************/
+					/**/	-3,0,	-2,0,	-1,0,
+					/**/	-3,1,	-2,1,	-1,1
+			);
+
+		// Sweep upwards
+		do {
+			if (i >= 0 && j < mrows && !gs1_mtxGetModule(occ, mcols, i, j)) {
+				plotCodeword(
+					i-2,j-2,  i-1,j-2,
+					i-2,j-1,  i-1,j-1,  i-0,j-1,
+					i-2,j-0,  i-1,j-0,  i-0,j-0
+				);
+			}
+			i+=2; j-=2;
+		} while (i < mcols && j >= 0);
+		i+=3; j++;
+
+		// Sweep downwards
+		do {
+			if (i < mcols && j >= 0 && !gs1_mtxGetModule(occ, mcols, i, j))
+				plotCodeword(
+					i-2,j-2,  i-1,j-2,
+					i-2,j-1,  i-1,j-1,  i-0,j-1,
+					i-2,j-0,  i-1,j-0,  i-0,j-0
+				);
+			i-=2; j+=2;
+		} while (i >= 0 && j < mrows);
+		i++; j+=3;
+
+	} while (i < mcols || j < mrows);
 
 
+	// Set checker pattern if required
+	if (gs1_mtxGetModule(occ, mcols, mrows-1, mcols-1) == 0) {
+		putModule(mrows-2, mcols-2, 1);
+		putModule(mrows-1, mcols-2, 0);
+		putModule(mrows-2, mcols-1, 0);
+		putModule(mrows-1, mcols-1, 1);
+	}
 
 }
 
