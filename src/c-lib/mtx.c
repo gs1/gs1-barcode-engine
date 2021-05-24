@@ -23,7 +23,7 @@
 #include "mtx.h"
 
 
-void gs1_mtxPutBit(uint8_t *mtx, int cols, int x, int y, uint8_t bit) {
+void gs1_mtxPutModule(uint8_t *mtx, int cols, int x, int y, uint8_t bit) {
 
 	int p = ((cols-1)/8+1)*y + x/8;
 
@@ -37,7 +37,7 @@ void gs1_mtxPutBit(uint8_t *mtx, int cols, int x, int y, uint8_t bit) {
 }
 
 
-uint8_t gs1_mtxGetBit(uint8_t *mtx, int cols, int x, int y) {
+uint8_t gs1_mtxGetModule(uint8_t *mtx, int cols, int x, int y) {
 
 	int p = ((cols-1)/8+1)*y + x/8;
 
@@ -53,11 +53,11 @@ void gs1_mtxToPatterns(uint8_t* mtx, int cols, int rows, struct patternLength *p
 
 	for (r = 0; r < rows; r++) {
 		patPos = 0;
-		last = gs1_mtxGetBit(mtx, cols, 0, r);
+		last = gs1_mtxGetModule(mtx, cols, 0, r);
 		pats[r].whtFirst = (last == 0);
 		pats[r].pattern[0] = 1;
 		for (c = 1; c < cols; c++) {
-			if (gs1_mtxGetBit(mtx, cols, c, r) == last) {
+			if (gs1_mtxGetModule(mtx, cols, c, r) == last) {
 				pats[r].pattern[patPos]++;
 			}
 			else {

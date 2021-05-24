@@ -271,22 +271,22 @@ static uint8_t (*const maskfun[8]) (uint8_t x, uint8_t y) = {
 
 
 // Syntactic sugar to include qz offset and wrap around processing
-#define putBit(d, x, y, b) do {							\
+#define putModule(d, x, y, b) do {						\
 	assert( x != 0 && y != 0 && abs(x) <= m->size && abs(y) <= m->size );	\
-	gs1_mtxPutBit(d, m->size + 2*QR_QZ,					\
+	gs1_mtxPutModule(d, m->size + 2*QR_QZ,					\
 		x > 0 ? x + QR_QZ - 1 : m->size + QR_QZ + x,			\
 		y > 0 ? y + QR_QZ - 1 : m->size + QR_QZ + y,			\
 		b);								\
 } while(0)
 
-#define getBit(s, x, y)								\
-	gs1_mtxGetBit(s, m->size + 2*QR_QZ,					\
+#define getModule(s, x, y)							\
+	gs1_mtxGetModule(s, m->size + 2*QR_QZ,					\
 		x > 0 ? x + QR_QZ - 1 : m->size + QR_QZ + x,			\
 		y > 0 ? y + QR_QZ - 1 : m->size + QR_QZ + y)
 
-#define putFixtureBit(x, y, b) do {						\
-	putBit(mtx, x, y, b);							\
-	putBit(fix, x, y, 1);							\
+#define putFixtureModule(x, y, b) do {						\
+	putModule(mtx, x, y, b);						\
+	putModule(fix, x, y, 1);						\
 } while(0)
 
 #define putAlign(x, y) do {							\
@@ -301,7 +301,7 @@ static void doPutAlign(uint8_t *mtx, uint8_t *fix, const struct metric *m, int x
 
 	for (i = 0; i < (int)sizeof(algnpat[0]); i++)
 		for (j = 0; j < (int)sizeof(algnpat[0]); j++)
-			putFixtureBit(x+i, y+j, algnpat[i][j]);
+			putFixtureModule(x+i, y+j, algnpat[i][j]);
 
 }
 
@@ -356,16 +356,16 @@ static void plotFixtures(uint8_t *mtx, uint8_t *fix, const struct metric *m) {
 
 	// Plot timing patterns
 	for (i = sizeof(finder[0]); i <= (int)(m->size - sizeof(finder[0]) - 1); i++) {
-		putFixtureBit(i+1, 7, (uint8_t)(i+1)%2);
-		putFixtureBit(7, i+1, (uint8_t)(i+1)%2);
+		putFixtureModule(i+1, 7, (uint8_t)(i+1)%2);
+		putFixtureModule(7, i+1, (uint8_t)(i+1)%2);
 	}
 
 	// Plot finder patterns
 	for (i = 0; i < (int)sizeof(finder[0]); i++) {
 		for (j = 0; j < (int)sizeof(finder[0]); j++) {
-			putFixtureBit( i+1,  j+1, finder[i][j]);
-			putFixtureBit(-i-1,  j+1, finder[i][j]);
-			putFixtureBit( i+1, -j-1, finder[i][j]);
+			putFixtureModule( i+1,  j+1, finder[i][j]);
+			putFixtureModule(-i-1,  j+1, finder[i][j]);
+			putFixtureModule( i+1, -j-1, finder[i][j]);
 		}
 	}
 
@@ -380,20 +380,20 @@ static void plotFixtures(uint8_t *mtx, uint8_t *fix, const struct metric *m) {
 
 	// Reserve the format information modules
 	for (i = 0; i < (int)(sizeof(formatpos) / sizeof(formatpos[0])); i++) {
-		putFixtureBit(formatpos[i][0][0], formatpos[i][0][1], 1);
-		putFixtureBit(formatpos[i][1][0], formatpos[i][1][1], 1);
+		putFixtureModule(formatpos[i][0][0], formatpos[i][0][1], 1);
+		putFixtureModule(formatpos[i][1][0], formatpos[i][1][1], 1);
 	}
 
 	// Reserve the version information modules
 	if (m->size >= 45) {
 		for (i = 0; i < (int)(sizeof(versionpos) / sizeof(versionpos[0])); i++) {
-			putFixtureBit(versionpos[i][0][0], versionpos[i][0][1], 0);
-			putFixtureBit(versionpos[i][1][0], versionpos[i][1][1], 0);
+			putFixtureModule(versionpos[i][0][0], versionpos[i][0][1], 0);
+			putFixtureModule(versionpos[i][1][0], versionpos[i][1][1], 0);
 		}
 	}
 
 	// Reserve the solitary dark module
-	putFixtureBit(9, -8, 0);
+	putFixtureModule(9, -8, 0);
 
 }
 
@@ -406,8 +406,8 @@ static void applyMask(uint8_t *dest, uint8_t *src,
 
 	for (i = 1; i <= m->size; i++) {
 		for (j = 1; j <= m->size; j++) {
-			putBit(dest, i, j, (uint8_t)(getBit(src, i, j) ^ (
-				(!getBit(fix, i, j)) &
+			putModule(dest, i, j, (uint8_t)(getModule(src, i, j) ^ (
+				(!getModule(fix, i, j)) &
 				((*maskfun) ((uint8_t)(i-1), (uint8_t)(j-1))))
 			));
 		}
@@ -474,21 +474,21 @@ static uint32_t evalMask(uint8_t *mtx, const struct metric *m) {
 		 *  Generates {0, ...} when starting with dark module
 		 *
 		 */
-		qc = lastc = getBit(mtx, k, 1);
+		qc = lastc = getModule(mtx, k, 1);
 		rlec[0] = lastc ^ 1;
 		rlec[1] = 1;
-		qr = lastr = getBit(mtx, 1, k);
+		qr = lastr = getModule(mtx, 1, k);
 		rler[0] = lastr ^ 1;
 		rler[1] = 1;
 		for (p = 2; p <= size; p++) {
-			if (getBit(mtx, k, p) == lastc) {
+			if (getModule(mtx, k, p) == lastc) {
 				rlec[qc]++;
 			}
 			else {
 				rlec[++qc] = 1;
 				lastc ^= 1;
 			}
-			if (getBit(mtx, p, k) == lastr) {
+			if (getModule(mtx, p, k) == lastr) {
 				rler[qr]++;
 			}
 			else {
@@ -504,9 +504,9 @@ static uint32_t evalMask(uint8_t *mtx, const struct metric *m) {
 		tmppairs = lastpairs;
 		lastpairs = thispairs;
 		thispairs = tmppairs;
-		last = getBit(mtx, 1, k) ^ 1;
+		last = getModule(mtx, 1, k) ^ 1;
 		for (i = 1; i <= size; i++) {
-			now = getBit(mtx, i, k);
+			now = getModule(mtx, i, k);
 			thispairs[i-1] = (uint8_t)(now + last);
 			last = now;
 		}
@@ -519,7 +519,7 @@ static uint32_t evalMask(uint8_t *mtx, const struct metric *m) {
 	// Score dark/light balance
 	for (i = 1; i <= size; i++)
 		for (j = 1; j <= size; j++)
-			n4 += getBit(mtx, i, j) == 1;
+			n4 += getModule(mtx, i, j) == 1;
 	n4 = abs(n4*100/(size*size)-50)/5*10;
 
 	return (uint32_t)(n1n3+n2+n4);
@@ -693,8 +693,8 @@ static void finaliseCodewords(gs1_encoder *ctx, uint8_t *cws, uint16_t *bits, co
 // Create a symbol that holds the given bitstream
 static void createMatrix(gs1_encoder *ctx, uint8_t *mtx, uint8_t *cws, const struct metric *m) {
 
-	uint8_t fix[MAX_QR_BYTES] = { 0 };	// 1 indicates fixed pattern
-	uint8_t msk[MAX_QR_BYTES];		// Used for mask evaluation
+	uint8_t fix[MAX_QR_BYTES] = { 0 };	// Matrix in which 1 indicates fixed pattern
+	uint8_t msk[MAX_QR_BYTES];		// Matrix used for mask evaluation
 
 	uint8_t mask = 0;			// Satisfy compiler
 	uint32_t formatval, versionval;
@@ -712,8 +712,8 @@ static void createMatrix(gs1_encoder *ctx, uint8_t *mtx, uint8_t *cws, const str
 	col = 1;    // 0 is left bit; 1 is right bit
 	for (k = 0; i >= 1; )
 	{
-		if (!getBit(fix, i, j)) {
-			putBit(mtx, i, j, (uint8_t)((cws[k/8] >> (7-k%8)) & 1));
+		if (!getModule(fix, i, j)) {
+			putModule(mtx, i, j, (uint8_t)((cws[k/8] >> (7-k%8)) & 1));
 			k++;
 		}
 		if (col == 1) {
@@ -747,7 +747,7 @@ static void createMatrix(gs1_encoder *ctx, uint8_t *mtx, uint8_t *cws, const str
 	applyMask(mtx, mtx, maskfun[mask], fix, m);
 
 	// Set the solitary dark module
-	putBit(mtx, 9, -8, 1);
+	putModule(mtx, 9, -8, 1);
 
 	// Plot the format information
 	switch (ctx->qrEClevel) {
@@ -760,16 +760,16 @@ static void createMatrix(gs1_encoder *ctx, uint8_t *mtx, uint8_t *cws, const str
 			return;
 	}
 	for (i = 0; i < (int)(sizeof(formatpos) / sizeof(formatpos[0])); i++) {
-		putBit(mtx, formatpos[i][0][0], formatpos[i][0][1], (uint8_t)((formatval >> (14-i)) & 1));
-		putBit(mtx, formatpos[i][1][0], formatpos[i][1][1], (uint8_t)((formatval >> (14-i)) & 1));
+		putModule(mtx, formatpos[i][0][0], formatpos[i][0][1], (uint8_t)((formatval >> (14-i)) & 1));
+		putModule(mtx, formatpos[i][1][0], formatpos[i][1][1], (uint8_t)((formatval >> (14-i)) & 1));
 	}
 
 	// Plot the version information modules
 	if (m->size >= 45) {
 		versionval = versionmap[(m->size-17)/4-7];
 		for (i = 0; i < (int)(sizeof(versionpos) / sizeof(versionpos[0])); i++) {
-			putBit(mtx, versionpos[i][0][0], versionpos[i][0][1], (uint8_t)((versionval >> (17-i)) & 1));
-			putBit(mtx, versionpos[i][1][0], versionpos[i][1][1], (uint8_t)((versionval >> (17-i)) & 1));
+			putModule(mtx, versionpos[i][0][0], versionpos[i][0][1], (uint8_t)((versionval >> (17-i)) & 1));
+			putModule(mtx, versionpos[i][1][0], versionpos[i][1][1], (uint8_t)((versionval >> (17-i)) & 1));
 		}
 	}
 
@@ -893,7 +893,7 @@ void test_qr_QR_fixtures(void) {
 		plotFixtures(mtx, fix, m);
 		for (i = 1, cnt = 0; i <= m->size; i++)
 			for (j = 1; j <= m->size; j++)
-				cnt += getBit(fix, i, j) ^ 1;
+				cnt += getModule(fix, i, j) ^ 1;
 		sprintf(casename, "V%d", v);
 		TEST_CASE(casename);
 		TEST_CHECK(cnt == m->modules);
