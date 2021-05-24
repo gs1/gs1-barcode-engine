@@ -307,7 +307,7 @@ static void doPutAlign(uint8_t *mtx, uint8_t *fix, const struct metric *m, int x
 
 
 // Reed Solomon product in GF(256)
-static inline uint8_t rsprod(uint8_t a, uint8_t b) {
+static inline uint8_t rsProd(uint8_t a, uint8_t b) {
 	return a && b ? rsalog[ (rslog[a] + rslog[b]) % 255 ] : 0;
 }
 
@@ -321,8 +321,8 @@ static void rsGenerateCoeffs(int size, uint8_t *coeffs) {
 	for (i = 0; i < size; i++) {
 		coeffs[i+1] = coeffs[i];
 		for (j = i; j > 0; j--)
-			coeffs[j] = coeffs[j-1] ^ rsprod(coeffs[j], rsalog[i]);
-		coeffs[0] = rsprod(coeffs[0], rsalog[i]);
+			coeffs[j] = coeffs[j-1] ^ rsProd(coeffs[j], rsalog[i]);
+		coeffs[0] = rsProd(coeffs[0], rsalog[i]);
 	}
 
 }
@@ -341,7 +341,7 @@ static void rsEncode(uint8_t* datcws, int datlen, uint8_t* ecccws, int ecclen, u
 
 	for (i = 0; i < datlen; i++)
 		for (j = 0; j < ecclen; j++)
-			tmp[i+j+1] = rsprod(coeffs[ecclen-j-1], tmp[i]) ^ tmp[i+j+1];
+			tmp[i+j+1] = rsProd(coeffs[ecclen-j-1], tmp[i]) ^ tmp[i+j+1];
 
 	memcpy(ecccws, tmp + datlen, (size_t)ecclen);
 
