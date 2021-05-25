@@ -179,7 +179,25 @@ static bool userInt(gs1_encoder *ctx) {
 			printf("\n 7) Enter GS1-128 height in X. Current value = %d",
 								gs1_encoder_getLinHeight(ctx));
 		}
-		printf("\n 8) Enter separator row height. Current value = %d", gs1_encoder_getSepHt(ctx));
+		if (gs1_encoder_getSym(ctx) == gs1_encoder_sQR) {
+			printf("\n 7) Enter GS1 QR Code version (0 = automatic). Current value = %d",
+								gs1_encoder_getQrVersion(ctx));
+		}
+		if (gs1_encoder_getSym(ctx) == gs1_encoder_sDM) {
+			printf("\n 7) Enter GS1 Data Matrix number of rows (0=automatic). Current value = %d",
+								gs1_encoder_getDmRows(ctx));
+		}
+		if (gs1_encoder_getSym(ctx) == gs1_encoder_sDM) {
+			printf("\n 8) Enter GS1 Data Matrix number of columns (0=automatic). Current value = %d",
+								gs1_encoder_getDmColumns(ctx));
+		}
+		if (gs1_encoder_getSym(ctx) == gs1_encoder_sQR) {
+			printf("\n 8) Enter GS1 QR Code error correction level (L=0, M=1, Q=2, H=3). Current value = %d",
+								gs1_encoder_getQrEClevel(ctx));
+		}
+		if (gs1_encoder_getSym(ctx) != gs1_encoder_sQR && gs1_encoder_getSym(ctx) != gs1_encoder_sDM) {
+			printf("\n 8) Enter separator row height. Current value = %d", gs1_encoder_getSepHt(ctx));
+		}
 		printf("\n 9) Select another symbology or exit program");
 		printf("\n\nMenu selection: ");
 		if (gets(inpStr) == NULL)
@@ -307,14 +325,35 @@ static bool userInt(gs1_encoder *ctx) {
 					printf("\nERROR: %s\n", gs1_encoder_getErrMsg(ctx));
 					continue;
 				}
+			}
+			 else if ((gs1_encoder_getSym(ctx) == gs1_encoder_sQR)) {
+				printf("\nEnter GS1 QR Code version: 1-40, 0=automatic: ");
+				if (gets(inpStr) == NULL)
+					return false;
+				i = atoi(inpStr);
+				if (!gs1_encoder_setQrVersion(ctx, i)) {
+					printf("\nERROR: %s\n", gs1_encoder_getErrMsg(ctx));
+					continue;
+				}
+			 }
+			 else if ((gs1_encoder_getSym(ctx) == gs1_encoder_sDM)) {
+				printf("\nEnter GS1 DataMatrix number of rows: 10-144, 0=automatic: ");
+				if (gets(inpStr) == NULL)
+					return false;
+				i = atoi(inpStr);
+				if (!gs1_encoder_setDmRows(ctx, i)) {
+					printf("\nERROR: %s\n", gs1_encoder_getErrMsg(ctx));
+					continue;
+				}
 			 }
 			 else {
 				printf("7 NOT A VALID SELECTION.");
 			 }
 			 break;
 			case 8:
+			 if (gs1_encoder_getSym(ctx) != gs1_encoder_sQR && gs1_encoder_getSym(ctx) != gs1_encoder_sDM) {
 				printf("\nEnter separator row height %d through %d valid: ",
-										gs1_encoder_getPixMult(ctx), 2*gs1_encoder_getPixMult(ctx));
+-										gs1_encoder_getPixMult(ctx), 2*gs1_encoder_getPixMult(ctx));
 				if (gets(inpStr) == NULL)
 					return false;
 				i = atoi(inpStr);
@@ -322,7 +361,28 @@ static bool userInt(gs1_encoder *ctx) {
 					printf("\nERROR: %s\n", gs1_encoder_getErrMsg(ctx));
 					continue;
 				}
-				break;
+			 }
+			 else if (gs1_encoder_getSym(ctx) == gs1_encoder_sQR) {
+				printf("\nEnter GS1 QR Code error correction level (L=0, M=1, Q=2, H=3): ");
+				if (gets(inpStr) == NULL)
+					return false;
+				i = atoi(inpStr);
+				if (!gs1_encoder_setQrEClevel(ctx, i)) {
+					printf("\nERROR: %s\n", gs1_encoder_getErrMsg(ctx));
+					continue;
+				}
+			 }
+			 else if (gs1_encoder_getSym(ctx) == gs1_encoder_sDM) {
+				printf("\nEnter GS1 Data Matrix number of columns: 8-144, 0=automatic: ");
+				if (gets(inpStr) == NULL)
+					return false;
+				i = atoi(inpStr);
+				if (!gs1_encoder_setDmColumns(ctx, i)) {
+					printf("\nERROR: %s\n", gs1_encoder_getErrMsg(ctx));
+					continue;
+				}
+			 }
+			 break;
 			case 9:
 				gs1_encoder_setSym(ctx, gs1_encoder_sNONE);
 				break;
