@@ -321,7 +321,7 @@ GS1_ENCODERS_API bool gs1_encoder_setQrEClevel(gs1_encoder *ctx, int ecLevel) {
  			ctx->qrEClevel = ecLevel;
 			break;
 		default:
-			strcpy(ctx->errMsg, "Valid number of segments range is 2 to 22");
+			strcpy(ctx->errMsg, "Valid QR Code error correction level values are L=0, M=1, Q=2, H=3");
 			ctx->errFlag = true;
 			return false;
 	}
