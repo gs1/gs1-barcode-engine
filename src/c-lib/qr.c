@@ -21,6 +21,7 @@
 #include <assert.h>
 #include <string.h>
 #include <stdbool.h>
+#include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
 
