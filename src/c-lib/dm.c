@@ -281,9 +281,11 @@ static void finaliseCodewords(gs1_encoder *ctx, uint8_t *cws, uint16_t *cwslen, 
 }
 
 
-#define putTimingModule(cx,rx,b) do {							\
+#define putTimingModule(c,r,b) do {							\
+	assert(c >= 0 && c < m->cols);							\
+	assert(r >= 0 && r < m->rows);							\
 	gs1_mtxPutModule(mtx, m->cols + 2*DM_QZ,					\
-			 DM_QZ + cx, DM_QZ + rx,					\
+			 DM_QZ + c, DM_QZ + r,						\
 			 b);								\
 } while(0)
 
@@ -295,6 +297,8 @@ static void finaliseCodewords(gs1_encoder *ctx, uint8_t *cws, uint16_t *cwslen, 
 	if (rr < 0)      { rr += mrows; cc += 4-(mrows+4)%8; }				\
 	if (cc < 0)      { cc += mcols; rr += 4-(mcols+4)%8; }				\
 	if (rr >= mrows) { rr -= mrows;                      }				\
+	assert(cc >= 0 && cc < mcols);							\
+	assert(rr >= 0 && rr < mrows);							\
 	gs1_mtxPutModule(occ, mcols, cc, rr, 1);					\
 	gs1_mtxPutModule(mtx, m->cols + 2*DM_QZ,					\
 			 DM_QZ + cc + 2*(cc/(mcols/m->regv)) + 1,			\
