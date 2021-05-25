@@ -154,6 +154,7 @@ TEST_LIST = {
      * dm.c
      *
      */
+    { "dm_DM_dataLength", test_dm_DM_dataLength },
     { "dm_DM_encode", test_dm_DM_encode },
 
 

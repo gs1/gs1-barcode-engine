@@ -182,7 +182,7 @@ static void createCodewords(gs1_encoder *ctx, uint8_t *string, uint8_t cws[MAX_D
 	uint8_t *p = cws;
 
 	// Encode the message in ASCII mode
-	while (*string) {
+	while (*string && p-cws < MAX_DM_DAT_CWS) {
 		if (*string >= '0' && *string <= '9') {
 			if (*(string+1) && *(string+1) >= '0' && *(string+1) <= '9') {
 				*p++ = (uint8_t)(((*string)-'0')*10 + (*string+1)-'0' + 130);
@@ -198,7 +198,7 @@ static void createCodewords(gs1_encoder *ctx, uint8_t *string, uint8_t cws[MAX_D
 		}
 	}
 
-	*cwslen = (uint16_t)(p - &cws[0]);
+	*cwslen = (!*string && p-cws <= MAX_DM_DAT_CWS) ? (uint16_t)(p-cws) : UINT16_MAX;
 
 }
 
@@ -548,6 +548,30 @@ out:
 #include "acutest.h"
 
 #include "gs1encoders-test.h"
+
+
+void test_dm_DM_dataLength(void) {
+
+	int i;
+	char string[MAX_DM_DAT_CWS+1] = { 0 };
+	char casename[5];
+
+	gs1_encoder* ctx = gs1_encoder_init();
+
+	gs1_encoder_setFormat(ctx, gs1_encoder_dRAW);
+	gs1_encoder_setSym(ctx, gs1_encoder_sDM);
+
+	for (i = 1; i <= MAX_DM_DAT_CWS; i++) {
+		string[i-1] = 'A';
+		gs1_encoder_setDataStr(ctx, string);
+		sprintf(casename, "%d", i);
+		TEST_CASE(casename);
+		TEST_CHECK(gs1_encoder_encode(ctx));
+	}
+
+	gs1_encoder_free(ctx);
+
+}
 
 
 void test_dm_DM_encode(void) {

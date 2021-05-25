@@ -28,6 +28,7 @@
 #define MAX_DM_BYTES	(((MAX_DM_COLS-1)/8+1) * MAX_DM_ROWS)
 
 #define MAX_DM_CWS	2178
+#define MAX_DM_DAT_CWS	1558
 
 #define MAX_DM_DAT_CWS_PER_BLK 175
 #define MAX_DM_ECC_CWS_PER_BLK 68
@@ -41,7 +42,7 @@ void gs1_DM(gs1_encoder *ctx);
 
 #ifdef UNIT_TESTS
 
-void test_dm_DM_encode(void);
+void test_dm_DM_dataLength(void);
 void test_dm_DM_encode(void);
 
 #endif
