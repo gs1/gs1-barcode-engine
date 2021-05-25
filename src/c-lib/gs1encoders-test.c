@@ -53,6 +53,21 @@
 #include "ucc128.h"
 
 
+void test_print_codewords(uint8_t *cws, int numcws) {
+	int i;
+	for (i=0; i < numcws; i++)
+		printf("%d ", cws[i]);
+	printf("\n");
+}
+
+void test_print_bits(uint8_t *bytes, int numbits) {
+	int i;
+	for (i=0; i < numbits; i++)
+		printf("%d", bytes[i/8] >> (7-i%8) & 1);
+	printf("\n");
+}
+
+
 void test_print_strings(gs1_encoder *ctx) {
 
 	char **strings;
