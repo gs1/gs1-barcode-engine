@@ -141,6 +141,8 @@ static void rsGenerateCoeffs(int size, uint8_t *coeffs) {
 
 	int i, j;
 
+	assert(size >= 1);  // Satisfy static analysis
+
 	coeffs[0] = 1;
 	for (i = 1; i <= size; i++) {
 		coeffs[i] = coeffs[i-1];
@@ -157,6 +159,9 @@ static void rsEncode(uint8_t* datcws, int datlen, uint8_t* ecccws, int ecclen, u
 
 	int i, j;
 	uint8_t tmp[MAX_DM_DAT_CWS_PER_BLK + MAX_DM_ECC_CWS_PER_BLK] = { 0 };
+
+	assert(datlen <= MAX_DM_DAT_CWS_PER_BLK);
+	assert(ecclen <= MAX_DM_ECC_CWS_PER_BLK);
 
 	memcpy(tmp, datcws, (size_t)datlen);
 
