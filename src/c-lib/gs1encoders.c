@@ -73,6 +73,8 @@ GS1_ENCODERS_API gs1_encoder* gs1_encoder_init(void) {
 	ctx->sepHt = 1;
 	ctx->segWidth = 22;
 	ctx->linHeight = 25;
+	ctx->dmRows = 0;
+	ctx->dmCols = 0;
 	ctx->qrEClevel = gs1_encoder_qrEClevelM;
 	ctx->qrVersion = 0;  // Automatic
 	ctx->format = gs1_encoder_dTIF;
@@ -245,6 +247,42 @@ GS1_ENCODERS_API bool gs1_encoder_setSegWidth(gs1_encoder *ctx, int segWidth) {
 		return false;
 	}
 	ctx->segWidth = segWidth;
+	return true;
+}
+
+
+GS1_ENCODERS_API int gs1_encoder_getDmRows(gs1_encoder *ctx) {
+	assert(ctx);
+	reset_error(ctx);
+	return ctx->dmRows;
+}
+GS1_ENCODERS_API bool gs1_encoder_setDmRows(gs1_encoder *ctx, int rows) {
+	assert(ctx);
+	reset_error(ctx);
+	if (rows != 0 && (rows < 8 || rows > 144)) {
+		strcpy(ctx->errMsg, "Valid number of Data Matrix rows range is 10 to 144, or 0");
+		ctx->errFlag = true;
+		return false;
+	}
+	ctx->dmRows = rows;
+	return true;
+}
+
+
+GS1_ENCODERS_API int gs1_encoder_getDmColumns(gs1_encoder *ctx) {
+	assert(ctx);
+	reset_error(ctx);
+	return ctx->dmCols;
+}
+GS1_ENCODERS_API bool gs1_encoder_setDmColumns(gs1_encoder *ctx, int columns) {
+	assert(ctx);
+	reset_error(ctx);
+	if (columns != 0 && (columns < 10 || columns > 144)) {
+		strcpy(ctx->errMsg, "Valid number of Data Matrix columns range is 10 to 144, or 0");
+		ctx->errFlag = true;
+		return false;
+	}
+	ctx->dmCols = columns;
 	return true;
 }
 
@@ -760,6 +798,42 @@ void test_api_sepHt(void) {
 	TEST_CHECK(!gs1_encoder_setSepHt(ctx, GS1_ENCODERS_MAX_PIXMULT - 1));
 	TEST_CHECK(gs1_encoder_setSepHt(ctx, 2 * GS1_ENCODERS_MAX_PIXMULT));
 	TEST_CHECK(!gs1_encoder_setSepHt(ctx, 2 * GS1_ENCODERS_MAX_PIXMULT + 1));
+
+	gs1_encoder_free(ctx);
+
+}
+
+
+void test_api_dmRowsColumns(void) {
+
+	gs1_encoder* ctx;
+
+	TEST_ASSERT((ctx = gs1_encoder_init()) != NULL);
+
+	TEST_CHECK(gs1_encoder_getDmRows(ctx) == 0);	// Default
+	TEST_CHECK(gs1_encoder_getDmColumns(ctx) == 0);	// Default
+
+	// Extents
+	TEST_CHECK(gs1_encoder_setDmRows(ctx, 8));
+	TEST_CHECK(gs1_encoder_getDmRows(ctx) == 8);
+	TEST_CHECK(gs1_encoder_setDmRows(ctx, 144));
+	TEST_CHECK(gs1_encoder_getDmRows(ctx) == 144);
+	TEST_CHECK(gs1_encoder_setDmColumns(ctx, 10));
+	TEST_CHECK(gs1_encoder_getDmColumns(ctx) == 10);
+	TEST_CHECK(gs1_encoder_setDmColumns(ctx, 144));
+	TEST_CHECK(gs1_encoder_getDmColumns(ctx) == 144);
+
+	// Invalid
+	TEST_CHECK(!gs1_encoder_setDmRows(ctx, 7));
+	TEST_CHECK(!gs1_encoder_setDmRows(ctx, 145));
+	TEST_CHECK(!gs1_encoder_setDmColumns(ctx, 9));
+	TEST_CHECK(!gs1_encoder_setDmColumns(ctx, 145));
+
+	// Back to automatic
+	TEST_CHECK(gs1_encoder_setDmRows(ctx, 0));
+	TEST_CHECK(gs1_encoder_getDmRows(ctx) == 0);
+	TEST_CHECK(gs1_encoder_setDmColumns(ctx, 0));
+	TEST_CHECK(gs1_encoder_getDmColumns(ctx) == 0);
 
 	gs1_encoder_free(ctx);
 
