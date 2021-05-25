@@ -321,7 +321,11 @@ GS1_ENCODERS_API bool gs1_encoder_setQrEClevel(gs1_encoder *ctx, int ecLevel) {
  			ctx->qrEClevel = ecLevel;
 			break;
 		default:
-			strcpy(ctx->errMsg, "Valid QR Code error correction level values are L=0, M=1, Q=2, H=3");
+			sprintf(ctx->errMsg, "Valid QR Code error correction level values are L=%d, M=%d, Q=%d, H=%d",
+				gs1_encoder_qrEClevelL,
+				gs1_encoder_qrEClevelM,
+				gs1_encoder_qrEClevelQ,
+				gs1_encoder_qrEClevelH);
 			ctx->errFlag = true;
 			return false;
 	}

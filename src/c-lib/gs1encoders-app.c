@@ -192,7 +192,11 @@ static bool userInt(gs1_encoder *ctx) {
 								gs1_encoder_getDmColumns(ctx));
 		}
 		if (gs1_encoder_getSym(ctx) == gs1_encoder_sQR) {
-			printf("\n 8) Enter GS1 QR Code error correction level (L=0, M=1, Q=2, H=3). Current value = %d",
+			printf("\n 8) Enter GS1 QR Code error correction level (L=%d, M=%d, Q=%d, H=%d). Current value = %d",
+								gs1_encoder_qrEClevelL,
+								gs1_encoder_qrEClevelM,
+								gs1_encoder_qrEClevelQ,
+								gs1_encoder_qrEClevelH,
 								gs1_encoder_getQrEClevel(ctx));
 		}
 		if (gs1_encoder_getSym(ctx) != gs1_encoder_sQR && gs1_encoder_getSym(ctx) != gs1_encoder_sDM) {
@@ -363,7 +367,11 @@ static bool userInt(gs1_encoder *ctx) {
 				}
 			 }
 			 else if (gs1_encoder_getSym(ctx) == gs1_encoder_sQR) {
-				printf("\nEnter GS1 QR Code error correction level (L=0, M=1, Q=2, H=3): ");
+				printf("\nEnter GS1 QR Code error correction level (L=%d, M=%d, Q=%d, H=%d): ",
+								gs1_encoder_qrEClevelL,
+								gs1_encoder_qrEClevelM,
+								gs1_encoder_qrEClevelQ,
+								gs1_encoder_qrEClevelH);
 				if (gets(inpStr) == NULL)
 					return false;
 				i = atoi(inpStr);

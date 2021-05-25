@@ -70,7 +70,7 @@ enum {
 
 
 enum {
-	gs1_encoder_qrEClevelL = 0,
+	gs1_encoder_qrEClevelL = 1,
 	gs1_encoder_qrEClevelM,
 	gs1_encoder_qrEClevelQ,
 	gs1_encoder_qrEClevelH,

@@ -612,7 +612,8 @@ static const struct metric* selectVersion(gs1_encoder *ctx, uint16_t bits_v[3]) 
 	for (vers = 1; vers < (int)(sizeof(metrics) / sizeof(metrics[0])); vers++) {
 		m = &metrics[vers];
 		ncws = m->modules/8;				// Total number of codewords
-		ecws = m->ecc_cws[ctx->qrEClevel];		// Number of error correction codewords
+		ecws = m->ecc_cws[ctx->qrEClevel -
+			gs1_encoder_qrEClevelL];		// Number of error correction codewords
 		dcws = ncws - ecws;				// Number of data codeword
 		dmod = dcws*8;					// Number of data modules
 		okay = true;
@@ -642,11 +643,14 @@ static void finaliseCodewords(gs1_encoder *ctx, uint8_t *cws, uint16_t *bits, co
 
 	ncws = m->modules/8;				// Total number of codewords
 	rbit = m->modules%8;				// Number of remainder bit
-	ecws = m->ecc_cws[ctx->qrEClevel];		// Number of error correction codewords
+	ecws = m->ecc_cws[ctx->qrEClevel -
+		gs1_encoder_qrEClevelL];		// Number of error correction codewords
 	dcws = ncws - ecws;				// Number of data codeword
 	dmod = dcws*8;					// Number of data modules
-	ecb1 = m->ecc_blks[ctx->qrEClevel][0];		// First error correction blocks
-	ecb2 = m->ecc_blks[ctx->qrEClevel][1];		// First error correction blocks
+	ecb1 = m->ecc_blks[ctx->qrEClevel -
+		gs1_encoder_qrEClevelL][0];		// First error correction blocks
+	ecb2 = m->ecc_blks[ctx->qrEClevel -
+		gs1_encoder_qrEClevelL][1];		// First error correction blocks
 	dcpb = dcws/(ecb1+ecb2);			// Base data codewords per block
 	ecpb = ncws/(ecb1+ecb2) - dcpb;			// Error correction codewords per block
 
@@ -921,7 +925,7 @@ void test_qr_QR_versions(void) {
 	gs1_encoder_setDataStr(ctx, "ABC123");
 
 	for (v = 1; v <= 40; v++) {
-		for (ec = 0; ec <= 3; ec++) {
+		for (ec = gs1_encoder_qrEClevelL; ec <= gs1_encoder_qrEClevelH; ec++) {
 			gs1_encoder_setQrVersion(ctx, v);
 			gs1_encoder_setQrEClevel(ctx, ec);
 			sprintf(casename, "V%d-%d", v, ec);
