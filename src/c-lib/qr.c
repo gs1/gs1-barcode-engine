@@ -438,15 +438,16 @@ static int evaln1n3(uint8_t *rle) {
 	rle = s;
 
 	// Detect 1:1:3:1:1 ratio next to 4 modules of whitespace
-	for (i = 3; i <= len - 3; i += 2) {
+	for (i = 3; i <= len - 3; i += 2)
 		if (rle[i] % 3 == 0					&&	// Multiple of 3 black modules
 			(rle[i-2] == rle[i-1] && rle[i-1] == rle[i+1]	&&	// in the ratio 1:1:3:1:1
-			 rle[i+1] == rle[i+2] && rle[i+2] == rle[i]/3)	&& (
-			(i == 3 || (i + 4 >= len)) || 				// at either extent of run
-			(rle[i-3] >= 4 || rle[i+3] >= 4)			// or bounded by dark modules
-		    ) )
+			 rle[i+1] == rle[i+2] && rle[i+2] == rle[i]/3)	&&
+				(
+					(i == 3 || (i + 4 >= len)) || 		// at either extent of run
+					(rle[i-3] >= 4 || rle[i+3] >= 4)	// or bounded by dark modules
+				)
+		   )
 			n3 += 40;
-	}
 
 	return n1 + n3;
 }
