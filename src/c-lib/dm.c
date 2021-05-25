@@ -602,8 +602,6 @@ NULL
 	};
 	TEST_CHECK(test_encode(ctx, gs1_encoder_sDM, "1501234567890", expect));
 
-	test_print_strings(ctx);
-
 	gs1_encoder_free(ctx);
 
 }

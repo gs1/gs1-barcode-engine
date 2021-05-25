@@ -979,13 +979,6 @@ NULL
 	};
 	TEST_CHECK(test_encode(ctx, gs1_encoder_sQR, "ABC123", expect));
 
-
-	TEST_CHECK(gs1_encoder_setFormat(ctx, gs1_encoder_dRAW));
-	TEST_CHECK(gs1_encoder_setSym(ctx, gs1_encoder_sQR));
-	TEST_CHECK(gs1_encoder_setDataStr(ctx, "ABC123"));
-	TEST_CHECK(gs1_encoder_encode(ctx));
-	test_print_strings(ctx);
-
 	gs1_encoder_free(ctx);
 
 }
