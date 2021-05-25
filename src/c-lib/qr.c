@@ -637,7 +637,7 @@ static void finaliseCodewords(gs1_encoder *ctx, uint8_t *cws, uint16_t *bits, co
 	int ncws, rbit, ecws, dcws, dmod, ecb1, ecb2, dcpb, ecpb;
 
 	uint8_t *p;
-	int i, j;
+	int i, j, a, b;
 
 	ncws = m->modules/8;				// Total number of codewords
 	rbit = m->modules%8;				// Number of remainder bit
@@ -674,18 +674,23 @@ static void finaliseCodewords(gs1_encoder *ctx, uint8_t *cws, uint16_t *bits, co
 			 tmpcws + dcws + (i+ecb1)*ecpb, ecpb, coeffs);
 
 	// Reassemble the codewords by interleaving the data and ECC blocks
-	p = &(cws[0]);
+	p = cws;
 	for (i = 0; i < dcpb+1; i++)
 		for (j = 0; j < ecb1 + ecb2; j++)
-			if ( i < dcpb || j >= ecb1)	// First block group is shorter
-				*p++ = tmpcws[j*dcpb + i];
+			if ( i < dcpb || j >= ecb1) {  // First block group is shorter
+				a = j < ecb1 ? j : ecb1;
+				b = j-a;
+				*p++ = tmpcws[a*dcpb + b*(dcpb+1) + i];
+			}
 	for (i = 0; i < ecpb; i++)
 		for (j = 0; j < ecb1 + ecb2; j++)
 			*p++ = tmpcws[dcws + j*ecpb + i];
 
+	*bits = (uint16_t)(ncws*8);
+
 	// Extend codewords by one if there are remainder bits
 	if (rbit != 0)
-		cws[ncws] = 0;
+		cws[ncws++] = 0;
 
 }
 
