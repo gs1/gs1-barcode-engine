@@ -35,6 +35,7 @@
 #pragma GCC diagnostic push
 #endif
 
+#include <assert.h>
 #include <stddef.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -57,6 +58,8 @@ void test_print_strings(gs1_encoder *ctx) {
 	char **strings;
 
 	gs1_encoder_getBufferStrings(ctx, &strings);
+
+	assert(strings);
 
 	printf("\n\n");
 
