@@ -50,7 +50,7 @@ void do_debug_print_pattern_lengths(char *prefix, struct patternLength *pats, in
 
 #define DEBUG_PRINT(...)
 #define DEBUG_PRINT_CWS(p,c,l)
-#define DEBUG_PRINT_PATTERN_LENGTHS(p,n)
+#define DEBUG_PRINT_PATTERN_LENGTHS(m,p,r)
 
 #endif  /* PRNT */
 
