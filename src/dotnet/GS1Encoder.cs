@@ -364,9 +364,10 @@ namespace gs1encoders_dotnet
                 throw new GS1EncoderParameterException(GetErrMsg());
         }
 
-        public bool Encode()
+        public void Encode()
         {
-            return gs1_encoder_encode(ctx);
+            if (!gs1_encoder_encode(ctx))
+                throw new GS1EncoderEncodeException(GetErrMsg());
         }
         public byte[] GetBuffer()
         {

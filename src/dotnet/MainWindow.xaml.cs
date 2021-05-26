@@ -39,11 +39,12 @@ namespace gs1encoders_dotnet
             qrVersionComboBox.SelectedValue = App.gs1Encoder.GetQrVersion().ToString();
             qrEClevelComboBox.SelectedValue = App.gs1Encoder.GetQrEClevel().ToString();
             dmRowsComboBox.SelectedValue = App.gs1Encoder.GetDmRows().ToString();
-//            dmColumnsTextBox.Text = App.gs1Encoder.GetDmColumns().ToString();
         }
 
         private void generateButton_Click(object sender, RoutedEventArgs e)
         {
+
+            errorMessageLabel.Content = "";
 
             try
             {
@@ -58,8 +59,7 @@ namespace gs1encoders_dotnet
                 if (Int32.TryParse(linHeightTextBox.Text, out v)) App.gs1Encoder.SetLinHeight(v);
                 if (Int32.TryParse((string)qrVersionComboBox.SelectedValue, out v)) App.gs1Encoder.SetQrVersion(v);
                 if (Int32.TryParse((string)qrEClevelComboBox.SelectedValue, out v)) App.gs1Encoder.SetQrEClevel(v);
-                if (Int32.TryParse((string)dmRowsComboBox.Text, out v)) App.gs1Encoder.SetDmRows(v);
-//                if (Int32.TryParse(dmColumnsTextBox.Text, out v)) App.gs1Encoder.SetDmColumns(v);
+                if (Int32.TryParse((string)dmRowsComboBox.SelectedValue, out v)) App.gs1Encoder.SetDmRows(v);
             }
             catch (GS1EncoderParameterException E)
             {
@@ -68,29 +68,44 @@ namespace gs1encoders_dotnet
                 return;
             }      
 
-            App.gs1Encoder.Encode();
+            try
+            { 
+                App.gs1Encoder.Encode();
+            }
+            catch (GS1EncoderEncodeException E)
+            {
+                errorMessageLabel.Content = "Error: " + E.Message;
+                LoadControls();
+                return;
+            }
+
             byte[] imageData = App.gs1Encoder.GetBuffer();
 
-            using (MemoryStream ms = new MemoryStream(imageData))
+            try
             {
+                using (MemoryStream ms = new MemoryStream(imageData))
+                {
 
-                BitmapImage img = new BitmapImage();
-                img.BeginInit();
-                img.CacheOption = BitmapCacheOption.OnLoad;
-                img.StreamSource = ms;
-                img.EndInit();
-                if (img.CanFreeze)
-                    img.Freeze();
-                barcodeImage.Source = img;
+                    BitmapImage img = new BitmapImage();
+                    img.BeginInit();
+                    img.CacheOption = BitmapCacheOption.OnLoad;
+                    img.StreamSource = ms;
+                    img.EndInit();
+                    if (img.CanFreeze)
+                        img.Freeze();
+                    barcodeImage.Source = img;
+                }
+            }
+            catch (Exception)
+            {
+                errorMessageLabel.Content = "An error occurred generating the barcode image";
+                LoadControls();
+                return;
             }
 
             LoadControls();
 
         }
 
-        private void ComboBoxItem_Selected(object sender, RoutedEventArgs e)
-        {
-
-        }
     }
 }
