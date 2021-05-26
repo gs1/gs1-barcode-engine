@@ -801,7 +801,7 @@ static int QRenc(gs1_encoder *ctx, uint8_t string[], struct patternLength *pats)
 
 	m = selectVersion(ctx, bits_v);
 	if (!m) {
-		strcpy(ctx->errMsg, "No suitable symbol found");
+		strcpy(ctx->errMsg, "Data exceeds the capacity of the symbol");
 		ctx->errFlag = true;
 		return 0;
 	}
