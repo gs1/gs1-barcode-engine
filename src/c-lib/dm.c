@@ -294,6 +294,8 @@ static void finaliseCodewords(gs1_encoder *ctx, uint8_t *cws, uint16_t *cwslen, 
 // as reserved
 #define putModule(cx,rx,b) do {								\
 	int cc = cx; int rr = rx;							\
+	assert(m->mcols >= 8);								\
+	assert(m->mrows >= 6);								\
 	if (rr < 0)         { rr += m->mrows; cc += 4-(m->mrows+4)%8; }			\
 	if (cc < 0)         { cc += m->mcols; rr += 4-(m->mcols+4)%8; }			\
 	if (rr >= m->mrows) { rr = rr % m->mrows;                     }			\
