@@ -296,7 +296,7 @@ static void finaliseCodewords(gs1_encoder *ctx, uint8_t *cws, uint16_t *cwslen, 
 	int cc = cx; int rr = rx;							\
 	if (rr < 0)         { rr += m->mrows; cc += 4-(m->mrows+4)%8; }			\
 	if (cc < 0)         { cc += m->mcols; rr += 4-(m->mcols+4)%8; }			\
-	if (rr >= m->mrows) { rr -= m->mrows;                         }			\
+	if (rr >= m->mrows) { rr = rr % m->mrows;                     }			\
 	assert(cc >= 0 && cc < m->mcols);						\
 	assert(rr >= 0 && rr < m->mrows);						\
 	gs1_mtxPutModule(occ, m->mcols, cc, rr, 1);					\
