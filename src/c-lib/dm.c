@@ -40,6 +40,9 @@
 	{ .rows = r, .cols = c,			\
 	  .regh = rh, .regv = rv,		\
 	  .rscw = cw, .rsbl = bl,		\
+	  .mrows = r-2*rh,			\
+	  .mcols = c-2*rv,			\
+	  .ncws = (r-2*rh)*(c-2*rv)/8 - cw,	\
 	}
 
 
@@ -50,6 +53,9 @@ struct metric {
 	uint8_t regv;		// Number of regions between vertical timing patterns
 	uint16_t rscw;		// Number of RSEC codewords
 	uint8_t rsbl;		// Number of block for RSEC
+	uint8_t mrows;		// Number of rows excluding timing patterns
+	uint8_t mcols;		// Number of columns excluding timing patterns
+	uint16_t ncws;		// Number of data codewords
 };
 
 
@@ -209,20 +215,17 @@ static const struct metric* selectVersion(gs1_encoder *ctx, uint16_t cwslen) {
 
 	const struct metric *m = NULL;
 	bool okay;
-	int vers, mrows, mcols, ncws;
+	int vers;
 
 	// Select a suitable symbol
 	for (vers = 1; vers < (int)(sizeof(metrics) / sizeof(metrics[0])); vers++) {
 		m = &metrics[vers];
-		mrows = m->rows - 2*m->regh;
-		mcols = m->cols - 2*m->regv;
-		ncws = mrows*mcols/8 - m->rscw;
 		okay = true;
 		if (ctx->dmRows != 0 &&
 		    ctx->dmRows != m->rows) okay = false;     // User specified rows
 		if (ctx->dmCols != 0 &&
 		    ctx->dmCols != m->cols) okay = false;     // User specified columns
-		if (cwslen > ncws) okay = false;              // Bitstream must fit capacity of symbol
+		if (cwslen > m->ncws) okay = false;              // Bitstream must fit capacity of symbol
 		if (okay) break;
 	}
 
@@ -237,45 +240,38 @@ static void finaliseCodewords(gs1_encoder *ctx, uint8_t *cws, uint16_t *cwslen, 
 
 	uint8_t tmpcws[MAX_DM_DAT_CWS_PER_BLK+MAX_DM_ECC_CWS_PER_BLK];
 	uint8_t coeffs[MAX_DM_ECC_CWS_PER_BLK+1];
-	int mrows, mcols, ncws, rscw, rsbl;
 	int i, j, pad;
 	uint8_t *p;
 
 	(void)ctx;
 
-	rscw = m->rscw;				// Error correction codewords
-	rsbl = m->rsbl;				// Error correction blocks
-	mrows = m->rows - 2*m->regh;		// Rows excluding timing patterns
-	mcols = m->cols - 2*m->regv;		// Columns excluding timing patterns
-	ncws = mrows*mcols/8 - m->rscw;		// Number of data codewords
-
-	assert(*cwslen <= ncws);
+	assert(*cwslen <= m->ncws);
 
 	// Complete the message by adding pseudo-random padding codewords
 	p = cws + *cwslen;
-	if (p-cws < ncws)
+	if (p-cws < m->ncws)
 		*p++ = 129;
-	while (p-cws < ncws) {
+	while (p-cws < m->ncws) {
 		pad = (uint8_t)((p-cws+1)*149 % 253 + 130);
 		if (pad > 254) pad -= 254;
 		*p++ = (uint8_t)pad;
 	}
 
 	// Generate coefficients
-	rsGenerateCoeffs(rscw/rsbl, coeffs);
+	rsGenerateCoeffs(m->rscw / m->rsbl, coeffs);
 
 	// Error correction for interleaved blocks of codewords
-	for (i = 0; i < rsbl; i++) {
+	for (i = 0; i < m->rsbl; i++) {
 
 		p = tmpcws;
-		for (j = i; j < ncws; j += rsbl)
+		for (j = i; j < m->ncws; j += m->rsbl)
 			*p++ = cws[j];
 
-		rsEncode(tmpcws, (int)(p-tmpcws), p, rscw/rsbl, coeffs);
+		rsEncode(tmpcws, (int)(p-tmpcws), p, m->rscw/m->rsbl, coeffs);
 
 		int offset = m->rscw == 620 ? (i<8 ? 2:-8) : 0;
-		for (j = i; j < rscw; j += rsbl)
-			cws[ncws+j+offset] = *p++;
+		for (j = i; j < m->rscw; j += m->rsbl)
+			cws[m->ncws + j + offset] = *p++;
 
 	}
 
@@ -295,15 +291,15 @@ static void finaliseCodewords(gs1_encoder *ctx, uint8_t *cws, uint16_t *cwslen, 
 // as reserved
 #define putModule(cx,rx,b) do {								\
 	int cc = cx; int rr = rx;							\
-	if (rr < 0)      { rr += mrows; cc += 4-(mrows+4)%8; }				\
-	if (cc < 0)      { cc += mcols; rr += 4-(mcols+4)%8; }				\
-	if (rr >= mrows) { rr -= mrows;                      }				\
-	assert(cc >= 0 && cc < mcols);							\
-	assert(rr >= 0 && rr < mrows);							\
-	gs1_mtxPutModule(occ, mcols, cc, rr, 1);					\
+	if (rr < 0)         { rr += m->mrows; cc += 4-(m->mrows+4)%8; }			\
+	if (cc < 0)         { cc += m->mcols; rr += 4-(m->mcols+4)%8; }			\
+	if (rr >= m->mrows) { rr -= m->mrows;                         }			\
+	assert(cc >= 0 && cc < m->mcols);						\
+	assert(rr >= 0 && rr < m->mrows);						\
+	gs1_mtxPutModule(occ, m->mcols, cc, rr, 1);					\
 	gs1_mtxPutModule(mtx, m->cols + 2*DM_QZ,					\
-			 DM_QZ + cc + 2*(cc/(mcols/m->regv)) + 1,			\
-			 DM_QZ + rr + 2*(rr/(mrows/m->regh)) + 1,			\
+			 DM_QZ + cc + 2*(cc/(m->mcols/m->regv)) + 1,			\
+			 DM_QZ + rr + 2*(rr/(m->mrows/m->regh)) + 1,			\
 			 b);								\
 } while(0)
 
@@ -324,14 +320,14 @@ static void finaliseCodewords(gs1_encoder *ctx, uint8_t *cws, uint16_t *cwslen, 
 
 // Place a codeword in the matrix at a corner where the wrapping is atypical
 #define plotCodewordCorner(c1,r1,c2,r2,c3,r3,c4,r4,c5,r5,c6,r6,c7,r7,c8,r8) do {	\
-	plotCodeword(c1 >= 0 ? c1 : c1+mcols, r1 >= 0 ? r1 : r1+mrows,			\
-		     c2 >= 0 ? c2 : c2+mcols, r2 >= 0 ? r2 : r2+mrows,			\
-		     c3 >= 0 ? c3 : c3+mcols, r3 >= 0 ? r3 : r3+mrows,			\
-		     c4 >= 0 ? c4 : c4+mcols, r4 >= 0 ? r4 : r4+mrows,			\
-		     c5 >= 0 ? c5 : c5+mcols, r5 >= 0 ? r5 : r5+mrows,			\
-		     c6 >= 0 ? c6 : c6+mcols, r6 >= 0 ? r6 : r6+mrows,			\
-		     c7 >= 0 ? c7 : c7+mcols, r7 >= 0 ? r7 : r7+mrows,			\
-		     c8 >= 0 ? c8 : c8+mcols, r8 >= 0 ? r8 : r8+mrows);			\
+	plotCodeword(c1 >= 0 ? c1 : c1 + m->mcols, r1 >= 0 ? r1 : r1 + m->mrows,	\
+		     c2 >= 0 ? c2 : c2 + m->mcols, r2 >= 0 ? r2 : r2 + m->mrows,	\
+		     c3 >= 0 ? c3 : c3 + m->mcols, r3 >= 0 ? r3 : r3 + m->mrows,	\
+		     c4 >= 0 ? c4 : c4 + m->mcols, r4 >= 0 ? r4 : r4 + m->mrows,	\
+		     c5 >= 0 ? c5 : c5 + m->mcols, r5 >= 0 ? r5 : r5 + m->mrows,	\
+		     c6 >= 0 ? c6 : c6 + m->mcols, r6 >= 0 ? r6 : r6 + m->mrows,	\
+		     c7 >= 0 ? c7 : c7 + m->mcols, r7 >= 0 ? r7 : r7 + m->mrows,	\
+		     c8 >= 0 ? c8 : c8 + m->mcols, r8 >= 0 ? r8 : r8 + m->mrows);	\
 } while(0)
 
 
@@ -340,15 +336,11 @@ static void createMatrix(gs1_encoder *ctx, uint8_t *mtx, uint8_t *cws, const str
 
 	uint8_t occ[MAX_DM_BYTES] = { 0 };  // Matrix to indicate occupied positions
 	int i, j;
-	int mrows, mcols;
 
 	(void)ctx;
 
-	mrows = m->rows - 2*m->regh;  // Rows excluding timing patterns
-	mcols = m->cols - 2*m->regv;  // Columns excluding timing patterns
-
 	// Plot timing patterns
-	for (i = 0; i < m->cols+1; i += mcols/m->regv + 2) {
+	for (i = 0; i < m->cols + 1; i += m->mcols / m->regv + 2) {
 		for (j = 0; j < m->rows; j++) {
 			if (i > 0)
 				putTimingModule(i-1, j, (uint8_t)(j%2));
@@ -356,7 +348,7 @@ static void createMatrix(gs1_encoder *ctx, uint8_t *mtx, uint8_t *cws, const str
 				putTimingModule(i, j, 1);
 		}
 	}
-	for (j = 0; j < m->rows+1; j += mrows/m->regh + 2) {
+	for (j = 0; j < m->rows + 1; j += m->mrows / m->regh + 2) {
 		for (i = 0; i < m->cols; i++) {
 			if (j > 0)
 				putTimingModule(i, j-1, 1);
@@ -371,7 +363,7 @@ static void createMatrix(gs1_encoder *ctx, uint8_t *mtx, uint8_t *cws, const str
 
 	do {
 
-		if (i == 0 && j == mrows)
+		if (i == 0 && j == m->mrows)
 			plotCodewordCorner(
 				0,-1,	1,-1,	2,-1,	/**/
 				/***********************/  /****************/
@@ -381,7 +373,7 @@ static void createMatrix(gs1_encoder *ctx, uint8_t *mtx, uint8_t *cws, const str
 							/**/	-1,2,
 							/**/	-1,3
 			);
-		if (i == 0 && j == mrows-2 && mcols%4 != 0)
+		if (i == 0 && j == m->mrows-2 && m->mcols % 4 != 0)
 			plotCodewordCorner(
 				0,-3,	/**/
 				0,-2,	/**/
@@ -391,7 +383,7 @@ static void createMatrix(gs1_encoder *ctx, uint8_t *mtx, uint8_t *cws, const str
 					/**/	-4,0,	-3,0,	-2,0,	-1,0,
 					/**/				-1,1
 			);
-		if (i == 0 && j == mrows-2 && mcols%8 == 4)
+		if (i == 0 && j == m->mrows - 2 && m->mcols % 8 == 4)
 			plotCodewordCorner(
 				0,-3,	/**/
 				0,-2,	/**/
@@ -403,7 +395,7 @@ static void createMatrix(gs1_encoder *ctx, uint8_t *mtx, uint8_t *cws, const str
 					/**/		-1,2,
 					/**/		-1,3
 			);
-		if (i == 2 && j == mrows+4 && mcols%8 == 0)
+		if (i == 2 && j == m->mrows + 4 && m->mcols % 8 == 0)
 			plotCodewordCorner(
 				0,-1,	/**/			-1,-1,
 				/*******/  /*************************/
@@ -414,7 +406,7 @@ static void createMatrix(gs1_encoder *ctx, uint8_t *mtx, uint8_t *cws, const str
 
 		// Sweep upwards
 		do {
-			if (i >= 0 && j < mrows && !gs1_mtxGetModule(occ, mcols, i, j)) {
+			if (i >= 0 && j < m->mrows && !gs1_mtxGetModule(occ, m->mcols, i, j)) {
 				plotCodeword(
 					i-2,j-2,  i-1,j-2,
 					i-2,j-1,  i-1,j-1,  i-0,j-1,
@@ -422,30 +414,31 @@ static void createMatrix(gs1_encoder *ctx, uint8_t *mtx, uint8_t *cws, const str
 				);
 			}
 			i+=2; j-=2;
-		} while (i < mcols && j >= 0);
+		} while (i < m->mcols && j >= 0);
 		i+=3; j++;
 
 		// Sweep downwards
 		do {
-			if (i < mcols && j >= 0 && !gs1_mtxGetModule(occ, mcols, i, j))
+			if (i < m->mcols && j >= 0 &&
+			    !gs1_mtxGetModule(occ, m->mcols, i, j))
 				plotCodeword(
 					i-2,j-2,  i-1,j-2,
 					i-2,j-1,  i-1,j-1,  i-0,j-1,
 					i-2,j-0,  i-1,j-0,  i-0,j-0
 				);
 			i-=2; j+=2;
-		} while (i >= 0 && j < mrows);
+		} while (i >= 0 && j < m->mrows);
 		i++; j+=3;
 
-	} while (i < mcols || j < mrows);
+	} while (i < m->mcols || j < m->mrows);
 
 
 	// Set checker pattern if required
-	if (gs1_mtxGetModule(occ, mcols, mrows-1, mcols-1) == 0) {
-		putModule(mrows-2, mcols-2, 1);
-		putModule(mrows-1, mcols-2, 0);
-		putModule(mrows-2, mcols-1, 0);
-		putModule(mrows-1, mcols-1, 1);
+	if (gs1_mtxGetModule(occ, m->mcols, m->mrows-1, m->mcols-1) == 0) {
+		putModule(m->mrows - 2, m->mcols - 2, 1);
+		putModule(m->mrows - 1, m->mcols - 2, 0);
+		putModule(m->mrows - 2, m->mcols - 1, 0);
+		putModule(m->mrows - 1, m->mcols - 1, 1);
 	}
 
 }
