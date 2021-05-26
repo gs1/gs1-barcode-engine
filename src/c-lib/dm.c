@@ -26,6 +26,7 @@
 #include <stdlib.h>
 
 #include "enc-private.h"
+#include "debug.h"
 #include "dm.h"
 #include "mtx.h"
 #include "driver.h"
@@ -257,6 +258,8 @@ static void finaliseCodewords(gs1_encoder *ctx, uint8_t *cws, uint16_t *cwslen, 
 		*p++ = (uint8_t)pad;
 	}
 
+	DEBUG_PRINT_CWS("Padded", cws, (uint16_t)(p-cws));
+
 	// Generate coefficients
 	rsGenerateCoeffs(m->rscw / m->rsbl, coeffs);
 
@@ -274,6 +277,8 @@ static void finaliseCodewords(gs1_encoder *ctx, uint8_t *cws, uint16_t *cwslen, 
 			cws[m->ncws + j + offset] = *p++;
 
 	}
+
+	DEBUG_PRINT_CWS("ECC codewords", cws, (uint16_t)(m->ncws + m->rscw));
 
 }
 
@@ -456,12 +461,18 @@ static int DMenc(gs1_encoder *ctx, uint8_t string[], struct patternLength *pats)
 
 	createCodewords(ctx, string, cws, &cwslen);
 
+	DEBUG_PRINT("\nData: %s\n", string);
+	DEBUG_PRINT_CWS("Codewords", cws, cwslen);
+
 	m = selectVersion(ctx, cwslen);
 	if (!m) {
 		strcpy(ctx->errMsg, "No suitable symbol found");
 		ctx->errFlag = true;
 		return 0;
 	}
+
+	DEBUG_PRINT("Symbol: %dx%d (cws: %d; ecc: %d; blocks: %d; regv: %d; regh: %d)\n",
+		m->rows, m->cols, m->ncws, m->rscw, m->rsbl, m->regh, m->regv);
 
 	finaliseCodewords(ctx, cws, &cwslen, m);
 	createMatrix(ctx, mtx, cws, m);
@@ -490,20 +501,7 @@ void gs1_DM(gs1_encoder *ctx) {
 	if (!(rows = DMenc(ctx, (uint8_t*)dataStr, pats)) || ctx->errFlag)
 		goto out;
 
-#if PRNT
-	{
-		int j;
-		printf("\n%s\n", dataStr);
-		printf("\n");
-		for (i = 0; i < rows; i++) {
-			for (j = 0; j < pats[i].length; j++) {
-				printf("%d", pats[i].pattern[j]);
-			}
-			printf("\n");
-		}
-		printf("\n");
-	}
-#endif
+	DEBUG_PRINT_PATTERN_LENGTHS("Patterns", pats, rows);
 
 	cols = 0;
 	for (i = 0; i < pats[0].length; i++)
