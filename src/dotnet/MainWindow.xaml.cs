@@ -34,8 +34,12 @@ namespace gs1encoders_dotnet
             XundercutTextBox.Text = App.gs1Encoder.GetXundercut().ToString();
             YundercutTextBox.Text = App.gs1Encoder.GetYundercut().ToString();
             sepHtTextBox.Text = App.gs1Encoder.GetSepHt().ToString();
-            segWidthTextBox.Text = App.gs1Encoder.GetSegWidth().ToString();
+            segWidthComboBox.SelectedValue = App.gs1Encoder.GetSegWidth().ToString();
             linHeightTextBox.Text = App.gs1Encoder.GetLinHeight().ToString();
+            qrVersionComboBox.SelectedValue = App.gs1Encoder.GetQrVersion().ToString();
+            qrEClevelComboBox.SelectedValue = App.gs1Encoder.GetQrEClevel().ToString();
+            dmRowsComboBox.SelectedValue = App.gs1Encoder.GetDmRows().ToString();
+//            dmColumnsTextBox.Text = App.gs1Encoder.GetDmColumns().ToString();
         }
 
         private void generateButton_Click(object sender, RoutedEventArgs e)
@@ -50,12 +54,17 @@ namespace gs1encoders_dotnet
                 if (Int32.TryParse(XundercutTextBox.Text, out v)) App.gs1Encoder.SetXundercut(v);
                 if (Int32.TryParse(YundercutTextBox.Text, out v)) App.gs1Encoder.SetYundercut(v);
                 if (Int32.TryParse(sepHtTextBox.Text, out v)) App.gs1Encoder.SetSepHt(v);
-                if (Int32.TryParse(segWidthTextBox.Text, out v)) App.gs1Encoder.SetSegWidth(v);
+                if (Int32.TryParse((string)segWidthComboBox.SelectedValue, out v)) App.gs1Encoder.SetSegWidth(v);
                 if (Int32.TryParse(linHeightTextBox.Text, out v)) App.gs1Encoder.SetLinHeight(v);
+                if (Int32.TryParse((string)qrVersionComboBox.SelectedValue, out v)) App.gs1Encoder.SetQrVersion(v);
+                if (Int32.TryParse((string)qrEClevelComboBox.SelectedValue, out v)) App.gs1Encoder.SetQrEClevel(v);
+                if (Int32.TryParse((string)dmRowsComboBox.Text, out v)) App.gs1Encoder.SetDmRows(v);
+//                if (Int32.TryParse(dmColumnsTextBox.Text, out v)) App.gs1Encoder.SetDmColumns(v);
             }
             catch (GS1EncoderParameterException E)
             {
                 errorMessageLabel.Content = "Error: " + E.Message;
+                LoadControls();
                 return;
             }      
 
@@ -79,7 +88,7 @@ namespace gs1encoders_dotnet
 
         }
 
-        private void symbologyComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void ComboBoxItem_Selected(object sender, RoutedEventArgs e)
         {
 
         }

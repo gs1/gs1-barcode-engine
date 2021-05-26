@@ -49,7 +49,7 @@ namespace gs1encoders_dotnet
 
             gs1Encoder.SetFileInputFlag(false);
             gs1Encoder.SetOutFile("");
-            gs1Encoder.SetBmp(true);
+            gs1Encoder.SetFormat(0);  // BMP
 
             gs1Encoder.SetSym(9);
             gs1Encoder.SetDataStr("999999999999||99123456");

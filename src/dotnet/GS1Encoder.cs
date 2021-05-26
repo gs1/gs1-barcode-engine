@@ -29,7 +29,7 @@ namespace gs1encoders_dotnet
     public class GS1Encoder
     {
 
-        private IntPtr ctx;
+        private readonly IntPtr ctx;
         private const String gs1_dll = "gs1encoders.dll";
 
         /*
@@ -94,6 +94,34 @@ namespace gs1encoders_dotnet
         [return: MarshalAs(UnmanagedType.U1)]
         private static extern bool gs1_encoder_setLinHeight(IntPtr ctx, int linHeight);
 
+        [DllImport(gs1_dll, EntryPoint = "gs1_encoder_getDmRows", CallingConvention = CallingConvention.Cdecl)]
+        private static extern int gs1_encoder_getDmRows(IntPtr ctx);
+
+        [DllImport(gs1_dll, EntryPoint = "gs1_encoder_setDmRows", CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.U1)]
+        private static extern bool gs1_encoder_setDmRows(IntPtr ctx, int rows);
+
+        [DllImport(gs1_dll, EntryPoint = "gs1_encoder_getDmColumns", CallingConvention = CallingConvention.Cdecl)]
+        private static extern int gs1_encoder_getDmColumns(IntPtr ctx);
+
+        [DllImport(gs1_dll, EntryPoint = "gs1_encoder_setDmColumns", CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.U1)]
+        private static extern bool gs1_encoder_setDmColumns(IntPtr ctx, int columns);
+
+        [DllImport(gs1_dll, EntryPoint = "gs1_encoder_getQrVersion", CallingConvention = CallingConvention.Cdecl)]
+        private static extern int gs1_encoder_getQrVersion(IntPtr ctx);
+
+        [DllImport(gs1_dll, EntryPoint = "gs1_encoder_setQrVersion", CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.U1)]
+        private static extern bool gs1_encoder_setQrVersion(IntPtr ctx, int columns);
+
+        [DllImport(gs1_dll, EntryPoint = "gs1_encoder_getQrEClevel", CallingConvention = CallingConvention.Cdecl)]
+        private static extern int gs1_encoder_getQrEClevel(IntPtr ctx);
+
+        [DllImport(gs1_dll, EntryPoint = "gs1_encoder_setQrEClevel", CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.U1)]
+        private static extern bool gs1_encoder_setQrEClevel(IntPtr ctx, int columns);
+
         [DllImport(gs1_dll, EntryPoint = "gs1_encoder_getFileInputFlag", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.U1)]
         private static extern bool gs1_encoder_getFileInputFlag(IntPtr ctx);
@@ -123,13 +151,12 @@ namespace gs1encoders_dotnet
         [return: MarshalAs(UnmanagedType.U1)]
         private static extern bool gs1_encoder_setOutFile(IntPtr ctx, string outFile);
 
-        [DllImport(gs1_dll, EntryPoint = "gs1_encoder_getBmp", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        [return: MarshalAs(UnmanagedType.U1)]
-        private static extern bool gs1_encoder_getBmp(IntPtr ctx);
+        [DllImport(gs1_dll, EntryPoint = "gs1_encoder_getFormat", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        private static extern int gs1_encoder_getFormat(IntPtr ctx);
 
-        [DllImport(gs1_dll, EntryPoint = "gs1_encoder_setBmp", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(gs1_dll, EntryPoint = "gs1_encoder_setFormat", CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.U1)]
-        private static extern bool gs1_encoder_setBmp(IntPtr ctx, bool bmp);
+        private static extern bool gs1_encoder_setFormat(IntPtr ctx, int format);
 
         [DllImport(gs1_dll, EntryPoint = "gs1_encoder_encode", CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.U1)]
@@ -238,6 +265,50 @@ namespace gs1encoders_dotnet
                 throw new GS1EncoderParameterException(GetErrMsg());
         }
 
+        public int GetQrVersion()
+        {
+            return gs1_encoder_getQrVersion(ctx);
+        }
+
+        public void SetQrVersion(int version)
+        {
+            if (!gs1_encoder_setQrVersion(ctx, version))
+                throw new GS1EncoderParameterException(GetErrMsg());
+        }
+
+        public int GetQrEClevel()
+        {
+            return gs1_encoder_getQrEClevel(ctx);
+        }
+
+        public void SetQrEClevel(int eclevel)
+        {
+            if (!gs1_encoder_setQrEClevel(ctx, eclevel))
+                throw new GS1EncoderParameterException(GetErrMsg());
+        }
+
+        public int GetDmRows()
+        {
+            return gs1_encoder_getDmRows(ctx);
+        }
+
+        public void SetDmRows(int rows)
+        {
+            if (!gs1_encoder_setDmRows(ctx, rows))
+                throw new GS1EncoderParameterException(GetErrMsg());
+        }
+
+        public int GetDmColumns()
+        {
+            return gs1_encoder_getDmColumns(ctx);
+        }
+
+        public void SetDmColumns(int columns)
+        {
+            if (!gs1_encoder_setDmColumns(ctx, columns))
+                throw new GS1EncoderParameterException(GetErrMsg());
+        }
+
         public bool GetFileInputFlag()
         {
             return gs1_encoder_getFileInputFlag(ctx);
@@ -271,14 +342,14 @@ namespace gs1encoders_dotnet
                 throw new GS1EncoderParameterException(GetErrMsg());
         }
 
-        public bool GetBmp()
+        public int GetFormat()
         {
-            return gs1_encoder_getBmp(ctx);
+            return gs1_encoder_getFormat(ctx);
         }
 
-        public void SetBmp(bool bmp)
+        public void SetFormat(int format)
         {
-            if (!gs1_encoder_setBmp(ctx, bmp))
+            if (!gs1_encoder_setFormat(ctx, format))
                 throw new GS1EncoderParameterException(GetErrMsg());
         }
 

@@ -5,21 +5,20 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:gs1encoders_dotnet"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        Title="MainWindow" Height="580" Width="800" MinWidth="800" MinHeight="580">
+    <Grid Margin="0,0,0,-31">
         <Grid.RowDefinitions>
-            <RowDefinition Height="326*"/>
-            <RowDefinition Height="93*"/>
+            <RowDefinition Height="233*"/>
+            <RowDefinition Height="13*"/>
+            <RowDefinition Height="15*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="43*"/>
-            <ColumnDefinition Width="47*"/>
-            <ColumnDefinition Width="702*"/>
+            <ColumnDefinition Width="0*"/>
+            <ColumnDefinition Width="373*"/>
         </Grid.ColumnDefinitions>
-        <Image x:Name="barcodeImage" HorizontalAlignment="Left" Height="279" Margin="146,115,0,0" VerticalAlignment="Top" Width="527" Stretch="None" Grid.Column="2" Grid.RowSpan="2"/>
-        <TextBox x:Name="dataStrTextBox" HorizontalAlignment="Left" Height="26" Margin="167,23,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="341" Grid.Column="2"/>
-        <Button x:Name="generateButton" Content="Generate Barcode" HorizontalAlignment="Left" Margin="517,23,0,0" VerticalAlignment="Top" Width="156" Click="generateButton_Click" Height="26" Grid.Column="2"/>
-        <ComboBox x:Name="symbologyComboBox" HorizontalAlignment="Left" Margin="30,23,0,0" VerticalAlignment="Top" Width="222" Height="26" Grid.ColumnSpan="3" SelectionChanged="symbologyComboBox_SelectionChanged">
+        <TextBox x:Name="dataStrTextBox" Height="26" Margin="273,23,201,0" TextWrapping="Wrap" VerticalAlignment="Top" Grid.Column="1"/>
+        <Button x:Name="generateButton" Content="Generate Barcode" HorizontalAlignment="Right" Margin="0,23,29,0" VerticalAlignment="Top" Width="156" Click="generateButton_Click" Height="26" Grid.Column="1"/>
+        <ComboBox x:Name="symbologyComboBox" HorizontalAlignment="Left" Margin="30,23,0,0" VerticalAlignment="Top" Width="222" Height="26" Grid.ColumnSpan="3">
             <ComboBoxItem Content="GS1 DataBar" HorizontalAlignment="Left" Width="220"/>
             <ComboBoxItem Content="GS1 DataBar Truncated" HorizontalAlignment="Left" Width="220"/>
             <ComboBoxItem Content="GS1 DataBar Stacked" HorizontalAlignment="Left" Width="220"/>
@@ -32,19 +31,114 @@
             <ComboBoxItem Content="EAN-8" HorizontalAlignment="Left" Width="220"/>
             <ComboBoxItem Content="GS1-128 with CC-A or CC-B" HorizontalAlignment="Left" Width="220"/>
             <ComboBoxItem Content="GS1-128 with CC-C" HorizontalAlignment="Left" Width="220"/>
+            <ComboBoxItem Content="GS1 QR Code" HorizontalAlignment="Left" Width="220"/>
+            <ComboBoxItem Content="GS1 DataMatrix" HorizontalAlignment="Left" Width="220"/>
         </ComboBox>
-        <TextBox x:Name="pixMultTextBox" HorizontalAlignment="Left" Height="23" Margin="26,115,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="66" Grid.Column="2"/>
-        <Label x:Name="label" Content="X pixels" HorizontalAlignment="Left" Margin="39,110,0,0" VerticalAlignment="Top" Grid.ColumnSpan="3"/>
-        <TextBox x:Name="XundercutTextBox" HorizontalAlignment="Left" Height="23" Margin="26,150,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="66" Grid.Column="2"/>
-        <Label x:Name="label_Copy" Content="X shrink" HorizontalAlignment="Left" Margin="39,145,0,0" VerticalAlignment="Top" Grid.ColumnSpan="3"/>
-        <TextBox x:Name="YundercutTextBox" HorizontalAlignment="Left" Height="23" Margin="26,185,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="66" Grid.Column="2"/>
-        <Label x:Name="label_Copy1" Content="Y shrink" HorizontalAlignment="Left" Margin="39,180,0,0" VerticalAlignment="Top" Grid.ColumnSpan="3"/>
-        <TextBox x:Name="sepHtTextBox" HorizontalAlignment="Left" Height="23" Margin="26,220,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="66" Grid.Column="2"/>
-        <Label x:Name="label_Copy2" Content="Sep Ht" HorizontalAlignment="Left" Margin="39,215,0,0" VerticalAlignment="Top" Grid.ColumnSpan="3"/>
-        <TextBox x:Name="segWidthTextBox" HorizontalAlignment="Left" Height="23" Margin="26,254,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="66" Grid.Column="2"/>
-        <Label x:Name="label_Copy3" Content="Segments" HorizontalAlignment="Left" Margin="39,249,0,0" VerticalAlignment="Top" Grid.ColumnSpan="3"/>
-        <TextBox x:Name="linHeightTextBox" HorizontalAlignment="Left" Height="23" Margin="26,289,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="66" Grid.Column="2"/>
-        <Label x:Name="label_Copy4" Content="Lin Ht" HorizontalAlignment="Left" Margin="39,284,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2"/>
-        <Label x:Name="errorMessageLabel" Content="" HorizontalAlignment="Center" Margin="1,68,14,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Height="37" Width="734" Grid.Column="1" FontWeight="Bold"/>
+        <TextBox x:Name="pixMultTextBox" HorizontalAlignment="Left" Height="23" Margin="180,150,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="66" Grid.Column="1"/>
+        <Label x:Name="label" Content="Pixels per module (X)" HorizontalAlignment="Left" Margin="20,145,0,0" VerticalAlignment="Top" Grid.ColumnSpan="3" Width="163" Height="30"/>
+        <TextBox x:Name="XundercutTextBox" HorizontalAlignment="Left" Height="23" Margin="180,183,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="66" Grid.Column="1"/>
+        <Label x:Name="label_Copy" Content="X undercut" HorizontalAlignment="Left" Margin="20,180,0,0" VerticalAlignment="Top" Grid.ColumnSpan="3" Width="163" Height="30"/>
+        <TextBox x:Name="YundercutTextBox" HorizontalAlignment="Left" Height="23" Margin="180,218,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="66" Grid.Column="1"/>
+        <Label x:Name="label_Copy1" Content="Y undercut" HorizontalAlignment="Left" Margin="20,215,0,0" VerticalAlignment="Top" Grid.ColumnSpan="3" Width="163" Height="30"/>
+        <TextBox x:Name="sepHtTextBox" HorizontalAlignment="Left" Height="23" Margin="180,253,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="66" Grid.Column="1"/>
+        <Label x:Name="label_Copy2" Content="CC separator height" HorizontalAlignment="Left" Margin="20,250,0,0" VerticalAlignment="Top" Grid.ColumnSpan="3" Width="163" Height="30"/>
+        <Label x:Name="label_Copy3" Content="DataBar Exp segments" HorizontalAlignment="Left" Margin="20,285,0,0" VerticalAlignment="Top" Grid.ColumnSpan="3" Width="163" Height="30"/>
+        <TextBox x:Name="linHeightTextBox" HorizontalAlignment="Left" Height="23" Margin="180,323,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="66" Grid.Column="1"/>
+        <Label x:Name="label_Copy4" Content="GS1-128 linear height" HorizontalAlignment="Left" Margin="20,320,0,0" VerticalAlignment="Top" Grid.ColumnSpan="3" Width="163" Height="30"/>
+        <Label x:Name="errorMessageLabel" Content="" HorizontalAlignment="Center" Margin="30,68,29,0" VerticalAlignment="Top" Grid.ColumnSpan="3" Height="37" Width="733" FontWeight="Bold"/>
+        <Label x:Name="label_Copy5" Content="QR Code version" HorizontalAlignment="Left" Margin="20,355,0,0" VerticalAlignment="Top" Grid.ColumnSpan="3" Width="163" Height="30"/>
+        <Label x:Name="label_Copy6" Content="QR Code EC level" HorizontalAlignment="Left" Margin="20,390,0,0" VerticalAlignment="Top" Grid.ColumnSpan="3" Width="163" Height="30"/>
+        <Label x:Name="label_Copy7" Content="DataMatrix rows" HorizontalAlignment="Left" Margin="20,425,0,0" VerticalAlignment="Top" Grid.ColumnSpan="3" Width="163" Height="30"/>
+        <ScrollViewer Grid.Column="1" Margin="273,115,30,30" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" MinWidth="477" MinHeight="371">
+            <Image x:Name="barcodeImage" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="None"/>
+        </ScrollViewer>
+        <ComboBox x:Name="qrEClevelComboBox" Grid.Column="1" HorizontalAlignment="Left" Margin="180,393,0,0" VerticalAlignment="Top" Width="66" RenderTransformOrigin="0.5,0.5" Height="23" SelectedValuePath="Tag">
+            <ComboBoxItem Content="L" Tag="1"  HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="M" Tag="2" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="Q" Tag="3" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="H" Tag="4" HorizontalAlignment="Left" Width="66"/>
+        </ComboBox>
+        <ComboBox x:Name="segWidthComboBox" Grid.Column="1" HorizontalAlignment="Left" Margin="180,288,0,0" VerticalAlignment="Top" Width="66" RenderTransformOrigin="0.5,0.5" Height="23" SelectedValuePath="Tag">
+            <ComboBoxItem Content="4" Tag="4" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="6" Tag="6" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="8" Tag="8" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="10" Tag="10" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="12" Tag="12" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="14" Tag="14" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="16" Tag="16" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="18" Tag="18" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="20" Tag="20" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="22" Tag="22" HorizontalAlignment="Left" Width="66"/>
+        </ComboBox>
+        <ComboBox x:Name="qrVersionComboBox" Grid.Column="1" HorizontalAlignment="Left" Margin="180,358,0,0" VerticalAlignment="Top" Width="66" RenderTransformOrigin="0.5,0.5" Height="23" SelectedValuePath="Tag">
+            <ComboBoxItem Content="Auto" Tag="0"  HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="1" Tag="1"  HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="2" Tag="2" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="3" Tag="3" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="4" Tag="4" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="5" Tag="5" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="6" Tag="6" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="7" Tag="7" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="8" Tag="8" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="9" Tag="9" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="10" Tag="10" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="11" Tag="11"  HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="12" Tag="12" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="13" Tag="13" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="14" Tag="14" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="15" Tag="15" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="16" Tag="16" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="17" Tag="17" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="18" Tag="18" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="19" Tag="19" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="20" Tag="20" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="21" Tag="21"  HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="22" Tag="22" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="23" Tag="23" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="24" Tag="24" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="25" Tag="25" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="26" Tag="26" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="27" Tag="27" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="28" Tag="28" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="29" Tag="29" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="30" Tag="30" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="31" Tag="31"  HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="32" Tag="32" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="33" Tag="33" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="34" Tag="34" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="35" Tag="35" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="36" Tag="36" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="37" Tag="37" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="38" Tag="38" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="39" Tag="39" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="40" Tag="40" HorizontalAlignment="Left" Width="66"/>
+        </ComboBox>
+        <ComboBox x:Name="dmRowsComboBox" Grid.Column="1" HorizontalAlignment="Left" Margin="180,428,0,0" VerticalAlignment="Top" Width="66" RenderTransformOrigin="0.5,0.5" Height="23" SelectedValuePath="Tag">
+            <ComboBoxItem Content="Auto" Tag="0"  HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="10" Tag="10"  HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="12" Tag="12" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="14" Tag="14" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="16" Tag="16" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="18" Tag="18"  HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="20" Tag="20" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="22" Tag="22" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="24" Tag="24" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="26" Tag="26"  HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="32" Tag="32" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="36" Tag="36" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="40" Tag="40" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="44" Tag="44"  HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="48" Tag="48" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="52" Tag="52" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="64" Tag="64" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="72" Tag="72" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="80" Tag="80" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="88" Tag="88" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="96" Tag="96"  HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="104" Tag="104" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="120" Tag="120" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="132" Tag="132" HorizontalAlignment="Left" Width="66"/>
+            <ComboBoxItem Content="144" Tag="144" HorizontalAlignment="Left" Width="66"/>
+        </ComboBox>
     </Grid>
 </Window>
