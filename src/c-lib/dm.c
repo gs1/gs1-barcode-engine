@@ -193,7 +193,7 @@ static void createCodewords(gs1_encoder *ctx, uint8_t *string, uint8_t cws[MAX_D
 	while (*string && p-cws < MAX_DM_DAT_CWS) {
 		if (*string >= '0' && *string <= '9') {
 			if (*(string+1) && *(string+1) >= '0' && *(string+1) <= '9') {
-				*p++ = (uint8_t)(((*string)-'0')*10 + (*string+1)-'0' + 130);
+				*p++ = (uint8_t)(((*string)-'0')*10 + *(string+1)-'0' + 130);
 				string += 2;
 			} else {  // Single digit
 				*p++ = (uint8_t)((*string++) + 1);
