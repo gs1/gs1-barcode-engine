@@ -278,8 +278,6 @@ static void finaliseCodewords(gs1_encoder *ctx, uint8_t *cws, uint16_t *cwslen, 
 
 	}
 
-	DEBUG_PRINT_CWS("ECC codewords", cws, (uint16_t)(m->ncws + m->rscw));
-
 }
 
 
@@ -475,6 +473,9 @@ static int DMenc(gs1_encoder *ctx, uint8_t string[], struct patternLength *pats)
 		m->rows, m->cols, m->ncws, m->rscw, m->rsbl, m->regh, m->regv);
 
 	finaliseCodewords(ctx, cws, &cwslen, m);
+
+	DEBUG_PRINT_CWS("ECC codewords", cws + m->ncws, m->rscw);
+
 	createMatrix(ctx, mtx, cws, m);
 
 	gs1_mtxToPatterns(mtx, m->cols + 2*DM_QZ, m->rows + 2*DM_QZ, pats);
