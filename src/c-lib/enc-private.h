@@ -28,9 +28,6 @@
 #include "gs1encoders.h"
 
 
-#define PRNT 0 // prints symbol data if 1
-
-
 struct sPrints {
 	int elmCnt;
 	int leftPad;

@@ -9,8 +9,14 @@ BUILD_DIR = build
 
 ifeq ($(MAKECMDGOALS),test)
 BUILD_DIR = test
-UNIT_TESTS = -DUNIT_TESTS
+UNIT_TEST_CFLAGS = -DUNIT_TESTS
 endif
+
+
+ifeq ($(DEBUG),yes)
+DEBUG_CFLAGS = -DPRNT
+endif
+
 
 ifeq ($(MAKECMDGOALS),clean-test)
 BUILD_DIR = test
@@ -24,7 +30,7 @@ SAN_ENV = ASAN_OPTIONS="symbolize=1 detect_leaks=1" LSAN_OPTIONS="fast_unwind_on
 endif
 
 
-CFLAGS = -g -O2 -D_FORTIFY_SOURCE=2 -Wall -Wextra -Wconversion -Wformat -Wformat-security -pedantic -Werror -MMD -fPIC $(SAN_CFLAGS) $(UNIT_TESTS)
+CFLAGS = -g -O2 -D_FORTIFY_SOURCE=2 -Wall -Wextra -Wconversion -Wformat -Wformat-security -pedantic -Werror -MMD -fPIC $(SAN_CFLAGS) $(UNIT_TEST_CFLAGS) $(DEBUG_CFLAGS)
 LDLIBS = -lc
 LDFLAGS = -Wl,--as-needed -Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,-z,now $(SAN_LDFLAGS)
 LDFLAGS_SO = -shared -Wl,-soname,lib$(NAME).so.$(MAJOR)

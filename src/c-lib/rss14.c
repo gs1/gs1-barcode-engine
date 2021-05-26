@@ -432,7 +432,7 @@ void gs1_RSS14(gs1_encoder *ctx) {
 			printf("\n%s", ccStr);
 			printf("\n");
 			for (i = 0; i < rows; i++) {
-				for (j = 0; j < CCB4_RSS14_ELMNTS; j++) {
+				for (j = 0; j < CCB4_ELMNTS; j++) {
 					printf("%d", ccPattern[i][j]);
 				}
 				printf("\n");
@@ -539,7 +539,7 @@ void gs1_RSS14S(gs1_encoder *ctx) {
 			printf("\n%s", ccStr);
 			printf("\n");
 			for (i = 0; i < rows; i++) {
-				for (j = 0; j < CCB2_RSS14_ELMNTS; j++) {
+				for (j = 0; j < CCB2_ELMNTS; j++) {
 					printf("%d", ccPattern[i][j]);
 				}
 				printf("\n");
@@ -684,7 +684,7 @@ void gs1_RSS14SO(gs1_encoder *ctx) {
 			printf("\n%s", ccStr);
 			printf("\n");
 			for (i = 0; i < rows; i++) {
-				for (j = 0; j < CCB2_RSS14_ELMNTS; j++) {
+				for (j = 0; j < CCB2_ELMNTS; j++) {
 					printf("%d", ccPattern[i][j]);
 				}
 				printf("\n");
