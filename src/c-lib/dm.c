@@ -478,7 +478,11 @@ static int DMenc(gs1_encoder *ctx, uint8_t string[], struct patternLength *pats)
 
 	createMatrix(ctx, mtx, cws, m);
 
+	DEBUG_PRINT_MATRIX("Matrix", mtx, m->cols + 2*DM_QZ, m->rows + 2*DM_QZ);
+
 	gs1_mtxToPatterns(mtx, m->cols + 2*DM_QZ, m->rows + 2*DM_QZ, pats);
+
+	DEBUG_PRINT_PATTERN_LENGTHS("Patterns", pats, m->rows);
 
 	return m->rows + 2*DM_QZ;
 
@@ -501,8 +505,6 @@ void gs1_DM(gs1_encoder *ctx) {
 
 	if (!(rows = DMenc(ctx, (uint8_t*)dataStr, pats)) || ctx->errFlag)
 		goto out;
-
-	DEBUG_PRINT_PATTERN_LENGTHS("Patterns", pats, rows);
 
 	cols = 0;
 	for (i = 0; i < pats[0].length; i++)
