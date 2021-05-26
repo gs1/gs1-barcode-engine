@@ -26,6 +26,7 @@
 
 #if PRNT
 
+
 void do_debug_print_cws(char *prefix, uint8_t* cws, uint16_t cwslen) {
 
 	int i;
@@ -36,6 +37,37 @@ void do_debug_print_cws(char *prefix, uint8_t* cws, uint16_t cwslen) {
 	}
 	printf("\n");
 }
+
+
+void do_debug_print_bits(char *prefix, uint8_t *bits, int numbits) {
+
+	int i;
+
+	printf("%s: ", prefix);
+	for (i = 0; i < numbits; i++) {
+		printf("%d", bits[i/8] >> (7-i%8) & 1);
+	}
+	printf("\n");
+
+}
+
+
+void do_debug_print_matrix(char* prefix, uint8_t *mtx, int c, int r) {
+
+	int x, y;
+	int bw = (c-1)/8+1;
+
+	printf("\n%s:\n", prefix);
+	for (y = 0; y < r; y++) {
+		for (x = 0; x < c; x++) {
+			printf("%s", (mtx[bw*y + x/8] >> (7-x%8) & 1) == 1 ? "X" : ".");
+		}
+		printf("\n");
+	}
+	printf("\n");
+
+}
+
 
 void do_debug_print_pattern_lengths(char* prefix, struct patternLength *pats, int rows) {
 
@@ -52,5 +84,6 @@ void do_debug_print_pattern_lengths(char* prefix, struct patternLength *pats, in
 	printf("\n");
 
 }
+
 
 #endif
