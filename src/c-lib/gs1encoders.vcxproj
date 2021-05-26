@@ -134,6 +134,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="cc.c" />
+    <ClCompile Include="debug.c" />
     <ClCompile Include="dm.c" />
     <ClCompile Include="driver.c" />
     <ClCompile Include="ean.c" />
@@ -148,6 +149,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cc.h" />
+    <ClInclude Include="debug.h" />
     <ClInclude Include="dm.h" />
     <ClInclude Include="driver.h" />
     <ClInclude Include="ean.h" />
