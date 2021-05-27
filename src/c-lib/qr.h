@@ -26,8 +26,7 @@
 #define MAX_QR_ELMNTS	MAX_QR_SIZE		// to accept a checkerboard test pattern
 #define MAX_QR_BYTES	(((MAX_QR_SIZE-1)/8+1) * MAX_QR_SIZE)
 
-#define MAX_QR_DATA_BITS	23648
-#define MAX_QR_DATA_BYTES	((MAX_QR_DATA_BITS-1)/8+1)
+#define MAX_QR_DAT_BITS		23648
 #define MAX_QR_DAT_CWS		2956	// Maximum data codewords (Version 40-L)
 #define MAX_QR_CWS		3706	// Maximum overall codewords (Version 40)
 #define MAX_QR_DAT_CWS_PER_BLK	128

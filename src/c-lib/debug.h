@@ -21,7 +21,11 @@
 #ifndef DEBUG_H
 #define DEBUG_H
 
+#include <stdint.h>
+
 #include "mtx.h"
+
+struct patternLength;
 
 
 #if PRNT

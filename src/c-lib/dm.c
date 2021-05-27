@@ -23,7 +23,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
-#include <stdlib.h>
 
 #include "enc-private.h"
 #include "debug.h"
@@ -460,13 +459,20 @@ static int DMenc(gs1_encoder *ctx, uint8_t string[], struct patternLength *pats)
 	(void)string;
 
 	createCodewords(ctx, string, cws, &cwslen);
+	if (cwslen == UINT16_MAX) {
+		strcpy(ctx->errMsg, "Data exceeds the capacity of any Data Matrix symbol");
+		ctx->errFlag = true;
+		return 0;
+	}
+
+	assert(cwslen <= MAX_DM_DAT_CWS);
 
 	DEBUG_PRINT("\nData: %s\n", string);
 	DEBUG_PRINT_CWS("Codewords", cws, cwslen);
 
 	m = selectVersion(ctx, cwslen);
 	if (!m) {
-		strcpy(ctx->errMsg, "Data exceeds the capacity of the symbol");
+		strcpy(ctx->errMsg, "Data exceeds the capacity of the specified symbol");
 		ctx->errFlag = true;
 		return 0;
 	}
@@ -475,6 +481,8 @@ static int DMenc(gs1_encoder *ctx, uint8_t string[], struct patternLength *pats)
 		m->rows, m->cols, m->ncws, m->rscw, m->rsbl, m->regh, m->regv);
 
 	finaliseCodewords(ctx, cws, &cwslen, m);
+
+	assert(cwslen <= MAX_DM_CWS);
 
 	DEBUG_PRINT_CWS("ECC codewords", cws + m->ncws, m->rscw);
 

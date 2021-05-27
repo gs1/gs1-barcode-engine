@@ -585,19 +585,19 @@ static void createCodewords(gs1_encoder *ctx, uint8_t *string, uint8_t cws_v[3][
 
 		// 0101 FNC1 in first
 		if (false)
-			addBits(cws_v[i], &bits_v[i], 4, 0x05, MAX_QR_DATA_BITS, false);
+			addBits(cws_v[i], &bits_v[i], 4, 0x05, MAX_QR_DAT_BITS, false);
 
 		// 0100 Enter byte mode
-		addBits(cws_v[i], &bits_v[i], 4, 0x04, MAX_QR_DATA_BITS, false);
+		addBits(cws_v[i], &bits_v[i], 4, 0x04, MAX_QR_DAT_BITS, false);
 
 		// Character count indicator
 		addBits(cws_v[i], &bits_v[i], cclens[i][2],
-			(uint16_t)strlen((char *)string), MAX_QR_DATA_BITS, false);
+			(uint16_t)strlen((char *)string), MAX_QR_DAT_BITS, false);
 
 		// Byte per character
 		p = &string[0];
 		while (*p)
-			addBits(cws_v[i], &bits_v[i], 8, *p++, MAX_QR_DATA_BITS, false);
+			addBits(cws_v[i], &bits_v[i], 8, *p++, MAX_QR_DAT_BITS, false);
 
 	}
 
@@ -801,15 +801,27 @@ static int QRenc(gs1_encoder *ctx, uint8_t string[], struct patternLength *pats)
 	assert(ctx->qrVersion >= 0 && ctx->qrVersion <= 40);
 
 	createCodewords(ctx, string, cws_v, bits_v);
+	if (bits_v[0] == UINT16_MAX && bits_v[1] == UINT16_MAX && bits_v[2] == UINT16_MAX) {
+		strcpy(ctx->errMsg, "Data exceeds the capacity of any QR Code symbol");
+		ctx->errFlag = true;
+		return 0;
+	}
+
+	assert(bits_v[0] <= MAX_QR_DAT_BITS || bits_v[0] == UINT16_MAX);
+	assert(bits_v[1] <= MAX_QR_DAT_BITS || bits_v[1] == UINT16_MAX);
+	assert(bits_v[2] <= MAX_QR_DAT_BITS || bits_v[2] == UINT16_MAX);
 
 	DEBUG_PRINT("\nData: %s\n", string);
-	DEBUG_PRINT_BITS("Bitstream (vergrp 1)", cws_v[0], bits_v[0]);
-	DEBUG_PRINT_BITS("Bitstream (vergrp 2)", cws_v[1], bits_v[1]);
-	DEBUG_PRINT_BITS("Bitstream (vergrp 3)", cws_v[2], bits_v[2]);
+	if (bits_v[0] != UINT16_MAX)
+		DEBUG_PRINT_BITS("Bitstream (vergrp 1)", cws_v[0], bits_v[0]);
+	if (bits_v[1] != UINT16_MAX)
+		DEBUG_PRINT_BITS("Bitstream (vergrp 2)", cws_v[1], bits_v[1]);
+	if (bits_v[2] != UINT16_MAX)
+		DEBUG_PRINT_BITS("Bitstream (vergrp 3)", cws_v[2], bits_v[2]);
 
 	m = selectVersion(ctx, bits_v);
 	if (!m) {
-		strcpy(ctx->errMsg, "Data exceeds the capacity of the symbol");
+		strcpy(ctx->errMsg, "Data exceeds the capacity of the specified symbol");
 		ctx->errFlag = true;
 		return 0;
 	}
@@ -823,6 +835,8 @@ static int QRenc(gs1_encoder *ctx, uint8_t string[], struct patternLength *pats)
 	DEBUG_PRINT_CWS("Codewords", cws_v[m->vergrp], (bits_v[m->vergrp]-1)/8+1);
 
 	finaliseCodewords(ctx, cws_v[m->vergrp], &bits_v[m->vergrp], m);
+
+	assert(bits_v[m->vergrp] <= MAX_QR_CWS*8);
 
 	DEBUG_PRINT_CWS("Final codewords", cws_v[m->vergrp], bits_v[m->vergrp]/8);
 
