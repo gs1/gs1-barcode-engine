@@ -37,7 +37,7 @@ namespace gs1encoders_dotnet
          *
          */
         [DllImport(gs1_dll, EntryPoint = "gs1_encoder_init", CallingConvention = CallingConvention.Cdecl)]
-        private static extern System.IntPtr gs1_encoder_init();
+        private static extern System.IntPtr gs1_encoder_init(IntPtr mem);
 
         [DllImport(gs1_dll, EntryPoint = "gs1_encoder_getVersion", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr gs1_encoder_getVersion(IntPtr ctx);
@@ -174,7 +174,7 @@ namespace gs1encoders_dotnet
          */
         public GS1Encoder()
         {
-            ctx = gs1_encoder_init();
+            ctx = gs1_encoder_init(IntPtr.Zero);
             if (ctx == IntPtr.Zero)
                 throw new GS1EncoderGeneralException("Failed to initalise GS1 Encoder library");
         }
