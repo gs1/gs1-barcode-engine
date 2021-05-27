@@ -64,11 +64,11 @@ void do_debug_print_pattern_lengths(char *prefix, struct patternLength *pats, in
 
 #else
 
-#define DEBUG_PRINT(...)
-#define DEBUG_PRINT_CWS(p,c,l)
-#define DEBUG_PRINT_BITS(p,b,l)
-#define DEBUG_PRINT_MATRIX(p,m,c,r)
-#define DEBUG_PRINT_PATTERN_LENGTHS(m,p,r)
+#define DEBUG_PRINT(...) {}
+#define DEBUG_PRINT_CWS(p,c,l) {}
+#define DEBUG_PRINT_BITS(p,b,l) {}
+#define DEBUG_PRINT_MATRIX(p,m,c,r) {}
+#define DEBUG_PRINT_PATTERN_LENGTHS(m,p,r) {}
 
 #endif  /* PRNT */
 
