@@ -41,8 +41,11 @@ struct sPrints {
 
 
 #include "cc.h"
+#include "dm.h"
 #include "driver.h"
 #include "ean.h"
+#include "mtx.h"
+#include "qr.h"
 #include "rss14.h"
 #include "rssexp.h"
 #include "rsslim.h"
@@ -102,6 +105,12 @@ struct gs1_encoder {
 	uint8_t rssutil_sepPattern[MAX_SEP_ELMNTS];
 	int rss_util_widths[MAX_K];
 	uint8_t ucc128_patCCC[UCC128_MAX_PAT];
+
+	// Ephemeral working space that can never clash
+	union {
+		struct patternLength qr_pats[MAX_QR_SIZE];
+		struct patternLength dm_pats[MAX_DM_ROWS];
+	};
 
 };
 

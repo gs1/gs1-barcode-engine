@@ -846,12 +846,7 @@ void gs1_QR(gs1_encoder *ctx) {
 	char* dataStr = ctx->dataStr;
 	int rows, cols, i;
 
-	pats = malloc(MAX_QR_SIZE * sizeof(struct patternLength));
-	if (!pats) {
-		strcpy(ctx->errMsg, "Out of memory allocating patterns");
-		ctx->errFlag = true;
-		return;
-	}
+	pats = ctx->qr_pats;
 
 	if (!(rows = QRenc(ctx, (uint8_t*)dataStr, pats)) || ctx->errFlag)
 		goto out;
@@ -879,8 +874,6 @@ void gs1_QR(gs1_encoder *ctx) {
 	gs1_driverFinalise(ctx);
 
 out:
-
-	free(pats);
 
 	return;
 }

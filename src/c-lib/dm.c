@@ -498,12 +498,7 @@ void gs1_DM(gs1_encoder *ctx) {
 	char* dataStr = ctx->dataStr;
 	int rows, cols, i;
 
-	pats = malloc(MAX_DM_ROWS * sizeof(struct patternLength));
-	if (!pats) {
-		strcpy(ctx->errMsg, "Out of memory allocating patterns");
-		ctx->errFlag = true;
-		return;
-	}
+	pats = ctx->dm_pats;
 
 	if (!(rows = DMenc(ctx, (uint8_t*)dataStr, pats)) || ctx->errFlag)
 		goto out;
@@ -531,8 +526,6 @@ void gs1_DM(gs1_encoder *ctx) {
 	gs1_driverFinalise(ctx);
 
 out:
-
-	free(pats);
 
 	return;
 
