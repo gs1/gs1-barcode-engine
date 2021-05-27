@@ -81,10 +81,12 @@ enum {
  */
 typedef struct gs1_encoder gs1_encoder;
 
+GS1_ENCODERS_API size_t gs1_encoder_instanceSize(void);
+
 /** @brief Initialise a gs1_encoder instance.
  *  @return gs1_encoder context on success, else NULL.
  */
-GS1_ENCODERS_API gs1_encoder* gs1_encoder_init(void);
+GS1_ENCODERS_API gs1_encoder* gs1_encoder_init(void *mem);
 
 GS1_ENCODERS_API char* gs1_encoder_getVersion(gs1_encoder *ctx);
 

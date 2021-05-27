@@ -470,7 +470,7 @@ void test_rssexp_RSSEXP_encode(void) {
 
 	char** expect;
 
-	gs1_encoder* ctx = gs1_encoder_init();
+	gs1_encoder* ctx = gs1_encoder_init(NULL);
 
 	expect = (char*[]){
 " X X   X   XXXX   X XXXXXXXX    X X XXX     XX   X XXX   XX   X  XX X XXXX      XXX  X XXX   XXX XXX XXXX X XXXX   XX   XXXXXX    X X   X  X      XX X ",

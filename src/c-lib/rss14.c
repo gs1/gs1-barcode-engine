@@ -780,7 +780,7 @@ void test_rss14_RSS14_encode(void) {
 
 	char** expect;
 
-	gs1_encoder* ctx = gs1_encoder_init();
+	gs1_encoder* ctx = gs1_encoder_init(NULL);
 
 	expect = (char*[]){
 " X X    X  X   XXX  XXXXX      X XXXX   X X  XX XX X  X XXXXX  X XXXXX     XXX XX XXXXX X XXXX X",
@@ -829,7 +829,7 @@ void test_rss14_RSS14T_encode(void) {
 
 	char** expect;
 
-	gs1_encoder* ctx = gs1_encoder_init();
+	gs1_encoder* ctx = gs1_encoder_init(NULL);
 
 	expect = (char*[]){
 " X X    X  X   XXX  XXXXX      X XXXX   X X  XX XX X  X XXXXX  X XXXXX     XXX XX XXXXX X XXXX X",
@@ -858,7 +858,7 @@ void test_rss14_RSS14S_encode(void) {
 
 	char** expect;
 
-	gs1_encoder* ctx = gs1_encoder_init();
+	gs1_encoder* ctx = gs1_encoder_init(NULL);
 
 	expect = (char*[]){
 " X X    X  X   XXX  XXXXX      X XXXX   X X  XX X ",
@@ -887,7 +887,7 @@ void test_rss14_RSS14SO_encode(void) {
 
 	char** expect;
 
-	gs1_encoder* ctx = gs1_encoder_init();
+	gs1_encoder* ctx = gs1_encoder_init(NULL);
 
 	expect = (char*[]){
 " X X    X  X   XXX  XXXXX      X XXXX   X X  XX X ",

@@ -644,7 +644,7 @@ void test_ean_EAN13_encode(void) {
 
 	char** expect;
 
-	gs1_encoder* ctx = gs1_encoder_init();
+	gs1_encoder* ctx = gs1_encoder_init(NULL);
 
 	expect = (char*[]){
 "       X X  XX  X  XX  X  XX XX X    X X   XX XXX  X X X X X    X   X  X  X   XXX X  XXX  X XXX  X X X       ",
@@ -734,7 +734,7 @@ void test_ean_EAN8_encode(void) {
 
 	char** expect;
 
-	gs1_encoder* ctx = gs1_encoder_init();
+	gs1_encoder* ctx = gs1_encoder_init(NULL);
 
 	expect = (char*[]){
 "       X X   XX X  X  XX XXXX X X   XX X X X  XXX X X    X   X  X    X X X       ",
@@ -810,7 +810,7 @@ void test_ean_UPCA_encode(void) {
 
 	char** expect;
 
-	gs1_encoder* ctx = gs1_encoder_init();
+	gs1_encoder* ctx = gs1_encoder_init(NULL);
 
 	expect = (char*[]){
 "       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
@@ -900,7 +900,7 @@ void test_ean_UPCE_encode(void) {
 
 	char** expect;
 
-	gs1_encoder* ctx = gs1_encoder_init();
+	gs1_encoder* ctx = gs1_encoder_init(NULL);
 
 	expect = (char*[]){
 "       X X X  XXX  XX  X  XX XX XXXX X  XXX X XX   X X X X       ",

@@ -109,6 +109,7 @@ struct gs1_encoder {
 #ifdef UNIT_TESTS
 
 void test_api_getVersion(void);
+void test_api_instanceSize(void);
 void test_api_defaults(void);
 void test_api_sym(void);
 void test_api_fileInputFlag(void);

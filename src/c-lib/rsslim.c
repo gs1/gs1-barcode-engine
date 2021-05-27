@@ -449,7 +449,7 @@ void test_rsslim_RSSLIM_encode(void) {
 
 	char** expect;
 
-	gs1_encoder* ctx = gs1_encoder_init();
+	gs1_encoder* ctx = gs1_encoder_init(NULL);
 
 	expect = (char*[]){
 " X   XX  XX   XX XX X X  XXX X  X X XX X  XX X  X  X XX   XX XXX  XX  XX X",

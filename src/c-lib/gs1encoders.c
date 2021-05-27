@@ -56,10 +56,23 @@ static void free_bufferStrings(gs1_encoder *ctx) {
 }
 
 
-GS1_ENCODERS_API gs1_encoder* gs1_encoder_init(void) {
+GS1_ENCODERS_API size_t gs1_encoder_instanceSize(void) {
+	return sizeof(struct gs1_encoder);
+}
 
-	gs1_encoder *ctx = malloc(sizeof(gs1_encoder));
-	if (ctx == NULL) return NULL;
+
+GS1_ENCODERS_API gs1_encoder* gs1_encoder_init(void *mem) {
+
+	gs1_encoder *ctx = NULL;
+
+	if (!mem) {  // No storage provided so allocate our own
+#ifndef NOMALLOC
+		ctx = malloc(sizeof(gs1_encoder));
+#endif
+		if (ctx == NULL) return NULL;
+	} else {  // Use the provided storage
+		ctx = mem;
+	}
 
 	reset_error(ctx);
 
@@ -606,7 +619,7 @@ void test_api_getVersion(void) {
 	gs1_encoder* ctx;
 	char* version;
 
-	TEST_ASSERT((ctx = gs1_encoder_init()) != NULL);
+	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
 
 	version = gs1_encoder_getVersion(ctx);
 	TEST_CHECK(version != NULL && strlen(version) > 0);
@@ -616,11 +629,48 @@ void test_api_getVersion(void) {
 }
 
 
+void test_api_instanceSize(void) {
+
+	TEST_ASSERT(gs1_encoder_instanceSize() == sizeof(struct gs1_encoder));
+
+}
+
+
+void test_api_init(void) {
+
+	gs1_encoder* ctx;
+	void *heap;
+	uint8_t stack[sizeof(gs1_encoder)];
+
+	// Mallocs its own memory
+	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	TEST_CHECK(gs1_encoder_getSym(ctx) == gs1_encoder_sNONE);
+	TEST_CHECK(gs1_encoder_getFormat(ctx) == gs1_encoder_dTIF);
+	TEST_CHECK(strcmp(gs1_encoder_getOutFile(ctx), DEFAULT_TIF_FILE) == 0);
+	gs1_encoder_free(ctx);
+
+	// We malloc the storage on the heap and pass it in
+	TEST_ASSERT((heap = malloc(sizeof(gs1_encoder))) != NULL);
+	TEST_ASSERT((ctx = gs1_encoder_init(heap)) == heap);
+	TEST_CHECK(gs1_encoder_getSym(ctx) == gs1_encoder_sNONE);
+	TEST_CHECK(gs1_encoder_getFormat(ctx) == gs1_encoder_dTIF);
+	TEST_CHECK(strcmp(gs1_encoder_getOutFile(ctx), DEFAULT_TIF_FILE) == 0);
+	gs1_encoder_free(ctx);
+
+	// We malloc the storage on the stack and pass it in
+	TEST_ASSERT((ctx = gs1_encoder_init(&stack)) != NULL);
+	TEST_CHECK(gs1_encoder_getSym(ctx) == gs1_encoder_sNONE);
+	TEST_CHECK(gs1_encoder_getFormat(ctx) == gs1_encoder_dTIF);
+	TEST_CHECK(strcmp(gs1_encoder_getOutFile(ctx), DEFAULT_TIF_FILE) == 0);
+
+}
+
+
 void test_api_defaults(void) {
 
 	gs1_encoder* ctx;
 
-	TEST_ASSERT((ctx = gs1_encoder_init()) != NULL);
+	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
 
 	TEST_CHECK(gs1_encoder_getSym(ctx) == gs1_encoder_sNONE);
 	TEST_CHECK(gs1_encoder_getPixMult(ctx) == 1);
@@ -644,7 +694,7 @@ void test_api_sym(void) {
 
 	gs1_encoder* ctx;
 
-	TEST_ASSERT((ctx = gs1_encoder_init()) != NULL);
+	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
 
 	TEST_CHECK(gs1_encoder_setSym(ctx, gs1_encoder_sRSS14));
 	TEST_CHECK(gs1_encoder_setSym(ctx, gs1_encoder_sRSS14T));
@@ -679,7 +729,7 @@ void test_api_fileInputFlag(void) {
 
 	gs1_encoder* ctx;
 
-	TEST_ASSERT((ctx = gs1_encoder_init()) != NULL);
+	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
 
 	TEST_CHECK(gs1_encoder_setFileInputFlag(ctx, true));     // dataFile
 	TEST_CHECK(gs1_encoder_getFileInputFlag(ctx) == true);
@@ -693,7 +743,7 @@ void test_api_pixMult(void) {
 
 	gs1_encoder* ctx;
 
-	TEST_ASSERT((ctx = gs1_encoder_init()) != NULL);
+	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
 
 	TEST_CHECK(gs1_encoder_setPixMult(ctx, 1));
 	TEST_CHECK(gs1_encoder_getPixMult(ctx) == 1);
@@ -748,7 +798,7 @@ void test_api_XYundercut(void) {
 
 	gs1_encoder* ctx;
 
-	TEST_ASSERT((ctx = gs1_encoder_init()) != NULL);
+	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
 
 	// Special case
 	gs1_encoder_setPixMult(ctx, 1);
@@ -783,7 +833,7 @@ void test_api_sepHt(void) {
 
 	gs1_encoder* ctx;
 
-	TEST_ASSERT((ctx = gs1_encoder_init()) != NULL);
+	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
 
 	gs1_encoder_setPixMult(ctx, 3);
 	TEST_CHECK(gs1_encoder_setSepHt(ctx, 5));
@@ -812,7 +862,7 @@ void test_api_dmRowsColumns(void) {
 
 	gs1_encoder* ctx;
 
-	TEST_ASSERT((ctx = gs1_encoder_init()) != NULL);
+	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
 
 	TEST_CHECK(gs1_encoder_getDmRows(ctx) == 0);	// Default
 	TEST_CHECK(gs1_encoder_getDmColumns(ctx) == 0);	// Default
@@ -848,7 +898,7 @@ void test_api_qrVersion(void) {
 
 	gs1_encoder* ctx;
 
-	TEST_ASSERT((ctx = gs1_encoder_init()) != NULL);
+	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
 
 	TEST_CHECK(gs1_encoder_getQrVersion(ctx) == 0);  // Default
 
@@ -875,7 +925,7 @@ void test_api_qrEClevel(void) {
 
 	gs1_encoder* ctx;
 
-	TEST_ASSERT((ctx = gs1_encoder_init()) != NULL);
+	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
 
 	TEST_CHECK(gs1_encoder_getQrEClevel(ctx) == gs1_encoder_qrEClevelM);  // Default
 
@@ -903,7 +953,7 @@ void test_api_segWidth(void) {
 
 	gs1_encoder* ctx;
 
-	TEST_ASSERT((ctx = gs1_encoder_init()) != NULL);
+	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
 
 	TEST_CHECK(gs1_encoder_setSegWidth(ctx, 6));
 	TEST_CHECK(gs1_encoder_getSegWidth(ctx) == 6);
@@ -924,7 +974,7 @@ void test_api_linHeight(void) {
 
 	gs1_encoder* ctx;
 
-	TEST_ASSERT((ctx = gs1_encoder_init()) != NULL);
+	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
 
 	TEST_CHECK(gs1_encoder_setLinHeight(ctx, 12));
 	TEST_CHECK(gs1_encoder_getLinHeight(ctx) == 12);
@@ -943,7 +993,7 @@ void test_api_outFile(void) {
 	char longfname[GS1_ENCODERS_MAX_FNAME+2];
 	int i;
 
-	TEST_ASSERT((ctx = gs1_encoder_init()) != NULL);
+	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
 
 	TEST_CHECK(gs1_encoder_setOutFile(ctx, "test.file"));
 	TEST_CHECK(strcmp(gs1_encoder_getOutFile(ctx), "test.file") == 0);
@@ -968,7 +1018,7 @@ void test_api_format(void) {
 
 	gs1_encoder* ctx;
 
-	TEST_ASSERT((ctx = gs1_encoder_init()) != NULL);
+	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
 
 	TEST_CHECK(gs1_encoder_setFormat(ctx, gs1_encoder_dTIF));
 	TEST_CHECK(gs1_encoder_setOutFile(ctx, "test.file"));
@@ -1010,7 +1060,7 @@ void test_api_dataFile(void) {
 	char longfname[GS1_ENCODERS_MAX_FNAME+2];
 	int i;
 
-	TEST_ASSERT((ctx = gs1_encoder_init()) != NULL);
+	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
 
 	TEST_CHECK(gs1_encoder_setDataFile(ctx, "test.file"));
 	TEST_CHECK(strcmp(gs1_encoder_getDataFile(ctx), "test.file") == 0);
@@ -1038,7 +1088,7 @@ void test_api_dataStr(void) {
 	char longdata[GS1_ENCODERS_MAX_KEYDATA+2];
 	int i;
 
-	TEST_ASSERT((ctx = gs1_encoder_init()) != NULL);
+	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
 
 	TEST_CHECK(gs1_encoder_setDataStr(ctx, "barcode"));
 	TEST_CHECK(strcmp(gs1_encoder_getDataStr(ctx), "barcode") == 0);
@@ -1068,7 +1118,7 @@ void test_api_getBuffer(void) {
 	uint8_t test_bmp[] = { 0x42, 0x4D, 0xDE, 0x04 };
 	uint8_t test_raw[] = { 0x01, 0x49, 0xBD, 0x3A };
 
-	TEST_ASSERT((ctx = gs1_encoder_init()) != NULL);
+	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
 
 	TEST_CHECK(gs1_encoder_getBuffer(ctx, (void*)&buf) == 0);
 	TEST_CHECK(gs1_encoder_getBufferWidth(ctx) == 0);

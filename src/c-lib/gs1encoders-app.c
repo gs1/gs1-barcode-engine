@@ -403,7 +403,7 @@ static bool userInt(gs1_encoder *ctx) {
 
 int main(int argc, char *argv[]) {
 
-	gs1_encoder* ctx = gs1_encoder_init();
+	gs1_encoder* ctx = gs1_encoder_init(NULL);
 	if (ctx == NULL) {
 		printf("Failed to initialise GS1 Encoders library!\n");
 		return 1;

@@ -625,7 +625,7 @@ void test_ucc_UCC128A_encode(void) {
 
 	char** expect;
 
-	gs1_encoder* ctx = gs1_encoder_init();
+	gs1_encoder* ctx = gs1_encoder_init(NULL);
 
 	expect = (char*[]){
 "          XX X  X    XXXX X XXX X  XXXX X  X XX  X    X XXXX  X  X  XXXX X  X    XX X  XX    X X  X  XX X    XX  XX XX  XX   XXX X XX          ",
@@ -655,7 +655,7 @@ void test_ucc_UCC128C_encode(void) {
 
 	char** expect;
 
-	gs1_encoder* ctx = gs1_encoder_init();
+	gs1_encoder* ctx = gs1_encoder_init(NULL);
 
 	expect = (char*[]){
 "   XXXXXXXX X X X   XXXX X X XXXX    XX X XXX XXXX    XXX XXXXX XXX X  X     X    X   X XXXX X XX  XXXXX XXX X  X   XXX   X   X   XX    XX XXXXX X X  XXXXX XXXXXXX X   X X  X             ",

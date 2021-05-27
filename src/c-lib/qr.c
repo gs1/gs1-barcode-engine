@@ -927,7 +927,7 @@ void test_qr_QR_versions(void) {
 	int v, ec;
 	char casename[6];
 
-	gs1_encoder* ctx = gs1_encoder_init();
+	gs1_encoder* ctx = gs1_encoder_init(NULL);
 
 	gs1_encoder_setFormat(ctx, gs1_encoder_dRAW);
 	gs1_encoder_setSym(ctx, gs1_encoder_sQR);
@@ -951,7 +951,7 @@ void test_qr_QR_encode(void) {
 
 	char** expect;
 
-	gs1_encoder* ctx = gs1_encoder_init();
+	gs1_encoder* ctx = gs1_encoder_init(NULL);
 
 	expect = (char*[]){
 "                             ",

@@ -553,7 +553,7 @@ void test_dm_DM_dataLength(void) {
 	char string[MAX_DM_DAT_CWS+1] = { 0 };
 	char casename[5];
 
-	gs1_encoder* ctx = gs1_encoder_init();
+	gs1_encoder* ctx = gs1_encoder_init(NULL);
 
 	gs1_encoder_setFormat(ctx, gs1_encoder_dRAW);
 	gs1_encoder_setSym(ctx, gs1_encoder_sDM);
@@ -575,7 +575,7 @@ void test_dm_DM_encode(void) {
 
 	char** expect;
 
-	gs1_encoder* ctx = gs1_encoder_init();
+	gs1_encoder* ctx = gs1_encoder_init(NULL);
 
 	expect = (char*[]){
 "                ",
