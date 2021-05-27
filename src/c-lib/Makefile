@@ -31,11 +31,16 @@ BUILD_DIR = test
 UNIT_TEST_CFLAGS = -DUNIT_TESTS
 endif
 
+ifeq ($(MAKECMDGOALS),fuzzer)
+SANITIZE = yes
+FUZZER_SAN_OPT = ,fuzzer
+FUZZER_CORPUS = corpus
+endif
+
 
 ifeq ($(DEBUG),yes)
 DEBUG_CFLAGS = -DPRNT
 endif
-
 
 ifeq ($(MAKECMDGOALS),clean-test)
 BUILD_DIR = test
@@ -43,7 +48,7 @@ endif
 
 ifeq ($(SANITIZE),yes)
 CC=clang
-SAN_CFLAGS = -fsanitize=address,leak,undefined -fno-omit-frame-pointer -fno-optimize-sibling-calls -O1
+SAN_CFLAGS = -fsanitize=address,leak,undefined$(FUZZER_SAN_OPT) -fno-omit-frame-pointer -fno-optimize-sibling-calls -O1
 SAN_LDFLAGS = -fuse-ld=lld
 SAN_ENV = ASAN_OPTIONS="symbolize=1 detect_leaks=1" LSAN_OPTIONS="fast_unwind_on_malloc=0:malloc_context_size=50" ASAN_SYMBOLIZER_PATH="$(shell which llvm-symbolizer)"
 endif
@@ -56,7 +61,9 @@ LDFLAGS_SO = -shared -Wl,-soname,lib$(NAME).so.$(MAJOR)
 
 APP = $(BUILD_DIR)/$(NAME).bin
 APP_STATIC = $(BUILD_DIR)/$(NAME)-linux.bin
+
 TEST_BIN = $(BUILD_DIR)/$(NAME)-test
+
 LIB_STATIC = $(BUILD_DIR)/lib$(NAME).a
 LIB_SHARED = $(BUILD_DIR)/lib$(NAME).so.$(VERSION) $(BUILD_DIR)/lib$(NAME).so $(BUILD_DIR)/lib$(NAME).so.$(MAJOR)
 
@@ -69,13 +76,23 @@ APP_OBJ = $(BUILD_DIR)/$(APP_SRC:.c=.o)
 TEST_SRC = gs1encoders-test.c
 TEST_OBJ = $(BUILD_DIR)/$(TEST_SRC:.c=.o)
 
+FUZZER_SRC = gs1encoders-fuzzer.c
+
+FUZZER_SYM = QR DM
+FUZZER_PREFIX = $(NAME)-fuzzer-
+FUZZER_BINS = $(addprefix $(BUILD_DIR)/$(FUZZER_PREFIX),$(FUZZER_SYM))
+FUZZER_OBJS = $(addsuffix .o, $(addprefix $(BUILD_DIR)/$(FUZZER_PREFIX),$(FUZZER_SYM)))
+
+FUZZER_CORPUS_PREFIX = corpus-
+FUZZER_CORPUSES = $(addsuffix /, $(addprefix $(FUZZER_CORPUS_PREFIX),$(FUZZER_SYM)))
+
 ALL_SRCS = $(wildcard *.c)
-SRCS = $(filter-out $(APP_SRC) $(TEST_SRC), $(ALL_SRCS))
+SRCS = $(filter-out $(APP_SRC) $(TEST_SRC) $(FUZZER_SRC), $(ALL_SRCS))
 OBJS = $(addprefix $(BUILD_DIR)/, $(SRCS:.c=.o))
-DEPS = $(addprefix $(BUILD_DIR)/, $(ALL_SRCS:.c=.d))
+DEPS = $(addprefix $(BUILD_DIR)/, $(ALL_SRCS:.c=.d)) $(FUZZER_OBJS:.o=.d)
 
 
-.PHONY: all clean app app-static lib libshared libstatic install install-static install-shared uninstall test clean-test
+.PHONY: all clean app app-static lib libshared libstatic install install-static install-shared uninstall test clean-test fuzzer
 
 default: lib app-static
 all: lib app app-static
@@ -135,16 +152,43 @@ $(TEST_BIN): $(OBJS) $(TEST_OBJ)
 
 
 #
+#  Fuzzer binary
+#
+
+define gen-fuzzer-target
+$$(FUZZER_CORPUS_PREFIX)$1/:
+	mkdir -p $$(FUZZER_CORPUS_PREFIX)$1
+
+$$(BUILD_DIR)/$$(FUZZER_PREFIX)$1.o : $$(FUZZER_SRC)
+	$$(CC) $$(CFLAGS) -DSYMBOLOGY=gs1_encoder_s$1 -c $$< -o $$@
+
+$$(BUILD_DIR)/$$(FUZZER_PREFIX)$1: $$(OBJS) $$(BUILD_DIR)/$$(FUZZER_PREFIX)$1.o
+	$$(CC) $$(CFLAGS) $$(OBJS) $$(BUILD_DIR)/$$(FUZZER_PREFIX)$1.o -o $$(BUILD_DIR)/$$(FUZZER_PREFIX)$1
+endef
+
+$(foreach sym,$(FUZZER_SYM),$(eval $(call gen-fuzzer-target,$(sym))))
+
+
+#
 #  Utility targets
 #
 test: $(TEST_BIN)
 	$(SAN_ENV) ./$(TEST_BIN) $(TEST)
 
+fuzzer: $(FUZZER_BINS) | $(FUZZER_CORPUSES)
+	@echo
+	@echo Start fuzzing as follows:
+	@echo
+	@for sym in $^ ; do \
+		echo '$(SAN_ENV)' $$sym -jobs=`nproc` -workers=`nproc` $(FUZZER_CORPUS_PREFIX)$${sym##*-} ; echo ; \
+	done
+	@echo
+
 clean:
-	$(RM) $(OBJS) $(APP_OBJ) $(APP) $(APP_STATIC) $(TEST_BIN) $(TEST_OBJ) $(LIB_STATIC) $(LIB_SHARED) $(DEPS)
+	$(RM) $(OBJS) $(APP_OBJ) $(APP) $(APP_STATIC) $(TEST_BIN) $(TEST_OBJ) $(FUZZER_BINS) $(FUZZER_OBJS) $(LIB_STATIC) $(LIB_SHARED) $(DEPS)
 
 clean-test:
-	$(RM) $(OBJS) $(APP_OBJ) $(APP) $(APP_STATIC) $(TEST_BIN) $(TEST_OBJ) $(LIB_STATIC) $(LIB_SHARED) $(DEPS)
+	$(RM) $(OBJS) $(APP_OBJ) $(APP) $(APP_STATIC) $(TEST_BIN) $(TEST_OBJ) $(FUZZER_BINS) $(FUZZER_OBJS) $(LIB_STATIC) $(LIB_SHARED) $(DEPS)
 
 
 install: install-static install-shared
