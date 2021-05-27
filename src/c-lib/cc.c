@@ -656,7 +656,7 @@ static int getUnusedBitCnt(gs1_encoder *ctx, int iBit, int *size) {
 			if ((*size = (iBit + 11) / 12) < 3) {
 				*size = 3; // 3 data sym chars minimum
 			}
-			if ((((*size)+1+ctx->rowWidth) % ctx->rowWidth) == 1) {
+			if ((((*size)+1+ctx->rssexp_rowWidth) % ctx->rssexp_rowWidth) == 1) {
 				(*size)++; // last row minimum of 2
 			}
 			return(*size*12 - iBit);

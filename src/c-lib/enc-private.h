@@ -81,7 +81,6 @@ struct gs1_encoder {
 	size_t bufferSize;
 	int errFlag;
 	char errMsg[512];
-	int rowWidth;
 	int line1;
 	int linFlag;		// tells pack whether linear or cc is being encoded
 	int colCnt;		// after set, may be decreased by getUnusedBitCnt
@@ -96,6 +95,7 @@ struct gs1_encoder {
 	int driver_numRows;
 	struct sPrints rss14_prntSep;
 	uint8_t rss14_sepPattern[RSS14_SYM_W/2+2];
+	int rssexp_rowWidth;
 	struct sPrints rsslim_prntSep;
 	uint8_t rsslim_sepPattern[RSSLIM_SYM_W];
 	struct sPrints rssutil_prntSep;

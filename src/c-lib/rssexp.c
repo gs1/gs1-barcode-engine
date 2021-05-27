@@ -280,7 +280,7 @@ void gs1_RSSExp(gs1_encoder *ctx) {
 		ccStr++; // point to secondary data
 	}
 
-	ctx->rowWidth = ctx->segWidth; // save for getUnusedBitCnt
+	ctx->rssexp_rowWidth = ctx->segWidth; // save for getUnusedBitCnt
 	if (!((segs = RSS14Eenc(ctx, (uint8_t*)dataStr, dblPattern, ccFlag)) > 0) || ctx->errFlag) return;
 
 	lNdx = 0;
