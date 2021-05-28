@@ -58,12 +58,12 @@ void do_debug_print_matrix(char* prefix, uint8_t *mtx, int c, int r) {
 	int x, y;
 	int bw = (c-1)/8+1;
 
-	printf("\n%s:\n", prefix);
+	printf("%s:\n  ", prefix);
 	for (y = 0; y < r; y++) {
 		for (x = 0; x < c; x++) {
 			printf("%s", (mtx[bw*y + x/8] >> (7-x%8) & 1) == 1 ? "X" : ".");
 		}
-		printf("\n");
+		printf("\n  ");
 	}
 	printf("\n");
 
@@ -74,13 +74,42 @@ void do_debug_print_pattern_lengths(char* prefix, struct patternLength *pats, in
 
 	int i, j;
 
-	printf("\n%s:\n", prefix);
+	printf("%s:\n  ", prefix);
 	for (i = 0; i < rows; i++) {
 		printf("%s:", pats[i].whtFirst ? "W" : "B");
 		for (j = 0; j < pats[i].length; j++) {
 			printf("%d", pats[i].pattern[j]);
 		}
-		printf("\n");
+		printf("\n  ");
+	}
+	printf("\n");
+
+}
+
+
+void do_debug_print_pattern(char *prefix, uint8_t* pattern, int elements) {
+
+	int i;
+
+	printf("%s:\n  ", prefix);
+	for (i = 0; i < elements; i++) {
+		printf("%d", pattern[i]);
+	}
+	printf("\n");
+
+}
+
+
+void do_debug_print_patterns(char *prefix, uint8_t* patterns, int elements, int rows) {
+
+	int i, j;
+
+	printf("%s:\n  ", prefix);
+	for (i = 0; i < rows; i++) {
+		for (j = 0; j < elements; j++) {
+			printf("%d", *(patterns+i*elements+j));
+		}
+		printf("\n  ");
 	}
 	printf("\n");
 

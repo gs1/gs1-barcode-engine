@@ -55,11 +55,21 @@ struct patternLength;
 	do_debug_print_pattern_lengths(m,p,r);		\
 } while (0)
 
+#define DEBUG_PRINT_PATTERN(m,p,e) do {			\
+	do_debug_print_pattern(m,p,e);			\
+} while (0)
+
+#define DEBUG_PRINT_PATTERNS(m,p,e,r) do {		\
+	do_debug_print_patterns(m,p,e,r);		\
+} while (0)
+
 
 void do_debug_print_cws(char *prefix, uint8_t *cws, uint16_t cwslen);
 void do_debug_print_bits(char* prefix, uint8_t *bits, int numbits);
 void do_debug_print_matrix(char* prefix, uint8_t *mtx, int c, int r);
 void do_debug_print_pattern_lengths(char *prefix, struct patternLength *pats, int rows);
+void do_debug_print_pattern(char *prefix, uint8_t* pattern, int elements);
+void do_debug_print_patterns(char *prefix, uint8_t* patterns, int elements, int rows);
 
 
 #else
@@ -69,6 +79,8 @@ void do_debug_print_pattern_lengths(char *prefix, struct patternLength *pats, in
 #define DEBUG_PRINT_BITS(p,b,l) {}
 #define DEBUG_PRINT_MATRIX(p,m,c,r) {}
 #define DEBUG_PRINT_PATTERN_LENGTHS(m,p,r) {}
+#define DEBUG_PRINT_PATTERN(m,p,e) {}
+#define DEBUG_PRINT_PATTERNS(m,p,e,r) {}
 
 #endif  /* PRNT */
 
