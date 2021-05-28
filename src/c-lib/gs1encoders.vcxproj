@@ -138,6 +138,7 @@
     <ClCompile Include="dm.c" />
     <ClCompile Include="driver.c" />
     <ClCompile Include="ean.c" />
+    <ClCompile Include="gs1.c" />
     <ClCompile Include="gs1encoders.c" />
     <ClCompile Include="mtx.c" />
     <ClCompile Include="qr.c" />
@@ -154,6 +155,7 @@
     <ClInclude Include="driver.h" />
     <ClInclude Include="ean.h" />
     <ClInclude Include="enc-private.h" />
+    <ClInclude Include="gs1.h" />
     <ClInclude Include="gs1encoders.h" />
     <ClInclude Include="mtx.h" />
     <ClInclude Include="qr.h" />

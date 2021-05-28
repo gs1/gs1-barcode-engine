@@ -122,6 +122,14 @@ namespace gs1encoders_dotnet
         [return: MarshalAs(UnmanagedType.U1)]
         private static extern bool gs1_encoder_setQrEClevel(IntPtr ctx, int columns);
 
+        [DllImport(gs1_dll, EntryPoint = "gs1_encoder_getAddCheckDigit", CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.U1)]
+        private static extern bool gs1_encoder_getAddCheckDigit(IntPtr ctx);        
+
+        [DllImport(gs1_dll, EntryPoint = "gs1_encoder_setAddCheckDigit", CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.U1)]
+        private static extern bool gs1_encoder_setAddCheckDigit(IntPtr ctx, bool addCheckDigit);
+
         [DllImport(gs1_dll, EntryPoint = "gs1_encoder_getFileInputFlag", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.U1)]
         private static extern bool gs1_encoder_getFileInputFlag(IntPtr ctx);
@@ -284,6 +292,17 @@ namespace gs1encoders_dotnet
         public void SetQrEClevel(int eclevel)
         {
             if (!gs1_encoder_setQrEClevel(ctx, eclevel))
+                throw new GS1EncoderParameterException(GetErrMsg());
+        }
+
+        public bool GetAddCheckDigit()
+        {
+            return gs1_encoder_getAddCheckDigit(ctx);
+        }
+
+        public void SetAddCheckDigit(bool addCheckDigit)
+        {
+            if (!gs1_encoder_setAddCheckDigit(ctx, addCheckDigit))
                 throw new GS1EncoderParameterException(GetErrMsg());
         }
 
