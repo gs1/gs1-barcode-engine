@@ -153,6 +153,7 @@ TEST_LIST = {
     { "api_dmRowsColumns", test_api_dmRowsColumns },
     { "api_qrVersion", test_api_qrVersion },
     { "api_qrEClevel", test_api_qrEClevel },
+    { "api_addCheckDigit", test_api_addCheckDigit },
     { "api_outFile", test_api_outFile },
     { "api_dataFile", test_api_dataFile },
     { "api_dataStr", test_api_dataStr },

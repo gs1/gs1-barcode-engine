@@ -125,6 +125,9 @@ GS1_ENCODERS_API bool gs1_encoder_setQrVersion(gs1_encoder *ctx, int version);
 GS1_ENCODERS_API int gs1_encoder_getQrEClevel(gs1_encoder *ctx);
 GS1_ENCODERS_API bool gs1_encoder_setQrEClevel(gs1_encoder *ctx, int ecLevel);
 
+GS1_ENCODERS_API bool gs1_encoder_getAddCheckDigit(gs1_encoder *ctx);
+GS1_ENCODERS_API bool gs1_encoder_setAddCheckDigit(gs1_encoder *ctx, bool addCheckDigit);
+
 GS1_ENCODERS_API bool gs1_encoder_getFileInputFlag(gs1_encoder *ctx);
 GS1_ENCODERS_API bool gs1_encoder_setFileInputFlag(gs1_encoder *ctx, bool fileInputFlag);
 

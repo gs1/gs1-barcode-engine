@@ -90,6 +90,7 @@ GS1_ENCODERS_API gs1_encoder* gs1_encoder_init(void *mem) {
 	ctx->dmCols = 0;
 	ctx->qrEClevel = gs1_encoder_qrEClevelM;
 	ctx->qrVersion = 0;  // Automatic
+	ctx->addCheckDigit = false;
 	ctx->format = gs1_encoder_dTIF;
 	strcpy(ctx->dataStr, "");
 	strcpy(ctx->dataFile, "data.txt");
@@ -342,6 +343,19 @@ GS1_ENCODERS_API bool gs1_encoder_setQrEClevel(gs1_encoder *ctx, int ecLevel) {
 			ctx->errFlag = true;
 			return false;
 	}
+	return true;
+}
+
+
+GS1_ENCODERS_API bool gs1_encoder_getAddCheckDigit(gs1_encoder *ctx) {
+	assert(ctx);
+	reset_error(ctx);
+	return ctx->addCheckDigit;
+}
+GS1_ENCODERS_API bool gs1_encoder_setAddCheckDigit(gs1_encoder *ctx, bool addCheckDigit) {
+	assert(ctx);
+	reset_error(ctx);
+	ctx->addCheckDigit = addCheckDigit;
 	return true;
 }
 
@@ -943,6 +957,25 @@ void test_api_qrEClevel(void) {
 
 	TEST_CHECK(!gs1_encoder_setQrEClevel(ctx, gs1_encoder_qrEClevelL - 1));
 	TEST_CHECK(!gs1_encoder_setQrEClevel(ctx, gs1_encoder_qrEClevelH + 1));
+
+	gs1_encoder_free(ctx);
+
+}
+
+
+void test_api_addCheckDigit(void) {
+
+	gs1_encoder* ctx;
+
+	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+
+	TEST_CHECK(!gs1_encoder_getAddCheckDigit(ctx));		// Default
+
+	TEST_CHECK(gs1_encoder_setAddCheckDigit(ctx, true));	// Set
+	TEST_CHECK(gs1_encoder_getAddCheckDigit(ctx));
+
+	TEST_CHECK(gs1_encoder_setAddCheckDigit(ctx, false));	// Reset
+	TEST_CHECK(!gs1_encoder_getAddCheckDigit(ctx));
 
 	gs1_encoder_free(ctx);
 
