@@ -56,16 +56,8 @@ int LLVMFuzzerTestOneInput(const uint8_t *buf, size_t len) {
 	memcpy(string, buf, len);
 	string[len] = '\0';
 
-	if (!gs1_encoder_setDataStr(ctx, string)) {
-		printf("SET DATA ERROR: %s", gs1_encoder_getErrMsg(ctx));
-		assert(false);
-	}
-
-	// Any encoding error other than exceeding the capacity of the symbol
-	// is something we would like to know about
-	if (!gs1_encoder_encode(ctx)) {
-		assert(strstr(gs1_encoder_getErrMsg(ctx), " exceeds the capacity of any ") != NULL);
-	}
+	gs1_encoder_setDataStr(ctx, string);
+	gs1_encoder_encode(ctx);
 
 	return 0;
 
