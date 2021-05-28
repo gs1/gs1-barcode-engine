@@ -47,6 +47,7 @@
 #include "cc.h"
 #include "dm.h"
 #include "ean.h"
+#include "gs1.h"
 #include "qr.h"
 #include "rss14.h"
 #include "rssexp.h"
@@ -190,10 +191,12 @@ TEST_LIST = {
      * ean.c
      *
      */
-    { "ean_EAN13_encode", test_ean_EAN13_encode },
+    { "ean_EAN13_encode_ean13", test_ean_EAN13_encode_ean13 },
+    { "ean_EAN13_encode_upca", test_ean_EAN13_encode_upca },
     { "ean_EAN8_encode", test_ean_EAN8_encode },
     { "ean_UPCA_encode", test_ean_UPCA_encode },
     { "ean_UPCE_encode", test_ean_UPCE_encode },
+    { "ean_zeroCompress", test_ean_zeroCompress },
 
 
     /*

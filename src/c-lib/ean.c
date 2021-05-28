@@ -18,6 +18,7 @@
  *
  */
 
+#include <assert.h>
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -25,8 +26,10 @@
 
 #include "enc-private.h"
 #include "cc.h"
+#include "debug.h"
 #include "driver.h"
 #include "ean.h"
+#include "gs1.h"
 
 
 #define EAN13_ELMNTS	61	// includes qz's
@@ -36,8 +39,9 @@
 #define EAN13_L_PAD	3	// EAN-13 7-X qz - CCA-2 3 offset
 #define EAN13_R_PAD	5	// EAN-13 WIDTH - MAX_WIDTH - EAN13_L_PAD
 
-// call with str = 13-digit primary with check digit = 0
-static bool EAN13enc(uint8_t str[], uint8_t pattern[] ) {
+
+// call with str = 13-digit primary
+static bool EAN13enc(uint8_t *str, uint8_t pattern[] ) {
 
 	static const uint16_t upcTblA[10] = {	0x3211, 0x2221, 0x2122, 0x1411, 0x1132,
 					0x1231, 0x1114, 0x1312, 0x1213, 0x3112 };
@@ -50,16 +54,7 @@ static bool EAN13enc(uint8_t str[], uint8_t pattern[] ) {
 
 	int i, j, abMask, bars, sNdx, pNdx, abBits;
 
-	// calculate UPC parity
-	for (j = 0, i = 0; i < 12; i += 2) {
-		j += str[i] - '0';
-		j += (str[i+1] - '0') * 3;
-	}
-	j = (j%10);
-	if (j > 0) {
-		j = 10 - j;
-	}
-	str[12] = (uint8_t)(j + '0');
+	assert(str && strlen((char*)str) == 13);
 
 	sNdx = 1;
 	pNdx = 0;
@@ -102,45 +97,62 @@ void gs1_EAN13(gs1_encoder *ctx) {
 	uint8_t sepPat1[5] = { 7,1,EAN13_W-16,1,7 }; // separator pattern 1
 	uint8_t sepPat2[5] = { 6,1,EAN13_W-14,1,6 }; // separator pattern 2
 
-	uint8_t (*ccPattern)[CCB4_ELMNTS] = ctx->ccPattern;
+	char primaryStr[14];
 
-	char dataStr[GS1_ENCODERS_MAX_DATA+1];
-	char primaryStr[14+1];
-	char tempStr[28+1];
+	uint8_t (*ccPattern)[CCB4_ELMNTS] = ctx->ccPattern;
 
 	int i;
 	int rows, ccFlag;
 	char *ccStr;
 
-	strcpy(dataStr, ctx->dataStr);
-	ccStr = strchr(dataStr, '|');
+	unsigned int digits = ctx->sym == gs1_encoder_sEAN13 ? 13 : 12;
+
+	DEBUG_PRINT("\nData: %s\n", ctx->dataStr);
+
+	ccStr = strchr(ctx->dataStr, '|');
 	if (ccStr == NULL) ccFlag = false;
 	else {
 		ccFlag = true;
 		ccStr[0] = '\0'; // separate primary data
 		ccStr++; // point to secondary data
+		DEBUG_PRINT("Primary %s\n", ctx->dataStr);
+		DEBUG_PRINT("CC: %s\n", ccStr);
 	}
 
-	if (strlen(dataStr) > 12) {
-		strcpy(ctx->errMsg, "primary data exceeds 12 digits");
+	if (!ctx->addCheckDigit) {
+		if (strlen(ctx->dataStr) != digits) {
+			sprintf(ctx->errMsg, "primary data must be %d digits", digits);
+			ctx->errFlag = true;
+			goto out;
+		}
+	}
+	else {
+		if (strlen(ctx->dataStr) != digits-1) {
+			sprintf(ctx->errMsg, "primary data must be %d digits without check digit", digits-1);
+			ctx->errFlag = true;
+			goto out;
+		}
+	}
+
+	primaryStr[0] = ctx->sym == gs1_encoder_sEAN13 ? '\0' : '0';  // Convert GTIN-12 to GTIN-13 if UPC-A
+	primaryStr[1] = '\0';
+	strcat(primaryStr, ctx->dataStr);
+
+	if (ctx->addCheckDigit)
+		strcat(primaryStr, "-");
+
+	if (!gs1_validateParity((uint8_t*)primaryStr) && !ctx->addCheckDigit) {
+		strcpy(ctx->errMsg, "primary data check digit is incorrect");
 		ctx->errFlag = true;
-		return;
+		goto out;
 	}
 
-	strcpy(tempStr, "000000000000");
-	strcat(tempStr, dataStr);
-	strcat(tempStr, "0"); // check digit = 0 for now
-	strcpy(primaryStr, tempStr + strlen(tempStr) - 13);
+	DEBUG_PRINT("Checked: %s\n", primaryStr);
 
-	if (!EAN13enc((uint8_t*)primaryStr, linPattern) || ctx->errFlag) return;
-#if PRNT
-	printf("\n%s", primaryStr);
-	printf("\n");
-	for (i = 0; i < EAN13_ELMNTS; i++) {
-		printf("%d", linPattern[i]);
-	}
-	printf("\n");
-#endif
+	if (!EAN13enc((uint8_t*)primaryStr, linPattern) || ctx->errFlag) goto out;
+
+	DEBUG_PRINT_PATTERN("Linear pattern", linPattern, EAN13_ELMNTS);
+
 	ctx->line1 = true; // so first line is not Y undercut
 	// init most likely prints values
 	prints.elmCnt = EAN13_ELMNTS;
@@ -160,21 +172,11 @@ void gs1_EAN13(gs1_encoder *ctx) {
 	sepPrnt.rightPad = 0;
 	sepPrnt.whtFirst = true;
 	sepPrnt.reverse = false;
+
 	if (ccFlag) {
-		if (!((rows = gs1_CC4enc(ctx, (uint8_t*)ccStr, ccPattern)) > 0) || ctx->errFlag) return;
-#if PRNT
-		{
-			int j;
-			printf("\n%s", ccStr);
-			printf("\n");
-			for (i = 0; i < rows; i++) {
-				for (j = 0; j < CCB4_ELMNTS; j++) {
-					printf("%d", ccPattern[i][j]);
-				}
-				printf("\n");
-			}
-		}
-#endif
+		if (!((rows = gs1_CC4enc(ctx, (uint8_t*)ccStr, ccPattern)) > 0) || ctx->errFlag) goto out;
+
+		DEBUG_PRINT_PATTERNS("CC pattern", (uint8_t*)(*ccPattern), CCB4_ELMNTS, rows);
 
 		gs1_driverInit(ctx, ctx->pixMult*EAN13_W, ctx->pixMult*(rows*2 + 6 + EAN13_H));
 
@@ -214,6 +216,13 @@ void gs1_EAN13(gs1_encoder *ctx) {
 
 		gs1_driverFinalise(ctx);
 	}
+
+out:
+
+	// Restore the original dataStr contents
+	if (ccFlag)
+		*(ccStr-1) = '|';
+
 	return;
 }
 
@@ -237,18 +246,9 @@ static bool EAN8enc(uint8_t str[], uint8_t pattern[] ) {
 
 	int i, j, bars, sNdx, pNdx;
 
-	// calculate UPC parity
-	for (j = 0, i = 0; i < 12; i += 2) {
-		j += str[i] - '0';
-		j += (str[i+1] - '0') * 3;
-	}
-	j = (j%10);
-	if (j > 0) {
-		j = 10 - j;
-	}
-	str[12] = (uint8_t)(j + '0');
+	assert(str && strlen((char*)str) == 8);
 
-	sNdx = 5;
+	sNdx = 0;
 	pNdx = 0;
 	for (i = 0; i < 4; i++) {
 		pattern[pNdx++] = lGuard[i];
@@ -285,9 +285,7 @@ void gs1_EAN8(gs1_encoder *ctx) {
 
 	uint8_t (*ccPattern)[CCB4_ELMNTS] = ctx->ccPattern;
 
-	char dataStr[GS1_ENCODERS_MAX_DATA+1];
-	char primaryStr[14+1];
-	char tempStr[28+1];
+	char primaryStr[8+1];
 
 	int i;
 	int rows, ccFlag;
@@ -296,35 +294,50 @@ void gs1_EAN8(gs1_encoder *ctx) {
 	int lpadEAN;
 	int elmntsCC;
 
-	strcpy(dataStr, ctx->dataStr);
-	ccStr = strchr(dataStr, '|');
+	DEBUG_PRINT("\nData: %s\n", ctx->dataStr);
+
+	ccStr = strchr(ctx->dataStr, '|');
 	if (ccStr == NULL) ccFlag = false;
 	else {
 		ccFlag = true;
 		ccStr[0] = '\0'; // separate primary data
 		ccStr++; // point to secondary data
+		DEBUG_PRINT("Primary %s\n", ctx->dataStr);
+		DEBUG_PRINT("CC: %s\n", ccStr);
 	}
 
-	if (strlen(dataStr) > 12) {
-		sprintf(ctx->errMsg, "primary data exceeds 12 digits");
+	if (!ctx->addCheckDigit) {
+		if (strlen(ctx->dataStr) != 8) {
+			strcpy(ctx->errMsg, "primary data must be 8 digits");
+			ctx->errFlag = true;
+			goto out;
+		}
+	}
+	else {
+		if (strlen(ctx->dataStr) != 7) {
+			strcpy(ctx->errMsg, "primary data must be 7 digits without check digit");
+			ctx->errFlag = true;
+			goto out;
+		}
+	}
+
+	strcpy(primaryStr, ctx->dataStr);
+
+	if (ctx->addCheckDigit)
+		strcat(primaryStr, "-");
+
+	if (!gs1_validateParity((uint8_t*)primaryStr) && !ctx->addCheckDigit) {
+		strcpy(ctx->errMsg, "primary data check digit is incorrect");
 		ctx->errFlag = true;
-		return;
+		goto out;
 	}
 
-	strcpy(tempStr, "000000000000");
-	strcat(tempStr, dataStr);
-	strcat(tempStr, "0"); // check digit = 0 for now
-	strcpy(primaryStr, tempStr + strlen(tempStr) - 13);
+	DEBUG_PRINT("Checked: %s\n", primaryStr);
 
-	if (!EAN8enc((uint8_t*)primaryStr, linPattern) || ctx->errFlag) return;
-#if PRNT
-	printf("\n%s", primaryStr);
-	printf("\n");
-	for (i = 0; i < EAN8_ELMNTS; i++) {
-		printf("%d", linPattern[i]);
-	}
-	printf("\n");
-#endif
+	if (!EAN8enc((uint8_t*)primaryStr, linPattern) || ctx->errFlag) goto out;
+
+	DEBUG_PRINT("Linear pattern", linPattern, EAN8_ELMNTS);
+
 	ctx->line1 = true; // so first line is not Y undercut
 	// init most likely prints values
 	lpadEAN = 0;
@@ -348,7 +361,7 @@ void gs1_EAN8(gs1_encoder *ctx) {
 	sepPrnt.whtFirst = true;
 	sepPrnt.reverse = false;
 	if (ccFlag) {
-		if (!((rows = gs1_CC3enc(ctx, (uint8_t*)ccStr, ccPattern)) > 0) || ctx->errFlag) return;
+		if (!((rows = gs1_CC3enc(ctx, (uint8_t*)ccStr, ccPattern)) > 0) || ctx->errFlag) goto out;
 		if (rows > MAX_CCA3_ROWS) { // CCB composite
 			lpadEAN = EAN8_L_PADB;
 			lpadCC = 0;
@@ -356,19 +369,8 @@ void gs1_EAN8(gs1_encoder *ctx) {
 			prints.leftPad = EAN8_L_PADB;
 			sepPrnt.leftPad = EAN8_L_PADB;
 		}
-#if PRNT
-		{
-			int j;
-			printf("\n%s", ccStr);
-			printf("\n");
-			for (i = 0; i < rows; i++) {
-				for (j = 0; j < elmntsCC; j++) {
-					printf("%d", ccPattern[i][j]);
-				}
-			}
-			printf("\n");
-		}
-#endif
+
+		DEBUG_PRINT_PATTERNS("CC pattern", (uint8_t*)(*ccPattern), elmntsCC, rows);
 
 		gs1_driverInit(ctx, ctx->pixMult*(EAN8_W+lpadEAN), ctx->pixMult*(rows*2 + 6 + EAN8_H));
 
@@ -407,6 +409,13 @@ void gs1_EAN8(gs1_encoder *ctx) {
 
 		gs1_driverFinalise(ctx);
 	}
+
+out:
+
+	// Restore the original dataStr contents
+	if (ccFlag)
+		*(ccStr-1) = '|';
+
 	return;
 }
 
@@ -418,8 +427,8 @@ void gs1_EAN8(gs1_encoder *ctx) {
 #define UPCE_L_PAD	3	// UPC-E 7X qz - 4X
 #define UPCE_R_PAD	5	// UPCE_W - MAX_WIDTH - UPCE_L_PAD
 
-// call with str = 13-digit primary with check digit = 0
-static bool UPCEenc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[] ) {
+// call with str = 7-digit primary
+static bool UPCEenc(uint8_t str[], uint8_t pattern[] ) {
 
 	static const uint16_t upcTblA[10] = {	0x3211, 0x2221, 0x2122, 0x1411, 0x1132,
 					0x1231, 0x1114, 0x1312, 0x1213, 0x3112 };
@@ -429,73 +438,22 @@ static bool UPCEenc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[] ) {
 	static const uint8_t lGuard[4] = { 7,1,1,1 };
 	static const uint8_t rGuard[7] = { 1,1,1,1,1,1,7 };
 
-	uint8_t data6[6+1];
-
 	int i, j, abMask, bars, sNdx, pNdx, abBits;
 
-	// calculate UPC parity
-	for (j = 0, i = 0; i < 12; i += 2) {
-		j += str[i] - '0';
-		j += (str[i+1] - '0') * 3;
-	}
-	j = (j%10);
-	if (j > 0) {
-		j = 10 - j;
-	}
-	str[12] = (uint8_t)(j + '0');
-
-	for (i = 0; i < 5; i++) {
-		data6[i] = str[i+2];
-	}
-	if (str[4] >= '0' && str[4] <= '2' &&
-			str[5] == '0' && str[6] == '0' && str[7] == '0' && str[8] == '0') {
-		// 00abc0000hij = abhijc, where c = 0-2
-		data6[2] = str[9];
-		data6[3] = str[10];
-		data6[4] = str[11];
-		data6[5] = str[4];
-	}
-	else if (str[5] == '0' && str[6] == '0' && str[7] == '0' &&
-			str[8] == '0' && str[9] == '0') {
-		// 00abc00000ij = abcij3
-		data6[3] = str[10];
-		data6[4] = str[11];
-		data6[5] = '3';
-	}
-	else if (str[6] == '0' && str[7] == '0' &&
-			str[8] == '0' && str[9] == '0' && str[10] == '0') {
-		// 00abcd00000j = abcdj4
-		data6[4] = str[11];
-		data6[5] = '4';
-	}
-	else if (str[11] >= '5' && str[11] <= '9' && str[7] == '0' &&
-			str[8] == '0' && str[9] == '0' && str[10] == '0') {
-		// 00abcde0000j = abcdej where j = 5-9
-		data6[5] = str[11];
-	}
-	else {
-		strcpy(ctx->errMsg, "Data cannot be converted to UPC-E");
-		ctx->errFlag = true;
-		return(false);
-	}
-
-	data6[6] = '\0';
-#if PRNT
-	printf("\n%s", data6);
-#endif
+	assert(str && strlen((char*)str) == 7);
 
 	sNdx = 0;
 	pNdx = 0;
 	for (i = 0; i < 4; i++) {
 		pattern[pNdx++] = lGuard[i];
 	}
-	abBits = abArr[str[12]-'0'];
+	abBits = abArr[str[6]-'0'];
 	for (abMask = 0x20, i = 0; i < 6; abMask >>= 1, i++) {
 		if ((abBits & abMask) != 0) {
-			bars = upcTblA[data6[sNdx++]-'0'];
+			bars = upcTblA[str[sNdx++]-'0'];
 		}
 		else {
-			bars = upcTblB[data6[sNdx++]-'0'];
+			bars = upcTblB[str[sNdx++]-'0'];
 		}
 		for (j = 12; j >= 0; j -= 4) {
 			pattern[pNdx++] = (uint8_t)((bars >> j) & 0xf);
@@ -506,6 +464,66 @@ static bool UPCEenc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[] ) {
 	}
 	return(true);
 }
+
+
+/*
+ *  Zero-compression for GTIN-12
+ *
+ *  abcdeNX <=> 0abN0000cdeX  :  0<N<2
+ *  abcde3X <=> 0abc00000deX
+ *  abcde4X <=> 0abcd00000eX
+ *  abcdeNX <=> 0abcde0000NX  :  5<N<9
+ *
+ */
+static bool zeroCompress(char *primaryStr, char *data7) {
+
+	int i;
+
+	assert(primaryStr && strlen((char*)primaryStr) == 12);
+	assert(data7);
+
+	if (primaryStr[0] != '0') {
+		return false;
+	}
+	for (i = 0; i < 5; i++) {
+		data7[i] = primaryStr[i+1];
+	}
+	if (primaryStr[3] >= '0' && primaryStr[3] <= '2' &&
+			primaryStr[4] == '0' && primaryStr[5] == '0' && primaryStr[6] == '0' && primaryStr[7] == '0') {
+		// 0abc0000hij = abhijc, where c = 0-2
+		data7[2] = primaryStr[8];
+		data7[3] = primaryStr[9];
+		data7[4] = primaryStr[10];
+		data7[5] = primaryStr[3];
+	}
+	else if (primaryStr[4] == '0' && primaryStr[5] == '0' && primaryStr[6] == '0' &&
+			primaryStr[7] == '0' && primaryStr[8] == '0') {
+		// 0abc00000ij = abcij3
+		data7[3] = primaryStr[9];
+		data7[4] = primaryStr[10];
+		data7[5] = '3';
+	}
+	else if (primaryStr[5] == '0' && primaryStr[6] == '0' &&
+			primaryStr[7] == '0' && primaryStr[8] == '0' && primaryStr[9] == '0') {
+		// 0abcd00000j = abcdj4
+		data7[4] = primaryStr[10];
+		data7[5] = '4';
+	}
+	else if (primaryStr[10] >= '5' && primaryStr[10] <= '9' && primaryStr[6] == '0' &&
+			primaryStr[7] == '0' && primaryStr[8] == '0' && primaryStr[9] == '0') {
+		// 0abcde0000j = abcdej where j = 5-9
+		data7[5] = primaryStr[10];
+	}
+	else {
+		return false;
+	}
+	data7[6] = primaryStr[11];
+	data7[7] = '\0';
+
+	return true;
+
+}
+
 
 void gs1_UPCE(gs1_encoder *ctx) {
 
@@ -518,43 +536,65 @@ void gs1_UPCE(gs1_encoder *ctx) {
 
 	uint8_t (*ccPattern)[CCB4_ELMNTS] = ctx->ccPattern;
 
-	char dataStr[GS1_ENCODERS_MAX_DATA+1];
-	char primaryStr[14+1];
-	char tempStr[28+1];
+	char primaryStr[12+1];
+	char data7[7+1];
 
 	int i;
 	int rows, ccFlag;
 	char *ccStr;
 
-	strcpy(dataStr, ctx->dataStr);
-	ccStr = strchr(dataStr, '|');
+	DEBUG_PRINT("\nData: %s\n", ctx->dataStr);
+
+	ccStr = strchr(ctx->dataStr, '|');
 	if (ccStr == NULL) ccFlag = false;
 	else {
 		ccFlag = true;
 		ccStr[0] = '\0'; // separate primary data
 		ccStr++; // point to secondary data
+		DEBUG_PRINT("Primary %s\n", ctx->dataStr);
+		DEBUG_PRINT("CC: %s\n", ccStr);
 	}
 
-	if (strlen(dataStr) > 12) {
-		sprintf(ctx->errMsg, "primary data exceeds 12 digits");
+	if (!ctx->addCheckDigit) {
+		if (strlen(ctx->dataStr) != 12) {
+			strcpy(ctx->errMsg, "primary data must be 12 digits");
+			ctx->errFlag = true;
+			goto out;
+		}
+	}
+	else {
+		if (strlen(ctx->dataStr) != 11) {
+			strcpy(ctx->errMsg, "primary data must be 11 digits without check digit");
+			ctx->errFlag = true;
+			goto out;
+		}
+	}
+
+	strcpy(primaryStr, ctx->dataStr);
+
+	if (ctx->addCheckDigit)
+		strcat(primaryStr, "-");
+
+	if (!gs1_validateParity((uint8_t*)primaryStr) && !ctx->addCheckDigit) {
+		strcpy(ctx->errMsg, "primary data check digit is incorrect");
 		ctx->errFlag = true;
-		return;
+		goto out;
 	}
 
-	strcpy(tempStr, "000000000000");
-	strcat(tempStr, dataStr);
-	strcat(tempStr, "0"); // check digit = 0 for now
-	strcpy(primaryStr, tempStr + strlen(tempStr) - 13);
+	DEBUG_PRINT("Checked: %s\n", primaryStr);
 
-	if (!UPCEenc(ctx, (uint8_t*)primaryStr, linPattern) || ctx->errFlag) return;
-#if PRNT
-	printf("\n%s", primaryStr);
-	printf("\n");
-	for (i = 0; i < UPCE_ELMNTS; i++) {
-		printf("%d", linPattern[i]);
+	// Perform zero-compression
+	if (!zeroCompress(primaryStr, data7)) {
+		strcpy(ctx->errMsg, "Data cannot be converted to UPC-E");
+		ctx->errFlag = true;
+		goto out;
 	}
-	printf("\n");
-#endif
+	DEBUG_PRINT("Zero-compressed: %s\n", data7);
+
+	if (!UPCEenc((uint8_t*)data7, linPattern) || ctx->errFlag) goto out;
+
+	DEBUG_PRINT_PATTERN("Linear pattern", linPattern, UPCE_ELMNTS);
+
 	ctx->line1 = true; // so first line is not Y undercut
 	// init most likely prints values
 	prints.elmCnt = UPCE_ELMNTS;
@@ -575,20 +615,9 @@ void gs1_UPCE(gs1_encoder *ctx) {
 	sepPrnt.whtFirst = true;
 	sepPrnt.reverse = false;
 	if (ccFlag) {
-		if (!((rows = gs1_CC2enc(ctx, (uint8_t*)ccStr, ccPattern)) > 0) || ctx->errFlag) return;
-#if PRNT
-		{
-			int j;
-			printf("\n%s", ccStr);
-			printf("\n");
-			for (i = 0; i < rows; i++) {
-				for (j = 0; j < CCB2_ELMNTS; j++) {
-					printf("%d", ccPattern[i][j]);
-				}
-				printf("\n");
-			}
-		}
-#endif
+		if (!((rows = gs1_CC2enc(ctx, (uint8_t*)ccStr, ccPattern)) > 0) || ctx->errFlag) goto out;
+
+		DEBUG_PRINT_PATTERNS("CC pattern", (uint8_t*)(*ccPattern), CCB2_ELMNTS, rows);
 
 		gs1_driverInit(ctx, ctx->pixMult*UPCE_W, ctx->pixMult*(rows*2 + 6 + UPCE_H));
 
@@ -627,6 +656,13 @@ void gs1_UPCE(gs1_encoder *ctx) {
 
 		gs1_driverFinalise(ctx);
 	}
+
+out:
+
+	// Restore the original dataStr contents
+	if (ccFlag)
+		*(ccStr-1) = '|';
+
 	return;
 }
 
@@ -640,7 +676,7 @@ void gs1_UPCE(gs1_encoder *ctx) {
 #include "gs1encoders-test.h"
 
 
-void test_ean_EAN13_encode(void) {
+void test_ean_EAN13_encode_ean13(void) {
 
 	char** expect;
 
@@ -723,7 +759,97 @@ void test_ean_EAN13_encode(void) {
 "       X X  XX  X  XX  X  XX XX X    X X   XX XXX  X X X X X    X   X  X  X   XXX X  XXX  X XXX  X X X       ",
 NULL
 	};
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sEAN13, "211234567890", expect));
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sEAN13, "2112345678900", expect));
+
+	gs1_encoder_free(ctx);
+
+}
+
+
+void test_ean_EAN13_encode_upca(void) {
+
+	char** expect;
+
+	gs1_encoder* ctx = gs1_encoder_init(NULL);
+
+	expect = (char*[]){
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+"       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
+NULL
+	};
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sUPCA, "416000336108", expect));
 
 	gs1_encoder_free(ctx);
 
@@ -799,7 +925,7 @@ void test_ean_EAN8_encode(void) {
 "       X X   XX X  X  XX XXXX X X   XX X X X  XXX X X    X   X  X    X X X       ",
 NULL
 	};
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sEAN8, "0234567", expect));
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sEAN8, "02345673", expect));
 
 	gs1_encoder_free(ctx);
 
@@ -889,9 +1015,76 @@ void test_ean_UPCA_encode(void) {
 "       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
 NULL
 	};
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sUPCA, "41600033610", expect));
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sUPCA, "416000336108", expect));
 
 	gs1_encoder_free(ctx);
+
+}
+
+
+static void test_zeroCompress(char* wide, char* narrow, bool valid) {
+
+	char data7[8];
+	char casename[25];
+
+	assert(wide && strlen(wide) == 12);
+	assert(narrow && strlen(narrow) == 7);
+
+	sprintf(casename, "%s <=> %s", wide, narrow);
+
+	TEST_CASE(casename);
+	TEST_ASSERT(zeroCompress(wide, data7) ^ !valid);
+	TEST_CHECK(!valid || strcmp(data7, narrow) == 0);
+	TEST_MSG("Wanted %s. Got %s.", narrow, data7);
+
+}
+
+
+void test_ean_zeroCompress(void) {
+
+	// abcdeNX <=> 0abN0000cdeX  :  0<N<2
+	test_zeroCompress("01200000567X","125670X", true );
+	test_zeroCompress("01210000567X","125671X", true );
+	test_zeroCompress("01220000567X","125672X", true );
+	test_zeroCompress("01230000567X","XXXXXXX", false);
+	test_zeroCompress("01240000567X","XXXXXXX", false);
+	test_zeroCompress("01250000567X","XXXXXXX", false);
+	test_zeroCompress("01260000567X","XXXXXXX", false);
+	test_zeroCompress("01270000567X","XXXXXXX", false);
+	test_zeroCompress("01280000567X","XXXXXXX", false);
+	test_zeroCompress("01290000567X","XXXXXXX", false);
+	test_zeroCompress("01201000567X","XXXXXXX", false);
+	test_zeroCompress("01200100567X","XXXXXXX", false);
+	test_zeroCompress("01200010567X","XXXXXXX", false);
+	test_zeroCompress("01200001567X","XXXXXXX", false);
+
+	// abcde3X <=> 0abc00000deX
+	test_zeroCompress("01230000045X","123453X", true );
+	test_zeroCompress("01231000045X","XXXXXXX", false);
+	test_zeroCompress("01230100045X","XXXXXXX", false);
+	test_zeroCompress("01230010045X","XXXXXXX", false);
+	test_zeroCompress("01230001045X","XXXXXXX", false);
+	test_zeroCompress("01230000145X","XXXXXXX", false);
+
+	// abcde4X <=> 0abcd00000eX
+	test_zeroCompress("01234000005X","123454X", true );
+	test_zeroCompress("01234100004X","XXXXXXX", false);	// Avoid match in next category
+	test_zeroCompress("01234010005X","XXXXXXX", false);
+	test_zeroCompress("01234001005X","XXXXXXX", false);
+	test_zeroCompress("01234000105X","XXXXXXX", false);
+	test_zeroCompress("01234000015X","XXXXXXX", false);
+
+	// abcdeNX <=> 0abcde0000NX
+	test_zeroCompress("01234500000X","XXXXXXX", false);
+	test_zeroCompress("01234500001X","XXXXXXX", false);
+	test_zeroCompress("01234500002X","XXXXXXX", false);
+	test_zeroCompress("01234500003X","XXXXXXX", false);
+	test_zeroCompress("01234500004X","XXXXXXX", false);
+	test_zeroCompress("01234500005X","123455X", true );
+	test_zeroCompress("01234500006X","123456X", true );
+	test_zeroCompress("01234500007X","123457X", true );
+	test_zeroCompress("01234500008X","123458X", true );
+	test_zeroCompress("01234500009X","123459X", true );
 
 }
 
@@ -979,7 +1172,7 @@ void test_ean_UPCE_encode(void) {
 "       X X X  XXX  XX  X  XX XX XXXX X  XXX X XX   X X X X       ",
 NULL
 	};
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sUPCE, "00123400005", expect));
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sUPCE, "001234000057", expect));
 
 	gs1_encoder_free(ctx);
 

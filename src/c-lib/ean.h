@@ -30,10 +30,12 @@ void gs1_UPCE(gs1_encoder *ctx);
 
 #ifdef UNIT_TESTS
 
-void test_ean_EAN13_encode(void);
+void test_ean_EAN13_encode_ean13(void);
+void test_ean_EAN13_encode_upca(void);
 void test_ean_EAN8_encode(void);
 void test_ean_UPCA_encode(void);
 void test_ean_UPCE_encode(void);
+void test_ean_zeroCompress(void);
 
 #endif
 

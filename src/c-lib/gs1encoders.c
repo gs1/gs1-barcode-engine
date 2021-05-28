@@ -1159,7 +1159,7 @@ void test_api_getBuffer(void) {
 	TEST_CHECK(buf == NULL);
 
 	TEST_CHECK(gs1_encoder_setSym(ctx, gs1_encoder_sEAN13));
-	TEST_CHECK(gs1_encoder_setDataStr(ctx, "123456789012"));
+	TEST_CHECK(gs1_encoder_setDataStr(ctx, "1234567890128"));
 	TEST_CHECK(gs1_encoder_setOutFile(ctx, ""));
 
 	TEST_CHECK(gs1_encoder_setFormat(ctx, gs1_encoder_dTIF));
@@ -1188,11 +1188,11 @@ void test_api_getBuffer(void) {
 
 	// Check integrity of dataStr after encode
 	TEST_CHECK(gs1_encoder_setSym(ctx, gs1_encoder_sEAN13));
-	TEST_CHECK(gs1_encoder_setDataStr(ctx, "123456789012|99123456"));
+	TEST_CHECK(gs1_encoder_setDataStr(ctx, "1234567890128|99123456"));
 	TEST_CHECK(gs1_encoder_setOutFile(ctx, ""));
 	TEST_CHECK(gs1_encoder_setFormat(ctx, gs1_encoder_dRAW));
 	TEST_CHECK(gs1_encoder_encode(ctx));
-	TEST_CHECK(strcmp(gs1_encoder_getDataStr(ctx), "123456789012|99123456") == 0);
+	TEST_CHECK(strcmp(gs1_encoder_getDataStr(ctx), "1234567890128|99123456") == 0);
 
 	gs1_encoder_free(ctx);
 

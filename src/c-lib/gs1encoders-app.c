@@ -121,19 +121,19 @@ static bool userInt(gs1_encoder *ctx) {
 				printf("\nSpecial data input characters:");
 				break;
 			case gs1_encoder_sUPCA:
-				printf("\n Primary data is up to 11 digits. Check digit must be omitted.");
+				printf("\n Primary data is 12 digits including check digit.");
 				printf("\n 2D component data starts with 1st AI. Only interior FNC1s are necessary.");
 				break;
 			case gs1_encoder_sUPCE:
-				printf("\n Primary data (not zero suppressed) is up to 10 digits. Check digit must be omitted.");
+				printf("\n Primary data (not zero suppressed) is 12 digits including check digit.");
 				printf("\n 2D component data starts with 1st AI. Only interior FNC1s are necessary.");
 				break;
 			case gs1_encoder_sEAN13:
-				printf("\n Primary data is up to 12 digits. Check digit must be omitted.");
+				printf("\n Primary data is 13 digits including check digit.");
 				printf("\n 2D component data starts with 1st AI. Only interior FNC1s are necessary.");
 				break;
 			case gs1_encoder_sEAN8:
-				printf("\n Primary data is up to 7 digits. Check digit must be omitted.");
+				printf("\n Primary data is 8 digits including check digit.");
 				printf("\n 2D component data starts with 1st AI. Only interior FNC1s are necessary.");
 				break;
 			case gs1_encoder_sUCC128_CCA:
