@@ -628,6 +628,10 @@ GS1_ENCODERS_API int gs1_encoder_getBufferHeight(gs1_encoder *ctx) {
 #include "acutest.h"
 
 
+// Sizable buffer on the heap so that we don't exhaust the stack
+char bigbuffer[GS1_ENCODERS_MAX_DATA+2];
+
+
 void test_api_getVersion(void) {
 
 	gs1_encoder* ctx;
@@ -1118,7 +1122,6 @@ void test_api_dataStr(void) {
 
 	gs1_encoder* ctx;
 
-	char longdata[GS1_ENCODERS_MAX_DATA+2];
 	int i;
 
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
@@ -1129,13 +1132,13 @@ void test_api_dataStr(void) {
 	TEST_CHECK(gs1_encoder_setDataStr(ctx, "a"));
 
 	for (i = 0; i <= GS1_ENCODERS_MAX_DATA; i++) {
-		longdata[i]='a';
+		bigbuffer[i]='a';
 	}
-	longdata[GS1_ENCODERS_MAX_DATA+1]='\0';
-	TEST_CHECK(!gs1_encoder_setDataStr(ctx, longdata));  // Too long
+	bigbuffer[GS1_ENCODERS_MAX_DATA+1]='\0';
+	TEST_CHECK(!gs1_encoder_setDataStr(ctx, bigbuffer));  // Too long
 
-	longdata[GS1_ENCODERS_MAX_DATA]='\0';
-	TEST_CHECK(gs1_encoder_setDataStr(ctx, longdata));   // Maximun length
+	bigbuffer[GS1_ENCODERS_MAX_DATA]='\0';
+	TEST_CHECK(gs1_encoder_setDataStr(ctx, bigbuffer));   // Maximun length
 
 	gs1_encoder_free(ctx);
 
