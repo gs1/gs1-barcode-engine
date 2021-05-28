@@ -25,10 +25,9 @@
 #include <stddef.h>
 
 #define GS1_ENCODERS_MAX_FNAME 120
-#define GS1_ENCODERS_MAX_DATA (75+2361)
+#define GS1_ENCODERS_MAX_DATA 8191	// Longest numeric data for QR is 7089
 #define GS1_ENCODERS_MAX_PIXMULT 12
-#define GS1_ENCODERS_MAX_KEYDATA 2048
-#define GS1_ENCODERS_MAX_LINHT 500     // max UCC/EAN-128 height in X
+#define GS1_ENCODERS_MAX_LINHT 500	// Max UCC/EAN-128 height in X
 
 #ifdef _WIN32
 #  define GS1_ENCODERS_API __declspec(dllexport)

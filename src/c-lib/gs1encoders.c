@@ -433,8 +433,8 @@ GS1_ENCODERS_API char* gs1_encoder_getDataStr(gs1_encoder *ctx) {
 GS1_ENCODERS_API bool gs1_encoder_setDataStr(gs1_encoder *ctx, char* dataStr) {
 	assert(ctx);
 	reset_error(ctx);
-	if (strlen(dataStr) > GS1_ENCODERS_MAX_KEYDATA) {
-		sprintf(ctx->errMsg, "Maximum data length is %d characters", GS1_ENCODERS_MAX_KEYDATA);
+	if (strlen(dataStr) > GS1_ENCODERS_MAX_DATA) {
+		sprintf(ctx->errMsg, "Maximum data length is %d characters", GS1_ENCODERS_MAX_DATA);
 		ctx->errFlag = true;
 		return false;
 	}
@@ -1118,7 +1118,7 @@ void test_api_dataStr(void) {
 
 	gs1_encoder* ctx;
 
-	char longdata[GS1_ENCODERS_MAX_KEYDATA+2];
+	char longdata[GS1_ENCODERS_MAX_DATA+2];
 	int i;
 
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
@@ -1128,13 +1128,13 @@ void test_api_dataStr(void) {
 	TEST_CHECK(gs1_encoder_setDataStr(ctx, ""));
 	TEST_CHECK(gs1_encoder_setDataStr(ctx, "a"));
 
-	for (i = 0; i <= GS1_ENCODERS_MAX_KEYDATA; i++) {
+	for (i = 0; i <= GS1_ENCODERS_MAX_DATA; i++) {
 		longdata[i]='a';
 	}
-	longdata[GS1_ENCODERS_MAX_KEYDATA+1]='\0';
+	longdata[GS1_ENCODERS_MAX_DATA+1]='\0';
 	TEST_CHECK(!gs1_encoder_setDataStr(ctx, longdata));  // Too long
 
-	longdata[GS1_ENCODERS_MAX_KEYDATA]='\0';
+	longdata[GS1_ENCODERS_MAX_DATA]='\0';
 	TEST_CHECK(gs1_encoder_setDataStr(ctx, longdata));   // Maximun length
 
 	gs1_encoder_free(ctx);

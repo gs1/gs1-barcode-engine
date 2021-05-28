@@ -53,7 +53,7 @@ static char* _gets(char* in) {
 
 	char* s;
 
-	s = fgets(in, GS1_ENCODERS_MAX_KEYDATA+1, stdin);
+	s = fgets(in, GS1_ENCODERS_MAX_DATA+1, stdin);
 	if (s != NULL) {
 		s[strcspn(s, "\r\n")] = 0;
 	}
@@ -63,7 +63,7 @@ static char* _gets(char* in) {
 
 static bool getSym(gs1_encoder *ctx) {
 
-	char inpStr[GS1_ENCODERS_MAX_KEYDATA+1];
+	char inpStr[GS1_ENCODERS_MAX_DATA+1];
 	int i;
 	int sym;
 
@@ -96,7 +96,7 @@ static bool userInt(gs1_encoder *ctx) {
 
 	int inMenu = true;
 	int retFlag = true; // return is false if exit program
-	char inpStr[GS1_ENCODERS_MAX_KEYDATA+1];
+	char inpStr[GS1_ENCODERS_MAX_DATA+1];
 	int menuVal, i;
 
 	while (inMenu) {
@@ -275,7 +275,7 @@ static bool userInt(gs1_encoder *ctx) {
 				break;
 			case 5:
 			 if (!gs1_encoder_getFileInputFlag(ctx)) { // for kbd input
-				printf("\nEnter linear|2d data. No more than %d characters: ", GS1_ENCODERS_MAX_KEYDATA);
+				printf("\nEnter linear|2d data: ");
 				if (gets(inpStr) == NULL)
 					return false;
 				if (!gs1_encoder_setDataStr(ctx, inpStr)) {
