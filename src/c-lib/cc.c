@@ -2111,9 +2111,7 @@ int gs1_CC2enc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][C
 		ctx->errFlag = true;
 		return(0);
 	}
-#if PRNT
-	printf("%s\n", str);
-#endif
+
 	size = gs1_pack(ctx, str, bitField);
 	if (size < 0 || CC2Sizes[size] == 0) {
 		strcpy(ctx->errMsg, "data error");
@@ -2146,9 +2144,7 @@ int gs1_CC3enc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][C
 		ctx->errFlag = true;
 		return(0);
 	}
-#if PRNT
-	printf("%s\n", str);
-#endif
+
 	size = gs1_pack(ctx, str, bitField);
 	if (size < 0 || CC3Sizes[size] == 0) {
 		strcpy(ctx->errMsg, "data error");
@@ -2181,9 +2177,7 @@ int gs1_CC4enc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][C
 		ctx->errFlag = true;
 		return(0);
 	}
-#if PRNT
-	printf("%s\n", str);
-#endif
+
 	size = gs1_pack(ctx, str, bitField);
 	if (size < 0 || CC4Sizes[size] == 0) {
 		strcpy(ctx->errMsg, "data error");
