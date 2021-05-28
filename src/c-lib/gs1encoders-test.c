@@ -98,8 +98,11 @@ bool test_encode(gs1_encoder *ctx, int sym, char* dataStr, char** expect) {
 	TEST_CHECK(gs1_encoder_setFormat(ctx, gs1_encoder_dRAW));
 	TEST_CHECK(gs1_encoder_setSym(ctx, sym));
 	TEST_CHECK(gs1_encoder_setDataStr(ctx, dataStr));
+
 	TEST_CHECK(gs1_encoder_encode(ctx));
-	TEST_CHECK(gs1_encoder_getBufferStrings(ctx, &strings) > 0);
+	TEST_MSG("Error: %s", gs1_encoder_getErrMsg(ctx));
+
+	TEST_ASSERT(gs1_encoder_getBufferStrings(ctx, &strings) > 0);
 
 	while (strings[i] && expect[i] &&
 			strcmp(expect[i], "...") != 0 &&
@@ -159,6 +162,13 @@ TEST_LIST = {
     { "api_dataStr", test_api_dataStr },
     { "api_format", test_api_format },
     { "api_getBuffer", test_api_getBuffer },
+
+
+    /*
+     * gs1.c
+     *
+     */
+    { "gs1_validateParity", test_gs1_validateParity },
 
 
     /*
