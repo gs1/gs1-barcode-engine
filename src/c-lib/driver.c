@@ -313,12 +313,13 @@ bool gs1_doDriverInit(gs1_encoder *ctx, long xdim, long ydim) {
 		ctx->outfp = oFile;
 	} else {
 		free(ctx->buffer);
-		if ((ctx->buffer = malloc(512 * sizeof(uint8_t))) == NULL) {
+		ctx->bufferCap = 1024;		// Initial size, will grow as needed
+		if ((ctx->buffer = malloc(ctx->bufferCap * sizeof(uint8_t))) == NULL) {
+			ctx->bufferCap = 0;
 			strcpy(ctx->errMsg, "Out of memory allocating output buffer");
 			ctx->errFlag = true;
 			return false;
 		}
-		ctx->bufferCap = 512;
 		ctx->bufferSize = 0;
 		ctx->bufferWidth = (int)xdim;
 		ctx->bufferHeight = (int)ydim;
