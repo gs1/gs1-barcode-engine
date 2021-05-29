@@ -458,7 +458,6 @@ static bool UPCEenc(uint8_t str[], uint8_t pattern[] ) {
 
 	assert(str && strlen((char*)str) == 7);
 	assert(gs1_allDigits(str));
-	assert(gs1_validateParity(str));
 
 	sNdx = 0;
 	pNdx = 0;
