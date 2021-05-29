@@ -25,6 +25,7 @@
 
 #include "enc-private.h"
 #include "cc.h"
+#include "debug.h"
 #include "driver.h"
 #include "rssexp.h"
 #include "rssutil.h"
@@ -256,32 +257,33 @@ void gs1_RSSExp(gs1_encoder *ctx) {
 
 	uint8_t (*ccPattern)[CCB4_ELMNTS] = ctx->ccPattern;
 
-	char dataStr[GS1_ENCODERS_MAX_DATA+1];
-
 	int i, j;
-	int rows = 0, ccFlag;
+	int rows = 0, ccFlag = 0;
 	int segs, lNdx, lNdx1, lMods, lHeight;
 	int evenRow, rev;
 	int chexSize;
 	char *ccStr;
 	int rPadl1, rPadcc;
 
-	strcpy(dataStr, ctx->dataStr);
-	ccStr = strchr(dataStr, '|');
+	DEBUG_PRINT("\nData: %s\n", ctx->dataStr);
+
+	ccStr = strchr(ctx->dataStr, '|');
 	if (ccStr == NULL) ccFlag = false;
 	else {
 		if (ctx->segWidth < 4) {
 			strcpy(ctx->errMsg, "Composite must be at least 4 segments wide");
 			ctx->errFlag = true;
-			return;
+			goto out;
 		}
 		ccFlag = true;
 		ccStr[0] = '\0'; // separate primary data
 		ccStr++; // point to secondary data
+		DEBUG_PRINT("Primary %s\n", ctx->dataStr);
+		DEBUG_PRINT("CC: %s\n", ccStr);
 	}
 
 	ctx->rssexp_rowWidth = ctx->segWidth; // save for getUnusedBitCnt
-	if (!((segs = RSS14Eenc(ctx, (uint8_t*)dataStr, dblPattern, ccFlag)) > 0) || ctx->errFlag) return;
+	if (!((segs = RSS14Eenc(ctx, (uint8_t*)ctx->dataStr, dblPattern, ccFlag)) > 0) || ctx->errFlag) goto out;
 
 	lNdx = 0;
 	for (i = 0; i < segs-1; i += 2) {
@@ -324,27 +326,14 @@ void gs1_RSSExp(gs1_encoder *ctx) {
 
 	rPadcc = lMods - RSSEXP_L_PAD - CCB4_WIDTH;
 
-#if PRNT
-	printf("\n%s", dataStr);
-	printf("\n");
-	for (i = 0; i < lNdx; i++) {
-		printf("%d", linPattern[i]);
-	}
-	printf("\n");
-#endif
+	DEBUG_PRINT_PATTERN("Linear pattern", linPattern, lNdx);
+
 	ctx->line1 = true; // so first line is not Y undercut
+
 	if (ccFlag) {
-		if (!((rows = gs1_CC4enc(ctx, (uint8_t*)ccStr, ccPattern)) > 0) || ctx->errFlag) return;
-#if PRNT
-		printf("\n%s", ccStr);
-		printf("\n");
-		for (i = 0; i < rows; i++) {
-			for (j = 0; j < CCB4_ELMNTS; j++) {
-				printf("%d", ccPattern[i][j]);
-			}
-			printf("\n");
-		}
-#endif
+		if (!((rows = gs1_CC4enc(ctx, (uint8_t*)ccStr, ccPattern)) > 0) || ctx->errFlag) goto out;
+
+		DEBUG_PRINT_PATTERNS("CC pattern", (uint8_t*)(*ccPattern), CCB4_ELMNTS, rows);
 	}
 
 	if (ccFlag) {
@@ -452,6 +441,12 @@ void gs1_RSSExp(gs1_encoder *ctx) {
 	}
 
 	gs1_driverFinalise(ctx);
+
+out:
+
+	// Restore the original dataStr contents
+	if (ccFlag)
+		*(ccStr-1) = '|';
 
 	return;
 }
