@@ -26,6 +26,7 @@
 
 
 bool gs1_validateParity(uint8_t *str);
+bool gs1_allDigits(uint8_t *str);
 
 
 #ifdef UNIT_TESTS

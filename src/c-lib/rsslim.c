@@ -18,6 +18,7 @@
  *
  */
 
+#include <assert.h>
 #include <string.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -25,7 +26,9 @@
 
 #include "enc-private.h"
 #include "cc.h"
+#include "debug.h"
 #include "driver.h"
+#include "gs1.h"
 #include "rsslim.h"
 #include "rssutil.h"
 
@@ -201,10 +204,14 @@ static bool RSSLimEnc(gs1_encoder *ctx, uint8_t string[], uint8_t bars[], int cc
 	int iIndex;
 	int *widths;
 
+	assert(string && strlen((char*)string) == 14);
+	assert(gs1_allDigits(string));
+	assert(gs1_validateParity(string));
+
+	string[13]='\0';
 	data = atof((char*)string);
-	if (data > 1999999999999.) {
-		return(false); // item number too large
-	}
+	assert(data < 2000000000000.);
+
 	if (ccFlag) data += SUPL_VAL;
 
 	// calculate left (high order) symbol half value:
@@ -298,42 +305,68 @@ void gs1_RSSLim(gs1_encoder *ctx) {
 
 	uint8_t (*ccPattern)[CCB4_ELMNTS] = ctx->ccPattern;
 
-	char dataStr[GS1_ENCODERS_MAX_DATA+1];
 	char primaryStr[14+1];
-	char tempStr[28+1];
 
 	int i;
 	int rows, ccFlag;
 	char *ccStr;
 
-	strcpy(dataStr, ctx->dataStr);
-	ccStr = strchr(dataStr, '|');
+	DEBUG_PRINT("\nData: %s\n", ctx->dataStr);
+
+	ccStr = strchr(ctx->dataStr, '|');
 	if (ccStr == NULL) ccFlag = false;
 	else {
 		ccFlag = true;
 		ccStr[0] = '\0'; // separate primary data
 		ccStr++; // point to secondary data
+		DEBUG_PRINT("Primary %s\n", ctx->dataStr);
+		DEBUG_PRINT("CC: %s\n", ccStr);
 	}
 
-	if (strlen(dataStr) > 13) {
-		strcpy(ctx->errMsg, "primary data exceeds 13 digits");
+	if (!ctx->addCheckDigit) {
+		if (strlen(ctx->dataStr) != 14) {
+			strcpy(ctx->errMsg, "primary data must be 14 digits");
+			ctx->errFlag = true;
+			goto out;
+		}
+	}
+	else {
+		if (strlen(ctx->dataStr) != 13) {
+			strcpy(ctx->errMsg, "primary data must be 13 digits without check digit");
+			ctx->errFlag = true;
+			goto out;
+		}
+	}
+
+	if (!gs1_allDigits((uint8_t*)ctx->dataStr)) {
+		strcpy(ctx->errMsg, "primary data must be all digits");
 		ctx->errFlag = true;
-		return;
+		goto out;
 	}
 
-	strcpy(tempStr, "000000000000");
-	strcat(tempStr, dataStr);
-	strcpy(primaryStr, tempStr + strlen(tempStr) - 13);
+	strcpy(primaryStr, ctx->dataStr);
 
-	if (!RSSLimEnc(ctx, (uint8_t*)primaryStr, linPattern, ccFlag) || ctx->errFlag) return;
-#if PRNT
-	printf("\n%s", primaryStr);
-	printf("\n");
-	for (i = 0; i < RSSLIM_ELMNTS; i++) {
-		printf("%d", linPattern[i]);
+	if (ctx->addCheckDigit)
+		strcat(primaryStr, "-");
+
+	if (!gs1_validateParity((uint8_t*)primaryStr) && !ctx->addCheckDigit) {
+		strcpy(ctx->errMsg, "primary data check digit is incorrect");
+		ctx->errFlag = true;
+		goto out;
 	}
-	printf("\n");
-#endif
+
+	DEBUG_PRINT("Checked: %s\n", primaryStr);
+
+	if (atof((char*)primaryStr) > 19999999999999.) {
+		strcpy(ctx->errMsg, "primary data item value is too large");
+		ctx->errFlag = true;
+		goto out;
+	}
+
+	if (!RSSLimEnc(ctx, (uint8_t*)primaryStr, linPattern, ccFlag) || ctx->errFlag) goto out;
+
+	DEBUG_PRINT_PATTERN("Linear pattern", linPattern, RSSLIM_ELMNTS);
+
 	ctx->line1 = true; // so first line is not Y undercut
 	// init most common RSS Limited row prints values
 	prints.elmCnt = RSSLIM_ELMNTS;
@@ -345,27 +378,10 @@ void gs1_RSSLim(gs1_encoder *ctx) {
 	prints.whtFirst = true;
 	prints.reverse = false;
 	if (ccFlag) {
-		if (!((rows = gs1_CC3enc(ctx, (uint8_t*)ccStr, ccPattern)) > 0) || ctx->errFlag) return;
-#if PRNT
-		{
-			int j;
-			printf("\n%s", ccStr);
-			printf("\n");
-			for (i = 0; i < rows; i++) {
-				if (rows <= MAX_CCA3_ROWS) { // CCA composite
-					for (j = 0; j < CCA3_ELMNTS; j++) {
-						printf("%d", ccPattern[i][j]);
-					}
-				}
-				else {
-					for (j = 0; j < CCB3_ELMNTS; j++) {
-						printf("%d", ccPattern[i][j]);
-					}
-				}
-				printf("\n");
-			}
-		}
-#endif
+		if (!((rows = gs1_CC3enc(ctx, (uint8_t*)ccStr, ccPattern)) > 0) || ctx->errFlag) goto out;
+
+		DEBUG_PRINT_PATTERNS("CC pattern", (uint8_t*)(*ccPattern),
+			rows <= MAX_CCA3_ROWS ? CCA3_ELMNTS : CCB3_ELMNTS, rows);
 
 		if (rows <= MAX_CCA3_ROWS) { // CCA composite
 			gs1_driverInit(ctx, ctx->pixMult*RSSLIM_SYM_W,
@@ -432,6 +448,13 @@ void gs1_RSSLim(gs1_encoder *ctx) {
 
 		gs1_driverFinalise(ctx);
 	}
+
+out:
+
+	// Restore the original dataStr contents
+	if (ccFlag)
+		*(ccStr-1) = '|';
+
 	return;
 }
 
@@ -464,7 +487,7 @@ void test_rsslim_RSSLIM_encode(void) {
 " X   XX  XX   XX XX X X  XXX X  X X XX X  XX X  X  X XX   XX XXX  XX  XX X",
 NULL
 	};
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sRSSLIM, "1501234567890", expect));
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sRSSLIM, "15012345678907", expect));
 
 	gs1_encoder_free(ctx);
 

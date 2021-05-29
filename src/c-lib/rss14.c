@@ -23,8 +23,11 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#include "assert.h"
 #include "enc-private.h"
+#include "debug.h"
 #include "driver.h"
+#include "gs1.h"
 #include "rss14.h"
 #include "rssutil.h"
 #include "cc.h"
@@ -135,8 +138,12 @@ static struct sPrints *separator14S(gs1_encoder *ctx, struct sPrints *prints) {
 #define	SEMI_MUL	1597
 
 
-// call with str = 13-digit primary, no check digit
+// call with str = 14-digit primary
 static bool RSS14enc(gs1_encoder *ctx, uint8_t string[], uint8_t bars[], int ccFlag) {
+
+	assert(string && strlen((char*)string) == 14);
+	assert(gs1_allDigits(string));
+	assert(gs1_validateParity(string));
 
 	// stores even elements N & max, odd N & max, even mul, combos
 	static const int tbl154[4*6] = {
@@ -178,6 +185,7 @@ static bool RSS14enc(gs1_encoder *ctx, uint8_t string[], uint8_t bars[], int ccF
 	int iIndex;
 	int *widths;
 
+	string[13] = '\0';
 	data = atof((char*)string);
 	if (ccFlag) data += 10000000000000.;
 
@@ -370,14 +378,14 @@ void gs1_RSS14(gs1_encoder *ctx) {
 
 	uint8_t (*ccPattern)[CCB4_ELMNTS] = ctx->ccPattern;
 
-	char dataStr[GS1_ENCODERS_MAX_DATA+1];
 	char primaryStr[14+1];
-	char tempStr[28+1];
 
 	int i;
 	int rows, ccFlag;
 	char *ccStr;
 	int symHt;
+
+	DEBUG_PRINT("\nData: %s\n", ctx->dataStr);
 
 	if (ctx->sym == gs1_encoder_sRSS14) {
 		symHt = RSS14_SYM_H;
@@ -385,35 +393,55 @@ void gs1_RSS14(gs1_encoder *ctx) {
 	else {
 		symHt = RSS14_TRNC_H;
 	}
-	strcpy(dataStr, ctx->dataStr);
-	ccStr = strchr(dataStr, '|');
+
+	ccStr = strchr(ctx->dataStr, '|');
 	if (ccStr == NULL) ccFlag = false;
 	else {
 		ccFlag = true;
 		ccStr[0] = '\0'; // separate primary data
 		ccStr++; // point to secondary data
+		DEBUG_PRINT("Primary %s\n", ctx->dataStr);
+		DEBUG_PRINT("CC: %s\n", ccStr);
 	}
 
-	if (strlen(dataStr) > 13) {
-		strcpy(ctx->errMsg, "primary data exceeds 13 digits");
+	if (!ctx->addCheckDigit) {
+		if (strlen(ctx->dataStr) != 14) {
+			strcpy(ctx->errMsg, "primary data must be 14 digits");
+			ctx->errFlag = true;
+			goto out;
+		}
+	}
+	else {
+		if (strlen(ctx->dataStr) != 13) {
+			strcpy(ctx->errMsg, "primary data must be 13 digits without check digit");
+			ctx->errFlag = true;
+			goto out;
+		}
+	}
+
+	if (!gs1_allDigits((uint8_t*)ctx->dataStr)) {
+		strcpy(ctx->errMsg, "primary data must be all digits");
 		ctx->errFlag = true;
-		return;
+		goto out;
 	}
 
-	strcpy(tempStr, "000000000000");
-	strcat(tempStr, dataStr);
-	strcpy(primaryStr, tempStr + strlen(tempStr) - 13);
+	strcpy(primaryStr, ctx->dataStr);
 
-	if (!RSS14enc(ctx, (uint8_t*)primaryStr, linPattern, ccFlag) || ctx->errFlag) return;
+	if (ctx->addCheckDigit)
+		strcat(primaryStr, "-");
 
-#if PRNT
-	printf("\n%s", primaryStr);
-	printf("\n");
-	for (i = 0; i < RSS14_ELMNTS; i++) {
-		printf("%d", linPattern[i]);
+	if (!gs1_validateParity((uint8_t*)primaryStr) && !ctx->addCheckDigit) {
+		strcpy(ctx->errMsg, "primary data check digit is incorrect");
+		ctx->errFlag = true;
+		goto out;
 	}
-	printf("\n");
-#endif
+
+	DEBUG_PRINT("Checked: %s\n", primaryStr);
+
+	if (!RSS14enc(ctx, (uint8_t*)primaryStr, linPattern, ccFlag) || ctx->errFlag) goto out;
+
+	DEBUG_PRINT_PATTERN("Linear pattern", linPattern, RSS14_ELMNTS);
+
 	ctx->line1 = true; // so first line is not Y undercut
 	// init most likely prints values
 	prints.elmCnt = RSS14_ELMNTS;
@@ -425,20 +453,10 @@ void gs1_RSS14(gs1_encoder *ctx) {
 	prints.whtFirst = true;
 	prints.reverse = false;
 	if (ccFlag) {
-		if (!((rows = gs1_CC4enc(ctx, (uint8_t*)ccStr, ccPattern)) > 0) || ctx->errFlag) return;
-#if PRNT
-		{
-			int j;
-			printf("\n%s", ccStr);
-			printf("\n");
-			for (i = 0; i < rows; i++) {
-				for (j = 0; j < CCB4_ELMNTS; j++) {
-					printf("%d", ccPattern[i][j]);
-				}
-				printf("\n");
-			}
-		}
-#endif
+		if (!((rows = gs1_CC4enc(ctx, (uint8_t*)ccStr, ccPattern)) > 0) || ctx->errFlag) goto out;
+
+		DEBUG_PRINT_PATTERNS("CC pattern", (uint8_t*)(*ccPattern), CCB4_ELMNTS, rows);
+
 		gs1_driverInit(ctx, ctx->pixMult*CCB4_WIDTH,
 				ctx->pixMult*(rows*2+symHt) + ctx->sepHt);
 
@@ -474,6 +492,13 @@ void gs1_RSS14(gs1_encoder *ctx) {
 
 		gs1_driverFinalise(ctx);
 	}
+
+out:
+
+	// Restore the original dataStr contents
+	if (ccFlag)
+		*(ccStr-1) = '|';
+
 	return;
 }
 
@@ -487,42 +512,62 @@ void gs1_RSS14S(gs1_encoder *ctx) {
 
 	uint8_t (*ccPattern)[CCB4_ELMNTS] = ctx->ccPattern;
 
-	char dataStr[GS1_ENCODERS_MAX_DATA+1];
 	char primaryStr[14+1];
-	char tempStr[28+1];
 
 	int i;
 	int rows, ccFlag;
 	char *ccStr;
 
-	strcpy(dataStr, ctx->dataStr);
-	ccStr = strchr(dataStr, '|');
+	DEBUG_PRINT("\nData: %s\n", ctx->dataStr);
+
+	ccStr = strchr(ctx->dataStr, '|');
 	if (ccStr == NULL) ccFlag = false;
 	else {
 		ccFlag = true;
 		ccStr[0] = '\0'; // separate primary data
 		ccStr++; // point to secondary data
+		DEBUG_PRINT("Primary %s\n", ctx->dataStr);
+		DEBUG_PRINT("CC: %s\n", ccStr);
 	}
 
-	if (strlen(dataStr) > 13) {
-		strcpy(ctx->errMsg, "primary data exceeds 13 digits");
+	if (!ctx->addCheckDigit) {
+		if (strlen(ctx->dataStr) != 14) {
+			strcpy(ctx->errMsg, "primary data must be 14 digits");
+			ctx->errFlag = true;
+			goto out;
+		}
+	}
+	else {
+		if (strlen(ctx->dataStr) != 13) {
+			strcpy(ctx->errMsg, "primary data must be 13 digits without check digit");
+			ctx->errFlag = true;
+			goto out;
+		}
+	}
+
+	if (!gs1_allDigits((uint8_t*)ctx->dataStr)) {
+		strcpy(ctx->errMsg, "primary data must be all digits");
 		ctx->errFlag = true;
-		return;
+		goto out;
 	}
 
-	strcpy(tempStr, "000000000000");
-	strcat(tempStr, dataStr);
-	strcpy(primaryStr, tempStr + strlen(tempStr) - 13);
+	strcpy(primaryStr, ctx->dataStr);
 
-	if (!RSS14enc(ctx, (uint8_t*)primaryStr, linPattern, ccFlag) || ctx->errFlag) return;
-#if PRNT
-	printf("\n%s", primaryStr);
-	printf("\n");
-	for (i = 0; i < RSS14_ELMNTS; i++) {
-		printf("%d", linPattern[i]);
+	if (ctx->addCheckDigit)
+		strcat(primaryStr, "-");
+
+	if (!gs1_validateParity((uint8_t*)primaryStr) && !ctx->addCheckDigit) {
+		strcpy(ctx->errMsg, "primary data check digit is incorrect");
+		ctx->errFlag = true;
+		goto out;
 	}
-	printf("\n");
-#endif
+
+	DEBUG_PRINT("Checked: %s\n", primaryStr);
+
+	if (!RSS14enc(ctx, (uint8_t*)primaryStr, linPattern, ccFlag) || ctx->errFlag) goto out;
+
+	DEBUG_PRINT_PATTERN("Linear pattern", linPattern, RSS14_ELMNTS);
+
 	ctx->line1 = true; // so first line is not Y undercut
 	// init most common RSS14S row prints values
 	prints.elmCnt = RSS14_ELMNTS/2;
@@ -532,20 +577,9 @@ void gs1_RSS14S(gs1_encoder *ctx) {
 	prints.whtFirst = true;
 	prints.reverse = false;
 	if (ccFlag) {
-		if (!((rows = gs1_CC2enc(ctx, (uint8_t*)ccStr, ccPattern)) > 0) || ctx->errFlag) return;
-#if PRNT
-		{
-			int j;
-			printf("\n%s", ccStr);
-			printf("\n");
-			for (i = 0; i < rows; i++) {
-				for (j = 0; j < CCB2_ELMNTS; j++) {
-					printf("%d", ccPattern[i][j]);
-				}
-				printf("\n");
-			}
-		}
-#endif
+		if (!((rows = gs1_CC2enc(ctx, (uint8_t*)ccStr, ccPattern)) > 0) || ctx->errFlag) goto out;
+
+		DEBUG_PRINT_PATTERNS("CC pattern", (uint8_t*)(*ccPattern), CCB2_ELMNTS, rows);
 
 		gs1_driverInit(ctx, ctx->pixMult*(CCB2_WIDTH),
 				ctx->pixMult*(rows*2+RSS14_ROWS1_H+RSS14_ROWS2_H) + 2*ctx->sepHt);
@@ -604,6 +638,13 @@ void gs1_RSS14S(gs1_encoder *ctx) {
 
 		gs1_driverFinalise(ctx);
 	}
+
+out:
+
+	// Restore the original dataStr contents
+	if (ccFlag)
+		*(ccStr-1) = '|';
+
 	return;
 }
 
@@ -619,13 +660,13 @@ void gs1_RSS14SO(gs1_encoder *ctx) {
 
 	uint8_t (*ccPattern)[CCB4_ELMNTS] = ctx->ccPattern;
 
-	char dataStr[GS1_ENCODERS_MAX_DATA+1];
 	char primaryStr[14+1];
-	char tempStr[28+1];
 
 	int i;
 	int rows, ccFlag;
 	char *ccStr;
+
+	DEBUG_PRINT("\nData: %s\n", ctx->dataStr);
 
 	for (i = 0; i < RSS14_SYM_W/2+2; i++) chexPattern[i] = 1; // chex = all 1X elements
 	chexPattern[0] = 5; // wide space on left
@@ -639,34 +680,54 @@ void gs1_RSS14SO(gs1_encoder *ctx) {
 	chexPrnts.rightPad = 0; // assume not a composite for now
 	chexPrnts.reverse = false;
 
-	strcpy(dataStr, ctx->dataStr);
-	ccStr = strchr(dataStr, '|');
+	ccStr = strchr(ctx->dataStr, '|');
 	if (ccStr == NULL) ccFlag = false;
 	else {
 		ccFlag = true;
 		ccStr[0] = '\0'; // separate primary data
 		ccStr++; // point to secondary data
+		DEBUG_PRINT("Primary %s\n", ctx->dataStr);
+		DEBUG_PRINT("CC: %s\n", ccStr);
 	}
 
-	if (strlen(dataStr) > 13) {
-		strcpy(ctx->errMsg, "primary data exceeds 13 digits");
+	if (!ctx->addCheckDigit) {
+		if (strlen(ctx->dataStr) != 14) {
+			strcpy(ctx->errMsg, "primary data must be 14 digits");
+			ctx->errFlag = true;
+			goto out;
+		}
+	}
+	else {
+		if (strlen(ctx->dataStr) != 13) {
+			strcpy(ctx->errMsg, "primary data must be 13 digits without check digit");
+			ctx->errFlag = true;
+			goto out;
+		}
+	}
+
+	if (!gs1_allDigits((uint8_t*)ctx->dataStr)) {
+		strcpy(ctx->errMsg, "primary data must be all digits");
 		ctx->errFlag = true;
-		return;
+		goto out;
 	}
 
-	strcpy(tempStr, "000000000000");
-	strcat(tempStr, dataStr);
-	strcpy(primaryStr, tempStr + strlen(tempStr) - 13);
+	strcpy(primaryStr, ctx->dataStr);
 
-	if (!RSS14enc(ctx, (uint8_t*)primaryStr, linPattern, ccFlag) || ctx->errFlag) return;
-#if PRNT
-	printf("\n%s", primaryStr);
-	printf("\n");
-	for (i = 0; i < RSS14_ELMNTS; i++) {
-		printf("%d", linPattern[i]);
+	if (ctx->addCheckDigit)
+		strcat(primaryStr, "-");
+
+	if (!gs1_validateParity((uint8_t*)primaryStr) && !ctx->addCheckDigit) {
+		strcpy(ctx->errMsg, "primary data check digit is incorrect");
+		ctx->errFlag = true;
+		goto out;
 	}
-	printf("\n");
-#endif
+
+	DEBUG_PRINT("Checked: %s\n", primaryStr);
+
+	if (!RSS14enc(ctx, (uint8_t*)primaryStr, linPattern, ccFlag) || ctx->errFlag) goto out;
+
+	DEBUG_PRINT_PATTERN("Linear pattern", linPattern, RSS14_ELMNTS);
+
 	ctx->line1 = true; // so first line is not Y undercut
 	// init most common RSS14SO row prints values
 	prints.elmCnt = RSS14_ELMNTS/2;
@@ -677,20 +738,9 @@ void gs1_RSS14SO(gs1_encoder *ctx) {
 	prints.reverse = false;
 	if (ccFlag) {
 		chexPrnts.rightPad = RSS14_R_PADR; // pad for composite
-		if (!((rows = gs1_CC2enc(ctx, (uint8_t*)ccStr, ccPattern)) > 0) || ctx->errFlag) return;
-#if PRNT
-		{
-			int j;
-			printf("\n%s", ccStr);
-			printf("\n");
-			for (i = 0; i < rows; i++) {
-				for (j = 0; j < CCB2_ELMNTS; j++) {
-					printf("%d", ccPattern[i][j]);
-				}
-				printf("\n");
-			}
-		}
-#endif
+		if (!((rows = gs1_CC2enc(ctx, (uint8_t*)ccStr, ccPattern)) > 0) || ctx->errFlag) goto out;
+
+		DEBUG_PRINT_PATTERNS("CC pattern", (uint8_t*)(*ccPattern), CCB2_ELMNTS, rows);
 
 		gs1_driverInit(ctx, ctx->pixMult*(CCB2_WIDTH),
 			ctx->pixMult*(rows*2+RSS14_SYM_H*2) + 4*ctx->sepHt);
@@ -763,6 +813,13 @@ void gs1_RSS14SO(gs1_encoder *ctx) {
 
 		gs1_driverFinalise(ctx);
 	}
+
+out:
+
+	// Restore the original dataStr contents
+	if (ccFlag)
+		*(ccStr-1) = '|';
+
 	return;
 }
 
@@ -818,7 +875,7 @@ void test_rss14_RSS14_encode(void) {
 " X X    X  X   XXX  XXXXX      X XXXX   X X  XX XX X  X XXXXX  X XXXXX     XXX XX XXXXX X XXXX X",
 NULL
 	};
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sRSS14, "2401234567890", expect));
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sRSS14, "24012345678905", expect));
 
 	gs1_encoder_free(ctx);
 
@@ -847,7 +904,7 @@ void test_rss14_RSS14T_encode(void) {
 " X X    X  X   XXX  XXXXX      X XXXX   X X  XX XX X  X XXXXX  X XXXXX     XXX XX XXXXX X XXXX X",
 NULL
 	};
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sRSS14T, "2401234567890", expect));
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sRSS14T, "24012345678905", expect));
 
 	gs1_encoder_free(ctx);
 
@@ -876,7 +933,7 @@ void test_rss14_RSS14S_encode(void) {
 "X XX X  X XXXXX  X XXXXX     XXX XX XXXXX X XXXX X",
 NULL
 	};
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sRSS14S, "2401234567890", expect));
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sRSS14S, "24012345678905", expect));
 
 	gs1_encoder_free(ctx);
 
@@ -961,7 +1018,7 @@ void test_rss14_RSS14SO_encode(void) {
 "X XX X  X XXXXX  X XXXXX     XXX XX XXXXX X XXXX X",
 NULL
 	};
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sRSS14SO, "2401234567890", expect));
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sRSS14SO, "24012345678905", expect));
 
 	gs1_encoder_free(ctx);
 

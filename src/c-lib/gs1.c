@@ -23,7 +23,6 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "enc-private.h"
 #include "gs1.h"
 
 
@@ -50,12 +49,24 @@ bool gs1_validateParity(uint8_t *str) {
 }
 
 
+bool gs1_allDigits(uint8_t *str) {
+
+	assert(str);
+
+	while (*str) {
+		if (*str < '0' || *str >'9')
+			return false;
+		str++;
+	}
+	return true;
+
+}
+
+
 #ifdef UNIT_TESTS
 
 #define TEST_NO_MAIN
 #include "acutest.h"
-
-#include "gs1encoders-test.h"
 
 
 void test_gs1_validateParity(void) {
