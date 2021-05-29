@@ -106,11 +106,11 @@ GS1_ENCODERS_API bool gs1_encoder_setYundercut(gs1_encoder *ctx, int Yundercut);
 GS1_ENCODERS_API int gs1_encoder_getSepHt(gs1_encoder *ctx);
 GS1_ENCODERS_API bool gs1_encoder_setSepHt(gs1_encoder *ctx, int sepHt);
 
-GS1_ENCODERS_API int gs1_encoder_getSegWidth(gs1_encoder *ctx);
-GS1_ENCODERS_API bool gs1_encoder_setSegWidth(gs1_encoder *ctx, int segWidth);
+GS1_ENCODERS_API int gs1_encoder_getRssExpSegWidth(gs1_encoder *ctx);
+GS1_ENCODERS_API bool gs1_encoder_setRssExpSegWidth(gs1_encoder *ctx, int rssExpSegWidth);
 
-GS1_ENCODERS_API int gs1_encoder_getLinHeight(gs1_encoder *ctx);
-GS1_ENCODERS_API bool gs1_encoder_setLinHeight(gs1_encoder *ctx, int linHeight);
+GS1_ENCODERS_API int gs1_encoder_getUcc128LinHeight(gs1_encoder *ctx);
+GS1_ENCODERS_API bool gs1_encoder_setUcc128LinHeight(gs1_encoder *ctx, int ucc128linHeight);
 
 GS1_ENCODERS_API int gs1_encoder_getDmRows(gs1_encoder *ctx);
 GS1_ENCODERS_API bool gs1_encoder_setDmRows(gs1_encoder *ctx, int rows);

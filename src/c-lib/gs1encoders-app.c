@@ -173,11 +173,11 @@ static bool userInt(gs1_encoder *ctx) {
 		printf("\n 6) Select TIF or BMP format. Current = %s",
 							 (gs1_encoder_getFormat(ctx) == gs1_encoder_dBMP) ? "BMP":"TIF");
 		if (gs1_encoder_getSym(ctx) == gs1_encoder_sRSSEXP) {
-			printf("\n 7) Select maximum segments per row. Current value = %d", gs1_encoder_getSegWidth(ctx));
+			printf("\n 7) Select maximum segments per row. Current value = %d", gs1_encoder_getRssExpSegWidth(ctx));
 		}
 		if ((gs1_encoder_getSym(ctx) == gs1_encoder_sUCC128_CCA) || (gs1_encoder_getSym(ctx) == gs1_encoder_sUCC128_CCC)) {
 			printf("\n 7) Enter GS1-128 height in X. Current value = %d",
-								gs1_encoder_getLinHeight(ctx));
+								gs1_encoder_getUcc128LinHeight(ctx));
 		}
 		if (gs1_encoder_getSym(ctx) == gs1_encoder_sQR) {
 			printf("\n 7) Enter GS1 QR Code version (0 = automatic). Current value = %d",
@@ -315,7 +315,7 @@ static bool userInt(gs1_encoder *ctx) {
 				if (gets(inpStr) == NULL)
 					return false;
 				i = atoi(inpStr);
-				if (!gs1_encoder_setSegWidth(ctx, i)) {
+				if (!gs1_encoder_setRssExpSegWidth(ctx, i)) {
 					printf("\nERROR: %s\n", gs1_encoder_getErrMsg(ctx));
 					continue;
 				}
@@ -325,7 +325,7 @@ static bool userInt(gs1_encoder *ctx) {
 				if (gets(inpStr) == NULL)
 					return false;
 				i = atoi(inpStr);
-				if (!gs1_encoder_setLinHeight(ctx, i)) {
+				if (!gs1_encoder_setUcc128LinHeight(ctx, i)) {
 					printf("\nERROR: %s\n", gs1_encoder_getErrMsg(ctx));
 					continue;
 				}

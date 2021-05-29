@@ -84,8 +84,8 @@ GS1_ENCODERS_API gs1_encoder* gs1_encoder_init(void *mem) {
 	ctx->Xundercut = 0;
 	ctx->Yundercut = 0;
 	ctx->sepHt = 1;
-	ctx->segWidth = 22;
-	ctx->linHeight = 25;
+	ctx->rssExpSegWidth = 22;
+	ctx->ucc128linHeight = 25;
 	ctx->dmRows = 0;
 	ctx->dmCols = 0;
 	ctx->qrEClevel = gs1_encoder_qrEClevelM;
@@ -242,25 +242,25 @@ GS1_ENCODERS_API bool gs1_encoder_setSepHt(gs1_encoder *ctx, int sepHt) {
 }
 
 
-GS1_ENCODERS_API int gs1_encoder_getSegWidth(gs1_encoder *ctx) {
+GS1_ENCODERS_API int gs1_encoder_getRssExpSegWidth(gs1_encoder *ctx) {
 	assert(ctx);
 	reset_error(ctx);
-	return ctx->segWidth;
+	return ctx->rssExpSegWidth;
 }
-GS1_ENCODERS_API bool gs1_encoder_setSegWidth(gs1_encoder *ctx, int segWidth) {
+GS1_ENCODERS_API bool gs1_encoder_setRssExpSegWidth(gs1_encoder *ctx, int rssExpSegWidth) {
 	assert(ctx);
 	reset_error(ctx);
-	if (segWidth < 2 || segWidth > 22) {
+	if (rssExpSegWidth < 2 || rssExpSegWidth > 22) {
 		strcpy(ctx->errMsg, "Valid number of segments range is 2 to 22");
 		ctx->errFlag = true;
 		return false;
 	}
-	if (segWidth & 1) {
+	if (rssExpSegWidth & 1) {
 		strcpy(ctx->errMsg, "Number of segments must be even");
 		ctx->errFlag = true;
 		return false;
 	}
-	ctx->segWidth = segWidth;
+	ctx->rssExpSegWidth = rssExpSegWidth;
 	return true;
 }
 
@@ -389,20 +389,20 @@ GS1_ENCODERS_API bool gs1_encoder_setFormat(gs1_encoder *ctx, int format) {
 }
 
 
-GS1_ENCODERS_API int gs1_encoder_getLinHeight(gs1_encoder *ctx) {
+GS1_ENCODERS_API int gs1_encoder_getUcc128LinHeight(gs1_encoder *ctx) {
 	assert(ctx);
 	reset_error(ctx);
-	return ctx->linHeight;
+	return ctx->ucc128linHeight;
 }
-GS1_ENCODERS_API bool gs1_encoder_setLinHeight(gs1_encoder *ctx, int linHeight) {
+GS1_ENCODERS_API bool gs1_encoder_setUcc128LinHeight(gs1_encoder *ctx, int ucc128linHeight) {
 	assert(ctx);
 	reset_error(ctx);
-	if (linHeight < 1 || linHeight > GS1_ENCODERS_MAX_LINHT) {
+	if (ucc128linHeight < 1 || ucc128linHeight > GS1_ENCODERS_MAX_LINHT) {
 		sprintf(ctx->errMsg, "Valid linear component height range is 1 to %d", GS1_ENCODERS_MAX_LINHT);
 		ctx->errFlag = true;
 		return false;
 	}
-	ctx->linHeight = linHeight;
+	ctx->ucc128linHeight = ucc128linHeight;
 	return true;
 }
 
@@ -695,8 +695,8 @@ void test_api_defaults(void) {
 	TEST_CHECK(gs1_encoder_getXundercut(ctx) == 0);
 	TEST_CHECK(gs1_encoder_getYundercut(ctx) == 0);
 	TEST_CHECK(gs1_encoder_getSepHt(ctx) == 1);
-	TEST_CHECK(gs1_encoder_getSegWidth(ctx) == 22);
-	TEST_CHECK(gs1_encoder_getLinHeight(ctx) == 25);
+	TEST_CHECK(gs1_encoder_getRssExpSegWidth(ctx) == 22);
+	TEST_CHECK(gs1_encoder_getUcc128LinHeight(ctx) == 25);
 	TEST_CHECK(gs1_encoder_getFormat(ctx) == gs1_encoder_dTIF);
 	TEST_CHECK(strcmp(gs1_encoder_getOutFile(ctx), DEFAULT_TIF_FILE) == 0);
 	TEST_CHECK(gs1_encoder_getFileInputFlag(ctx) == false);    // dataStr
@@ -992,15 +992,15 @@ void test_api_segWidth(void) {
 
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
 
-	TEST_CHECK(gs1_encoder_setSegWidth(ctx, 6));
-	TEST_CHECK(gs1_encoder_getSegWidth(ctx) == 6);
-	TEST_CHECK(!gs1_encoder_setSegWidth(ctx, 0));
-	TEST_CHECK(!gs1_encoder_setSegWidth(ctx, 1));
-	TEST_CHECK(gs1_encoder_setSegWidth(ctx, 2));
-	TEST_CHECK(!gs1_encoder_setSegWidth(ctx, 5));    // not even
-	TEST_CHECK(gs1_encoder_setSegWidth(ctx, 22));
-	TEST_CHECK(!gs1_encoder_setSegWidth(ctx, 23));
-	TEST_CHECK(!gs1_encoder_setSegWidth(ctx, 24));
+	TEST_CHECK(gs1_encoder_setRssExpSegWidth(ctx, 6));
+	TEST_CHECK(gs1_encoder_getRssExpSegWidth(ctx) == 6);
+	TEST_CHECK(!gs1_encoder_setRssExpSegWidth(ctx, 0));
+	TEST_CHECK(!gs1_encoder_setRssExpSegWidth(ctx, 1));
+	TEST_CHECK(gs1_encoder_setRssExpSegWidth(ctx, 2));
+	TEST_CHECK(!gs1_encoder_setRssExpSegWidth(ctx, 5));    // not even
+	TEST_CHECK(gs1_encoder_setRssExpSegWidth(ctx, 22));
+	TEST_CHECK(!gs1_encoder_setRssExpSegWidth(ctx, 23));
+	TEST_CHECK(!gs1_encoder_setRssExpSegWidth(ctx, 24));
 
 	gs1_encoder_free(ctx);
 
@@ -1013,10 +1013,10 @@ void test_api_linHeight(void) {
 
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
 
-	TEST_CHECK(gs1_encoder_setLinHeight(ctx, 12));
-	TEST_CHECK(gs1_encoder_getLinHeight(ctx) == 12);
-	TEST_CHECK(!gs1_encoder_setLinHeight(ctx, 0));
-	TEST_CHECK(!gs1_encoder_setLinHeight(ctx, GS1_ENCODERS_MAX_LINHT+1));
+	TEST_CHECK(gs1_encoder_setUcc128LinHeight(ctx, 12));
+	TEST_CHECK(gs1_encoder_getUcc128LinHeight(ctx) == 12);
+	TEST_CHECK(!gs1_encoder_setUcc128LinHeight(ctx, 0));
+	TEST_CHECK(!gs1_encoder_setUcc128LinHeight(ctx, GS1_ENCODERS_MAX_LINHT+1));
 
 	gs1_encoder_free(ctx);
 

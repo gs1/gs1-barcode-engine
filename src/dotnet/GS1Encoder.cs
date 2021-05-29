@@ -80,19 +80,19 @@ namespace gs1encoders_dotnet
         [return: MarshalAs(UnmanagedType.U1)]
         private static extern bool gs1_encoder_setSepHt(IntPtr ctx, int sepHt);
 
-        [DllImport(gs1_dll, EntryPoint = "gs1_encoder_getSegWidth", CallingConvention = CallingConvention.Cdecl)]
-        private static extern int gs1_encoder_getSegWidth(IntPtr ctx);
+        [DllImport(gs1_dll, EntryPoint = "gs1_encoder_getRssExpSegWidth", CallingConvention = CallingConvention.Cdecl)]
+        private static extern int gs1_encoder_getRssExpSegWidth(IntPtr ctx);
 
-        [DllImport(gs1_dll, EntryPoint = "gs1_encoder_setSegWidth", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(gs1_dll, EntryPoint = "gs1_encoder_setRssExpSegWidth", CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.U1)]
-        private static extern bool gs1_encoder_setSegWidth(IntPtr ctx, int segWidth);
+        private static extern bool gs1_encoder_setRssExpSegWidth(IntPtr ctx, int segWidth);
 
-        [DllImport(gs1_dll, EntryPoint = "gs1_encoder_getLinHeight", CallingConvention = CallingConvention.Cdecl)]
-        private static extern int gs1_encoder_getLinHeight(IntPtr ctx);
+        [DllImport(gs1_dll, EntryPoint = "gs1_encoder_getUcc128LinHeight", CallingConvention = CallingConvention.Cdecl)]
+        private static extern int gs1_encoder_getUcc128LinHeight(IntPtr ctx);
 
-        [DllImport(gs1_dll, EntryPoint = "gs1_encoder_setLinHeight", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(gs1_dll, EntryPoint = "gs1_encoder_setUcc128LinHeight", CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.U1)]
-        private static extern bool gs1_encoder_setLinHeight(IntPtr ctx, int linHeight);
+        private static extern bool gs1_encoder_setUcc128LinHeight(IntPtr ctx, int linHeight);
 
         [DllImport(gs1_dll, EntryPoint = "gs1_encoder_getDmRows", CallingConvention = CallingConvention.Cdecl)]
         private static extern int gs1_encoder_getDmRows(IntPtr ctx);
@@ -251,25 +251,25 @@ namespace gs1encoders_dotnet
                 throw new GS1EncoderParameterException(GetErrMsg());
         }
 
-        public int GetSegWidth()
+        public int GetRssExpSegWidth()
         {
-            return gs1_encoder_getSegWidth(ctx);
+            return gs1_encoder_getRssExpSegWidth(ctx);
         }
 
-        public void SetSegWidth(int segWidth)
+        public void SetRssExpSegWidth(int segWidth)
         {
-            if (!gs1_encoder_setSegWidth(ctx, segWidth))
+            if (!gs1_encoder_setRssExpSegWidth(ctx, segWidth))
                 throw new GS1EncoderParameterException(GetErrMsg());
         }
 
-        public int GetLinHeight()
+        public int GetUcc128LinHeight()
         {
-            return gs1_encoder_getLinHeight(ctx);
+            return gs1_encoder_getUcc128LinHeight(ctx);
         }
 
-        public void SetLinHeight(int linHeight)
+        public void SetUcc128LinHeight(int linHeight)
         {
-            if (!gs1_encoder_setLinHeight(ctx, linHeight))
+            if (!gs1_encoder_setUcc128LinHeight(ctx, linHeight))
                 throw new GS1EncoderParameterException(GetErrMsg());
         }
 

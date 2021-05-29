@@ -270,7 +270,7 @@ void gs1_RSSExp(gs1_encoder *ctx) {
 	ccStr = strchr(ctx->dataStr, '|');
 	if (ccStr == NULL) ccFlag = false;
 	else {
-		if (ctx->segWidth < 4) {
+		if (ctx->rssExpSegWidth < 4) {
 			strcpy(ctx->errMsg, "Composite must be at least 4 segments wide");
 			ctx->errFlag = true;
 			goto out;
@@ -282,7 +282,7 @@ void gs1_RSSExp(gs1_encoder *ctx) {
 		DEBUG_PRINT("CC: %s\n", ccStr);
 	}
 
-	ctx->rssexp_rowWidth = ctx->segWidth; // save for getUnusedBitCnt
+	ctx->rssexp_rowWidth = ctx->rssExpSegWidth; // save for getUnusedBitCnt
 	if (!((segs = RSS14Eenc(ctx, (uint8_t*)ctx->dataStr, dblPattern, ccFlag)) > 0) || ctx->errFlag) goto out;
 
 	lNdx = 0;
@@ -296,7 +296,7 @@ void gs1_RSSExp(gs1_encoder *ctx) {
 			linPattern[lNdx++] = dblPattern[i/2][j];
 		}
 	}
-	j = (segs <= ctx->segWidth) ? segs : ctx->segWidth;
+	j = (segs <= ctx->rssExpSegWidth) ? segs : ctx->rssExpSegWidth;
 	i = (segs+j-1)/j; // number of linear rows
 	lHeight = ctx->pixMult*i*RSSEXP_SYM_H + ctx->sepHt*(i-1)*3;
 	lNdx = (j/2)*(8+5+8) + (j&1)*(8+5);
@@ -367,7 +367,7 @@ void gs1_RSSExp(gs1_encoder *ctx) {
 	prints.leftPad = 0;
 	prints.rightPad = 0;
 
-	for (i = 0; i < segs-ctx->segWidth; i += ctx->segWidth) {
+	for (i = 0; i < segs-ctx->rssExpSegWidth; i += ctx->rssExpSegWidth) {
 
 		rev = evenRow ^ ((i/2)&1);
 		prints.pattern = &linPattern[(i/2)*(8+5+8)+(i&1)*8];
@@ -506,7 +506,7 @@ NULL
 	};
 	TEST_CHECK(test_encode(ctx, gs1_encoder_sRSSEXP, "01950123456789033103000123", expect));
 
-	gs1_encoder_setSegWidth(ctx, 4);
+	gs1_encoder_setRssExpSegWidth(ctx, 4);
 	expect = (char*[]){
 " X X   X   XXXX   X XXXXXXXX    X X XXX     XX   X XXX   XX   X  XX X XXXX      XXX  X XXX   XXX XXX X",
 " X X   X   XXXX   X XXXXXXXX    X X XXX     XX   X XXX   XX   X  XX X XXXX      XXX  X XXX   XXX XXX X",

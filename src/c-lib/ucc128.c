@@ -408,7 +408,7 @@ void gs1_U128A(gs1_encoder *ctx) {
 	prints.elmCnt = symChars*6+3;
 	prints.pattern = linPattern;
 	prints.guards = false;
-	prints.height = ctx->pixMult * ctx->linHeight;
+	prints.height = ctx->pixMult * ctx->ucc128linHeight;
 	prints.leftPad = 0;
 	prints.rightPad = 0;
 	prints.whtFirst = true;
@@ -429,7 +429,7 @@ void gs1_U128A(gs1_encoder *ctx) {
 		ccLpad = symWidth - (CCB4_WIDTH + ccRpad);
 
 		gs1_driverInit(ctx, ctx->pixMult*symWidth,
-				ctx->pixMult*(rows*2+ctx->linHeight) + ctx->sepHt);
+				ctx->pixMult*(rows*2+ctx->ucc128linHeight) + ctx->sepHt);
 
 		// CC-C
 		prints.elmCnt = CCB4_ELMNTS;
@@ -452,7 +452,7 @@ void gs1_U128A(gs1_encoder *ctx) {
 		// UCC-128
 		prints.elmCnt = symChars*6+3;
 		prints.pattern = linPattern;
-		prints.height = ctx->pixMult*ctx->linHeight;
+		prints.height = ctx->pixMult*ctx->ucc128linHeight;
 		prints.leftPad = 0;
 		prints.rightPad = 0;
 		gs1_driverAddRow(ctx, &prints);
@@ -460,7 +460,7 @@ void gs1_U128A(gs1_encoder *ctx) {
 		gs1_driverFinalise(ctx);
 	}
 	else { // primary only
-		gs1_driverInit(ctx, ctx->pixMult*(symChars*11+22), ctx->pixMult*ctx->linHeight);
+		gs1_driverInit(ctx, ctx->pixMult*(symChars*11+22), ctx->pixMult*ctx->ucc128linHeight);
 
 		// UCC-128
 		gs1_driverAddRow(ctx, &prints);
@@ -533,7 +533,7 @@ void gs1_U128C(gs1_encoder *ctx) {
 	prints.elmCnt = symChars*6+3;
 	prints.pattern = linPattern;
 	prints.guards = false;
-	prints.height = ctx->pixMult*ctx->linHeight;
+	prints.height = ctx->pixMult*ctx->ucc128linHeight;
 	prints.leftPad = 0;
 	prints.rightPad = 0;
 	prints.whtFirst = true;
@@ -548,7 +548,7 @@ void gs1_U128C(gs1_encoder *ctx) {
 		ccRpad = symWidth - UCC128_L_PAD - ((ctx->colCnt+4)*17+5);
 
 		gs1_driverInit(ctx, ctx->pixMult*symWidth,
-				ctx->pixMult*(ctx->rowCnt*3+ctx->linHeight) + ctx->sepHt);
+				ctx->pixMult*(ctx->rowCnt*3+ctx->ucc128linHeight) + ctx->sepHt);
 
 		// CC-C
 		prints.elmCnt = (ctx->colCnt+4)*8+3;
@@ -571,7 +571,7 @@ void gs1_U128C(gs1_encoder *ctx) {
 		// UCC-128
 		prints.elmCnt = symChars*6+3;
 		prints.pattern = linPattern;
-		prints.height = ctx->pixMult*ctx->linHeight;
+		prints.height = ctx->pixMult*ctx->ucc128linHeight;
 		prints.leftPad = 0;
 		prints.rightPad = 0;
 		gs1_driverAddRow(ctx, &prints);
@@ -579,7 +579,7 @@ void gs1_U128C(gs1_encoder *ctx) {
 		gs1_driverFinalise(ctx);
 	}
 	else { // primary only
-		gs1_driverInit(ctx, ctx->pixMult*(symChars*11+22), ctx->pixMult*ctx->linHeight);
+		gs1_driverInit(ctx, ctx->pixMult*(symChars*11+22), ctx->pixMult*ctx->ucc128linHeight);
 
 		// UCC-128
 		gs1_driverAddRow(ctx, &prints);
