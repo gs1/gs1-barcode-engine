@@ -55,6 +55,8 @@ static bool EAN13enc(uint8_t *str, uint8_t pattern[] ) {
 	int i, j, abMask, bars, sNdx, pNdx, abBits;
 
 	assert(str && strlen((char*)str) == 13);
+	assert(gs1_allDigits(str));
+	assert(gs1_validateParity(str));
 
 	sNdx = 1;
 	pNdx = 0;
@@ -132,6 +134,12 @@ void gs1_EAN13(gs1_encoder *ctx) {
 			ctx->errFlag = true;
 			goto out;
 		}
+	}
+
+	if (!gs1_allDigits((uint8_t*)ctx->dataStr)) {
+		strcpy(ctx->errMsg, "primary data must be all digits");
+		ctx->errFlag = true;
+		goto out;
 	}
 
 	primaryStr[0] = ctx->sym == gs1_encoder_sEAN13 ? '\0' : '0';  // Convert GTIN-12 to GTIN-13 if UPC-A
@@ -247,6 +255,8 @@ static bool EAN8enc(uint8_t str[], uint8_t pattern[] ) {
 	int i, j, bars, sNdx, pNdx;
 
 	assert(str && strlen((char*)str) == 8);
+	assert(gs1_allDigits(str));
+	assert(gs1_validateParity(str));
 
 	sNdx = 0;
 	pNdx = 0;
@@ -321,6 +331,12 @@ void gs1_EAN8(gs1_encoder *ctx) {
 		}
 	}
 
+	if (!gs1_allDigits((uint8_t*)ctx->dataStr)) {
+		strcpy(ctx->errMsg, "primary data must be all digits");
+		ctx->errFlag = true;
+		goto out;
+	}
+
 	strcpy(primaryStr, ctx->dataStr);
 
 	if (ctx->addCheckDigit)
@@ -336,7 +352,7 @@ void gs1_EAN8(gs1_encoder *ctx) {
 
 	if (!EAN8enc((uint8_t*)primaryStr, linPattern) || ctx->errFlag) goto out;
 
-	DEBUG_PRINT("Linear pattern", linPattern, EAN8_ELMNTS);
+	DEBUG_PRINT_PATTERN("Linear pattern", linPattern, EAN8_ELMNTS);
 
 	ctx->line1 = true; // so first line is not Y undercut
 	// init most likely prints values
@@ -441,6 +457,8 @@ static bool UPCEenc(uint8_t str[], uint8_t pattern[] ) {
 	int i, j, abMask, bars, sNdx, pNdx, abBits;
 
 	assert(str && strlen((char*)str) == 7);
+	assert(gs1_allDigits(str));
+	assert(gs1_validateParity(str));
 
 	sNdx = 0;
 	pNdx = 0;
@@ -568,6 +586,12 @@ void gs1_UPCE(gs1_encoder *ctx) {
 			ctx->errFlag = true;
 			goto out;
 		}
+	}
+
+	if (!gs1_allDigits((uint8_t*)ctx->dataStr)) {
+		strcpy(ctx->errMsg, "primary data must be all digits");
+		ctx->errFlag = true;
+		goto out;
 	}
 
 	strcpy(primaryStr, ctx->dataStr);
