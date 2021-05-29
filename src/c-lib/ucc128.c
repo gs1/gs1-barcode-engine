@@ -26,6 +26,7 @@
 #include "gs1encoders.h"
 #include "enc-private.h"
 #include "cc.h"
+#include "debug.h"
 #include "driver.h"
 #include "ucc128.h"
 
@@ -366,47 +367,41 @@ void gs1_U128A(gs1_encoder *ctx) {
 
 	uint8_t (*ccPattern)[CCB4_ELMNTS] = ctx->ccPattern;
 
-	char dataStr[GS1_ENCODERS_MAX_DATA+1];
-
 	int i;
 	int rows, ccFlag, symChars, symWidth, ccLpad, ccRpad;
-	char primaryStr[120+1];
+	char primaryStr[49+1];
 	char *ccStr;
 
-	strcpy(dataStr, ctx->dataStr);
-	ccStr = strchr(dataStr, '|');
+	DEBUG_PRINT("\nData: %s\n", ctx->dataStr);
+
+	ccStr = strchr(ctx->dataStr, '|');
 	if (ccStr == NULL) ccFlag = false;
 	else {
 		ccFlag = true;
 		ccStr[0] = '\0'; // separate primary data
 		ccStr++; // point to secondary data
+		DEBUG_PRINT("Primary %s\n", ctx->dataStr);
+		DEBUG_PRINT("CC: %s\n", ccStr);
 	}
 
-	if (strlen(dataStr) > 48) {
+	if (strlen(ctx->dataStr) > 48) {
 		strcpy(ctx->errMsg, "primary data exceeds 48 characters");
 		ctx->errFlag = true;
-		return;
+		goto out;
 	}
 
 	// insert leading FNC1 if not already there
-	if (dataStr[0] != '#') {
+	if (ctx->dataStr[0] != '#') {
 		strcpy(primaryStr, "#");
 	}
 	else {
 		primaryStr[0] = '\0';
 	}
-	strcat(primaryStr, dataStr);
+	strcat(primaryStr, ctx->dataStr);
 
-	symChars = enc128((uint8_t*)primaryStr, linPattern, (ccFlag) ? 1 : 0);
+	if ((symChars = enc128((uint8_t*)primaryStr, linPattern, (ccFlag) ? 1 : 0)) <= 0) goto out;
 
-#if PRNT
-	printf("\n%s", primaryStr);
-	printf("\n");
-	for (i = 0; i < (symChars*6+3); i++) {
-		printf("%d", linPattern[i]);
-	}
-	printf("\n");
-#endif
+	DEBUG_PRINT_PATTERN("Linear pattern", linPattern, symChars*6+3);
 
 	ctx->line1 = true; // so first line is not Y undercut
 	// init most likely prints values
@@ -419,20 +414,9 @@ void gs1_U128A(gs1_encoder *ctx) {
 	prints.whtFirst = true;
 	prints.reverse = false;
 	if (ccFlag) {
-		if (!((rows = gs1_CC4enc(ctx, (uint8_t*)ccStr, ccPattern)) > 0) || ctx->errFlag) return;
-#if PRNT
-		{
-			int j;
-			printf("\n%s", ccStr);
-			printf("\n");
-			for (i = 0; i < rows; i++) {
-				for (j = 0; j < CCB4_ELMNTS; j++) {
-					printf("%d", ccPattern[i][j]);
-				}
-				printf("\n");
-			}
-		}
-#endif
+		if (!((rows = gs1_CC4enc(ctx, (uint8_t*)ccStr, ccPattern)) > 0) || ctx->errFlag) goto out;
+
+		DEBUG_PRINT_PATTERNS("CC pattern", (uint8_t*)(*ccPattern), CCB4_ELMNTS, rows);
 
 		if (symChars < 9) {
 			strcpy(ctx->errMsg, "linear component too short");
@@ -483,6 +467,13 @@ void gs1_U128A(gs1_encoder *ctx) {
 
 		gs1_driverFinalise(ctx);
 	}
+
+out:
+
+	// Restore the original dataStr contents
+	if (ccFlag)
+		*(ccStr-1) = '|';
+
 	return;
 }
 
@@ -494,54 +485,49 @@ void gs1_U128C(gs1_encoder *ctx) {
 
 	uint8_t linPattern[(UCC128_SYMMAX*6)+3];
 
-	char dataStr[GS1_ENCODERS_MAX_DATA+1];
-
 	int i;
 	int ccFlag, symChars, symWidth, ccRpad;
-	char primaryStr[120+1];
+	char primaryStr[49+1];
 	char *ccStr;
 
-	strcpy(dataStr, ctx->dataStr);
-	ccStr = strchr(dataStr, '|');
+	DEBUG_PRINT("\nData: %s\n", ctx->dataStr);
+
+	ccStr = strchr(ctx->dataStr, '|');
 	if (ccStr == NULL) ccFlag = false;
 	else {
 		ccFlag = true;
 		ccStr[0] = '\0'; // separate primary data
 		ccStr++; // point to secondary data
+		DEBUG_PRINT("Primary %s\n", ctx->dataStr);
+		DEBUG_PRINT("CC: %s\n", ccStr);
 	}
 
-	if (strlen(dataStr) > 48) {
+	if (strlen(ctx->dataStr) > 48) {
 		strcpy(ctx->errMsg, "primary data exceeds 48 characters");
 		ctx->errFlag = true;
 		return;
 	}
 
 	// insert leading FNC1 if not already there
-	if (dataStr[0] != '#') {
+	if (ctx->dataStr[0] != '#') {
 		strcpy(primaryStr, "#");
 	}
 	else {
 		primaryStr[0] = '\0';
 	}
-	strcat(primaryStr, dataStr);
+	strcat(primaryStr, ctx->dataStr);
 
-	symChars = enc128((uint8_t*)primaryStr, linPattern, (ccFlag) ? 2 : 0); // 2 for CCC
+	if ((symChars = enc128((uint8_t*)primaryStr, linPattern, (ccFlag) ? 2 : 0)) <= 0) goto out;
 
-#if PRNT
-	printf("\n%s", primaryStr);
-	printf("\n");
-	for (i = 0; i < (symChars*6+3); i++) {
-		printf("%d", linPattern[i]);
-	}
-	printf("\n");
-#endif
+	DEBUG_PRINT_PATTERN("Linear pattern", linPattern, symChars*6+3);
 
 	ctx->colCnt = ((symChars*11 + 22 - UCC128_L_PAD - 5)/17) -4;
 	if (ctx->colCnt < 1) {
 		strcpy(ctx->errMsg, "UCC-128 too small");
 		ctx->errFlag = true;
-		return;
+		goto out;
 	}
+
 	ctx->line1 = true; // so first line is not Y undercut
 	// init most likely prints values
 	prints.elmCnt = symChars*6+3;
@@ -552,21 +538,11 @@ void gs1_U128C(gs1_encoder *ctx) {
 	prints.rightPad = 0;
 	prints.whtFirst = true;
 	prints.reverse = false;
+
 	if (ccFlag) {
-		if (!gs1_CCCenc(ctx, (uint8_t*)ccStr, patCCC) || ctx->errFlag) return;
-#if PRNT
-		{
-			int j;
-			printf("\n%s", ccStr);
-			printf("\n");
-			for (i = 0; i < ctx->rowCnt; i++) {
-				for (j = 0; j < (ctx->colCnt+4)*8+3; j++) {
-					printf("%d", patCCC[i*((ctx->colCnt+4)*8+3) + j]);
-				}
-				printf("\n");
-			}
-		}
-#endif
+		if (!gs1_CCCenc(ctx, (uint8_t*)ccStr, patCCC) || ctx->errFlag) goto out;
+
+		DEBUG_PRINT_PATTERNS("CC pattern", (uint8_t*)(*ccPattern), (ctx->colCnt+4)*8+3, ctx->rowCnt);
 
 		symWidth = symChars*11+22;
 		ccRpad = symWidth - UCC128_L_PAD - ((ctx->colCnt+4)*17+5);
@@ -610,6 +586,13 @@ void gs1_U128C(gs1_encoder *ctx) {
 
 		gs1_driverFinalise(ctx);
 	}
+
+out:
+
+	// Restore the original dataStr contents
+	if (ccFlag)
+		*(ccStr-1) = '|';
+
 	return;
 }
 
