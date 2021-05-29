@@ -40,7 +40,7 @@ static bool emitData(gs1_encoder *ctx, void *data, size_t len) {
 				ctx->bufferSize = 0;
 				ctx->bufferWidth = 0;
 				ctx->bufferHeight = 0;
-				strcpy(ctx->errMsg, "Failed to expand buffer");
+				strcpy(ctx->errMsg, "Failed to expand output buffer");
 				ctx->errFlag = true;
 				return false;
 			};
@@ -312,7 +312,6 @@ bool gs1_doDriverInit(gs1_encoder *ctx, long xdim, long ydim) {
 		}
 		ctx->outfp = oFile;
 	} else {
-		free(ctx->buffer);
 		ctx->bufferCap = 1024;		// Initial size, will grow as needed
 		if ((ctx->buffer = malloc(ctx->bufferCap * sizeof(uint8_t))) == NULL) {
 			ctx->bufferCap = 0;
@@ -327,7 +326,7 @@ bool gs1_doDriverInit(gs1_encoder *ctx, long xdim, long ydim) {
 
 	if (ctx->format == gs1_encoder_dBMP) {
 		if ((ctx->driver_rowBuffer = malloc((unsigned long)ydim * sizeof(struct sPrints))) == NULL) {
-			strcpy(ctx->errMsg, "Out of memory");
+			strcpy(ctx->errMsg, "Out of memory creating initial BMP row buffer");
 			ctx->errFlag = true;
 			return false;
 		}
@@ -353,7 +352,7 @@ bool gs1_doDriverAddRow(gs1_encoder *ctx, struct sPrints *prints) {
 		row = &ctx->driver_rowBuffer[ctx->driver_numRows++];
 		memcpy(row, prints, sizeof(struct sPrints));
 		if ((row->pattern = malloc((unsigned int)prints->elmCnt * sizeof(uint8_t))) == NULL) {
-			strcpy(ctx->errMsg, "Out of memory");
+			strcpy(ctx->errMsg, "Out of memory extending BMP row buffer");
 			ctx->errFlag = true;
 			return false;
 		}
@@ -393,7 +392,7 @@ bool gs1_doDriverFinalise(gs1_encoder *ctx) {
 			free(ctx->buffer);
 			ctx->bufferCap = 0;
 			ctx->bufferSize = 0;
-			strcpy(ctx->errMsg, "Failed to shrink buffer");
+			strcpy(ctx->errMsg, "Failed to shrink output buffer");
 			ctx->errFlag = true;
 			return false;
 		};

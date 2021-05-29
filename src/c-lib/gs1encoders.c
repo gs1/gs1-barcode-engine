@@ -463,6 +463,7 @@ GS1_ENCODERS_API bool gs1_encoder_setDataFile(gs1_encoder *ctx, char* dataFile) 
 
 GS1_ENCODERS_API char* gs1_encoder_getErrMsg(gs1_encoder *ctx) {
 	assert(ctx);
+	assert(!ctx->errFlag ^ *ctx->errMsg);
 	return ctx->errMsg;
 }
 
@@ -475,6 +476,10 @@ GS1_ENCODERS_API bool gs1_encoder_encode(gs1_encoder *ctx) {
 	reset_error(ctx);
 
 	free_bufferStrings(ctx);
+	free(ctx->buffer);
+	ctx->buffer = NULL;
+	ctx->bufferCap = 0;
+	ctx->bufferSize = 0;
 	ctx->bufferWidth = 0;
 	ctx->bufferHeight = 0;
 
@@ -550,17 +555,28 @@ GS1_ENCODERS_API bool gs1_encoder_encode(gs1_encoder *ctx) {
 
 	}
 
-	return !ctx->errFlag;
+	if (ctx->errFlag) {
+		assert(!ctx->buffer && ctx->bufferCap == 0 && ctx->bufferSize == 0 &&
+			ctx->bufferWidth == 0 && ctx->bufferHeight == 0);
+		return false;
+	}
+
+	return true;
 
 }
 
 
 GS1_ENCODERS_API size_t gs1_encoder_getBuffer(gs1_encoder *ctx, void** out) {
 	assert(ctx);
+
 	if (!ctx->buffer) {
+		assert(ctx->bufferSize == 0);
 		*out = NULL;
 		return 0;
 	}
+
+	assert(ctx->bufferSize > 0);
+
 	*out = ctx->buffer;
 	return ctx->bufferSize;
 }
@@ -611,12 +627,14 @@ out:
 
 GS1_ENCODERS_API int gs1_encoder_getBufferWidth(gs1_encoder *ctx) {
 	assert(ctx);
+	assert(!ctx->buffer ^ (ctx->bufferWidth > 0));
 	return ctx->bufferWidth;
 }
 
 
 GS1_ENCODERS_API int gs1_encoder_getBufferHeight(gs1_encoder *ctx) {
 	assert(ctx);
+	assert(!ctx->buffer ^ (ctx->bufferHeight > 0));
 	return ctx->bufferHeight;
 }
 
