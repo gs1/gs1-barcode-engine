@@ -9,5 +9,11 @@ lib*.so
 lib*.so.*
 *.vcxproj.user
 src/c-lib/build/
+src/c-lib/test/
+src/c-lib/corpus-*/
+src/c-lib/crash-*
+src/c-lib/fuzz-*
+src/c-lib/out.tif
+src/c-lib/out.bmp
 src/dotnet/bin/
 src/dotnet/obj/
