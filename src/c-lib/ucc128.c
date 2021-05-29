@@ -21,6 +21,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdio.h>
 
 #include "gs1encoders.h"
 #include "enc-private.h"

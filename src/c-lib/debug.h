@@ -23,8 +23,6 @@
 
 #include <stdint.h>
 
-#include "mtx.h"
-
 struct patternLength;
 
 
