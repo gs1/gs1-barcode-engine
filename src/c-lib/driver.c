@@ -29,7 +29,9 @@
 
 
 static bool emitData(gs1_encoder *ctx, void *data, size_t len) {
+
 	uint8_t *buf;
+
 	if (strcmp(ctx->outFile, "") != 0) {
 		fwrite(data, len, 1, ctx->outfp);
 	} else {
@@ -50,7 +52,6 @@ static bool emitData(gs1_encoder *ctx, void *data, size_t len) {
 		memcpy(&ctx->buffer[ctx->bufferSize], data, len);
 		ctx->bufferSize += len;
 	}
-
 	return true;
 
 }
