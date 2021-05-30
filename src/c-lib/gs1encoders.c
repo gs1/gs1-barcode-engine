@@ -30,6 +30,7 @@
 #include "driver.h"
 #include "dm.h"
 #include "ean.h"
+#include "gs1.h"
 #include "rss14.h"
 #include "rssexp.h"
 #include "rsslim.h"
@@ -439,6 +440,20 @@ GS1_ENCODERS_API bool gs1_encoder_setDataStr(gs1_encoder *ctx, char* dataStr) {
 		return false;
 	}
 	strcpy(ctx->dataStr, dataStr);
+	return true;
+}
+
+
+GS1_ENCODERS_API bool gs1_encoder_setGS1dataStr(gs1_encoder *ctx, char* gs1data) {
+	assert(ctx);
+	reset_error(ctx);
+
+	if (!gs1_parseGS1data(gs1data, ctx->dataStr)) {
+		strcpy(ctx->errMsg, "Invalid GS1 data");
+		ctx->errFlag = true;
+		return false;
+	}
+
 	return true;
 }
 

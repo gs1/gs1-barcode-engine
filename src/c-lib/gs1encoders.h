@@ -133,6 +133,8 @@ GS1_ENCODERS_API bool gs1_encoder_setFileInputFlag(gs1_encoder *ctx, bool fileIn
 GS1_ENCODERS_API char* gs1_encoder_getDataStr(gs1_encoder *ctx);
 GS1_ENCODERS_API bool gs1_encoder_setDataStr(gs1_encoder *ctx, char* dataStr);
 
+GS1_ENCODERS_API bool gs1_encoder_setGS1dataStr(gs1_encoder *ctx, char* dataStr);
+
 GS1_ENCODERS_API char* gs1_encoder_getDataFile(gs1_encoder *ctx);
 GS1_ENCODERS_API bool gs1_encoder_setDataFile(gs1_encoder *ctx, char* dataFile);
 
