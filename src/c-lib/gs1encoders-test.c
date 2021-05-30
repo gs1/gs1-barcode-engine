@@ -169,6 +169,7 @@ TEST_LIST = {
      * gs1.c
      *
      */
+    { "gs1_gs1_parseGS1data", test_gs1_parseGS1data },
     { "gs1_validateParity", test_gs1_validateParity },
 
 
