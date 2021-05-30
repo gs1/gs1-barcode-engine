@@ -2104,6 +2104,9 @@ int gs1_CC2enc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][C
 	int size;
 	int i;
 
+	if (*str == '#')
+		str++;
+
 	ctx->linFlag = 0;
 	ctx->cc_CCSizes = CC2Sizes;
 	if ((i=gs1_check2DData(str)) != 0) {
@@ -2136,6 +2139,9 @@ int gs1_CC3enc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][C
 	uint16_t codeWords[MAX_CCB4_CW];
 	int size;
 	int i;
+
+	if (*str == '#')
+		str++;
 
 	ctx->linFlag = 0;
 	ctx->cc_CCSizes = CC3Sizes;
@@ -2170,6 +2176,9 @@ int gs1_CC4enc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][C
 	int size;
 	int i;
 
+	if (*str == '#')
+		str++;
+
 	ctx->linFlag = 0;
 	ctx->cc_CCSizes = CC4Sizes;
 	if ((i=gs1_check2DData(str)) != 0) {
@@ -2200,6 +2209,9 @@ bool gs1_CCCenc(gs1_encoder *ctx, uint8_t str[], uint8_t patCCC[] ) {
 	uint16_t codeWords[MAX_CCC_CW];
 	int byteCnt;
 	int i;
+
+	if (*str == '#')
+		str++;
 
 	ctx->linFlag = -1; // CC-C flag value
 	if ((i=gs1_check2DData(str)) != 0) {
