@@ -23,6 +23,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
+#include "assert.h"
 #include "enc-private.h"
 #include "cc.h"
 #include "debug.h"
@@ -265,25 +266,28 @@ void gs1_RSSExp(gs1_encoder *ctx) {
 	char *ccStr;
 	int rPadl1, rPadcc;
 
-	DEBUG_PRINT("\nData: %s\n", ctx->dataStr);
+	char *dataStr = ctx->dataStr;
 
-	ccStr = strchr(ctx->dataStr, '|');
+	assert(ctx->rssExpSegWidth >= 4 && ctx->rssExpSegWidth <= 22);
+	assert(ctx->rssExpSegWidth % 2 == 0);
+
+	DEBUG_PRINT("\nData: %s\n", dataStr);
+
+	if (*dataStr == '#')
+		dataStr++;
+
+	ccStr = strchr(dataStr, '|');
 	if (ccStr == NULL) ccFlag = false;
 	else {
-		if (ctx->rssExpSegWidth < 4) {
-			strcpy(ctx->errMsg, "Composite must be at least 4 segments wide");
-			ctx->errFlag = true;
-			goto out;
-		}
 		ccFlag = true;
 		ccStr[0] = '\0'; // separate primary data
 		ccStr++; // point to secondary data
-		DEBUG_PRINT("Primary %s\n", ctx->dataStr);
+		DEBUG_PRINT("Primary %s\n", dataStr);
 		DEBUG_PRINT("CC: %s\n", ccStr);
 	}
 
 	ctx->rssexp_rowWidth = ctx->rssExpSegWidth; // save for getUnusedBitCnt
-	if (!((segs = RSS14Eenc(ctx, (uint8_t*)ctx->dataStr, dblPattern, ccFlag)) > 0) || ctx->errFlag) goto out;
+	if (!((segs = RSS14Eenc(ctx, (uint8_t*)dataStr, dblPattern, ccFlag)) > 0) || ctx->errFlag) goto out;
 
 	lNdx = 0;
 	for (i = 0; i < segs-1; i += 2) {
@@ -582,6 +586,7 @@ NULL
 NULL
 	};
 	TEST_CHECK(test_encode(ctx, gs1_encoder_sRSSEXP, "01950123456789033103000123", expect));
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sRSSEXP, "#01950123456789033103000123", expect));
 
 	gs1_encoder_free(ctx);
 

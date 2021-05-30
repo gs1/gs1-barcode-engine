@@ -305,46 +305,50 @@ void gs1_RSSLim(gs1_encoder *ctx) {
 
 	uint8_t (*ccPattern)[CCB4_ELMNTS] = ctx->ccPattern;
 
+	char *dataStr = ctx->dataStr;
 	char primaryStr[14+1];
 
 	int i;
 	int rows, ccFlag;
 	char *ccStr;
 
-	DEBUG_PRINT("\nData: %s\n", ctx->dataStr);
+	DEBUG_PRINT("\nData: %s\n", dataStr);
 
-	ccStr = strchr(ctx->dataStr, '|');
+	if (strlen(dataStr) >= 3 && strncmp(dataStr, "#01", 3) == 0)
+	dataStr += 3;
+
+	ccStr = strchr(dataStr, '|');
 	if (ccStr == NULL) ccFlag = false;
 	else {
 		ccFlag = true;
 		ccStr[0] = '\0'; // separate primary data
 		ccStr++; // point to secondary data
-		DEBUG_PRINT("Primary %s\n", ctx->dataStr);
+		DEBUG_PRINT("Primary %s\n", dataStr);
 		DEBUG_PRINT("CC: %s\n", ccStr);
 	}
 
 	if (!ctx->addCheckDigit) {
-		if (strlen(ctx->dataStr) != 14) {
+		if (strlen(dataStr) != 14) {
 			strcpy(ctx->errMsg, "primary data must be 14 digits");
 			ctx->errFlag = true;
 			goto out;
 		}
 	}
 	else {
-		if (strlen(ctx->dataStr) != 13) {
+		if (strlen(dataStr) != 13) {
 			strcpy(ctx->errMsg, "primary data must be 13 digits without check digit");
 			ctx->errFlag = true;
 			goto out;
 		}
 	}
 
-	if (!gs1_allDigits((uint8_t*)ctx->dataStr)) {
+	if (!gs1_allDigits((uint8_t*)dataStr)) {
 		strcpy(ctx->errMsg, "primary data must be all digits");
 		ctx->errFlag = true;
 		goto out;
 	}
 
-	strcpy(primaryStr, ctx->dataStr);
+	strcpy(primaryStr, dataStr);
 
 	if (ctx->addCheckDigit)
 		strcat(primaryStr, "-");
@@ -488,6 +492,7 @@ void test_rsslim_RSSLIM_encode(void) {
 NULL
 	};
 	TEST_CHECK(test_encode(ctx, gs1_encoder_sRSSLIM, "15012345678907", expect));
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sRSSLIM, "#0115012345678907", expect));
 
 	gs1_encoder_free(ctx);
 
