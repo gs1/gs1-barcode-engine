@@ -99,6 +99,7 @@ void gs1_EAN13(gs1_encoder *ctx) {
 	uint8_t sepPat1[5] = { 7,1,EAN13_W-16,1,7 }; // separator pattern 1
 	uint8_t sepPat2[5] = { 6,1,EAN13_W-14,1,6 }; // separator pattern 2
 
+	char *dataStr = ctx->dataStr;
 	char primaryStr[14];
 
 	uint8_t (*ccPattern)[CCB4_ELMNTS] = ctx->ccPattern;
@@ -109,34 +110,37 @@ void gs1_EAN13(gs1_encoder *ctx) {
 
 	unsigned int digits = ctx->sym == gs1_encoder_sEAN13 ? 13 : 12;
 
-	DEBUG_PRINT("\nData: %s\n", ctx->dataStr);
+	DEBUG_PRINT("\nData: %s\n", dataStr);
 
-	ccStr = strchr(ctx->dataStr, '|');
+	if (strlen(dataStr) >= 17-digits && strncmp(dataStr, "#0100", 17-digits) == 0)
+		dataStr += 17-digits;
+
+	ccStr = strchr(dataStr, '|');
 	if (ccStr == NULL) ccFlag = false;
 	else {
 		ccFlag = true;
 		ccStr[0] = '\0'; // separate primary data
 		ccStr++; // point to secondary data
-		DEBUG_PRINT("Primary %s\n", ctx->dataStr);
+		DEBUG_PRINT("Primary %s\n", dataStr);
 		DEBUG_PRINT("CC: %s\n", ccStr);
 	}
 
 	if (!ctx->addCheckDigit) {
-		if (strlen(ctx->dataStr) != digits) {
+		if (strlen(dataStr) != digits) {
 			sprintf(ctx->errMsg, "primary data must be %d digits", digits);
 			ctx->errFlag = true;
 			goto out;
 		}
 	}
 	else {
-		if (strlen(ctx->dataStr) != digits-1) {
+		if (strlen(dataStr) != digits-1) {
 			sprintf(ctx->errMsg, "primary data must be %d digits without check digit", digits-1);
 			ctx->errFlag = true;
 			goto out;
 		}
 	}
 
-	if (!gs1_allDigits((uint8_t*)ctx->dataStr)) {
+	if (!gs1_allDigits((uint8_t*)dataStr)) {
 		strcpy(ctx->errMsg, "primary data must be all digits");
 		ctx->errFlag = true;
 		goto out;
@@ -144,7 +148,7 @@ void gs1_EAN13(gs1_encoder *ctx) {
 
 	primaryStr[0] = ctx->sym == gs1_encoder_sEAN13 ? '\0' : '0';  // Convert GTIN-12 to GTIN-13 if UPC-A
 	primaryStr[1] = '\0';
-	strcat(primaryStr, ctx->dataStr);
+	strcat(primaryStr, dataStr);
 
 	if (ctx->addCheckDigit)
 		strcat(primaryStr, "-");
@@ -295,6 +299,7 @@ void gs1_EAN8(gs1_encoder *ctx) {
 
 	uint8_t (*ccPattern)[CCB4_ELMNTS] = ctx->ccPattern;
 
+	char *dataStr = ctx->dataStr;
 	char primaryStr[8+1];
 
 	int i;
@@ -304,40 +309,43 @@ void gs1_EAN8(gs1_encoder *ctx) {
 	int lpadEAN;
 	int elmntsCC;
 
-	DEBUG_PRINT("\nData: %s\n", ctx->dataStr);
+	DEBUG_PRINT("\nData: %s\n", dataStr);
 
-	ccStr = strchr(ctx->dataStr, '|');
+	if (strlen(dataStr) >= 9 && strncmp(dataStr, "#01000000", 9) == 0)
+		dataStr += 9;
+
+	ccStr = strchr(dataStr, '|');
 	if (ccStr == NULL) ccFlag = false;
 	else {
 		ccFlag = true;
 		ccStr[0] = '\0'; // separate primary data
 		ccStr++; // point to secondary data
-		DEBUG_PRINT("Primary %s\n", ctx->dataStr);
+		DEBUG_PRINT("Primary %s\n", dataStr);
 		DEBUG_PRINT("CC: %s\n", ccStr);
 	}
 
 	if (!ctx->addCheckDigit) {
-		if (strlen(ctx->dataStr) != 8) {
+		if (strlen(dataStr) != 8) {
 			strcpy(ctx->errMsg, "primary data must be 8 digits");
 			ctx->errFlag = true;
 			goto out;
 		}
 	}
 	else {
-		if (strlen(ctx->dataStr) != 7) {
+		if (strlen(dataStr) != 7) {
 			strcpy(ctx->errMsg, "primary data must be 7 digits without check digit");
 			ctx->errFlag = true;
 			goto out;
 		}
 	}
 
-	if (!gs1_allDigits((uint8_t*)ctx->dataStr)) {
+	if (!gs1_allDigits((uint8_t*)dataStr)) {
 		strcpy(ctx->errMsg, "primary data must be all digits");
 		ctx->errFlag = true;
 		goto out;
 	}
 
-	strcpy(primaryStr, ctx->dataStr);
+	strcpy(primaryStr, dataStr);
 
 	if (ctx->addCheckDigit)
 		strcat(primaryStr, "-");
@@ -553,6 +561,7 @@ void gs1_UPCE(gs1_encoder *ctx) {
 
 	uint8_t (*ccPattern)[CCB4_ELMNTS] = ctx->ccPattern;
 
+	char *dataStr = ctx->dataStr;
 	char primaryStr[12+1];
 	char data7[7+1];
 
@@ -560,40 +569,43 @@ void gs1_UPCE(gs1_encoder *ctx) {
 	int rows, ccFlag;
 	char *ccStr;
 
-	DEBUG_PRINT("\nData: %s\n", ctx->dataStr);
+	DEBUG_PRINT("\nData: %s\n", dataStr);
 
-	ccStr = strchr(ctx->dataStr, '|');
+	if (strlen(dataStr) >= 5 && strncmp(dataStr, "#0100", 5) == 0)
+		dataStr += 5;
+
+	ccStr = strchr(dataStr, '|');
 	if (ccStr == NULL) ccFlag = false;
 	else {
 		ccFlag = true;
 		ccStr[0] = '\0'; // separate primary data
 		ccStr++; // point to secondary data
-		DEBUG_PRINT("Primary %s\n", ctx->dataStr);
+		DEBUG_PRINT("Primary %s\n", dataStr);
 		DEBUG_PRINT("CC: %s\n", ccStr);
 	}
 
 	if (!ctx->addCheckDigit) {
-		if (strlen(ctx->dataStr) != 12) {
+		if (strlen(dataStr) != 12) {
 			strcpy(ctx->errMsg, "primary data must be 12 digits");
 			ctx->errFlag = true;
 			goto out;
 		}
 	}
 	else {
-		if (strlen(ctx->dataStr) != 11) {
+		if (strlen(dataStr) != 11) {
 			strcpy(ctx->errMsg, "primary data must be 11 digits without check digit");
 			ctx->errFlag = true;
 			goto out;
 		}
 	}
 
-	if (!gs1_allDigits((uint8_t*)ctx->dataStr)) {
+	if (!gs1_allDigits((uint8_t*)dataStr)) {
 		strcpy(ctx->errMsg, "primary data must be all digits");
 		ctx->errFlag = true;
 		goto out;
 	}
 
-	strcpy(primaryStr, ctx->dataStr);
+	strcpy(primaryStr, dataStr);
 
 	if (ctx->addCheckDigit)
 		strcat(primaryStr, "-");
@@ -783,6 +795,7 @@ void test_ean_EAN13_encode_ean13(void) {
 NULL
 	};
 	TEST_CHECK(test_encode(ctx, gs1_encoder_sEAN13, "2112345678900", expect));
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sEAN13, "#0102112345678900", expect));
 
 	gs1_encoder_free(ctx);
 
@@ -873,6 +886,7 @@ void test_ean_EAN13_encode_upca(void) {
 NULL
 	};
 	TEST_CHECK(test_encode(ctx, gs1_encoder_sUPCA, "416000336108", expect));
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sUPCA, "#0100416000336108", expect));
 
 	gs1_encoder_free(ctx);
 
@@ -949,6 +963,7 @@ void test_ean_EAN8_encode(void) {
 NULL
 	};
 	TEST_CHECK(test_encode(ctx, gs1_encoder_sEAN8, "02345673", expect));
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sEAN8, "#0100000002345673", expect));
 
 	gs1_encoder_free(ctx);
 
@@ -1039,6 +1054,7 @@ void test_ean_UPCA_encode(void) {
 NULL
 	};
 	TEST_CHECK(test_encode(ctx, gs1_encoder_sUPCA, "416000336108", expect));
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sUPCA, "#0100416000336108", expect));
 
 	gs1_encoder_free(ctx);
 
