@@ -78,7 +78,7 @@ void do_debug_print_pattern_lengths(char* prefix, struct patternLength *pats, in
 	for (i = 0; i < rows; i++) {
 		printf("%s:", pats[i].whtFirst ? "W" : "B");
 		for (j = 0; j < pats[i].length; j++) {
-			printf("%d", pats[i].pattern[j]);
+			printf("%d ", pats[i].pattern[j]);
 		}
 		printf("\n  ");
 	}
@@ -93,7 +93,7 @@ void do_debug_print_pattern(char *prefix, uint8_t* pattern, int elements) {
 
 	printf("%s:\n  ", prefix);
 	for (i = 0; i < elements; i++) {
-		printf("%d", pattern[i]);
+		printf("%d ", pattern[i]);
 	}
 	printf("\n");
 
@@ -107,7 +107,7 @@ void do_debug_print_patterns(char *prefix, uint8_t* patterns, int elements, int 
 	printf("%s:\n  ", prefix);
 	for (i = 0; i < rows; i++) {
 		for (j = 0; j < elements; j++) {
-			printf("%d", *(patterns+i*elements+j));
+			printf("%d ", *(patterns+i*elements+j));
 		}
 		printf("\n  ");
 	}
