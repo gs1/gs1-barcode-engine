@@ -187,10 +187,22 @@ static void createCodewords(gs1_encoder *ctx, uint8_t *string, uint8_t cws[MAX_D
 	(void)ctx;
 
 	uint8_t *p = cws;
+	bool gs1Mode = false;
+
+	if (*string == '#') {									// "#..." => GS1 mode
+		gs1Mode = true;
+	} else if (strlen((char*)string) >= 2 && strncmp((char*)string, "\\#", 2) == 0) {	// "\#" => "#..."; not GS1 mode
+		string++;	// Skip '\' escape
+	} else if (strlen((char*)string) >= 3 && strncmp((char*)string, "\\\\#", 2) == 0) {	// "\\#" => "\#..."; not GS1 mode
+		string++;	// Skip '\' escape
+	}
 
 	// Encode the message in ASCII mode
 	while (*string && p-cws < MAX_DM_DAT_CWS) {
-		if (*string >= '0' && *string <= '9') {
+		if (*string == '#' && gs1Mode) {
+			*p++ = 232;
+			string++;
+		} else if (*string >= '0' && *string <= '9') {
 			if (*(string+1) && *(string+1) >= '0' && *(string+1) <= '9') {
 				*p++ = (uint8_t)(((*string)-'0')*10 + *(string+1)-'0' + 130);
 				string += 2;
@@ -458,6 +470,8 @@ static int DMenc(gs1_encoder *ctx, uint8_t string[], struct patternLength *pats)
 	(void)ctx;
 	(void)string;
 
+	DEBUG_PRINT("\nData: %s\n", string);
+
 	createCodewords(ctx, string, cws, &cwslen);
 	if (cwslen == UINT16_MAX) {
 		strcpy(ctx->errMsg, "Data exceeds the capacity of any Data Matrix symbol");
@@ -467,7 +481,6 @@ static int DMenc(gs1_encoder *ctx, uint8_t string[], struct patternLength *pats)
 
 	assert(cwslen <= MAX_DM_DAT_CWS);
 
-	DEBUG_PRINT("\nData: %s\n", string);
 	DEBUG_PRINT_CWS("Codewords", cws, cwslen);
 
 	m = selectVersion(ctx, cwslen);
@@ -598,6 +611,33 @@ void test_dm_DM_encode(void) {
 NULL
 	};
 	TEST_CHECK(test_encode(ctx, gs1_encoder_sDM, "1501234567890", expect));
+
+	expect = (char*[]){
+"                      ",
+" X X X X X X X X X X  ",
+" XX XX X   XXX XX XXX ",
+" X   X X     XXX  X   ",
+" X XXXXX XX  X X    X ",
+" XXXX X    X       X  ",
+" X  X  X XX  XXXXX  X ",
+" XX      X X X   XXX  ",
+" XXXX  X  X     XXX X ",
+" X    XX XXXX X   XX  ",
+" XX X    X XXXXX  X X ",
+" XX  X    XX X XXX    ",
+" X  XX     X XXXXXXXX ",
+" XXX      XX  X X     ",
+" X    XXX   XXXX X XX ",
+" XX  XX   XXXX XX XX  ",
+" XX   XXX XXX  X   XX ",
+" X  XXXX     XX X     ",
+" XX    XXXX XX  XXX X ",
+" X  XX X    X  X X X  ",
+" XXXXXXXXXXXXXXXXXXXX ",
+"                      ",
+NULL
+	};
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sDM, "#011234567890123110ABC123#11210630", expect));  // GS1 mode
 
 	gs1_encoder_free(ctx);
 
