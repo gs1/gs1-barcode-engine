@@ -112,48 +112,43 @@ static bool userInt(gs1_encoder *ctx) {
 			case gs1_encoder_sRSS14T:
 			case gs1_encoder_sRSS14S:
 			case gs1_encoder_sRSS14SO:
+				printf("\n Primary data is 14 digits with check digit, or AI syntax: (01)..............");
+				printf("\n For Composite, provide both primary and 2D components as AI syntax separated by |.");
+				break;
 			case gs1_encoder_sRSSLIM:
-				printf("\n Primary data is up to 13 digits. Check digit must be omitted.");
-				printf("\n 2D component data starts with 1st AI. Only interior FNC1s are needed.");
-				break;
-			case gs1_encoder_sRSSEXP:
-				printf("\n GS1 DataBar Expanded (& 2D component) data starts with 1st AI. Only interior FNC1s are needed.");
-				printf("\nSpecial data input characters:");
-				break;
-			case gs1_encoder_sUPCA:
-				printf("\n Primary data is 12 digits including check digit.");
-				printf("\n 2D component data starts with 1st AI. Only interior FNC1s are necessary.");
-				break;
-			case gs1_encoder_sUPCE:
-				printf("\n Primary data (not zero suppressed) is 12 digits including check digit.");
-				printf("\n 2D component data starts with 1st AI. Only interior FNC1s are necessary.");
-				break;
-			case gs1_encoder_sEAN13:
-				printf("\n Primary data is 13 digits including check digit.");
-				printf("\n 2D component data starts with 1st AI. Only interior FNC1s are necessary.");
-				break;
-			case gs1_encoder_sEAN8:
-				printf("\n Primary data is 8 digits including check digit.");
-				printf("\n 2D component data starts with 1st AI. Only interior FNC1s are necessary.");
+				printf("\n Primary data is 14 digits with check digit, or AI syntax: (01)..............");
+				printf("\n GTIN must begin with 0 or 1, e.g. (01)0............. or (01)1.............");
+				printf("\n For Composite, provide both primary and 2D components as AI syntax separated by |.");
 				break;
 			case gs1_encoder_sUCC128_CCA:
 			case gs1_encoder_sUCC128_CCC:
-				printf("\n Code 128 data starts with 1st AI. Only interior FNC1s are necessary.");
-				printf("\n 2D component data starts with 1st AI. Only interior FNC1s are necessary.");
+			case gs1_encoder_sRSSEXP:
+				printf("\n Primary data is in AI syntax, e.g. (01)..............(10)......");
+				break;
+			case gs1_encoder_sUPCA:
+				printf("\n Primary data is 12 digits with check digit, or AI syntax: (01)00............");
+				printf("\n For Composite, provide both primary and 2D components as AI syntax separated by |.");
+				break;
+			case gs1_encoder_sUPCE:
+				printf("\n Primary data (not zero suppressed) is 12 digits with check digit, or AI syntax: (01)00............");
+				printf("\n For Composite, provide both primary and 2D components as AI syntax separated by |.");
+				break;
+			case gs1_encoder_sEAN13:
+				printf("\n Primary data is 13 digits with check digit, or AI syntax: (01)0.............");
+				printf("\n For Composite, provide both primary and 2D components as AI syntax separated by |.");
+				break;
+			case gs1_encoder_sEAN8:
+				printf("\n Primary data is 8 digits including check digit, or AI syntax: (01)000000........");
+				printf("\n For Composite, provide both primary and 2D components as AI syntax separated by |.");
 				break;
 			case gs1_encoder_sQR:
 			case gs1_encoder_sDM:
-				printf("\n Data starts with 1st AI. Only interior FNC1s are needed.");
-				printf("\nSpecial data input characters:");
+				printf("\n Data is in AI syntax, e.g (01)..............(10)......");
 				break;
 			default:
 				printf("\nSYMBOL TYPE ERROR.");
 				return(false);
 		}
-		printf("\n Special characters:");
-		printf("\n   # (pound sign):   FNC1");
-		printf("\n   | (vertical bar): Separates primary and secondary data");
-		printf("\n   ^ (caret):        Symbol separator used to flag ]e1n format in 2D data");
 		printf("\n\nMENU (Symbology: %s):", SYMBOLOGY_NAMES[gs1_encoder_getSym(ctx)]);
 		printf("\n 0) Enter pixels per X. Current value = %d", gs1_encoder_getPixMult(ctx));
 		printf("\n 1) Enter X pixels to undercut. Current value = %d", gs1_encoder_getXundercut(ctx));
@@ -278,9 +273,16 @@ static bool userInt(gs1_encoder *ctx) {
 				printf("\nEnter linear|2d data: ");
 				if (gets(inpStr) == NULL)
 					return false;
-				if (!gs1_encoder_setDataStr(ctx, inpStr)) {
-					printf("\nERROR: %s\n", gs1_encoder_getErrMsg(ctx));
-					continue;
+				if (strlen(inpStr) > 0 && *inpStr == '(') {
+					if (!gs1_encoder_setGS1dataStr(ctx, inpStr)) {
+						printf("\nERROR: %s\n", gs1_encoder_getErrMsg(ctx));
+						continue;
+					}
+				} else {
+					if (!gs1_encoder_setDataStr(ctx, inpStr)) {
+						printf("\nERROR: %s\n", gs1_encoder_getErrMsg(ctx));
+						continue;
+					}
 				}
 				inMenu = false;
 			 }
