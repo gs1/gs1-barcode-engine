@@ -23,7 +23,96 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "gs1encoders.h"
 #include "gs1.h"
+
+
+// AI prefixes that are defined as not requiring termination by an FNC1 character
+static const char* fixedAIprefixes[22] = {
+	"00", "01", "02",
+	"03", "04",
+	"11", "12", "13", "14", "15", "16", "17", "18", "19",
+	"20",
+	// "23",	// No longer defined as fixed length
+	"31", "32", "33", "34", "35", "36",
+	"41"
+};
+
+
+// Write to dataStr checking for overflow
+#define writeDataStr(v) do {						\
+	if (strlen(dataStr) + strlen(v) > GS1_ENCODERS_MAX_DATA)	\
+		goto fail;						\
+	strcat(dataStr, v);						\
+} while (0)
+
+#define nwriteDataStr(v,l) do {						\
+	if (strlen(dataStr) + l > GS1_ENCODERS_MAX_DATA)		\
+		goto fail;						\
+	strncat(dataStr, v, l);						\
+} while (0)
+
+
+// Convert GS1 AI syntax data to regular data string with # = FNC1
+bool gs1_parseGS1data(char *gs1Data, char *dataStr) {
+
+	assert(gs1Data);
+	assert(dataStr);
+
+	char *p = gs1Data;
+	char *r;
+	int i;
+	bool fnc1req = true;
+
+	*dataStr = '\0';
+
+	while (*p) {
+
+		if (*p++ != '(') goto fail; 			// Expect start of AI
+		if (!(r = strchr(p, ')'))) goto fail;		// Find end of A
+		if (r-p < 2 || r-p > 4) goto fail;		// AI is 2-4 characters
+		*r++ = '\0';					// Delimit the end of the AI pointed to by p
+		if (!gs1_allDigits((uint8_t*)p)) goto fail;	// AI must be numeric
+
+		if (fnc1req)
+			writeDataStr("#");			// Write FNC1, if required
+		writeDataStr(p);				// Write AI
+
+		fnc1req = true;					// Determine whether FNC1 required before next AI
+		for (i = 0; i < (int)(sizeof(fixedAIprefixes) / sizeof(fixedAIprefixes[0])); i++)
+			if (strncmp(fixedAIprefixes[i], p, 2) == 0)
+				fnc1req = false;
+
+		if (!*r)					// Fail if message ends after AI and no value
+			goto fail;
+
+again:
+
+		if ((p = strchr(r, '(')) == NULL) {
+			writeDataStr(r);			// Write until end of data
+			break;
+		}
+
+		if (*(p-1) == '\\') {				// This bracket is an escaped data character
+			nwriteDataStr(r, (size_t)(p-r-1));	// Write up to the escape character
+			writeDataStr("(");			// Write the data bracket
+			r = p+1;				// And keep going
+			goto again;
+		}
+
+		if (p-r < 1) goto fail;				// Value cannot be empty
+		nwriteDataStr(r, (size_t)(p-r));		// Write the value
+
+	}
+
+	return true;
+
+fail:
+
+	*dataStr = '\0';
+	return false;
+
+}
 
 
 // Validate and set the parity digit
@@ -63,10 +152,55 @@ bool gs1_allDigits(uint8_t *str) {
 }
 
 
+
 #ifdef UNIT_TESTS
 
 #define TEST_NO_MAIN
 #include "acutest.h"
+
+
+static void test_parseGS1data(bool should_succeed, char *gs1data, char* expect) {
+
+	char in[256];
+	char out[256];
+	char casename[256];
+
+	sprintf(casename, "%s => %s", gs1data, expect);
+	TEST_CASE(casename);
+
+	strcpy(in, gs1data);
+	TEST_CHECK(gs1_parseGS1data(in, out) ^ !should_succeed);
+	if (should_succeed)
+		TEST_CHECK(strcmp(out, expect) == 0);
+	TEST_MSG("Given: %s; Got: %s; Expected: %s", gs1data, out, expect);
+
+}
+
+
+void test_gs1_parseGS1data(void) {
+
+	test_parseGS1data(true,  "(01)12345678901234", "#0112345678901234");
+	test_parseGS1data(true,  "(10)12345", "#1012345");
+	test_parseGS1data(true,  "(01)12345678901234(10)12345", "#01123456789012341012345");	// No FNC1 after (01)
+	test_parseGS1data(true,  "(3199)12345(10)12345", "#3199123451012345");			// No FNC1 after (3199)
+	test_parseGS1data(true,  "(10)12345(11)98765", "#1012345#1198765");			// FNC1 after (10)
+	test_parseGS1data(true,  "(3799)12345(11)98765", "#379912345#1198765");			// FNC1 after (3799)
+	test_parseGS1data(true,  "(10)12345\\(11)98765", "#1012345(11)98765");			// Escaped bracket
+	test_parseGS1data(true,  "(10)12345\\(", "#1012345(");					// At end if fine
+
+	test_parseGS1data(false, "(10)(11)98765", "");						// Value must not be empty
+	test_parseGS1data(false, "(10)12345(11)", "");						// Value must not be empty
+	test_parseGS1data(false, "(1A)12345", "");						// AI must be numeric
+	test_parseGS1data(false, "1(12345", "");						// Must start with AI
+	test_parseGS1data(false, "12345", "");							// Must start with AI
+	test_parseGS1data(false, "()12345", "");						// AI too short
+	test_parseGS1data(false, "(1)12345", "");						// AI too short
+	test_parseGS1data(false, "(12345)12345", "");						// AI too long
+	test_parseGS1data(false, "(15", "");							// AI must terminate
+	test_parseGS1data(false, "(1", "");							// AI must terminate
+	test_parseGS1data(false, "(", "");							// AI must terminate
+
+}
 
 
 void test_gs1_validateParity(void) {
