@@ -50,11 +50,11 @@ namespace gs1encoders_dotnet
             gs1Encoder.SetFileInputFlag(false);
             gs1Encoder.SetOutFile("");
             gs1Encoder.SetFormat(0);  // BMP
-
-            gs1Encoder.SetSym(9);
-            gs1Encoder.SetDataStr("999999999999||99123456");
-
             gs1Encoder.SetPixMult(2);
+
+            gs1Encoder.SetSym(12);  // TODO enums
+            mw.dataStrTextBox.Text = "(01)12345678901231";
+            gs1Encoder.SetGS1dataStr(mw.dataStrTextBox.Text);
             
             mw.LoadControls();
 

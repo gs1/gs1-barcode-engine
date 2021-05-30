@@ -29,7 +29,7 @@ namespace gs1encoders_dotnet
         public void LoadControls()
         {
             symbologyComboBox.SelectedIndex = App.gs1Encoder.GetSym();
-            dataStrTextBox.Text = App.gs1Encoder.GetDataStr();
+            rawDataLabel.Content = "Raw data (FNC1 = \"#\"):   " + App.gs1Encoder.GetDataStr();            
             pixMultTextBox.Text = App.gs1Encoder.GetPixMult().ToString();
             XundercutTextBox.Text = App.gs1Encoder.GetXundercut().ToString();
             YundercutTextBox.Text = App.gs1Encoder.GetYundercut().ToString();
@@ -43,13 +43,21 @@ namespace gs1encoders_dotnet
 
         private void generateButton_Click(object sender, RoutedEventArgs e)
         {
-
+            barcodeImage.Source = null;
+            rawDataLabel.Content = "";
             errorMessageLabel.Content = "";
 
             try
             {
                 App.gs1Encoder.SetSym(symbologyComboBox.SelectedIndex);
-                App.gs1Encoder.SetDataStr(dataStrTextBox.Text);
+                if (dataStrTextBox.Text.Length > 0 && dataStrTextBox.Text[0] == '(')
+                {
+                    App.gs1Encoder.SetGS1dataStr(dataStrTextBox.Text);
+                }
+                else
+                {
+                    App.gs1Encoder.SetDataStr(dataStrTextBox.Text);
+                }
                 int v;
                 if (Int32.TryParse(pixMultTextBox.Text, out v)) App.gs1Encoder.SetPixMult(v);
                 if (Int32.TryParse(XundercutTextBox.Text, out v)) App.gs1Encoder.SetXundercut(v);

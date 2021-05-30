@@ -145,6 +145,10 @@ namespace gs1encoders_dotnet
         [return: MarshalAs(UnmanagedType.U1)]
         private static extern bool gs1_encoder_setDataStr(IntPtr ctx, string dataStr);
 
+        [DllImport(gs1_dll, EntryPoint = "gs1_encoder_setGS1dataStr", CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.U1)]
+        private static extern bool gs1_encoder_setGS1dataStr(IntPtr ctx, string gs1data);
+
         [DllImport(gs1_dll, EntryPoint = "gs1_encoder_getDataFile", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr gs1_encoder_getDataFile(IntPtr ctx);
 
@@ -347,6 +351,11 @@ namespace gs1encoders_dotnet
         public void SetDataStr(string dataStr)
         {
             if (!gs1_encoder_setDataStr(ctx, dataStr))
+                throw new GS1EncoderParameterException(GetErrMsg());
+        }
+        public void SetGS1dataStr(string gs1data)
+        {
+            if (!gs1_encoder_setGS1dataStr(ctx, gs1data))
                 throw new GS1EncoderParameterException(GetErrMsg());
         }
 

@@ -45,7 +45,7 @@
         <Label x:Name="label_Copy3" Content="DataBar Exp segments" HorizontalAlignment="Left" Margin="20,285,0,0" VerticalAlignment="Top" Grid.ColumnSpan="3" Width="163" Height="30"/>
         <TextBox x:Name="linHeightTextBox" HorizontalAlignment="Left" Height="23" Margin="180,323,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="66" Grid.Column="1"/>
         <Label x:Name="label_Copy4" Content="GS1-128 linear height" HorizontalAlignment="Left" Margin="20,320,0,0" VerticalAlignment="Top" Grid.ColumnSpan="3" Width="163" Height="30"/>
-        <Label x:Name="errorMessageLabel" Content="" HorizontalAlignment="Center" Margin="30,68,29,0" VerticalAlignment="Top" Grid.ColumnSpan="3" Height="37" Width="733" FontWeight="Bold"/>
+        <Label x:Name="errorMessageLabel" Content="" HorizontalAlignment="Center" Margin="30,90,29,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Height="28" Width="733" FontWeight="Bold"/>
         <Label x:Name="label_Copy5" Content="QR Code version" HorizontalAlignment="Left" Margin="20,355,0,0" VerticalAlignment="Top" Grid.ColumnSpan="3" Width="163" Height="30"/>
         <Label x:Name="label_Copy6" Content="QR Code EC level" HorizontalAlignment="Left" Margin="20,390,0,0" VerticalAlignment="Top" Grid.ColumnSpan="3" Width="163" Height="30"/>
         <Label x:Name="label_Copy7" Content="DataMatrix rows" HorizontalAlignment="Left" Margin="20,425,0,0" VerticalAlignment="Top" Grid.ColumnSpan="3" Width="163" Height="30"/>
@@ -140,5 +140,6 @@
             <ComboBoxItem Content="132" Tag="132" HorizontalAlignment="Left" Width="66"/>
             <ComboBoxItem Content="144" Tag="144" HorizontalAlignment="Left" Width="66"/>
         </ComboBox>
+        <Label x:Name="rawDataLabel" Content="" HorizontalAlignment="Center" Margin="29,57,30,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Height="28" Width="733"/>
     </Grid>
 </Window>
