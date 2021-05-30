@@ -24,6 +24,7 @@
 #include <string.h>
 
 #include "gs1encoders.h"
+#include "enc-private.h"
 #include "gs1.h"
 
 
@@ -41,13 +42,13 @@ static const char* fixedAIprefixes[22] = {
 
 // Write to dataStr checking for overflow
 #define writeDataStr(v) do {						\
-	if (strlen(dataStr) + strlen(v) > GS1_ENCODERS_MAX_DATA)	\
+	if (strlen(dataStr) + strlen(v) > MAX_DATA)			\
 		goto fail;						\
 	strcat(dataStr, v);						\
 } while (0)
 
 #define nwriteDataStr(v,l) do {						\
-	if (strlen(dataStr) + l > GS1_ENCODERS_MAX_DATA)		\
+	if (strlen(dataStr) + l > MAX_DATA)				\
 		goto fail;						\
 	strncat(dataStr, v, l);						\
 } while (0)

@@ -22,6 +22,7 @@
 #define UCC128_H
 
 
+#define UCC128_MAX_LINHT	500	// Maximum linear height in X
 #define UCC128_SYMMAX		53	// UCC/EAN-128 48 symbol chars + strt,FNC1,link,chk & stop max
 #define UCC128_MAX_PAT		10574	// 928*8 + 90*(4*8 + 3) for max codewords and 90 rows
 #define UCC128_L_PAD		(10-9)	// CCC starts -9X from 1st start bar

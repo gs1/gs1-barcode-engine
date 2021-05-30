@@ -62,6 +62,27 @@ GS1_ENCODERS_API size_t gs1_encoder_instanceSize(void) {
 }
 
 
+GS1_ENCODERS_API int gs1_encoder_getMaxUcc128LinHeight(void) {
+	return UCC128_MAX_LINHT;
+}
+
+
+GS1_ENCODERS_API int gs1_encoder_getMaxFilenameLength(void) {
+	return MAX_FNAME;
+}
+
+
+GS1_ENCODERS_API int gs1_encoder_getMaxInputBuffer(void) {
+	return MAX_DATA;
+
+}
+
+
+GS1_ENCODERS_API int gs1_encoder_getMaxPixMult(void) {
+	return MAX_PIXMULT;
+}
+
+
 GS1_ENCODERS_API gs1_encoder* gs1_encoder_init(void *mem) {
 
 	gs1_encoder *ctx = NULL;
@@ -163,8 +184,8 @@ GS1_ENCODERS_API int gs1_encoder_getPixMult(gs1_encoder *ctx) {
 GS1_ENCODERS_API bool gs1_encoder_setPixMult(gs1_encoder *ctx, int pixMult) {
 	assert(ctx);
 	reset_error(ctx);
-	if (pixMult < 1 || pixMult > GS1_ENCODERS_MAX_PIXMULT) {
-		sprintf(ctx->errMsg, "Valid X-dimension range is 1 to %d", GS1_ENCODERS_MAX_PIXMULT);
+	if (pixMult < 1 || pixMult > MAX_PIXMULT) {
+		sprintf(ctx->errMsg, "Valid X-dimension range is 1 to %d", MAX_PIXMULT);
 		ctx->errFlag = true;
 		return false;
 	}
@@ -398,8 +419,8 @@ GS1_ENCODERS_API int gs1_encoder_getUcc128LinHeight(gs1_encoder *ctx) {
 GS1_ENCODERS_API bool gs1_encoder_setUcc128LinHeight(gs1_encoder *ctx, int ucc128linHeight) {
 	assert(ctx);
 	reset_error(ctx);
-	if (ucc128linHeight < 1 || ucc128linHeight > GS1_ENCODERS_MAX_LINHT) {
-		sprintf(ctx->errMsg, "Valid linear component height range is 1 to %d", GS1_ENCODERS_MAX_LINHT);
+	if (ucc128linHeight < 1 || ucc128linHeight > UCC128_MAX_LINHT) {
+		sprintf(ctx->errMsg, "Valid linear component height range is 1 to %d", UCC128_MAX_LINHT);
 		ctx->errFlag = true;
 		return false;
 	}
@@ -416,8 +437,8 @@ GS1_ENCODERS_API char* gs1_encoder_getOutFile(gs1_encoder *ctx) {
 GS1_ENCODERS_API bool gs1_encoder_setOutFile(gs1_encoder *ctx, char* outFile) {
 	assert(ctx);
 	reset_error(ctx);
-	if (strlen(outFile) > GS1_ENCODERS_MAX_FNAME) {
-		sprintf(ctx->errMsg, "Maximum output file is %d characters", GS1_ENCODERS_MAX_FNAME);
+	if (strlen(outFile) > MAX_FNAME) {
+		sprintf(ctx->errMsg, "Maximum output file is %d characters", MAX_FNAME);
 		ctx->errFlag = true;
 		return false;
 	}
@@ -434,8 +455,8 @@ GS1_ENCODERS_API char* gs1_encoder_getDataStr(gs1_encoder *ctx) {
 GS1_ENCODERS_API bool gs1_encoder_setDataStr(gs1_encoder *ctx, char* dataStr) {
 	assert(ctx);
 	reset_error(ctx);
-	if (strlen(dataStr) > GS1_ENCODERS_MAX_DATA) {
-		sprintf(ctx->errMsg, "Maximum data length is %d characters", GS1_ENCODERS_MAX_DATA);
+	if (strlen(dataStr) > MAX_DATA) {
+		sprintf(ctx->errMsg, "Maximum data length is %d characters", MAX_DATA);
 		ctx->errFlag = true;
 		return false;
 	}
@@ -466,8 +487,8 @@ GS1_ENCODERS_API char* gs1_encoder_getDataFile(gs1_encoder *ctx) {
 GS1_ENCODERS_API bool gs1_encoder_setDataFile(gs1_encoder *ctx, char* dataFile) {
 	assert(ctx);
 	reset_error(ctx);
-	if (strlen(dataFile) < 1 || strlen(dataFile) > GS1_ENCODERS_MAX_FNAME) {
-		sprintf(ctx->errMsg, "Input file must be 1 to %d characters", GS1_ENCODERS_MAX_FNAME);
+	if (strlen(dataFile) < 1 || strlen(dataFile) > MAX_FNAME) {
+		sprintf(ctx->errMsg, "Input file must be 1 to %d characters", MAX_FNAME);
 		ctx->errFlag = true;
 		return false;
 	}
@@ -505,7 +526,7 @@ GS1_ENCODERS_API bool gs1_encoder_encode(gs1_encoder *ctx) {
 			ctx->errFlag = true;
 			return false;
 		}
-		i = fread(ctx->dataStr, sizeof(char), GS1_ENCODERS_MAX_DATA, iFile);
+		i = fread(ctx->dataStr, sizeof(char), MAX_DATA, iFile);
 		while (i > 0 && ctx->dataStr[i-1] < 32) i--; // strip trailing CRLF etc.
 		ctx->dataStr[i] = '\0';
 		fclose(iFile);
@@ -662,7 +683,7 @@ GS1_ENCODERS_API int gs1_encoder_getBufferHeight(gs1_encoder *ctx) {
 
 
 // Sizable buffer on the heap so that we don't exhaust the stack
-char bigbuffer[GS1_ENCODERS_MAX_DATA+2];
+char bigbuffer[MAX_DATA+2];
 
 
 void test_api_getVersion(void) {
@@ -681,9 +702,27 @@ void test_api_getVersion(void) {
 
 
 void test_api_instanceSize(void) {
+	TEST_CHECK(gs1_encoder_instanceSize() == sizeof(struct gs1_encoder));
+}
 
-	TEST_ASSERT(gs1_encoder_instanceSize() == sizeof(struct gs1_encoder));
 
+void test_api_maxUcc128LinHeight(void) {
+	TEST_CHECK(gs1_encoder_getMaxUcc128LinHeight() == UCC128_MAX_LINHT);
+}
+
+
+void test_api_maxFilenameLength(void) {
+	TEST_CHECK(gs1_encoder_getMaxFilenameLength() == MAX_FNAME);
+}
+
+
+void test_api_maxInputBuffer(void) {
+	TEST_CHECK(gs1_encoder_getMaxInputBuffer() == MAX_DATA);
+}
+
+
+void test_api_maxPixMult(void) {
+	TEST_CHECK(gs1_encoder_getMaxPixMult() == MAX_PIXMULT);
 }
 
 
@@ -799,7 +838,7 @@ void test_api_pixMult(void) {
 	TEST_CHECK(gs1_encoder_setPixMult(ctx, 1));
 	TEST_CHECK(gs1_encoder_getPixMult(ctx) == 1);
 	TEST_CHECK(!gs1_encoder_setPixMult(ctx, 0));
-	TEST_CHECK(!gs1_encoder_setPixMult(ctx, GS1_ENCODERS_MAX_PIXMULT + 1));
+	TEST_CHECK(!gs1_encoder_setPixMult(ctx, MAX_PIXMULT + 1));
 	TEST_CHECK(gs1_encoder_setPixMult(ctx, 2));
 	TEST_CHECK(gs1_encoder_getPixMult(ctx) == 2);
 
@@ -862,9 +901,9 @@ void test_api_XYundercut(void) {
 	TEST_CHECK(gs1_encoder_setYundercut(ctx, 1));
 
 	// Maxima
-	gs1_encoder_setPixMult(ctx, GS1_ENCODERS_MAX_PIXMULT);
-	TEST_CHECK(gs1_encoder_setXundercut(ctx, GS1_ENCODERS_MAX_PIXMULT - 1));
-	TEST_CHECK(gs1_encoder_setYundercut(ctx, GS1_ENCODERS_MAX_PIXMULT - 1));
+	gs1_encoder_setPixMult(ctx, MAX_PIXMULT);
+	TEST_CHECK(gs1_encoder_setXundercut(ctx, MAX_PIXMULT - 1));
+	TEST_CHECK(gs1_encoder_setYundercut(ctx, MAX_PIXMULT - 1));
 
 	// Must be less than X dimension
 	gs1_encoder_setPixMult(ctx, 2);
@@ -898,11 +937,11 @@ void test_api_sepHt(void) {
 	TEST_CHECK(!gs1_encoder_setSepHt(ctx, 3));
 
 	// Range with largest X dimension
-	gs1_encoder_setPixMult(ctx, GS1_ENCODERS_MAX_PIXMULT);
-	TEST_CHECK(gs1_encoder_setSepHt(ctx, GS1_ENCODERS_MAX_PIXMULT));
-	TEST_CHECK(!gs1_encoder_setSepHt(ctx, GS1_ENCODERS_MAX_PIXMULT - 1));
-	TEST_CHECK(gs1_encoder_setSepHt(ctx, 2 * GS1_ENCODERS_MAX_PIXMULT));
-	TEST_CHECK(!gs1_encoder_setSepHt(ctx, 2 * GS1_ENCODERS_MAX_PIXMULT + 1));
+	gs1_encoder_setPixMult(ctx, MAX_PIXMULT);
+	TEST_CHECK(gs1_encoder_setSepHt(ctx, MAX_PIXMULT));
+	TEST_CHECK(!gs1_encoder_setSepHt(ctx, MAX_PIXMULT - 1));
+	TEST_CHECK(gs1_encoder_setSepHt(ctx, 2 * MAX_PIXMULT));
+	TEST_CHECK(!gs1_encoder_setSepHt(ctx, 2 * MAX_PIXMULT + 1));
 
 	gs1_encoder_free(ctx);
 
@@ -1049,7 +1088,7 @@ void test_api_linHeight(void) {
 	TEST_CHECK(gs1_encoder_setUcc128LinHeight(ctx, 12));
 	TEST_CHECK(gs1_encoder_getUcc128LinHeight(ctx) == 12);
 	TEST_CHECK(!gs1_encoder_setUcc128LinHeight(ctx, 0));
-	TEST_CHECK(!gs1_encoder_setUcc128LinHeight(ctx, GS1_ENCODERS_MAX_LINHT+1));
+	TEST_CHECK(!gs1_encoder_setUcc128LinHeight(ctx, UCC128_MAX_LINHT+1));
 
 	gs1_encoder_free(ctx);
 
@@ -1060,7 +1099,7 @@ void test_api_outFile(void) {
 
 	gs1_encoder* ctx;
 
-	char longfname[GS1_ENCODERS_MAX_FNAME+2];
+	char longfname[MAX_FNAME+2];
 	int i;
 
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
@@ -1070,7 +1109,7 @@ void test_api_outFile(void) {
 	TEST_CHECK(gs1_encoder_setOutFile(ctx, ""));
 	TEST_CHECK(gs1_encoder_setOutFile(ctx, "a"));
 
-	for (i = 0; i < GS1_ENCODERS_MAX_FNAME; i++) {
+	for (i = 0; i < MAX_FNAME; i++) {
 		longfname[i]='a';
 	}
 	longfname[i+1]='\0';
@@ -1127,7 +1166,7 @@ void test_api_dataFile(void) {
 
 	gs1_encoder* ctx;
 
-	char longfname[GS1_ENCODERS_MAX_FNAME+2];
+	char longfname[MAX_FNAME+2];
 	int i;
 
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
@@ -1137,13 +1176,13 @@ void test_api_dataFile(void) {
 	TEST_CHECK(!gs1_encoder_setDataFile(ctx, ""));
 	TEST_CHECK(gs1_encoder_setDataFile(ctx, "a"));
 
-	for (i = 0; i <= GS1_ENCODERS_MAX_FNAME; i++) {
+	for (i = 0; i <= MAX_FNAME; i++) {
 		longfname[i]='a';
 	}
-	longfname[GS1_ENCODERS_MAX_FNAME+1]='\0';
+	longfname[MAX_FNAME+1]='\0';
 	TEST_CHECK(!gs1_encoder_setDataFile(ctx, longfname));  // Too long
 
-	longfname[GS1_ENCODERS_MAX_FNAME]='\0';
+	longfname[MAX_FNAME]='\0';
 	TEST_CHECK(gs1_encoder_setDataFile(ctx, longfname));   // Maximun length
 
 	gs1_encoder_free(ctx);
@@ -1164,13 +1203,13 @@ void test_api_dataStr(void) {
 	TEST_CHECK(gs1_encoder_setDataStr(ctx, ""));
 	TEST_CHECK(gs1_encoder_setDataStr(ctx, "a"));
 
-	for (i = 0; i <= GS1_ENCODERS_MAX_DATA; i++) {
+	for (i = 0; i <= MAX_DATA; i++) {
 		bigbuffer[i]='a';
 	}
-	bigbuffer[GS1_ENCODERS_MAX_DATA+1]='\0';
+	bigbuffer[MAX_DATA+1]='\0';
 	TEST_CHECK(!gs1_encoder_setDataStr(ctx, bigbuffer));  // Too long
 
-	bigbuffer[GS1_ENCODERS_MAX_DATA]='\0';
+	bigbuffer[MAX_DATA]='\0';
 	TEST_CHECK(gs1_encoder_setDataStr(ctx, bigbuffer));   // Maximun length
 
 	gs1_encoder_free(ctx);

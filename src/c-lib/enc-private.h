@@ -28,6 +28,12 @@
 #include "gs1encoders.h"
 
 
+// Implementation limits that can be changed
+#define MAX_FNAME	120	// Maximum filename
+#define MAX_DATA	8191	// Maximum input buffer size
+#define MAX_PIXMULT	12	// Largest X dimension
+
+
 struct sPrints {
 	int elmCnt;
 	int leftPad;
@@ -70,9 +76,9 @@ struct gs1_encoder {
 	int qrEClevel;		// QR Code error correction level
 	int format;		// BMP, TIF or RAW
 	bool fileInputFlag;	// true is dataFile else dataStr
-	char dataStr[GS1_ENCODERS_MAX_DATA+1];
-	char dataFile[GS1_ENCODERS_MAX_FNAME+1];
-	char outFile[GS1_ENCODERS_MAX_FNAME+1];
+	char dataStr[MAX_DATA+1];
+	char dataFile[MAX_FNAME+1];
+	char outFile[MAX_FNAME+1];
 	uint8_t *buffer;	// We may allocate an output buffer
 	int bufferWidth;	// Width of a raw format buffer
 	int bufferHeight;	// Height of a raw format buffer
@@ -120,6 +126,11 @@ struct gs1_encoder {
 
 void test_api_getVersion(void);
 void test_api_instanceSize(void);
+void test_api_instanceSize(void);
+void test_api_maxUcc128LinHeight(void);
+void test_api_maxFilenameLength(void);
+void test_api_maxInputBuffer(void);
+void test_api_maxPixMult(void);
 void test_api_defaults(void);
 void test_api_sym(void);
 void test_api_fileInputFlag(void);

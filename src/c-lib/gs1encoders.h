@@ -18,16 +18,12 @@
  *
  */
 
-#ifndef ENC_H
-#define ENC_H
+#ifndef GS1_ENCODERS_H
+#define GS1_ENCODERS_H
 
 #include <stdbool.h>
 #include <stddef.h>
 
-#define GS1_ENCODERS_MAX_FNAME 120
-#define GS1_ENCODERS_MAX_DATA 8191	// Longest numeric data for QR is 7089
-#define GS1_ENCODERS_MAX_PIXMULT 12
-#define GS1_ENCODERS_MAX_LINHT 500	// Max UCC/EAN-128 height in X
 
 #ifdef _WIN32
 #  define GS1_ENCODERS_API __declspec(dllexport)
@@ -80,14 +76,25 @@ enum {
  */
 typedef struct gs1_encoder gs1_encoder;
 
-GS1_ENCODERS_API size_t gs1_encoder_instanceSize(void);
-
-/** @brief Initialise a gs1_encoder instance.
- *  @return gs1_encoder context on success, else NULL.
- */
-GS1_ENCODERS_API gs1_encoder* gs1_encoder_init(void *mem);
 
 GS1_ENCODERS_API char* gs1_encoder_getVersion(gs1_encoder *ctx);
+
+GS1_ENCODERS_API size_t gs1_encoder_instanceSize(void);
+
+GS1_ENCODERS_API int gs1_encoder_getMaxFilenameLength(void);
+
+GS1_ENCODERS_API int gs1_encoder_getMaxInputBuffer(void);
+
+GS1_ENCODERS_API int gs1_encoder_getMaxPixMult(void);
+
+GS1_ENCODERS_API int gs1_encoder_getMaxUcc128LinHeight(void);
+
+
+/**
+ * @brief Initialise a gs1_encoder instance.
+ * @return gs1_encoder context on success, else NULL.
+ */
+GS1_ENCODERS_API gs1_encoder* gs1_encoder_init(void *mem);
 
 GS1_ENCODERS_API char* gs1_encoder_getErrMsg(gs1_encoder *ctx);
 
@@ -157,11 +164,11 @@ GS1_ENCODERS_API int gs1_encoder_getBufferHeight(gs1_encoder *ctx);
 
 GS1_ENCODERS_API size_t gs1_encoder_getBufferStrings(gs1_encoder *ctx, char*** out);
 
+
 /** @brief Release a gs1_encoder instance.
  *  @param ctx Instance to free.
  */
 GS1_ENCODERS_API void gs1_encoder_free(gs1_encoder *ctx);
-
 
 
 #ifdef __cplusplus
@@ -169,4 +176,4 @@ GS1_ENCODERS_API void gs1_encoder_free(gs1_encoder *ctx);
 #endif
 
 
-#endif /* ENC_H */
+#endif /* GS1_ENCODERS_H */

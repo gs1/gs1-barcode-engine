@@ -146,6 +146,10 @@ TEST_LIST = {
      */
     { "api_getVersion", test_api_getVersion },
     { "api_instanceSize", test_api_instanceSize },
+    { "api_maxUcc128LinHeight", test_api_maxUcc128LinHeight },
+    { "api_maxFilenameLength", test_api_maxFilenameLength },
+    { "api_maxInputBuffer", test_api_maxInputBuffer },
+    { "api_maxPixMult", test_api_maxPixMult },
     { "api_defaults", test_api_defaults },
     { "api_sym", test_api_sym },
     { "api_fileInputFlag", test_api_fileInputFlag },
