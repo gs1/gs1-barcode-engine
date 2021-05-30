@@ -566,12 +566,21 @@ static void addBits(uint8_t bitField[], uint16_t* bitPos, int length, uint16_t b
 
 
 // Generate the bitstream that represents the data message as a sequence of 8-bit codewords and length
-static void createCodewords(gs1_encoder *ctx, uint8_t *string, uint8_t cws_v[3][MAX_QR_CWS], uint16_t bits_v[3]) {
+static void createCodewords(gs1_encoder *ctx, uint8_t *str, uint8_t cws_v[3][MAX_QR_CWS], uint16_t bits_v[3]) {
 
 	int i;
-	uint8_t *p;
+	bool gs1Mode = false;
 
 	(void) ctx;
+
+	if (*str == '#') {								// "#..." => GS1 mode
+		gs1Mode = true;
+		str++;
+	} else if (strlen((char*)str) >= 2 && strncmp((char*)str, "\\#", 2) == 0) {	// "\#" => "#..."; not GS1 mode
+		str++;     // Skip '\' escape
+	} else if (strlen((char*)str) >= 3 && strncmp((char*)str, "\\\\#", 2) == 0) {	// "\\#" => "\#..."; not GS1 mode
+		str++;     // Skip '\' escape
+	}
 
 	/*
 	 * Elements of the encoded message have differing lengths based on the
@@ -584,7 +593,7 @@ static void createCodewords(gs1_encoder *ctx, uint8_t *string, uint8_t cws_v[3][
 	for (i = 0; i < 3; i++) {
 
 		// 0101 FNC1 in first
-		if (false)
+		if (gs1Mode)
 			addBits(cws_v[i], &bits_v[i], 4, 0x05, MAX_QR_DAT_BITS, false);
 
 		// 0100 Enter byte mode
@@ -592,12 +601,16 @@ static void createCodewords(gs1_encoder *ctx, uint8_t *string, uint8_t cws_v[3][
 
 		// Character count indicator
 		addBits(cws_v[i], &bits_v[i], cclens[i][2],
-			(uint16_t)strlen((char *)string), MAX_QR_DAT_BITS, false);
+			(uint16_t)strlen((char *)str), MAX_QR_DAT_BITS, false);
 
 		// Byte per character
-		p = &string[0];
-		while (*p)
-			addBits(cws_v[i], &bits_v[i], 8, *p++, MAX_QR_DAT_BITS, false);
+		while (*str) {
+			if (*str == '#' && gs1Mode)
+				addBits(cws_v[i], &bits_v[i], 8, 0x1d, MAX_QR_DAT_BITS, false);  // FNC1 -> GS
+			else
+				addBits(cws_v[i], &bits_v[i], 8, *str, MAX_QR_DAT_BITS, false);
+			str++;
+		}
 
 	}
 
@@ -800,6 +813,8 @@ static int QRenc(gs1_encoder *ctx, uint8_t string[], struct patternLength *pats)
 	assert(ctx->qrEClevel >= gs1_encoder_qrEClevelL && ctx->qrEClevel <= gs1_encoder_qrEClevelH);
 	assert(ctx->qrVersion >= 0 && ctx->qrVersion <= 40);
 
+	DEBUG_PRINT("\nData: %s\n", string);
+
 	createCodewords(ctx, string, cws_v, bits_v);
 	if (bits_v[0] == UINT16_MAX && bits_v[1] == UINT16_MAX && bits_v[2] == UINT16_MAX) {
 		strcpy(ctx->errMsg, "Data exceeds the capacity of any QR Code symbol");
@@ -811,7 +826,6 @@ static int QRenc(gs1_encoder *ctx, uint8_t string[], struct patternLength *pats)
 	assert(bits_v[1] <= MAX_QR_DAT_BITS || bits_v[1] == UINT16_MAX);
 	assert(bits_v[2] <= MAX_QR_DAT_BITS || bits_v[2] == UINT16_MAX);
 
-	DEBUG_PRINT("\nData: %s\n", string);
 	if (bits_v[0] != UINT16_MAX)
 		DEBUG_PRINT_BITS("Bitstream (vergrp 1)", cws_v[0], bits_v[0]);
 	if (bits_v[1] != UINT16_MAX)
@@ -832,7 +846,7 @@ static int QRenc(gs1_encoder *ctx, uint8_t string[], struct patternLength *pats)
 		m->ecc_blks[ctx->qrEClevel - gs1_encoder_qrEClevelL][0],
 		m->ecc_blks[ctx->qrEClevel - gs1_encoder_qrEClevelL][1]);
 
-	DEBUG_PRINT_CWS("Codewords", cws_v[m->vergrp], (bits_v[m->vergrp]-1)/8+1);
+	DEBUG_PRINT_CWS("Codewords", cws_v[m->vergrp], (uint16_t)((bits_v[m->vergrp]-1)/8+1));
 
 	finaliseCodewords(ctx, cws_v[m->vergrp], &bits_v[m->vergrp], m);
 
@@ -993,6 +1007,48 @@ void test_qr_QR_encode(void) {
 NULL
 	};
 	TEST_CHECK(test_encode(ctx, gs1_encoder_sQR, "ABC123", expect));
+
+	expect = (char*[]){
+"                                     ",
+"                                     ",
+"                                     ",
+"                                     ",
+"    XXXXXXX     XX  X     XXXXXXX    ",
+"    X     X  X XX X XXX X X     X    ",
+"    X XXX X XX  X  X   X  X XXX X    ",
+"    X XXX X XXXXX  XXXX X X XXX X    ",
+"    X XXX X X     XX  XX  X XXX X    ",
+"    X     X X X    X XX   X     X    ",
+"    XXXXXXX X X X X X X X XXXXXXX    ",
+"            XXXX XXXX   X            ",
+"    X XXXXX  XXXXXX  XX   XXXXX      ",
+"      X X  X  X XX  X  X X  X        ",
+"      XX XX XX X  X   X  X X XXX     ",
+"    X X  X X X     X X  X X X   X    ",
+"      XXX XX XXXX  X    XX XX XX     ",
+"     X X X   XX X XX                 ",
+"     XXX XX  X XX  XXXX  X X XXX     ",
+"        XX   XX  XX     X X X   X    ",
+"     XX X X X X XXXXX X  X  XXXX     ",
+"    X       X XXXX       XX    X     ",
+"    X X  XXXX  X  XXXXX XX X XXX     ",
+"    X XXX  X  X        X  X XX  X    ",
+"    X  XXXXXX XX   X  X XXXXX  X     ",
+"            XX XX X X  XX   X        ",
+"    XXXXXXX  XXXX  XXXX X X XXXX     ",
+"    X     X X   XXX     X   XX XX    ",
+"    X XXX X XXXXX XX XX XXXXXX X     ",
+"    X XXX X X   XX X  XXXX X   X     ",
+"    X XXX X X XXX XXXXX   XXXXX      ",
+"    X     X   X X X    X X X X       ",
+"    XXXXXXX XX     XX X   X X X      ",
+"                                     ",
+"                                     ",
+"                                     ",
+"                                     ",
+NULL
+	};
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sQR, "#011234567890123110ABC123#11210630", expect));  // GS1 mode
 
 	gs1_encoder_free(ctx);
 
