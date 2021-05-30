@@ -542,7 +542,7 @@ void gs1_U128C(gs1_encoder *ctx) {
 	if (ccFlag) {
 		if (!gs1_CCCenc(ctx, (uint8_t*)ccStr, patCCC) || ctx->errFlag) goto out;
 
-		DEBUG_PRINT_PATTERNS("CC pattern", (uint8_t*)(*ccPattern), (ctx->colCnt+4)*8+3, ctx->rowCnt);
+		DEBUG_PRINT_PATTERNS("CC pattern", patCCC, (ctx->colCnt+4)*8+3, ctx->rowCnt);
 
 		symWidth = symChars*11+22;
 		ccRpad = symWidth - UCC128_L_PAD - ((ctx->colCnt+4)*17+5);
@@ -629,6 +629,7 @@ void test_ucc_UCC128A_encode(void) {
 "vvv",
 	};
 	TEST_CHECK(test_encode(ctx, gs1_encoder_sUCC128_CCA, "123123123123|99123123", expect));
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sUCC128_CCA, "#123123123123|#99123123", expect));
 
 	gs1_encoder_free(ctx);
 
@@ -686,6 +687,7 @@ void test_ucc_UCC128C_encode(void) {
 NULL
 	};
 	TEST_CHECK(test_encode(ctx, gs1_encoder_sUCC128_CCC, "00030123456789012340|02130123456789093724#101234567ABCDEFG", expect));
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sUCC128_CCC, "#00030123456789012340|#02130123456789093724#101234567ABCDEFG", expect));
 
 	gs1_encoder_free(ctx);
 
