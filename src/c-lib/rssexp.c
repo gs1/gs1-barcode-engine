@@ -268,8 +268,8 @@ void gs1_RSSExp(gs1_encoder *ctx) {
 
 	char *dataStr = ctx->dataStr;
 
-	assert(ctx->rssExpSegWidth >= 4 && ctx->rssExpSegWidth <= 22);
-	assert(ctx->rssExpSegWidth % 2 == 0);
+	assert(ctx->dataBarExpandedSegmentsWidth >= 4 && ctx->dataBarExpandedSegmentsWidth <= 22);
+	assert(ctx->dataBarExpandedSegmentsWidth % 2 == 0);
 
 	DEBUG_PRINT("\nData: %s\n", dataStr);
 
@@ -286,7 +286,7 @@ void gs1_RSSExp(gs1_encoder *ctx) {
 		DEBUG_PRINT("CC: %s\n", ccStr);
 	}
 
-	ctx->rssexp_rowWidth = ctx->rssExpSegWidth; // save for getUnusedBitCnt
+	ctx->rssexp_rowWidth = ctx->dataBarExpandedSegmentsWidth; // save for getUnusedBitCnt
 	if (!((segs = RSS14Eenc(ctx, (uint8_t*)dataStr, dblPattern, ccFlag)) > 0) || ctx->errFlag) goto out;
 
 	lNdx = 0;
@@ -300,7 +300,7 @@ void gs1_RSSExp(gs1_encoder *ctx) {
 			linPattern[lNdx++] = dblPattern[i/2][j];
 		}
 	}
-	j = (segs <= ctx->rssExpSegWidth) ? segs : ctx->rssExpSegWidth;
+	j = (segs <= ctx->dataBarExpandedSegmentsWidth) ? segs : ctx->dataBarExpandedSegmentsWidth;
 	i = (segs+j-1)/j; // number of linear rows
 	lHeight = ctx->pixMult*i*RSSEXP_SYM_H + ctx->sepHt*(i-1)*3;
 	lNdx = (j/2)*(8+5+8) + (j&1)*(8+5);
@@ -371,7 +371,7 @@ void gs1_RSSExp(gs1_encoder *ctx) {
 	prints.leftPad = 0;
 	prints.rightPad = 0;
 
-	for (i = 0; i < segs-ctx->rssExpSegWidth; i += ctx->rssExpSegWidth) {
+	for (i = 0; i < segs-ctx->dataBarExpandedSegmentsWidth; i += ctx->dataBarExpandedSegmentsWidth) {
 
 		rev = evenRow ^ ((i/2)&1);
 		prints.pattern = &linPattern[(i/2)*(8+5+8)+(i&1)*8];
@@ -508,9 +508,9 @@ void test_rssexp_RSSEXP_encode(void) {
 " X X   X   XXXX   X XXXXXXXX    X X XXX     XX   X XXX   XX   X  XX X XXXX      XXX  X XXX   XXX XXX XXXX X XXXX   XX   XXXXXX    X X   X  X      XX X ",
 NULL
 	};
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sRSSEXP, "01950123456789033103000123", expect));
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sDataBarExpanded, "01950123456789033103000123", expect));
 
-	gs1_encoder_setRssExpSegWidth(ctx, 4);
+	gs1_encoder_setDataBarExpandedSegmentsWidth(ctx, 4);
 	expect = (char*[]){
 " X X   X   XXXX   X XXXXXXXX    X X XXX     XX   X XXX   XX   X  XX X XXXX      XXX  X XXX   XXX XXX X",
 " X X   X   XXXX   X XXXXXXXX    X X XXX     XX   X XXX   XX   X  XX X XXXX      XXX  X XXX   XXX XXX X",
@@ -585,8 +585,8 @@ NULL
 "  X XXXX X XXXX   XX   XXXXXX    X X   X  X      XX X                                                 ",
 NULL
 	};
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sRSSEXP, "01950123456789033103000123", expect));
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sRSSEXP, "#01950123456789033103000123", expect));
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sDataBarExpanded, "01950123456789033103000123", expect));
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sDataBarExpanded, "#01950123456789033103000123", expect));
 
 	gs1_encoder_free(ctx);
 

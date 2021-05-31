@@ -388,7 +388,7 @@ void gs1_RSS14(gs1_encoder *ctx) {
 
 	DEBUG_PRINT("\nData: %s\n", dataStr);
 
-	if (ctx->sym == gs1_encoder_sRSS14) {
+	if (ctx->sym == gs1_encoder_sDataBarOmni) {
 		symHt = RSS14_SYM_H;
 	}
 	else {
@@ -887,8 +887,8 @@ void test_rss14_RSS14_encode(void) {
 " X X    X  X   XXX  XXXXX      X XXXX   X X  XX XX X  X XXXXX  X XXXXX     XXX XX XXXXX X XXXX X",
 NULL
 	};
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sRSS14, "24012345678905", expect));
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sRSS14, "#0124012345678905", expect));
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sDataBarOmni, "24012345678905", expect));
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sDataBarOmni, "#0124012345678905", expect));
 
 	gs1_encoder_free(ctx);
 
@@ -917,8 +917,8 @@ void test_rss14_RSS14T_encode(void) {
 " X X    X  X   XXX  XXXXX      X XXXX   X X  XX XX X  X XXXXX  X XXXXX     XXX XX XXXXX X XXXX X",
 NULL
 	};
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sRSS14T, "24012345678905", expect));
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sRSS14T, "#0124012345678905", expect));
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sDataBarTruncated, "24012345678905", expect));
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sDataBarTruncated, "#0124012345678905", expect));
 
 	gs1_encoder_free(ctx);
 
@@ -947,8 +947,8 @@ void test_rss14_RSS14S_encode(void) {
 "X XX X  X XXXXX  X XXXXX     XXX XX XXXXX X XXXX X",
 NULL
 	};
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sRSS14S, "24012345678905", expect));
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sRSS14S, "#0124012345678905", expect));
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sDataBarStacked, "24012345678905", expect));
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sDataBarStacked, "#0124012345678905", expect));
 
 	gs1_encoder_free(ctx);
 
@@ -1033,8 +1033,8 @@ void test_rss14_RSS14SO_encode(void) {
 "X XX X  X XXXXX  X XXXXX     XXX XX XXXXX X XXXX X",
 NULL
 	};
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sRSS14SO, "24012345678905", expect));
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sRSS14SO, "#0124012345678905", expect));
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sDataBarStackedOmni, "24012345678905", expect));
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sDataBarStackedOmni, "#0124012345678905", expect));
 
 	gs1_encoder_free(ctx);
 

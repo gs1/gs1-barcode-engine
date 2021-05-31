@@ -68,8 +68,8 @@ struct gs1_encoder {
 	int Yundercut;		// Y pixels to undercut
 	int addCheckDigit;	// for EAN/UPC and RSS-14/Lim, calculated if true, otherwise validated
 	int sepHt;		// separator row height
-	int rssExpSegWidth;	// Number of segments for RSS Expdanded (Stacked)
-	int ucc128linHeight;		// height of UCC/EAN-128 in X
+	int dataBarExpandedSegmentsWidth;	// Number of segments for RSS Expdanded (Stacked)
+	int gs1_128LinearHeight;		// height of UCC/EAN-128 in X
 	int dmRows;		// Data Matrix fixed number of rows
 	int dmCols;		// Data Matrix fixed number of columns
 	int qrVersion;		// QR Code fixed symbol version

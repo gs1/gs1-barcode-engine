@@ -98,22 +98,22 @@ extern "C" {
 
 /// All of the major GS1 barcode formats ("symbologies") are supported by this library.
 enum symbologies {
-	gs1_encoder_sNONE = -1,		///< None defined
-	gs1_encoder_sRSS14,		///< GS1 DataBar Omnidirectional
-	gs1_encoder_sRSS14T,		///< GS1 DataBar Truncated
-	gs1_encoder_sRSS14S,		///< GS1 DataBar Stacked
-	gs1_encoder_sRSS14SO,		///< GS1 DataBar Stacked Omnidirectional
-	gs1_encoder_sRSSLIM,		///< GS1 DataBar Limited
-	gs1_encoder_sRSSEXP,		///< GS1 DataBar Expanded (Stacked)
-	gs1_encoder_sUPCA,		///< UPC-A
-	gs1_encoder_sUPCE,		///< UPC-E
-	gs1_encoder_sEAN13,		///< EAN-13
-	gs1_encoder_sEAN8,		///< EAN-8
-	gs1_encoder_sUCC128_CCA,	///< GS1-128 with CC-A or CC-B
-	gs1_encoder_sUCC128_CCC,	///< GS1-128 with CC-C
-	gs1_encoder_sQR,		///< (GS1) QR Code
-	gs1_encoder_sDM,		///< (GS1) Data Matrix
-	gs1_encoder_sNUMSYMS,		///< Value is the number of symbologies
+	gs1_encoder_sNONE = -1,			///< None defined
+	gs1_encoder_sDataBarOmni,		///< GS1 DataBar Omnidirectional
+	gs1_encoder_sDataBarTruncated,		///< GS1 DataBar Truncated
+	gs1_encoder_sDataBarStacked,		///< GS1 DataBar Stacked
+	gs1_encoder_sDataBarStackedOmni,	///< GS1 DataBar Stacked Omnidirectional
+	gs1_encoder_sDataBarLimited,		///< GS1 DataBar Limited
+	gs1_encoder_sDataBarExpanded,		///< GS1 DataBar Expanded (Stacked)
+	gs1_encoder_sUPCA,			///< UPC-A
+	gs1_encoder_sUPCE,			///< UPC-E
+	gs1_encoder_sEAN13,			///< EAN-13
+	gs1_encoder_sEAN8,			///< EAN-8
+	gs1_encoder_sGS1_128_CCA,		///< GS1-128 with CC-A or CC-B
+	gs1_encoder_sGS1_128_CCC,		///< GS1-128 with CC-C
+	gs1_encoder_sQR,			///< (GS1) QR Code
+	gs1_encoder_sDM,			///< (GS1) Data Matrix
+	gs1_encoder_sNUMSYMS,			///< Value is the number of symbologies
 };
 
 
@@ -242,7 +242,7 @@ GS1_ENCODERS_API int gs1_encoder_getMaxFilenameLength(void);
  *
  * @return maximum number bytes that can be supplied for encoding
  */
-GS1_ENCODERS_API int gs1_encoder_getMaxInputBuffer(void);
+GS1_ENCODERS_API int gs1_encoder_getMaxDataStrLength(void);
 
 
 /**
@@ -267,7 +267,7 @@ GS1_ENCODERS_API int gs1_encoder_getMaxPixMult(void);
  *
  * @return maximum GS1-128 height in modules
  */
-GS1_ENCODERS_API int gs1_encoder_getMaxUcc128LinHeight(void);
+GS1_ENCODERS_API int gs1_encoder_getMaxGS1_128LinearHeight(void);
 
 
 /**
@@ -446,12 +446,12 @@ GS1_ENCODERS_API bool gs1_encoder_setSepHt(gs1_encoder *ctx, int sepHt);
  * @brief Get the current number of segments per row for GS1 DataBar Expanded
  * Stacked symbols.
  *
- * @see gs1_encoder_setRssExpSegWidth()
+ * @see gs1_encoder_setDataBarExpandedSegmentsWidth()
  *
  * @param [in,out] ctx ::gs1_encoder context
  * @return current segments per row
  */
-GS1_ENCODERS_API int gs1_encoder_getRssExpSegWidth(gs1_encoder *ctx);
+GS1_ENCODERS_API int gs1_encoder_getDataBarExpandedSegmentsWidth(gs1_encoder *ctx);
 
 
 /**
@@ -462,43 +462,43 @@ GS1_ENCODERS_API int gs1_encoder_getRssExpSegWidth(gs1_encoder *ctx);
  * symbol character for GS1 DataBar Expanded, resulting in a non-stacked
  * symbol.
  *
- * @see gs1_encoder_getRssExpSegWidth()
+ * @see gs1_encoder_getDataBarExpandedSegmentsWidth()
  *
  * \note
  * Valid values are even numbers from 2 to 22.
  *
  * @param [in,out] ctx ::gs1_encoder context
- * @param [in] rssExpSegWidth segments per row
+ * @param [in] dataBarExpandedSegmentsWidth segments per row
  * @return true on success, otherwise false and an error message is set
  */
-GS1_ENCODERS_API bool gs1_encoder_setRssExpSegWidth(gs1_encoder *ctx, int rssExpSegWidth);
+GS1_ENCODERS_API bool gs1_encoder_setDataBarExpandedSegmentsWidth(gs1_encoder *ctx, int dataBarExpandedSegmentsWidth);
 
 
 /**
  * @brief Get the height of GS1-128 linear symbols in modules.
  *
- * @see gs1_encoder_setUcc128LinHeight
+ * @see gs1_encoder_setGS1_128LinearHeight
  *
  * @param [in,out] ctx ::gs1_encoder context
  * @return current linear symbol height in modules
  */
-GS1_ENCODERS_API int gs1_encoder_getUcc128LinHeight(gs1_encoder *ctx);
+GS1_ENCODERS_API int gs1_encoder_getGS1_128LinearHeight(gs1_encoder *ctx);
 
 
 /**
  * @brief Set the height of GS1-128 linear symbols in modules.
  *
  * \note
- * Valid values are 1 to the value returned by gs1_encoder_getMaxUcc128LinHeight().
+ * Valid values are 1 to the value returned by gs1_encoder_getMaxGS1_128LinearHeight().
  *
- * @see gs1_encoder_getUcc128LinHeight()
- * @see gs1_encoder_getMaxUcc128LinHeight()
+ * @see gs1_encoder_getGS1_128LinearHeight()
+ * @see gs1_encoder_getMaxGS1_128LinearHeight()
  *
  * @param [in,out] ctx ::gs1_encoder context
- * @param [in] ucc128linHeight height in modules
+ * @param [in] gs1_128LinearHeight height in modules
  * @return true on success, otherwise false and an error message is set
  */
-GS1_ENCODERS_API bool gs1_encoder_setUcc128LinHeight(gs1_encoder *ctx, int ucc128linHeight);
+GS1_ENCODERS_API bool gs1_encoder_setGS1_128LinearHeight(gs1_encoder *ctx, int gs1_128LinearHeight);
 
 
 /**
@@ -732,10 +732,10 @@ GS1_ENCODERS_API char* gs1_encoder_getDataStr(gs1_encoder *ctx);
  *
  * \note
  * The length of the data must be less that the value returned by
- * gs1_encoder_getMaxInputBuffer().
+ * gs1_encoder_getMaxDataStrLength().
  *
  * @see gs1_encoder_setGS1dataStr()
- * @see gs1_encoder_getMaxInputBuffer()
+ * @see gs1_encoder_getMaxDataStrLength()
  * @see gs1_encoder_getDataStr()
  * @see gs1_encoder_setFileInputFlag()
  *
@@ -779,10 +779,10 @@ GS1_ENCODERS_API bool gs1_encoder_setDataStr(gs1_encoder *ctx, char* dataStr);
  *
  * \note
  * The ultimate length of the encoded data must be less that the value returned by
- * gs1_encoder_getMaxInputBuffer().
+ * gs1_encoder_getMaxDataStrLength().
  *
  * @see gs1_encoder_setDataStr()
- * @see gs1_encoder_getMaxInputBuffer()
+ * @see gs1_encoder_getMaxDataStrLength()
  * @see gs1_encoder_getDataStr()
  * @see gs1_encoder_setFileInputFlag()
  *

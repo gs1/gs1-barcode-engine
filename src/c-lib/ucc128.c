@@ -408,7 +408,7 @@ void gs1_U128A(gs1_encoder *ctx) {
 	prints.elmCnt = symChars*6+3;
 	prints.pattern = linPattern;
 	prints.guards = false;
-	prints.height = ctx->pixMult * ctx->ucc128linHeight;
+	prints.height = ctx->pixMult * ctx->gs1_128LinearHeight;
 	prints.leftPad = 0;
 	prints.rightPad = 0;
 	prints.whtFirst = true;
@@ -429,7 +429,7 @@ void gs1_U128A(gs1_encoder *ctx) {
 		ccLpad = symWidth - (CCB4_WIDTH + ccRpad);
 
 		gs1_driverInit(ctx, ctx->pixMult*symWidth,
-				ctx->pixMult*(rows*2+ctx->ucc128linHeight) + ctx->sepHt);
+				ctx->pixMult*(rows*2+ctx->gs1_128LinearHeight) + ctx->sepHt);
 
 		// CC-C
 		prints.elmCnt = CCB4_ELMNTS;
@@ -452,7 +452,7 @@ void gs1_U128A(gs1_encoder *ctx) {
 		// UCC-128
 		prints.elmCnt = symChars*6+3;
 		prints.pattern = linPattern;
-		prints.height = ctx->pixMult*ctx->ucc128linHeight;
+		prints.height = ctx->pixMult*ctx->gs1_128LinearHeight;
 		prints.leftPad = 0;
 		prints.rightPad = 0;
 		gs1_driverAddRow(ctx, &prints);
@@ -460,7 +460,7 @@ void gs1_U128A(gs1_encoder *ctx) {
 		gs1_driverFinalise(ctx);
 	}
 	else { // primary only
-		gs1_driverInit(ctx, ctx->pixMult*(symChars*11+22), ctx->pixMult*ctx->ucc128linHeight);
+		gs1_driverInit(ctx, ctx->pixMult*(symChars*11+22), ctx->pixMult*ctx->gs1_128LinearHeight);
 
 		// UCC-128
 		gs1_driverAddRow(ctx, &prints);
@@ -533,7 +533,7 @@ void gs1_U128C(gs1_encoder *ctx) {
 	prints.elmCnt = symChars*6+3;
 	prints.pattern = linPattern;
 	prints.guards = false;
-	prints.height = ctx->pixMult*ctx->ucc128linHeight;
+	prints.height = ctx->pixMult*ctx->gs1_128LinearHeight;
 	prints.leftPad = 0;
 	prints.rightPad = 0;
 	prints.whtFirst = true;
@@ -548,7 +548,7 @@ void gs1_U128C(gs1_encoder *ctx) {
 		ccRpad = symWidth - UCC128_L_PAD - ((ctx->colCnt+4)*17+5);
 
 		gs1_driverInit(ctx, ctx->pixMult*symWidth,
-				ctx->pixMult*(ctx->rowCnt*3+ctx->ucc128linHeight) + ctx->sepHt);
+				ctx->pixMult*(ctx->rowCnt*3+ctx->gs1_128LinearHeight) + ctx->sepHt);
 
 		// CC-C
 		prints.elmCnt = (ctx->colCnt+4)*8+3;
@@ -571,7 +571,7 @@ void gs1_U128C(gs1_encoder *ctx) {
 		// UCC-128
 		prints.elmCnt = symChars*6+3;
 		prints.pattern = linPattern;
-		prints.height = ctx->pixMult*ctx->ucc128linHeight;
+		prints.height = ctx->pixMult*ctx->gs1_128LinearHeight;
 		prints.leftPad = 0;
 		prints.rightPad = 0;
 		gs1_driverAddRow(ctx, &prints);
@@ -579,7 +579,7 @@ void gs1_U128C(gs1_encoder *ctx) {
 		gs1_driverFinalise(ctx);
 	}
 	else { // primary only
-		gs1_driverInit(ctx, ctx->pixMult*(symChars*11+22), ctx->pixMult*ctx->ucc128linHeight);
+		gs1_driverInit(ctx, ctx->pixMult*(symChars*11+22), ctx->pixMult*ctx->gs1_128LinearHeight);
 
 		// UCC-128
 		gs1_driverAddRow(ctx, &prints);
@@ -615,7 +615,7 @@ void test_ucc_UCC128A_encode(void) {
 "          XX X  X    XXXX X XXX X  XXXX X  X XX  X    X XXXX  X  X  XXXX X  X    XX X  XX    X X  X  XX X    XX  XX XX  XX   XXX X XX          ",
 "vvv",
 	};
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sUCC128_CCA, "testing", expect));
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sGS1_128_CCA, "testing", expect));
 
 	expect = (char*[]){
 "                    XX XX XXX XXX  XX XXX XXXX X   X X     X    X  XXX X  XX  XX    XX  XX XXXX  XXXX  X X  XX XX   X X                        ",
@@ -628,8 +628,8 @@ void test_ucc_UCC128A_encode(void) {
 "          XX X  XXX  XXXX X XXX X XX  XXX  XX XX   XX XXX XX XXX X XX  XXX  XX XX   XX XXX XX XXX XXX X XXXX XXXX X  X  XX   XXX X XX          ",
 "vvv",
 	};
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sUCC128_CCA, "123123123123|99123123", expect));
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sUCC128_CCA, "#123123123123|#99123123", expect));
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sGS1_128_CCA, "123123123123|99123123", expect));
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sGS1_128_CCA, "#123123123123|#99123123", expect));
 
 	gs1_encoder_free(ctx);
 
@@ -686,8 +686,8 @@ void test_ucc_UCC128C_encode(void) {
 "          XX X  XXX  XXXX X XXX XX XX  XX  X  X  XX   XX  XX XX  XXX XX XXX X XXX XX   X    X XX  XX XX XXXX XX  XX XX  XXX XX XXX XX   X X   X XXXX XXX XXX XXXX X XX   XXX X XX          ",
 NULL
 	};
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sUCC128_CCC, "00030123456789012340|02130123456789093724#101234567ABCDEFG", expect));
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sUCC128_CCC, "#00030123456789012340|#02130123456789093724#101234567ABCDEFG", expect));
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sGS1_128_CCC, "00030123456789012340|02130123456789093724#101234567ABCDEFG", expect));
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sGS1_128_CCC, "#00030123456789012340|#02130123456789093724#101234567ABCDEFG", expect));
 
 	gs1_encoder_free(ctx);
 

@@ -55,7 +55,7 @@ static char* _gets(char* in) {
 
 	char* s;
 
-	s = fgets(in, gs1_encoder_getMaxInputBuffer()+1, stdin);
+	s = fgets(in, gs1_encoder_getMaxDataStrLength()+1, stdin);
 	if (s != NULL) {
 		s[strcspn(s, "\r\n")] = 0;
 	}
@@ -108,21 +108,21 @@ static bool userInt(gs1_encoder *ctx) {
 		}
 		printf("\n\nData input string or file format:");
 		switch (gs1_encoder_getSym(ctx)) {
-			case gs1_encoder_sRSS14:
-			case gs1_encoder_sRSS14T:
-			case gs1_encoder_sRSS14S:
-			case gs1_encoder_sRSS14SO:
+			case gs1_encoder_sDataBarOmni:
+			case gs1_encoder_sDataBarTruncated:
+			case gs1_encoder_sDataBarStacked:
+			case gs1_encoder_sDataBarStackedOmni:
 				printf("\n Primary data is 14 digits with check digit, or AI syntax: (01)..............");
 				printf("\n For Composite, provide both primary and 2D components as AI syntax separated by |.");
 				break;
-			case gs1_encoder_sRSSLIM:
+			case gs1_encoder_sDataBarLimited:
 				printf("\n Primary data is 14 digits with check digit, or AI syntax: (01)..............");
 				printf("\n GTIN must begin with 0 or 1, e.g. (01)0............. or (01)1.............");
 				printf("\n For Composite, provide both primary and 2D components as AI syntax separated by |.");
 				break;
-			case gs1_encoder_sUCC128_CCA:
-			case gs1_encoder_sUCC128_CCC:
-			case gs1_encoder_sRSSEXP:
+			case gs1_encoder_sGS1_128_CCA:
+			case gs1_encoder_sGS1_128_CCC:
+			case gs1_encoder_sDataBarExpanded:
 				printf("\n Primary data is in AI syntax, e.g. (01)..............(10)......");
 				break;
 			case gs1_encoder_sUPCA:
@@ -167,12 +167,12 @@ static bool userInt(gs1_encoder *ctx) {
 		}
 		printf("\n 6) Select TIF or BMP format. Current = %s",
 							 (gs1_encoder_getFormat(ctx) == gs1_encoder_dBMP) ? "BMP":"TIF");
-		if (gs1_encoder_getSym(ctx) == gs1_encoder_sRSSEXP) {
-			printf("\n 7) Select maximum segments per row. Current value = %d", gs1_encoder_getRssExpSegWidth(ctx));
+		if (gs1_encoder_getSym(ctx) == gs1_encoder_sDataBarExpanded) {
+			printf("\n 7) Select maximum segments per row. Current value = %d", gs1_encoder_getDataBarExpandedSegmentsWidth(ctx));
 		}
-		if ((gs1_encoder_getSym(ctx) == gs1_encoder_sUCC128_CCA) || (gs1_encoder_getSym(ctx) == gs1_encoder_sUCC128_CCC)) {
+		if ((gs1_encoder_getSym(ctx) == gs1_encoder_sGS1_128_CCA) || (gs1_encoder_getSym(ctx) == gs1_encoder_sGS1_128_CCC)) {
 			printf("\n 7) Enter GS1-128 height in X. Current value = %d",
-								gs1_encoder_getUcc128LinHeight(ctx));
+								gs1_encoder_getGS1_128LinearHeight(ctx));
 		}
 		if (gs1_encoder_getSym(ctx) == gs1_encoder_sQR) {
 			printf("\n 7) Enter GS1 QR Code version (0 = automatic). Current value = %d",
@@ -312,22 +312,22 @@ static bool userInt(gs1_encoder *ctx) {
 				}
 				break;
 			case 7:
-			 if (gs1_encoder_getSym(ctx) == gs1_encoder_sRSSEXP) {
+			 if (gs1_encoder_getSym(ctx) == gs1_encoder_sDataBarExpanded) {
 				printf("\nEnter maximum segments per row. Even values 2 to 22 valid: ");
 				if (gets(inpStr) == NULL)
 					return false;
 				i = atoi(inpStr);
-				if (!gs1_encoder_setRssExpSegWidth(ctx, i)) {
+				if (!gs1_encoder_setDataBarExpandedSegmentsWidth(ctx, i)) {
 					printf("\nERROR: %s\n", gs1_encoder_getErrMsg(ctx));
 					continue;
 				}
 			 }
-			 else if ((gs1_encoder_getSym(ctx) == gs1_encoder_sUCC128_CCA) || (gs1_encoder_getSym(ctx) == gs1_encoder_sUCC128_CCC)) {
-				printf("\nEnter UCC/EAN-128 height in X. 1-%d valid: ", gs1_encoder_getMaxUcc128LinHeight());
+			 else if ((gs1_encoder_getSym(ctx) == gs1_encoder_sGS1_128_CCA) || (gs1_encoder_getSym(ctx) == gs1_encoder_sGS1_128_CCC)) {
+				printf("\nEnter GS1-128 height in X. 1-%d valid: ", gs1_encoder_getMaxGS1_128LinearHeight());
 				if (gets(inpStr) == NULL)
 					return false;
 				i = atoi(inpStr);
-				if (!gs1_encoder_setUcc128LinHeight(ctx, i)) {
+				if (!gs1_encoder_setGS1_128LinearHeight(ctx, i)) {
 					printf("\nERROR: %s\n", gs1_encoder_getErrMsg(ctx));
 					continue;
 				}
@@ -405,7 +405,7 @@ static bool userInt(gs1_encoder *ctx) {
 
 int main(int argc, char *argv[]) {
 
-	inpStr = malloc((size_t)(gs1_encoder_getMaxInputBuffer()+1));
+	inpStr = malloc((size_t)(gs1_encoder_getMaxDataStrLength()+1));
 	if (inpStr == NULL) {
 		printf("Failed to allocate the input buffer!\n");
 		return 1;
