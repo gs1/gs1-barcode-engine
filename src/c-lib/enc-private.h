@@ -86,6 +86,7 @@ struct gs1_encoder {
 	char VERSION[16];
 
 	// per-instance globals
+	bool localAlloc;	// True if we malloc()ed this struct
 	FILE *outfp;
 	size_t bufferCap;
 	size_t bufferSize;

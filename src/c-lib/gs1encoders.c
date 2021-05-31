@@ -92,8 +92,10 @@ GS1_ENCODERS_API gs1_encoder* gs1_encoder_init(void *mem) {
 		ctx = malloc(sizeof(gs1_encoder));
 #endif
 		if (ctx == NULL) return NULL;
+		ctx->localAlloc = true;
 	} else {  // Use the provided storage
 		ctx = mem;
+		ctx->localAlloc = false;
 	}
 
 	reset_error(ctx);
@@ -134,7 +136,8 @@ GS1_ENCODERS_API void gs1_encoder_free(gs1_encoder *ctx) {
 	reset_error(ctx);
 	free_bufferStrings(ctx);
 	free(ctx->buffer);
-	free(ctx);
+	if (ctx->localAlloc)
+		free(ctx);
 }
 
 
