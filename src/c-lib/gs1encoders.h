@@ -23,7 +23,56 @@
  *
  * @endlicenseblock
  *
+ *
+ * Overview
+ * --------
+ *
+ * The GS1 Barcode Encoder Library support the generation of GS1 barcode symbols.
+ *
+ * The supported symbologies are:
+ *
+ *   * GS1 DataBar family
+ *   * GS1-128
+ *   * UPC and EAN
+ *   * 2D Composite Components are supported for each of the above.
+ *   * Data Matrix
+ *   * QR Code
+ *
+ * The barcode input data can either be received from a string buffer or read
+ * from a file in either plain or GS1 Application Identifier syntax. The
+ * barcode symbols can either be written to a BMP or TIFF file, or accessed by
+ * a buffer in the aforementioned graphical formats, a raw bitmap matrix format
+ * or as an array of strings.
+ *
+ * A typical programming workflow is to write the generated barcode image directly to a file:
+ *
+ * \code
+ * gs1_encoder *ctx = gs1_encoder_init(NULL);           // Create a new instance of the library
+ * gs1_encoder_setFormat(ctx, gs1_encoder_dBMP);        // Select BMP output
+ * gs1_encoder_setOutFile(ctx, "out.bmp");              // Select output to a file
+ * gs1_encoder_setSym(ctx, gs1_encoder_sDM);            // Choose the Data Matrix symbology
+ * gs1_encoder_setGS1DataStr(ctx,                       // Data provided in GS1 AI syntax
+ *        "(01)12345678901231(10)ABC123(11)210630");
+ * gs1_encoder_encode(ctx);                             // Generate the image, writing the file
+ * gs1_encoder_free(ctx);                               // Release the instance of the library
+ * \endcode
+ *
+ * Another is to capture the output as a set of strings:
+ *
+ * \code
+ * gs1_encoder *ctx = gs1_encoder_init(NULL);           // Create a new instance of the library
+ * gs1_encoder_setFormat(ctx, gs1_encoder_dRAW);        // Select RAW output (no graphical header)
+ * gs1_encoder_setOutFile(ctx, "");                     // Select output to a buffer
+ * gs1_encoder_setSym(ctx, gs1_encoder_sEAN13;          // Choose the EAN-13 symbology
+ * gs1_encoder_setGS1DataStr(ctx, "2112345678900");     // Data provided in plain syntax
+ * gs1_encoder_encode(ctx);                             // Generate the image, writing the buffer
+ * size = gs1_encoder_getBuffer(ctx, buffer);           // Read from the buffer
+ * rows = gs1_encoder_getBufferStrings(ctx, strings);   // Alternatively convert buffer to an array of strings
+ * gs1_encoder_free(ctx);                               // Release the instance of the library
+ * \endcode
+ *
  */
+
 
 #ifndef GS1_ENCODERS_H
 #define GS1_ENCODERS_H
@@ -47,7 +96,7 @@ extern "C" {
 #endif
 
 
-/// enum to select a symbology.
+/// All of the major GS1 barcode formats ("symbologies") are supported by this library.
 enum symbologies {
 	gs1_encoder_sNONE = -1,		///< None defined
 	gs1_encoder_sRSS14,		///< GS1 DataBar Omnidirectional
@@ -68,7 +117,8 @@ enum symbologies {
 };
 
 
-/// enum to select the output format.
+/// Barcode images can be written in common BMP and TIFF graphical formats, as
+/// well as output as a headerless matrix.
 enum formats {
 	gs1_encoder_dBMP = 0,		///< BMP format
 	gs1_encoder_dTIF = 1,		///< TIFF format
@@ -76,7 +126,8 @@ enum formats {
 };
 
 
-/// enum to select QR Code error correction level.
+/// The QR Code symbology supports several error correction levels which allow
+/// differing amount of unreadable data to be reconstructed.
 enum qrEClevel {
 	gs1_encoder_qrEClevelL = 1,	///< Low error correction (7% damage recovery)
 	gs1_encoder_qrEClevelM,		///< Medium error correction (15% damage recovery)
@@ -94,18 +145,18 @@ enum qrEClevel {
  * for that instance. Any number of instances of the library can be created,
  * each operating seperately and equivalently to all others.
  *
- * This library does not introduce and global variables. In general, all state
- * is maintained in instances of the gs1_encoder struct and this state should
- * only be modified using the public API functions provided by this library
- * (decorated with GS1_ENCODERS_API).
+ * This library does not introduce any global variables. All runtime state
+ * is maintained in instances of the ::gs1_encoder struct and this state should
+ * only be modified using the public API functions provided by this library,
+ * decorated with GS1_ENCODERS_API.
  *
  * A context is created by calling gs1_encoder_init() and destroyed by calling
  * gs1_encoder_free().
  *
  * \note
  * This struct is deliberately opaque and it's layout should be assumed to vary
- * between releases of the library and between builds create with different
- * options.
+ * between releases of the library and even between builds created with
+ * different options.
  *
  * \note
  * The library is thread-safe provided that each thread operates on its own
@@ -195,7 +246,7 @@ GS1_ENCODERS_API int gs1_encoder_getMaxInputBuffer(void);
 
 
 /**
- * @brief Get the maximum X-dimension (in pixels)
+ * @brief Get the maximum X-dimension in pixels
  *
  * This is an implementation limit that may be lowered for systems with limited
  * memory by rebuilding the library.
@@ -237,6 +288,10 @@ GS1_ENCODERS_API gs1_encoder* gs1_encoder_init(void *mem);
 
 /**
  * @brief Read an error message generated by the library.
+ *
+ * When any of the setter functions of this library or gs1_encoder_encode()
+ * returns false to indicate an error, a human-friendly error message is
+ * generated which can be read using this function.
  *
  * @param [in,out] ctx ::gs1_encoder context
  * @return pointer to error message string
@@ -592,7 +647,7 @@ GS1_ENCODERS_API bool gs1_encoder_setAddCheckDigit(gs1_encoder *ctx, bool addChe
  * @see gs1_encoder_setFileInputFlag()
  *
  * @param [in,out] ctx ::gs1_encoder context
- * @return true of input if from a file; false if from a buffer
+ * @return true if input is from a file; false if input is from a buffer
  */
 GS1_ENCODERS_API bool gs1_encoder_getFileInputFlag(gs1_encoder *ctx);
 
@@ -622,8 +677,7 @@ GS1_ENCODERS_API bool gs1_encoder_setFileInputFlag(gs1_encoder *ctx, bool fileIn
 
 
 /**
- * @brief Reads the data from the buffer that is used when buffer input is
- * selected.
+ * @brief Reads the data from the barcode data buffer.
  *
  * @see gs1_encoder_getDataStr()
  * @see gs1_encoder_setFileInputFlag()
@@ -644,11 +698,37 @@ GS1_ENCODERS_API char* gs1_encoder_getDataStr(gs1_encoder *ctx);
  * separate fields that are not specified as being pre-defined length from
  * subsequent fields.
  *
- * The acceptable raw data input varies between encoders.
- *
- * It is strongly advised that GS1 data input is specified using
+ * It is strongly advised that GS1 data input is instead specified using
  * gs1_encoder_setGS1dataStr() which takes care of the AI encoding rules
- * automatically, including insertion of FNC1 characters where required.
+ * automatically, including insertion of FNC1 characters where required. This
+ * can be used for all symbologies that accept GS1 AI syntax data.
+ *
+ * The acceptable raw data input varies between symbologies:
+ *
+ *   * **EAN-13**:: 13 digits including check digit
+ *   * **EAN-8**:: 8 digits including check digit
+ *   * **UPC-A**:: 12 digits including check digit
+ *   * **UPC-E**:: 12 digits (not zero-suppressed) including check digit
+ *   * **GS1 DataBar Omnidirectional**:: 14 digits including check digit
+ *   * **GS1 DataBar Truncated**:: 14 digits including check digit
+ *   * **GS1 DataBar Stacked**:: 14 digits including check digit
+ *   * **GS1 DataBar Stacked Omnidirectional**:: 14 digits including check digit
+ *   * **GS1 DataBar Expanded (Stacked)**:: GS1 AI syntax in raw form, with "#" = FNC1
+ *   * **GS1 DataMatrix**:: GS1 AI syntax in raw form, with "#" = FNC1
+ *   * **GS1 QR Code**:: GS1 AI syntax in raw form, with "#" = FNC1
+ *   * **Data Matrix**:: Plain string
+ *   * **QR Code**:: Plain string
+ *
+ * 2D Component must be specified as GS1 AI syntax in raw form, with "#" = FNC1.
+ * It must be separated from the primary linear components with a "|"
+ * character, for example:
+ *
+ * \code
+ * #0112345678901231|#10ABC123#11210630
+ * \endcode
+ *
+ * Again, for GS1 data it is simpler and less error prone to specify the input
+ * in human-friendly GS1 AI syntax using gs1_encoder_setGS1dataStr().
  *
  * \note
  * The length of the data must be less that the value returned by
@@ -701,6 +781,7 @@ GS1_ENCODERS_API bool gs1_encoder_setDataStr(gs1_encoder *ctx, char* dataStr);
  * The ultimate length of the encoded data must be less that the value returned by
  * gs1_encoder_getMaxInputBuffer().
  *
+ * @see gs1_encoder_setDataStr()
  * @see gs1_encoder_getMaxInputBuffer()
  * @see gs1_encoder_getDataStr()
  * @see gs1_encoder_setFileInputFlag()
@@ -814,12 +895,12 @@ GS1_ENCODERS_API bool gs1_encoder_setOutFile(gs1_encoder *ctx, char* outFile);
  * @brief Generate a barcode symbol representing the given input data
  *
  * This will create a barcode image for the symbology specified by
- * gs1_encoder_setSym() containing the data provided by gs1_encoder_setDataStr
- * or gs1_encoder_setGS1dataStr().
+ * gs1_encoder_setSym() containing the data provided by
+ * gs1_encoder_setDataStr() or gs1_encoder_setGS1dataStr().
  *
  * If the input is valid for the selected symbology then the image output will
- * be written to the output file specified by gs1_encoder_setOutFile() or to
- * the output buffer if the output filename is empty in the format specifiede
+ * be written to the output file specified by gs1_encoder_setOutFile(), or to
+ * the output buffer if the output filename is empty, in the format specified
  * by gs1_encoder_setFormat().
  *
  * @see gs1_encoder_setSym()
@@ -857,7 +938,7 @@ GS1_ENCODERS_API size_t gs1_encoder_getBuffer(gs1_encoder *ctx, void** buffer);
  * @see gs1_encoder_getBufferStrings()
  *
  * @param [in,out] ctx ::gs1_encoder context
- * @return the number of columns in the image held in the buffer
+ * @return the number of columns of the image held in the buffer
  */
 GS1_ENCODERS_API int gs1_encoder_getBufferWidth(gs1_encoder *ctx);
 
@@ -869,7 +950,7 @@ GS1_ENCODERS_API int gs1_encoder_getBufferWidth(gs1_encoder *ctx);
  * @see gs1_encoder_getBufferStrings()
  *
  * @param [in,out] ctx ::gs1_encoder context
- * @return the number of rows in the image held in the buffer
+ * @return the number of rows of the image held in the buffer
  */
 GS1_ENCODERS_API int gs1_encoder_getBufferHeight(gs1_encoder *ctx);
 

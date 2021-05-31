@@ -10,6 +10,7 @@ lib*.so.*
 *.vcxproj.user
 src/c-lib/build/
 src/c-lib/test/
+src/c-lib/docstmp/
 src/c-lib/corpus-*/
 src/c-lib/crash-*
 src/c-lib/fuzz-*

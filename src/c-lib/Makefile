@@ -92,7 +92,7 @@ OBJS = $(addprefix $(BUILD_DIR)/, $(SRCS:.c=.o))
 DEPS = $(addprefix $(BUILD_DIR)/, $(ALL_SRCS:.c=.d)) $(FUZZER_OBJS:.o=.d)
 
 
-.PHONY: all clean app app-static lib libshared libstatic install install-static install-shared uninstall test clean-test fuzzer
+.PHONY: all clean app app-static lib libshared libstatic install install-static install-shared uninstall test clean-test fuzzer docs
 
 default: lib app-static
 all: lib app app-static
@@ -215,6 +215,21 @@ uninstall:
 	$(RM) $(DESTDIR)$(PREFIX)/lib/lib$(NAME).so
 	$(RM) $(DESTDIR)$(PREFIX)/lib/lib$(NAME).a
 	-ldconfig
+
+docs:
+	doxygen
+	mkdir -p docs
+	cp docstmp/gs1encoders_8h.html docs/index.html
+	cp docstmp/doxygen.css docs
+	cp docstmp/doxygen.png docs
+	cp docstmp/dynsections.js docs
+	cp docstmp/jquery.js docs
+	cp docstmp/menu.js docs
+	cp docstmp/menudata.js docs
+	cp docstmp/nav_f.png docs
+	cp docstmp/nav_g.png docs
+	cp docstmp/nav_h.png docs
+	cp docstmp/tabs.css docs
 
 
 -include $(DEPS)
