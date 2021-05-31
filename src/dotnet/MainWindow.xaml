@@ -31,8 +31,8 @@
             <ComboBoxItem Content="EAN-8" HorizontalAlignment="Left" Width="220"/>
             <ComboBoxItem Content="GS1-128 with CC-A or CC-B" HorizontalAlignment="Left" Width="220"/>
             <ComboBoxItem Content="GS1-128 with CC-C" HorizontalAlignment="Left" Width="220"/>
-            <ComboBoxItem Content="GS1 QR Code" HorizontalAlignment="Left" Width="220"/>
-            <ComboBoxItem Content="GS1 DataMatrix" HorizontalAlignment="Left" Width="220"/>
+            <ComboBoxItem Content="QR Code" HorizontalAlignment="Left" Width="220"/>
+            <ComboBoxItem Content="DataMatrix" HorizontalAlignment="Left" Width="220"/>
         </ComboBox>
         <TextBox x:Name="pixMultTextBox" HorizontalAlignment="Left" Height="23" Margin="180,150,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="66" Grid.Column="1"/>
         <Label x:Name="label" Content="Pixels per module (X)" HorizontalAlignment="Left" Margin="20,145,0,0" VerticalAlignment="Top" Grid.ColumnSpan="3" Width="163" Height="30"/>
