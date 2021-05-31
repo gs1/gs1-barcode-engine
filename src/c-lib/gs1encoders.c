@@ -730,6 +730,7 @@ void test_api_init(void) {
 
 	gs1_encoder* ctx;
 	void *heap;
+	size_t mem;
 	uint8_t stack[sizeof(gs1_encoder)];
 
 	// Mallocs its own memory
@@ -740,7 +741,8 @@ void test_api_init(void) {
 	gs1_encoder_free(ctx);
 
 	// We malloc the storage on the heap and pass it in
-	TEST_ASSERT((heap = malloc(sizeof(gs1_encoder))) != NULL);
+	TEST_ASSERT((mem = gs1_encoder_instanceSize()) > 0);
+	TEST_ASSERT((heap = malloc(mem)) != NULL);
 	TEST_ASSERT((ctx = gs1_encoder_init(heap)) == heap);
 	TEST_CHECK(gs1_encoder_getSym(ctx) == gs1_encoder_sNONE);
 	TEST_CHECK(gs1_encoder_getFormat(ctx) == gs1_encoder_dTIF);
