@@ -27,7 +27,8 @@
  * Overview
  * --------
  *
- * The GS1 Barcode Encoder Library support the generation of GS1 barcode symbols.
+ * The GS1 Barcode Encoder Library provides routines to generate GS1 barcode
+ * symbols and to process GS1 data.
  *
  * The supported symbologies are:
  *
@@ -39,14 +40,17 @@
  *   * QR Code
  *
  * The barcode input data can either be received from a string buffer or read
- * from a file in either plain or GS1 Application Identifier syntax. The
- * barcode symbols can either be written to a BMP or TIFF file, or accessed by
- * a buffer in the aforementioned graphical formats, a raw bitmap matrix format
- * or as an array of strings.
+ * from a file as either a raw barcode message or in human-friendly GS1
+ * Application Identifier syntax. The barcode symbols be written to a BMP or
+ * TIFF file, or accessed by a buffer in either graphical format or as an array
+ * of strings.
  *
- * A typical programming workflow is to write the generated barcode image directly to a file:
+ * This example use of the library low is to write the generated barcode image
+ * directly to a file:
  *
  * \code
+ * #import "gs1encoders.h"
+ *
  * gs1_encoder *ctx = gs1_encoder_init(NULL);           // Create a new instance of the library
  * gs1_encoder_setFormat(ctx, gs1_encoder_dBMP);        // Select BMP output
  * gs1_encoder_setOutFile(ctx, "out.bmp");              // Select output to a file
@@ -57,9 +61,12 @@
  * gs1_encoder_free(ctx);                               // Release the instance of the library
  * \endcode
  *
- * Another is to capture the output as a set of strings:
+ * Another is to capture the graphical output into a buffer or extract the
+ * image as a set of strings that can be processed by the application:
  *
  * \code
+ * #import "gs1encoders.h"
+ *
  * gs1_encoder *ctx = gs1_encoder_init(NULL);           // Create a new instance of the library
  * gs1_encoder_setFormat(ctx, gs1_encoder_dRAW);        // Select RAW output (no graphical header)
  * gs1_encoder_setOutFile(ctx, "");                     // Select output to a buffer
@@ -68,8 +75,15 @@
  * gs1_encoder_encode(ctx);                             // Generate the image, writing the buffer
  * size = gs1_encoder_getBuffer(ctx, buffer);           // Read from the buffer
  * rows = gs1_encoder_getBufferStrings(ctx, strings);   // Alternatively convert buffer to an array of strings
+ * ...
  * gs1_encoder_free(ctx);                               // Release the instance of the library
  * \endcode
+ *
+ * Most of the setter and action functions of this library return a boolean
+ * indicating whether the function was successful and write an error message
+ * that can be accessed with gs1_encoder_getErrMsg() in the event of failure.
+ * The example code above should be extended to check the return status of each
+ * function when used in production code.
  *
  */
 
@@ -139,11 +153,11 @@ enum qrEClevel {
 /**
  * @brief A gs1_encoder context.
  *
- * This is an opaque struct that represents an encoder context.
+ * This is an opaque struct that represents an instance of the library.
  *
- * A context is an "instance" of the library and maintains all state required
- * for that instance. Any number of instances of the library can be created,
- * each operating seperately and equivalently to all others.
+ * This context maintains all state required for an instance. Any number of
+ * instances of the library can be created, each operating seperately and
+ * equivalently to the others.
  *
  * This library does not introduce any global variables. All runtime state
  * is maintained in instances of the ::gs1_encoder struct and this state should
@@ -151,7 +165,8 @@ enum qrEClevel {
  * decorated with GS1_ENCODERS_API.
  *
  * A context is created by calling gs1_encoder_init() and destroyed by calling
- * gs1_encoder_free().
+ * gs1_encoder_free(), releasing all of the storage allocated by the library
+ * for that instance.
  *
  * \note
  * This struct is deliberately opaque and it's layout should be assumed to vary
@@ -181,12 +196,14 @@ GS1_ENCODERS_API char* gs1_encoder_getVersion(gs1_encoder *ctx);
  * @brief Find the memory storage requirements for an instance of ::gs1_encoder.
  *
  * For embedded systems it may be desirable to provide a pre-allocated buffer
- * to a new context for storage purposes, rather than have the instance
- * malloc() it's own storage.
+ * to a new context for storage purposes, rather than to have the instance
+ * malloc() it's own storage. This may avoid problems such as heap
+ * fragmentation on systems with a poor memory allocator or a restricted
+ * working set size.
  *
- * This function provides the minimum size required for such a buffer.
+ * This function returns the minimum size required for such a buffer.
  *
- * Example of allocating our own heap storage:
+ * Example of a user of the library allocating its own heap storage:
  *
  * \code{.c}
  * gs1_encoder *ctx;
@@ -194,12 +211,16 @@ GS1_ENCODERS_API char* gs1_encoder_getVersion(gs1_encoder *ctx);
  * void *heap = malloc(mem);
  * assert(heap);
  * ctx = gs1_encoder_init(heap);
+ * ...
+ * gs1_encoder_free(ctx);
+ * free(heap);
  * \endcode
  *
- * Example of using static storage:
+ * Example of a user of the library using static storage allocated at compile
+ * time:
  *
  * \code{.c}
- * static uint8_t prealloc[65536];
+ * static uint8_t prealloc[65536];  // Ensure that this is big enough
  * ...
  * void myFunc(void) {
  * 	gs1_encoder *ctx;
@@ -273,10 +294,13 @@ GS1_ENCODERS_API int gs1_encoder_getMaxGS1_128LinearHeight(void);
 /**
  * @brief Initialise a new ::gs1_encoder context.
  *
- * If storage is provided then this will be used, however it is more typical to
- * pass NULL in which case the library will malloc its own storage.
+ * If it expected that most users of the library will pass NULL to this
+ * function which causes the library will allocate its own storage.
  *
- * Any storage buffer provided must be sufficient for the instance.
+ * If a pointer to a storage buffer is provided then this will be used instead,
+ * however this buffer must be sufficient for the needs of the instance as
+ * returned by gs1_encoder_instanceSize() and this buffer should not be reused
+ * or freed until gs1_encoder_free() is called.
  *
  * @see gs1_encoder_instanceSize()
  *
@@ -290,8 +314,11 @@ GS1_ENCODERS_API gs1_encoder* gs1_encoder_init(void *mem);
  * @brief Read an error message generated by the library.
  *
  * When any of the setter functions of this library or gs1_encoder_encode()
- * returns false to indicate an error, a human-friendly error message is
+ * returns false (indicating an error), a human-friendly error message is
  * generated which can be read using this function.
+ *
+ * \note
+ * The pointer does not need to be free()ed.
  *
  * @param [in,out] ctx ::gs1_encoder context
  * @return pointer to error message string
@@ -677,7 +704,10 @@ GS1_ENCODERS_API bool gs1_encoder_setFileInputFlag(gs1_encoder *ctx, bool fileIn
 
 
 /**
- * @brief Reads the data from the barcode data buffer.
+ * @brief Reads the barcode data buffer.
+ *
+ * \note
+ * The returned pointer does not need to be free()ed.
  *
  * @see gs1_encoder_getDataStr()
  * @see gs1_encoder_setFileInputFlag()
@@ -797,6 +827,9 @@ GS1_ENCODERS_API bool gs1_encoder_setGS1dataStr(gs1_encoder *ctx, char* dataStr)
  * @brief Gets the filename for a file containing the barcode data when file
  * input is selected.
  *
+ * \note
+ * The returned pointer does not need to be free()ed.
+ *
  * @see gs1_encoder_setDataFile()
  * @see gs1_encoder_setFileInputFlag()
  *
@@ -856,6 +889,9 @@ GS1_ENCODERS_API bool gs1_encoder_setFormat(gs1_encoder *ctx, int format);
 
 /**
  * @brief Get the current output filename.
+ *
+ * \note
+ * The returned pointer does not need to be free()ed.
  *
  * @see gs1_encoder_setOutFile()
  *
@@ -1001,7 +1037,7 @@ GS1_ENCODERS_API int gs1_encoder_getBufferHeight(gs1_encoder *ctx);
  * @see gs1_encoder_getBuffer()
  *
  * @param [in,out] ctx ::gs1_encoder context
- * @param [out] strings pointer to an array of strings
+ * @param [out] strings the value of the given pointer is rewritten to point to an array of strings
  * @return the number of rows in the returned array of strings
  */
 GS1_ENCODERS_API size_t gs1_encoder_getBufferStrings(gs1_encoder *ctx, char*** strings);

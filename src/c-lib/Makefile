@@ -218,18 +218,18 @@ uninstall:
 
 docs:
 	doxygen
-	mkdir -p docs
-	cp docstmp/gs1encoders_8h.html docs/index.html
-	cp docstmp/doxygen.css docs
-	cp docstmp/doxygen.png docs
-	cp docstmp/dynsections.js docs
-	cp docstmp/jquery.js docs
-	cp docstmp/menu.js docs
-	cp docstmp/menudata.js docs
-	cp docstmp/nav_f.png docs
-	cp docstmp/nav_g.png docs
-	cp docstmp/nav_h.png docs
-	cp docstmp/tabs.css docs
+	cp docstmp/gs1encoders_8h.html ../../docs/index.html
+	cp docstmp/gs1encoders_8h.html ../../docs
+	cp docstmp/doxygen.css ../../docs
+	cp docstmp/doxygen.png ../../docs
+	cp docstmp/dynsections.js ../../docs
+	cp docstmp/jquery.js ../../docs
+	cp docstmp/menu.js ../../docs
+	cp docstmp/menudata.js ../../docs
+	cp docstmp/nav_f.png ../../docs
+	cp docstmp/nav_g.png ../../docs
+	cp docstmp/nav_h.png ../../docs
+	cp docstmp/tabs.css ../../docs
 
 
 -include $(DEPS)

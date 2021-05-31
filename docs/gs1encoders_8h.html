@@ -60,7 +60,7 @@ $(function() {
 </dd></dl>
 <h2><a class="anchor" id="autotoc_md0"></a>
 Overview</h2>
-<p>The GS1 Barcode Encoder Library support the generation of GS1 barcode symbols.</p>
+<p>The GS1 Barcode Encoder Library provides routines to generate GS1 barcode symbols and to process GS1 data.</p>
 <p>The supported symbologies are:</p>
 <ul>
 <li>GS1 DataBar family</li>
@@ -70,9 +70,11 @@ Overview</h2>
 <li>Data Matrix</li>
 <li>QR Code</li>
 </ul>
-<p>The barcode input data can either be received from a string buffer or read from a file in either plain or GS1 Application Identifier syntax. The barcode symbols can either be written to a BMP or TIFF file, or accessed by a buffer in the aforementioned graphical formats, a raw bitmap matrix format or as an array of strings.</p>
-<p>A typical programming workflow is to write the generated barcode image directly to a file:</p>
-<div class="fragment"><div class="line"><a class="code" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx = <a class="code" href="gs1encoders_8h.html#a6e10980e07a7e70d81592243171e9cff">gs1_encoder_init</a>(NULL);           <span class="comment">// Create a new instance of the library</span></div>
+<p>The barcode input data can either be received from a string buffer or read from a file as either a raw barcode message or in human-friendly GS1 Application Identifier syntax. The barcode symbols be written to a BMP or TIFF file, or accessed by a buffer in either graphical format or as an array of strings.</p>
+<p>This example use of the library low is to write the generated barcode image directly to a file:</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#import &quot;<a class="code" href="gs1encoders_8h.html">gs1encoders.h</a>&quot;</span></div>
+<div class="line"> </div>
+<div class="line"><a class="code" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx = <a class="code" href="gs1encoders_8h.html#a6e10980e07a7e70d81592243171e9cff">gs1_encoder_init</a>(NULL);           <span class="comment">// Create a new instance of the library</span></div>
 <div class="line"><a class="code" href="gs1encoders_8h.html#a1d385f9b4244e6b88e855da230246e01">gs1_encoder_setFormat</a>(ctx, <a class="code" href="gs1encoders_8h.html#a12f58149bb2cdab504621ba5b390ef64a8e5e88196a4041bc8e95ec27965b60e4">gs1_encoder_dBMP</a>);        <span class="comment">// Select BMP output</span></div>
 <div class="line"><a class="code" href="gs1encoders_8h.html#a65d8546a9ec715462c424c35dbe910d8">gs1_encoder_setOutFile</a>(ctx, <span class="stringliteral">&quot;out.bmp&quot;</span>);              <span class="comment">// Select output to a file</span></div>
 <div class="line"><a class="code" href="gs1encoders_8h.html#a4c6e9e761ef9d0be70222b5b15767d7f">gs1_encoder_setSym</a>(ctx, <a class="code" href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8ae133b476dcbc3d56579df62d6a08ba6d">gs1_encoder_sDM</a>);            <span class="comment">// Choose the Data Matrix symbology</span></div>
@@ -80,8 +82,10 @@ Overview</h2>
 <div class="line">       <span class="stringliteral">&quot;(01)12345678901231(10)ABC123(11)210630&quot;</span>);</div>
 <div class="line"><a class="code" href="gs1encoders_8h.html#ae3ec8ae78be621eab641b03b560eccfc">gs1_encoder_encode</a>(ctx);                             <span class="comment">// Generate the image, writing the file</span></div>
 <div class="line"><a class="code" href="gs1encoders_8h.html#a0078a51318ba3551052c309fe48110ae">gs1_encoder_free</a>(ctx);                               <span class="comment">// Release the instance of the library</span></div>
-</div><!-- fragment --><p>Another is to capture the output as a set of strings:</p>
-<div class="fragment"><div class="line"><a class="code" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx = <a class="code" href="gs1encoders_8h.html#a6e10980e07a7e70d81592243171e9cff">gs1_encoder_init</a>(NULL);           <span class="comment">// Create a new instance of the library</span></div>
+</div><!-- fragment --><p>Another is to capture the graphical output into a buffer or extract the image as a set of strings that can be processed by the application:</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#import &quot;<a class="code" href="gs1encoders_8h.html">gs1encoders.h</a>&quot;</span></div>
+<div class="line"> </div>
+<div class="line"><a class="code" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx = <a class="code" href="gs1encoders_8h.html#a6e10980e07a7e70d81592243171e9cff">gs1_encoder_init</a>(NULL);           <span class="comment">// Create a new instance of the library</span></div>
 <div class="line"><a class="code" href="gs1encoders_8h.html#a1d385f9b4244e6b88e855da230246e01">gs1_encoder_setFormat</a>(ctx, <a class="code" href="gs1encoders_8h.html#a12f58149bb2cdab504621ba5b390ef64a8b3eb847583daabfc11b8622736656ed">gs1_encoder_dRAW</a>);        <span class="comment">// Select RAW output (no graphical header)</span></div>
 <div class="line"><a class="code" href="gs1encoders_8h.html#a65d8546a9ec715462c424c35dbe910d8">gs1_encoder_setOutFile</a>(ctx, <span class="stringliteral">&quot;&quot;</span>);                     <span class="comment">// Select output to a buffer</span></div>
 <div class="line"><a class="code" href="gs1encoders_8h.html#a4c6e9e761ef9d0be70222b5b15767d7f">gs1_encoder_setSym</a>(ctx, <a class="code" href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8a05cad5357f37d39d1a9b10db759fb4a2">gs1_encoder_sEAN13</a>;          <span class="comment">// Choose the EAN-13 symbology</span></div>
@@ -89,8 +93,10 @@ Overview</h2>
 <div class="line"><a class="code" href="gs1encoders_8h.html#ae3ec8ae78be621eab641b03b560eccfc">gs1_encoder_encode</a>(ctx);                             <span class="comment">// Generate the image, writing the buffer</span></div>
 <div class="line">size = <a class="code" href="gs1encoders_8h.html#a3b0f42977b787a19c8526037d6f9a4df">gs1_encoder_getBuffer</a>(ctx, buffer);           <span class="comment">// Read from the buffer</span></div>
 <div class="line">rows = <a class="code" href="gs1encoders_8h.html#afaa932adfe73b0b5b33f89c03be8a441">gs1_encoder_getBufferStrings</a>(ctx, strings);   <span class="comment">// Alternatively convert buffer to an array of strings</span></div>
-<div class="line"><a class="code" href="gs1encoders_8h.html#a0078a51318ba3551052c309fe48110ae">gs1_encoder_free</a>(ctx);                               <span class="comment">// Release the instance of the library</span></div>
-</div><!-- fragment --> </div><table class="memberdecls">
+<div class="line">...</div>
+<div class="line">gs1_encoder_free(ctx);                               <span class="comment">// Release the instance of the library</span></div>
+</div><!-- fragment --><p>Most of the setter and action functions of this library return a boolean indicating whether the function was successful and write an error message that can be accessed with <a class="el" href="gs1encoders_8h.html#aee9e7c8b49fe2a8fa7bd0b21c1e7510b" title="Read an error message generated by the library.">gs1_encoder_getErrMsg()</a> in the event of failure. The example code above should be extended to check the return status of each function when used in production code. </p>
+</div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
 <tr class="memitem:a34f786d8479759fd8894c6d22a9f5c34"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a></td></tr>
@@ -101,21 +107,21 @@ Typedefs</h2></td></tr>
 Enumerations</h2></td></tr>
 <tr class="memitem:a190f26971a88a11a2faed3182a9157c8"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8">symbologies</a> { <br />
 &#160;&#160;<a class="el" href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8a5df1931a2be629e0cba82a5ac392e18d">gs1_encoder_sNONE</a> = -1, 
-<a class="el" href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8aabc66577291b085511fe183f5ea349cc">gs1_encoder_sRSS14</a>, 
-<a class="el" href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8a9a6a02f5733b88379f69de9a95afd033">gs1_encoder_sRSS14T</a>, 
-<a class="el" href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8ad12cea65a704c4028aa49e32a1d4592c">gs1_encoder_sRSS14S</a>, 
+<a class="el" href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8a18aef6a5b8d04d5222d6495b9156685b">gs1_encoder_sDataBarOmni</a>, 
+<a class="el" href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8a014910ca17a30e70183b9d1e3fcc490a">gs1_encoder_sDataBarTruncated</a>, 
+<a class="el" href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8a3125c0fefeefc444f0e158f74add53db">gs1_encoder_sDataBarStacked</a>, 
 <br />
-&#160;&#160;<a class="el" href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8a9a9ff489f735eda7854d62926f2b367c">gs1_encoder_sRSS14SO</a>, 
-<a class="el" href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8a8a250926a636c023d946a5f22f04d337">gs1_encoder_sRSSLIM</a>, 
-<a class="el" href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8a6a5f673887229c90410659cd1bec3036">gs1_encoder_sRSSEXP</a>, 
+&#160;&#160;<a class="el" href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8a5e00ff4a90615fca1dde472eb847fe4b">gs1_encoder_sDataBarStackedOmni</a>, 
+<a class="el" href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8a94a6d06a4195f0bd7bf5975d27ab8070">gs1_encoder_sDataBarLimited</a>, 
+<a class="el" href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8acf7f816a924a4e9d0dd8d4d39f709847">gs1_encoder_sDataBarExpanded</a>, 
 <a class="el" href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8a3e2e190205c38c82a0f384c361dc227f">gs1_encoder_sUPCA</a>, 
 <br />
 &#160;&#160;<a class="el" href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8adedd4d65ff3420f9e56c9c7edd177d92">gs1_encoder_sUPCE</a>, 
 <a class="el" href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8a05cad5357f37d39d1a9b10db759fb4a2">gs1_encoder_sEAN13</a>, 
 <a class="el" href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8ac582b7f1d7e748f14b98a40a9610ae44">gs1_encoder_sEAN8</a>, 
-<a class="el" href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8a56f14f2ed9db49a4035e3a99829428d7">gs1_encoder_sUCC128_CCA</a>, 
+<a class="el" href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8a7a6e74c2cad48bb27a00a067947a1c8d">gs1_encoder_sGS1_128_CCA</a>, 
 <br />
-&#160;&#160;<a class="el" href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8ac8f6c397f9b01d0ed2320047666d8c6e">gs1_encoder_sUCC128_CCC</a>, 
+&#160;&#160;<a class="el" href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8a9d95e648588c4e2cab744a969e9cc049">gs1_encoder_sGS1_128_CCC</a>, 
 <a class="el" href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8a2ff3d6b47e141e82f74795d9834560c3">gs1_encoder_sQR</a>, 
 <a class="el" href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8ae133b476dcbc3d56579df62d6a08ba6d">gs1_encoder_sDM</a>, 
 <a class="el" href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8a89eba163f359c68083143631f5164255">gs1_encoder_sNUMSYMS</a>
@@ -146,15 +152,15 @@ Functions</h2></td></tr>
 <tr class="memitem:ab7a51ceb3ac2fc7d2a99101e9fee0906"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#ab7a51ceb3ac2fc7d2a99101e9fee0906">gs1_encoder_getMaxFilenameLength</a> (void)</td></tr>
 <tr class="memdesc:ab7a51ceb3ac2fc7d2a99101e9fee0906"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the maximum filename length that can be used for input and output.  <a href="gs1encoders_8h.html#ab7a51ceb3ac2fc7d2a99101e9fee0906">More...</a><br /></td></tr>
 <tr class="separator:ab7a51ceb3ac2fc7d2a99101e9fee0906"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a695bd64a793090c213133b79dd9ca7de"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#a695bd64a793090c213133b79dd9ca7de">gs1_encoder_getMaxInputBuffer</a> (void)</td></tr>
-<tr class="memdesc:a695bd64a793090c213133b79dd9ca7de"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the maximum size of the input data buffer for barcode message content.  <a href="gs1encoders_8h.html#a695bd64a793090c213133b79dd9ca7de">More...</a><br /></td></tr>
-<tr class="separator:a695bd64a793090c213133b79dd9ca7de"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa24d43ed449f07eae209f974686b195c"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#aa24d43ed449f07eae209f974686b195c">gs1_encoder_getMaxDataStrLength</a> (void)</td></tr>
+<tr class="memdesc:aa24d43ed449f07eae209f974686b195c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the maximum size of the input data buffer for barcode message content.  <a href="gs1encoders_8h.html#aa24d43ed449f07eae209f974686b195c">More...</a><br /></td></tr>
+<tr class="separator:aa24d43ed449f07eae209f974686b195c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5bfa45afeb7501157a72604ba4611279"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#a5bfa45afeb7501157a72604ba4611279">gs1_encoder_getMaxPixMult</a> (void)</td></tr>
 <tr class="memdesc:a5bfa45afeb7501157a72604ba4611279"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the maximum X-dimension in pixels.  <a href="gs1encoders_8h.html#a5bfa45afeb7501157a72604ba4611279">More...</a><br /></td></tr>
 <tr class="separator:a5bfa45afeb7501157a72604ba4611279"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2c44d5445a9e07db7a0586c7d4942f14"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#a2c44d5445a9e07db7a0586c7d4942f14">gs1_encoder_getMaxUcc128LinHeight</a> (void)</td></tr>
-<tr class="memdesc:a2c44d5445a9e07db7a0586c7d4942f14"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the maximum height of GS1-128 linear symbols in modules.  <a href="gs1encoders_8h.html#a2c44d5445a9e07db7a0586c7d4942f14">More...</a><br /></td></tr>
-<tr class="separator:a2c44d5445a9e07db7a0586c7d4942f14"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac3020cfeb55158f3fafffc4ccef84eea"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#ac3020cfeb55158f3fafffc4ccef84eea">gs1_encoder_getMaxGS1_128LinearHeight</a> (void)</td></tr>
+<tr class="memdesc:ac3020cfeb55158f3fafffc4ccef84eea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the maximum height of GS1-128 linear symbols in modules.  <a href="gs1encoders_8h.html#ac3020cfeb55158f3fafffc4ccef84eea">More...</a><br /></td></tr>
+<tr class="separator:ac3020cfeb55158f3fafffc4ccef84eea"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6e10980e07a7e70d81592243171e9cff"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API <a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#a6e10980e07a7e70d81592243171e9cff">gs1_encoder_init</a> (void *mem)</td></tr>
 <tr class="memdesc:a6e10980e07a7e70d81592243171e9cff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise a new <a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34" title="A gs1_encoder context.">gs1_encoder</a> context.  <a href="gs1encoders_8h.html#a6e10980e07a7e70d81592243171e9cff">More...</a><br /></td></tr>
 <tr class="separator:a6e10980e07a7e70d81592243171e9cff"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -191,18 +197,18 @@ Functions</h2></td></tr>
 <tr class="memitem:ab83a2fb13a88cfb0e7f4d5080707664b"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#ab83a2fb13a88cfb0e7f4d5080707664b">gs1_encoder_setSepHt</a> (<a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx, int sepHt)</td></tr>
 <tr class="memdesc:ab83a2fb13a88cfb0e7f4d5080707664b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the separator height between linear and 2D components.  <a href="gs1encoders_8h.html#ab83a2fb13a88cfb0e7f4d5080707664b">More...</a><br /></td></tr>
 <tr class="separator:ab83a2fb13a88cfb0e7f4d5080707664b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4cc8dd3402b96242b45492d264fe4a99"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#a4cc8dd3402b96242b45492d264fe4a99">gs1_encoder_getRssExpSegWidth</a> (<a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx)</td></tr>
-<tr class="memdesc:a4cc8dd3402b96242b45492d264fe4a99"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current number of segments per row for GS1 DataBar Expanded Stacked symbols.  <a href="gs1encoders_8h.html#a4cc8dd3402b96242b45492d264fe4a99">More...</a><br /></td></tr>
-<tr class="separator:a4cc8dd3402b96242b45492d264fe4a99"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa9271f17353230c60a63e745fdcd3b33"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#aa9271f17353230c60a63e745fdcd3b33">gs1_encoder_setRssExpSegWidth</a> (<a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx, int rssExpSegWidth)</td></tr>
-<tr class="memdesc:aa9271f17353230c60a63e745fdcd3b33"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the number of segments per row for GS1 DataBar Expanded Stacked symbols.  <a href="gs1encoders_8h.html#aa9271f17353230c60a63e745fdcd3b33">More...</a><br /></td></tr>
-<tr class="separator:aa9271f17353230c60a63e745fdcd3b33"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a98ec3ef7dacc0cc936c41b44482e2922"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#a98ec3ef7dacc0cc936c41b44482e2922">gs1_encoder_getUcc128LinHeight</a> (<a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx)</td></tr>
-<tr class="memdesc:a98ec3ef7dacc0cc936c41b44482e2922"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the height of GS1-128 linear symbols in modules.  <a href="gs1encoders_8h.html#a98ec3ef7dacc0cc936c41b44482e2922">More...</a><br /></td></tr>
-<tr class="separator:a98ec3ef7dacc0cc936c41b44482e2922"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad1b706ee653185152245a3992e0c3a46"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#ad1b706ee653185152245a3992e0c3a46">gs1_encoder_setUcc128LinHeight</a> (<a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx, int ucc128linHeight)</td></tr>
-<tr class="memdesc:ad1b706ee653185152245a3992e0c3a46"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the height of GS1-128 linear symbols in modules.  <a href="gs1encoders_8h.html#ad1b706ee653185152245a3992e0c3a46">More...</a><br /></td></tr>
-<tr class="separator:ad1b706ee653185152245a3992e0c3a46"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a626e39e506b7a2344fc2b24b4cfd3df9"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#a626e39e506b7a2344fc2b24b4cfd3df9">gs1_encoder_getDataBarExpandedSegmentsWidth</a> (<a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx)</td></tr>
+<tr class="memdesc:a626e39e506b7a2344fc2b24b4cfd3df9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current number of segments per row for GS1 DataBar Expanded Stacked symbols.  <a href="gs1encoders_8h.html#a626e39e506b7a2344fc2b24b4cfd3df9">More...</a><br /></td></tr>
+<tr class="separator:a626e39e506b7a2344fc2b24b4cfd3df9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aacdd7a8af8aac8806fce536b13190a63"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#aacdd7a8af8aac8806fce536b13190a63">gs1_encoder_setDataBarExpandedSegmentsWidth</a> (<a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx, int dataBarExpandedSegmentsWidth)</td></tr>
+<tr class="memdesc:aacdd7a8af8aac8806fce536b13190a63"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the number of segments per row for GS1 DataBar Expanded Stacked symbols.  <a href="gs1encoders_8h.html#aacdd7a8af8aac8806fce536b13190a63">More...</a><br /></td></tr>
+<tr class="separator:aacdd7a8af8aac8806fce536b13190a63"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab221c1bdda1bcbad7ab81abc90871418"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#ab221c1bdda1bcbad7ab81abc90871418">gs1_encoder_getGS1_128LinearHeight</a> (<a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx)</td></tr>
+<tr class="memdesc:ab221c1bdda1bcbad7ab81abc90871418"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the height of GS1-128 linear symbols in modules.  <a href="gs1encoders_8h.html#ab221c1bdda1bcbad7ab81abc90871418">More...</a><br /></td></tr>
+<tr class="separator:ab221c1bdda1bcbad7ab81abc90871418"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa03e031f96b703b62b565414a5d64833"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#aa03e031f96b703b62b565414a5d64833">gs1_encoder_setGS1_128LinearHeight</a> (<a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx, int gs1_128LinearHeight)</td></tr>
+<tr class="memdesc:aa03e031f96b703b62b565414a5d64833"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the height of GS1-128 linear symbols in modules.  <a href="gs1encoders_8h.html#aa03e031f96b703b62b565414a5d64833">More...</a><br /></td></tr>
+<tr class="separator:aa03e031f96b703b62b565414a5d64833"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af9cc3e5dec885cc55aeede3d4163256c"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#af9cc3e5dec885cc55aeede3d4163256c">gs1_encoder_getDmRows</a> (<a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx)</td></tr>
 <tr class="memdesc:af9cc3e5dec885cc55aeede3d4163256c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current fixed number of rows for Data Matrix symbols.  <a href="gs1encoders_8h.html#af9cc3e5dec885cc55aeede3d4163256c">More...</a><br /></td></tr>
 <tr class="separator:af9cc3e5dec885cc55aeede3d4163256c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -240,7 +246,7 @@ Functions</h2></td></tr>
 <tr class="memdesc:a114c44586db6c7c481edcacccde763ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Selects between a file and buffer for barcode data input. symbols.  <a href="gs1encoders_8h.html#a114c44586db6c7c481edcacccde763ff">More...</a><br /></td></tr>
 <tr class="separator:a114c44586db6c7c481edcacccde763ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6ab16e68827bb7adc811e8e5ec6cc369"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#a6ab16e68827bb7adc811e8e5ec6cc369">gs1_encoder_getDataStr</a> (<a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx)</td></tr>
-<tr class="memdesc:a6ab16e68827bb7adc811e8e5ec6cc369"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads the data from the barcode data buffer.  <a href="gs1encoders_8h.html#a6ab16e68827bb7adc811e8e5ec6cc369">More...</a><br /></td></tr>
+<tr class="memdesc:a6ab16e68827bb7adc811e8e5ec6cc369"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads the barcode data buffer.  <a href="gs1encoders_8h.html#a6ab16e68827bb7adc811e8e5ec6cc369">More...</a><br /></td></tr>
 <tr class="separator:a6ab16e68827bb7adc811e8e5ec6cc369"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad0e7c44b083e541810cb58eeef3028c6"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#ad0e7c44b083e541810cb58eeef3028c6">gs1_encoder_setDataStr</a> (<a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx, char *dataStr)</td></tr>
 <tr class="memdesc:ad0e7c44b083e541810cb58eeef3028c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the raw data in the buffer that is used when buffer input is selected.  <a href="gs1encoders_8h.html#ad0e7c44b083e541810cb58eeef3028c6">More...</a><br /></td></tr>
@@ -299,10 +305,10 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>A gs1_encoder context. </p>
-<p>This is an opaque struct that represents an encoder context.</p>
-<p>A context is an "instance" of the library and maintains all state required for that instance. Any number of instances of the library can be created, each operating seperately and equivalently to all others.</p>
+<p>This is an opaque struct that represents an instance of the library.</p>
+<p>This context maintains all state required for an instance. Any number of instances of the library can be created, each operating seperately and equivalently to the others.</p>
 <p>This library does not introduce any global variables. All runtime state is maintained in instances of the <a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34" title="A gs1_encoder context.">gs1_encoder</a> struct and this state should only be modified using the public API functions provided by this library, decorated with GS1_ENCODERS_API.</p>
-<p>A context is created by calling <a class="el" href="gs1encoders_8h.html#a6e10980e07a7e70d81592243171e9cff" title="Initialise a new gs1_encoder context.">gs1_encoder_init()</a> and destroyed by calling <a class="el" href="gs1encoders_8h.html#a0078a51318ba3551052c309fe48110ae" title="Destroy a gs1_encoder instance.">gs1_encoder_free()</a>.</p>
+<p>A context is created by calling <a class="el" href="gs1encoders_8h.html#a6e10980e07a7e70d81592243171e9cff" title="Initialise a new gs1_encoder context.">gs1_encoder_init()</a> and destroyed by calling <a class="el" href="gs1encoders_8h.html#a0078a51318ba3551052c309fe48110ae" title="Destroy a gs1_encoder instance.">gs1_encoder_free()</a>, releasing all of the storage allocated by the library for that instance.</p>
 <dl class="section note"><dt>Note</dt><dd>This struct is deliberately opaque and it's layout should be assumed to vary between releases of the library and even between builds created with different options.</dd>
 <dd>
 The library is thread-safe provided that each thread operates on its own instance of the library. </dd></dl>
@@ -374,17 +380,17 @@ The library is thread-safe provided that each thread operates on its own instanc
 <table class="fieldtable">
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a190f26971a88a11a2faed3182a9157c8a5df1931a2be629e0cba82a5ac392e18d"></a>gs1_encoder_sNONE&#160;</td><td class="fielddoc"><p>None defined. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a190f26971a88a11a2faed3182a9157c8aabc66577291b085511fe183f5ea349cc"></a>gs1_encoder_sRSS14&#160;</td><td class="fielddoc"><p>GS1 DataBar Omnidirectional. </p>
+<tr><td class="fieldname"><a id="a190f26971a88a11a2faed3182a9157c8a18aef6a5b8d04d5222d6495b9156685b"></a>gs1_encoder_sDataBarOmni&#160;</td><td class="fielddoc"><p>GS1 DataBar Omnidirectional. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a190f26971a88a11a2faed3182a9157c8a9a6a02f5733b88379f69de9a95afd033"></a>gs1_encoder_sRSS14T&#160;</td><td class="fielddoc"><p>GS1 DataBar Truncated. </p>
+<tr><td class="fieldname"><a id="a190f26971a88a11a2faed3182a9157c8a014910ca17a30e70183b9d1e3fcc490a"></a>gs1_encoder_sDataBarTruncated&#160;</td><td class="fielddoc"><p>GS1 DataBar Truncated. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a190f26971a88a11a2faed3182a9157c8ad12cea65a704c4028aa49e32a1d4592c"></a>gs1_encoder_sRSS14S&#160;</td><td class="fielddoc"><p>GS1 DataBar Stacked. </p>
+<tr><td class="fieldname"><a id="a190f26971a88a11a2faed3182a9157c8a3125c0fefeefc444f0e158f74add53db"></a>gs1_encoder_sDataBarStacked&#160;</td><td class="fielddoc"><p>GS1 DataBar Stacked. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a190f26971a88a11a2faed3182a9157c8a9a9ff489f735eda7854d62926f2b367c"></a>gs1_encoder_sRSS14SO&#160;</td><td class="fielddoc"><p>GS1 DataBar Stacked Omnidirectional. </p>
+<tr><td class="fieldname"><a id="a190f26971a88a11a2faed3182a9157c8a5e00ff4a90615fca1dde472eb847fe4b"></a>gs1_encoder_sDataBarStackedOmni&#160;</td><td class="fielddoc"><p>GS1 DataBar Stacked Omnidirectional. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a190f26971a88a11a2faed3182a9157c8a8a250926a636c023d946a5f22f04d337"></a>gs1_encoder_sRSSLIM&#160;</td><td class="fielddoc"><p>GS1 DataBar Limited. </p>
+<tr><td class="fieldname"><a id="a190f26971a88a11a2faed3182a9157c8a94a6d06a4195f0bd7bf5975d27ab8070"></a>gs1_encoder_sDataBarLimited&#160;</td><td class="fielddoc"><p>GS1 DataBar Limited. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a190f26971a88a11a2faed3182a9157c8a6a5f673887229c90410659cd1bec3036"></a>gs1_encoder_sRSSEXP&#160;</td><td class="fielddoc"><p>GS1 DataBar Expanded (Stacked) </p>
+<tr><td class="fieldname"><a id="a190f26971a88a11a2faed3182a9157c8acf7f816a924a4e9d0dd8d4d39f709847"></a>gs1_encoder_sDataBarExpanded&#160;</td><td class="fielddoc"><p>GS1 DataBar Expanded (Stacked) </p>
 </td></tr>
 <tr><td class="fieldname"><a id="a190f26971a88a11a2faed3182a9157c8a3e2e190205c38c82a0f384c361dc227f"></a>gs1_encoder_sUPCA&#160;</td><td class="fielddoc"><p>UPC-A. </p>
 </td></tr>
@@ -394,9 +400,9 @@ The library is thread-safe provided that each thread operates on its own instanc
 </td></tr>
 <tr><td class="fieldname"><a id="a190f26971a88a11a2faed3182a9157c8ac582b7f1d7e748f14b98a40a9610ae44"></a>gs1_encoder_sEAN8&#160;</td><td class="fielddoc"><p>EAN-8. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a190f26971a88a11a2faed3182a9157c8a56f14f2ed9db49a4035e3a99829428d7"></a>gs1_encoder_sUCC128_CCA&#160;</td><td class="fielddoc"><p>GS1-128 with CC-A or CC-B. </p>
+<tr><td class="fieldname"><a id="a190f26971a88a11a2faed3182a9157c8a7a6e74c2cad48bb27a00a067947a1c8d"></a>gs1_encoder_sGS1_128_CCA&#160;</td><td class="fielddoc"><p>GS1-128 with CC-A or CC-B. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a190f26971a88a11a2faed3182a9157c8ac8f6c397f9b01d0ed2320047666d8c6e"></a>gs1_encoder_sUCC128_CCC&#160;</td><td class="fielddoc"><p>GS1-128 with CC-C. </p>
+<tr><td class="fieldname"><a id="a190f26971a88a11a2faed3182a9157c8a9d95e648588c4e2cab744a969e9cc049"></a>gs1_encoder_sGS1_128_CCC&#160;</td><td class="fielddoc"><p>GS1-128 with CC-C. </p>
 </td></tr>
 <tr><td class="fieldname"><a id="a190f26971a88a11a2faed3182a9157c8a2ff3d6b47e141e82f74795d9834560c3"></a>gs1_encoder_sQR&#160;</td><td class="fielddoc"><p>(GS1) QR Code </p>
 </td></tr>
@@ -636,7 +642,7 @@ The library is thread-safe provided that each thread operates on its own instanc
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in,out]</td><td class="paramname">ctx</td><td><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34" title="A gs1_encoder context.">gs1_encoder</a> context </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">strings</td><td>pointer to an array of strings </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">strings</td><td>the value of the given pointer is rewritten to point to an array of strings </td></tr>
   </table>
   </dd>
 </dl>
@@ -674,6 +680,34 @@ The library is thread-safe provided that each thread operates on its own instanc
 
 </div>
 </div>
+<a id="a626e39e506b7a2344fc2b24b4cfd3df9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a626e39e506b7a2344fc2b24b4cfd3df9">&#9670;&nbsp;</a></span>gs1_encoder_getDataBarExpandedSegmentsWidth()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">GS1_ENCODERS_API int gs1_encoder_getDataBarExpandedSegmentsWidth </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *&#160;</td>
+          <td class="paramname"><em>ctx</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the current number of segments per row for GS1 DataBar Expanded Stacked symbols. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#aacdd7a8af8aac8806fce536b13190a63" title="Set the number of segments per row for GS1 DataBar Expanded Stacked symbols.">gs1_encoder_setDataBarExpandedSegmentsWidth()</a></dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">ctx</td><td><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34" title="A gs1_encoder context.">gs1_encoder</a> context </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>current segments per row </dd></dl>
+
+</div>
+</div>
 <a id="aa3fa271108eb2ddd88b8765dabd484af"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa3fa271108eb2ddd88b8765dabd484af">&#9670;&nbsp;</a></span>gs1_encoder_getDataFile()</h2>
 
@@ -691,6 +725,7 @@ The library is thread-safe provided that each thread operates on its own instanc
 </div><div class="memdoc">
 
 <p>Gets the filename for a file containing the barcode data when file input is selected. </p>
+<dl class="section note"><dt>Note</dt><dd>The returned pointer does not need to be free()ed.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#aa349b994ab49cfee11faf647fd052cf8" title="Sets the filename for a file from which barcode data is read when file input is selected.">gs1_encoder_setDataFile()</a> </dd>
 <dd>
 <a class="el" href="gs1encoders_8h.html#a114c44586db6c7c481edcacccde763ff" title="Selects between a file and buffer for barcode data input. symbols.">gs1_encoder_setFileInputFlag()</a></dd></dl>
@@ -720,8 +755,9 @@ The library is thread-safe provided that each thread operates on its own instanc
       </table>
 </div><div class="memdoc">
 
-<p>Reads the data from the barcode data buffer. </p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#a6ab16e68827bb7adc811e8e5ec6cc369" title="Reads the data from the barcode data buffer.">gs1_encoder_getDataStr()</a> </dd>
+<p>Reads the barcode data buffer. </p>
+<dl class="section note"><dt>Note</dt><dd>The returned pointer does not need to be free()ed.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#a6ab16e68827bb7adc811e8e5ec6cc369" title="Reads the barcode data buffer.">gs1_encoder_getDataStr()</a> </dd>
 <dd>
 <a class="el" href="gs1encoders_8h.html#a114c44586db6c7c481edcacccde763ff" title="Selects between a file and buffer for barcode data input. symbols.">gs1_encoder_setFileInputFlag()</a></dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -807,7 +843,8 @@ The library is thread-safe provided that each thread operates on its own instanc
 </div><div class="memdoc">
 
 <p>Read an error message generated by the library. </p>
-<p>When any of the setter functions of this library or <a class="el" href="gs1encoders_8h.html#ae3ec8ae78be621eab641b03b560eccfc" title="Generate a barcode symbol representing the given input data.">gs1_encoder_encode()</a> returns false to indicate an error, a human-friendly error message is generated which can be read using this function.</p>
+<p>When any of the setter functions of this library or <a class="el" href="gs1encoders_8h.html#ae3ec8ae78be621eab641b03b560eccfc" title="Generate a barcode symbol representing the given input data.">gs1_encoder_encode()</a> returns false (indicating an error), a human-friendly error message is generated which can be read using this function.</p>
+<dl class="section note"><dt>Note</dt><dd>The pointer does not need to be free()ed.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in,out]</td><td class="paramname">ctx</td><td><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34" title="A gs1_encoder context.">gs1_encoder</a> context </td></tr>
@@ -874,6 +911,58 @@ The library is thread-safe provided that each thread operates on its own instanc
 
 </div>
 </div>
+<a id="ab221c1bdda1bcbad7ab81abc90871418"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab221c1bdda1bcbad7ab81abc90871418">&#9670;&nbsp;</a></span>gs1_encoder_getGS1_128LinearHeight()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">GS1_ENCODERS_API int gs1_encoder_getGS1_128LinearHeight </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *&#160;</td>
+          <td class="paramname"><em>ctx</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the height of GS1-128 linear symbols in modules. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#aa03e031f96b703b62b565414a5d64833" title="Set the height of GS1-128 linear symbols in modules.">gs1_encoder_setGS1_128LinearHeight</a></dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">ctx</td><td><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34" title="A gs1_encoder context.">gs1_encoder</a> context </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>current linear symbol height in modules </dd></dl>
+
+</div>
+</div>
+<a id="aa24d43ed449f07eae209f974686b195c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa24d43ed449f07eae209f974686b195c">&#9670;&nbsp;</a></span>gs1_encoder_getMaxDataStrLength()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">GS1_ENCODERS_API int gs1_encoder_getMaxDataStrLength </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the maximum size of the input data buffer for barcode message content. </p>
+<p>This is an implementation limit that may be lowered for systems with limited memory by rebuilding the library.</p>
+<dl class="section note"><dt>Note</dt><dd>Each barcode symbology has its own data capacity that may be somewhat less than this maximum size.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#ad0e7c44b083e541810cb58eeef3028c6" title="Sets the raw data in the buffer that is used when buffer input is selected.">gs1_encoder_setDataStr()</a></dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>maximum number bytes that can be supplied for encoding </dd></dl>
+
+</div>
+</div>
 <a id="ab7a51ceb3ac2fc7d2a99101e9fee0906"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ab7a51ceb3ac2fc7d2a99101e9fee0906">&#9670;&nbsp;</a></span>gs1_encoder_getMaxFilenameLength()</h2>
 
@@ -897,14 +986,14 @@ The library is thread-safe provided that each thread operates on its own instanc
 
 </div>
 </div>
-<a id="a695bd64a793090c213133b79dd9ca7de"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a695bd64a793090c213133b79dd9ca7de">&#9670;&nbsp;</a></span>gs1_encoder_getMaxInputBuffer()</h2>
+<a id="ac3020cfeb55158f3fafffc4ccef84eea"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac3020cfeb55158f3fafffc4ccef84eea">&#9670;&nbsp;</a></span>gs1_encoder_getMaxGS1_128LinearHeight()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">GS1_ENCODERS_API int gs1_encoder_getMaxInputBuffer </td>
+          <td class="memname">GS1_ENCODERS_API int gs1_encoder_getMaxGS1_128LinearHeight </td>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
@@ -913,11 +1002,9 @@ The library is thread-safe provided that each thread operates on its own instanc
       </table>
 </div><div class="memdoc">
 
-<p>Get the maximum size of the input data buffer for barcode message content. </p>
+<p>Get the maximum height of GS1-128 linear symbols in modules. </p>
 <p>This is an implementation limit that may be lowered for systems with limited memory by rebuilding the library.</p>
-<dl class="section note"><dt>Note</dt><dd>Each barcode symbology has its own data capacity that may be somewhat less than this maximum size.</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#ad0e7c44b083e541810cb58eeef3028c6" title="Sets the raw data in the buffer that is used when buffer input is selected.">gs1_encoder_setDataStr()</a></dd></dl>
-<dl class="section return"><dt>Returns</dt><dd>maximum number bytes that can be supplied for encoding </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>maximum GS1-128 height in modules </dd></dl>
 
 </div>
 </div>
@@ -946,28 +1033,6 @@ The library is thread-safe provided that each thread operates on its own instanc
 
 </div>
 </div>
-<a id="a2c44d5445a9e07db7a0586c7d4942f14"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2c44d5445a9e07db7a0586c7d4942f14">&#9670;&nbsp;</a></span>gs1_encoder_getMaxUcc128LinHeight()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">GS1_ENCODERS_API int gs1_encoder_getMaxUcc128LinHeight </td>
-          <td>(</td>
-          <td class="paramtype">void&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Get the maximum height of GS1-128 linear symbols in modules. </p>
-<p>This is an implementation limit that may be lowered for systems with limited memory by rebuilding the library.</p>
-<dl class="section return"><dt>Returns</dt><dd>maximum GS1-128 height in modules </dd></dl>
-
-</div>
-</div>
 <a id="ad485620a6bcbf9a4fdbf87180edfbf8a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ad485620a6bcbf9a4fdbf87180edfbf8a">&#9670;&nbsp;</a></span>gs1_encoder_getOutFile()</h2>
 
@@ -985,6 +1050,7 @@ The library is thread-safe provided that each thread operates on its own instanc
 </div><div class="memdoc">
 
 <p>Get the current output filename. </p>
+<dl class="section note"><dt>Note</dt><dd>The returned pointer does not need to be free()ed.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#a65d8546a9ec715462c424c35dbe910d8" title="Set the output file for the barcode symbol.">gs1_encoder_setOutFile()</a></dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -1082,34 +1148,6 @@ The library is thread-safe provided that each thread operates on its own instanc
 
 </div>
 </div>
-<a id="a4cc8dd3402b96242b45492d264fe4a99"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4cc8dd3402b96242b45492d264fe4a99">&#9670;&nbsp;</a></span>gs1_encoder_getRssExpSegWidth()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">GS1_ENCODERS_API int gs1_encoder_getRssExpSegWidth </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *&#160;</td>
-          <td class="paramname"><em>ctx</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Get the current number of segments per row for GS1 DataBar Expanded Stacked symbols. </p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#aa9271f17353230c60a63e745fdcd3b33" title="Set the number of segments per row for GS1 DataBar Expanded Stacked symbols.">gs1_encoder_setRssExpSegWidth()</a></dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">ctx</td><td><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34" title="A gs1_encoder context.">gs1_encoder</a> context </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>current segments per row </dd></dl>
-
-</div>
-</div>
 <a id="a1a20f915fbe83e690a9506f3d8901b67"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a1a20f915fbe83e690a9506f3d8901b67">&#9670;&nbsp;</a></span>gs1_encoder_getSepHt()</h2>
 
@@ -1163,34 +1201,6 @@ The library is thread-safe provided that each thread operates on its own instanc
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>symbology type, one of <a class="el" href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8" title="All of the major GS1 barcode formats (&quot;symbologies&quot;) are supported by this library.">symbologies</a> </dd></dl>
-
-</div>
-</div>
-<a id="a98ec3ef7dacc0cc936c41b44482e2922"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a98ec3ef7dacc0cc936c41b44482e2922">&#9670;&nbsp;</a></span>gs1_encoder_getUcc128LinHeight()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">GS1_ENCODERS_API int gs1_encoder_getUcc128LinHeight </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *&#160;</td>
-          <td class="paramname"><em>ctx</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Get the height of GS1-128 linear symbols in modules. </p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#ad1b706ee653185152245a3992e0c3a46" title="Set the height of GS1-128 linear symbols in modules.">gs1_encoder_setUcc128LinHeight</a></dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">ctx</td><td><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34" title="A gs1_encoder context.">gs1_encoder</a> context </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>current linear symbol height in modules </dd></dl>
 
 </div>
 </div>
@@ -1294,8 +1304,8 @@ The library is thread-safe provided that each thread operates on its own instanc
 </div><div class="memdoc">
 
 <p>Initialise a new <a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34" title="A gs1_encoder context.">gs1_encoder</a> context. </p>
-<p>If storage is provided then this will be used, however it is more typical to pass NULL in which case the library will malloc its own storage.</p>
-<p>Any storage buffer provided must be sufficient for the instance.</p>
+<p>If it expected that most users of the library will pass NULL to this function which causes the library will allocate its own storage.</p>
+<p>If a pointer to a storage buffer is provided then this will be used instead, however this buffer must be sufficient for the needs of the instance as returned by <a class="el" href="gs1encoders_8h.html#afd581bb226f56c149cc1f903cbd77ca5" title="Find the memory storage requirements for an instance of gs1_encoder.">gs1_encoder_instanceSize()</a> and this buffer should not be reused or freed until <a class="el" href="gs1encoders_8h.html#a0078a51318ba3551052c309fe48110ae" title="Destroy a gs1_encoder instance.">gs1_encoder_free()</a> is called.</p>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#afd581bb226f56c149cc1f903cbd77ca5" title="Find the memory storage requirements for an instance of gs1_encoder.">gs1_encoder_instanceSize()</a></dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -1324,16 +1334,19 @@ The library is thread-safe provided that each thread operates on its own instanc
 </div><div class="memdoc">
 
 <p>Find the memory storage requirements for an instance of <a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34" title="A gs1_encoder context.">gs1_encoder</a>. </p>
-<p>For embedded systems it may be desirable to provide a pre-allocated buffer to a new context for storage purposes, rather than have the instance malloc() it's own storage.</p>
-<p>This function provides the minimum size required for such a buffer.</p>
-<p>Example of allocating our own heap storage:</p>
+<p>For embedded systems it may be desirable to provide a pre-allocated buffer to a new context for storage purposes, rather than to have the instance malloc() it's own storage. This may avoid problems such as heap fragmentation on systems with a poor memory allocator or a restricted working set size.</p>
+<p>This function returns the minimum size required for such a buffer.</p>
+<p>Example of a user of the library allocating its own heap storage:</p>
 <div class="fragment"><div class="line"><a class="code" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx;</div>
 <div class="line"><span class="keywordtype">size_t</span> mem = <a class="code" href="gs1encoders_8h.html#afd581bb226f56c149cc1f903cbd77ca5">gs1_encoder_instanceSize</a>();</div>
 <div class="line"><span class="keywordtype">void</span> *heap = malloc(mem);</div>
 <div class="line">assert(heap);</div>
 <div class="line">ctx = <a class="code" href="gs1encoders_8h.html#a6e10980e07a7e70d81592243171e9cff">gs1_encoder_init</a>(heap);</div>
-</div><!-- fragment --><p>Example of using static storage:</p>
-<div class="fragment"><div class="line"><span class="keyword">static</span> uint8_t prealloc[65536];</div>
+<div class="line">...</div>
+<div class="line">gs1_encoder_free(ctx);</div>
+<div class="line">free(heap);</div>
+</div><!-- fragment --><p>Example of a user of the library using static storage allocated at compile time:</p>
+<div class="fragment"><div class="line"><span class="keyword">static</span> uint8_t prealloc[65536];  <span class="comment">// Ensure that this is big enough</span></div>
 <div class="line">...</div>
 <div class="line">void myFunc(<span class="keywordtype">void</span>) {</div>
 <div class="line">    <a class="code" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx;</div>
@@ -1383,6 +1396,47 @@ The library is thread-safe provided that each thread operates on its own instanc
   <table class="params">
     <tr><td class="paramdir">[in,out]</td><td class="paramname">ctx</td><td><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34" title="A gs1_encoder context.">gs1_encoder</a> context </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">addCheckDigit</td><td>enabled if true; disabled if false </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true on success, otherwise false and an error message is set </dd></dl>
+
+</div>
+</div>
+<a id="aacdd7a8af8aac8806fce536b13190a63"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aacdd7a8af8aac8806fce536b13190a63">&#9670;&nbsp;</a></span>gs1_encoder_setDataBarExpandedSegmentsWidth()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">GS1_ENCODERS_API bool gs1_encoder_setDataBarExpandedSegmentsWidth </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *&#160;</td>
+          <td class="paramname"><em>ctx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>dataBarExpandedSegmentsWidth</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set the number of segments per row for GS1 DataBar Expanded Stacked symbols. </p>
+<p>The default number of segments per row (22) matches the maximum number of symbol character for GS1 DataBar Expanded, resulting in a non-stacked symbol.</p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#a626e39e506b7a2344fc2b24b4cfd3df9" title="Get the current number of segments per row for GS1 DataBar Expanded Stacked symbols.">gs1_encoder_getDataBarExpandedSegmentsWidth()</a></dd></dl>
+<dl class="section note"><dt>Note</dt><dd>Valid values are even numbers from 2 to 22.</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">ctx</td><td><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34" title="A gs1_encoder context.">gs1_encoder</a> context </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">dataBarExpandedSegmentsWidth</td><td>segments per row </td></tr>
   </table>
   </dd>
 </dl>
@@ -1482,12 +1536,12 @@ The library is thread-safe provided that each thread operates on its own instanc
 <p>2D Component must be specified as GS1 AI syntax in raw form, with "#" = FNC1. It must be separated from the primary linear components with a "|" character, for example:</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#0112345678901231|#10ABC123#11210630</span></div>
 </div><!-- fragment --><p>Again, for GS1 data it is simpler and less error prone to specify the input in human-friendly GS1 AI syntax using <a class="el" href="gs1encoders_8h.html#a235492d4ca699a30469609f66e1f1fe9" title="Sets the data in the buffer that is used when buffer input is selected by parsing input provided in G...">gs1_encoder_setGS1dataStr()</a>.</p>
-<dl class="section note"><dt>Note</dt><dd>The length of the data must be less that the value returned by <a class="el" href="gs1encoders_8h.html#a695bd64a793090c213133b79dd9ca7de" title="Get the maximum size of the input data buffer for barcode message content.">gs1_encoder_getMaxInputBuffer()</a>.</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>The length of the data must be less that the value returned by <a class="el" href="gs1encoders_8h.html#aa24d43ed449f07eae209f974686b195c" title="Get the maximum size of the input data buffer for barcode message content.">gs1_encoder_getMaxDataStrLength()</a>.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#a235492d4ca699a30469609f66e1f1fe9" title="Sets the data in the buffer that is used when buffer input is selected by parsing input provided in G...">gs1_encoder_setGS1dataStr()</a> </dd>
 <dd>
-<a class="el" href="gs1encoders_8h.html#a695bd64a793090c213133b79dd9ca7de" title="Get the maximum size of the input data buffer for barcode message content.">gs1_encoder_getMaxInputBuffer()</a> </dd>
+<a class="el" href="gs1encoders_8h.html#aa24d43ed449f07eae209f974686b195c" title="Get the maximum size of the input data buffer for barcode message content.">gs1_encoder_getMaxDataStrLength()</a> </dd>
 <dd>
-<a class="el" href="gs1encoders_8h.html#a6ab16e68827bb7adc811e8e5ec6cc369" title="Reads the data from the barcode data buffer.">gs1_encoder_getDataStr()</a> </dd>
+<a class="el" href="gs1encoders_8h.html#a6ab16e68827bb7adc811e8e5ec6cc369" title="Reads the barcode data buffer.">gs1_encoder_getDataStr()</a> </dd>
 <dd>
 <a class="el" href="gs1encoders_8h.html#a114c44586db6c7c481edcacccde763ff" title="Selects between a file and buffer for barcode data input. symbols.">gs1_encoder_setFileInputFlag()</a></dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -1674,6 +1728,48 @@ The library is thread-safe provided that each thread operates on its own instanc
 
 </div>
 </div>
+<a id="aa03e031f96b703b62b565414a5d64833"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa03e031f96b703b62b565414a5d64833">&#9670;&nbsp;</a></span>gs1_encoder_setGS1_128LinearHeight()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">GS1_ENCODERS_API bool gs1_encoder_setGS1_128LinearHeight </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *&#160;</td>
+          <td class="paramname"><em>ctx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>gs1_128LinearHeight</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set the height of GS1-128 linear symbols in modules. </p>
+<dl class="section note"><dt>Note</dt><dd>Valid values are 1 to the value returned by <a class="el" href="gs1encoders_8h.html#ac3020cfeb55158f3fafffc4ccef84eea" title="Get the maximum height of GS1-128 linear symbols in modules.">gs1_encoder_getMaxGS1_128LinearHeight()</a>.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#ab221c1bdda1bcbad7ab81abc90871418" title="Get the height of GS1-128 linear symbols in modules.">gs1_encoder_getGS1_128LinearHeight()</a> </dd>
+<dd>
+<a class="el" href="gs1encoders_8h.html#ac3020cfeb55158f3fafffc4ccef84eea" title="Get the maximum height of GS1-128 linear symbols in modules.">gs1_encoder_getMaxGS1_128LinearHeight()</a></dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">ctx</td><td><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34" title="A gs1_encoder context.">gs1_encoder</a> context </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">gs1_128LinearHeight</td><td>height in modules </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true on success, otherwise false and an error message is set </dd></dl>
+
+</div>
+</div>
 <a id="a235492d4ca699a30469609f66e1f1fe9"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a235492d4ca699a30469609f66e1f1fe9">&#9670;&nbsp;</a></span>gs1_encoder_setGS1dataStr()</h2>
 
@@ -1705,15 +1801,15 @@ The library is thread-safe provided that each thread operates on its own instanc
 <div class="fragment"><div class="line">(01)12345678901231(10)ABC123(11)210630</div>
 </div><!-- fragment --><p>This syntax harmonises the format for the input accepted by all symbologies. For example the following input is acceptable for EAN-13, UPC-A, UPC-E and any variant of the GS1 DataBar family:</p>
 <div class="fragment"><div class="line">(01)00031234000054</div>
-</div><!-- fragment --><p>The input is immediately parsed and the resulting encoding is available via <a class="el" href="gs1encoders_8h.html#a6ab16e68827bb7adc811e8e5ec6cc369" title="Reads the data from the barcode data buffer.">gs1_encoder_getDataStr()</a>.</p>
+</div><!-- fragment --><p>The input is immediately parsed and the resulting encoding is available via <a class="el" href="gs1encoders_8h.html#a6ab16e68827bb7adc811e8e5ec6cc369" title="Reads the barcode data buffer.">gs1_encoder_getDataStr()</a>.</p>
 <p>For symbologies that support a composite component (all except <a class="el" href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8ae133b476dcbc3d56579df62d6a08ba6d" title="(GS1) Data Matrix">gs1_encoder_sDM</a> and <a class="el" href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8a2ff3d6b47e141e82f74795d9834560c3" title="(GS1) QR Code">gs1_encoder_sQR</a>), the data for the linear and 2D components can be separated by a "|" character, for example:</p>
 <div class="fragment"><div class="line">(01)12345678901231|(10)ABC123(11)210630</div>
-</div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>The ultimate length of the encoded data must be less that the value returned by <a class="el" href="gs1encoders_8h.html#a695bd64a793090c213133b79dd9ca7de" title="Get the maximum size of the input data buffer for barcode message content.">gs1_encoder_getMaxInputBuffer()</a>.</dd></dl>
+</div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>The ultimate length of the encoded data must be less that the value returned by <a class="el" href="gs1encoders_8h.html#aa24d43ed449f07eae209f974686b195c" title="Get the maximum size of the input data buffer for barcode message content.">gs1_encoder_getMaxDataStrLength()</a>.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#ad0e7c44b083e541810cb58eeef3028c6" title="Sets the raw data in the buffer that is used when buffer input is selected.">gs1_encoder_setDataStr()</a> </dd>
 <dd>
-<a class="el" href="gs1encoders_8h.html#a695bd64a793090c213133b79dd9ca7de" title="Get the maximum size of the input data buffer for barcode message content.">gs1_encoder_getMaxInputBuffer()</a> </dd>
+<a class="el" href="gs1encoders_8h.html#aa24d43ed449f07eae209f974686b195c" title="Get the maximum size of the input data buffer for barcode message content.">gs1_encoder_getMaxDataStrLength()</a> </dd>
 <dd>
-<a class="el" href="gs1encoders_8h.html#a6ab16e68827bb7adc811e8e5ec6cc369" title="Reads the data from the barcode data buffer.">gs1_encoder_getDataStr()</a> </dd>
+<a class="el" href="gs1encoders_8h.html#a6ab16e68827bb7adc811e8e5ec6cc369" title="Reads the barcode data buffer.">gs1_encoder_getDataStr()</a> </dd>
 <dd>
 <a class="el" href="gs1encoders_8h.html#a114c44586db6c7c481edcacccde763ff" title="Selects between a file and buffer for barcode data input. symbols.">gs1_encoder_setFileInputFlag()</a></dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -1901,47 +1997,6 @@ The library is thread-safe provided that each thread operates on its own instanc
 
 </div>
 </div>
-<a id="aa9271f17353230c60a63e745fdcd3b33"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa9271f17353230c60a63e745fdcd3b33">&#9670;&nbsp;</a></span>gs1_encoder_setRssExpSegWidth()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">GS1_ENCODERS_API bool gs1_encoder_setRssExpSegWidth </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *&#160;</td>
-          <td class="paramname"><em>ctx</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>rssExpSegWidth</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Set the number of segments per row for GS1 DataBar Expanded Stacked symbols. </p>
-<p>The default number of segments per row (22) matches the maximum number of symbol character for GS1 DataBar Expanded, resulting in a non-stacked symbol.</p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#a4cc8dd3402b96242b45492d264fe4a99" title="Get the current number of segments per row for GS1 DataBar Expanded Stacked symbols.">gs1_encoder_getRssExpSegWidth()</a></dd></dl>
-<dl class="section note"><dt>Note</dt><dd>Valid values are even numbers from 2 to 22.</dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">ctx</td><td><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34" title="A gs1_encoder context.">gs1_encoder</a> context </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">rssExpSegWidth</td><td>segments per row </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>true on success, otherwise false and an error message is set </dd></dl>
-
-</div>
-</div>
 <a id="ab83a2fb13a88cfb0e7f4d5080707664b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ab83a2fb13a88cfb0e7f4d5080707664b">&#9670;&nbsp;</a></span>gs1_encoder_setSepHt()</h2>
 
@@ -2017,48 +2072,6 @@ The library is thread-safe provided that each thread operates on its own instanc
   <table class="params">
     <tr><td class="paramdir">[in,out]</td><td class="paramname">ctx</td><td><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34" title="A gs1_encoder context.">gs1_encoder</a> context </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">sym</td><td>symbology type </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>true on success, otherwise false and an error message is set </dd></dl>
-
-</div>
-</div>
-<a id="ad1b706ee653185152245a3992e0c3a46"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad1b706ee653185152245a3992e0c3a46">&#9670;&nbsp;</a></span>gs1_encoder_setUcc128LinHeight()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">GS1_ENCODERS_API bool gs1_encoder_setUcc128LinHeight </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *&#160;</td>
-          <td class="paramname"><em>ctx</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>ucc128linHeight</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Set the height of GS1-128 linear symbols in modules. </p>
-<dl class="section note"><dt>Note</dt><dd>Valid values are 1 to the value returned by <a class="el" href="gs1encoders_8h.html#a2c44d5445a9e07db7a0586c7d4942f14" title="Get the maximum height of GS1-128 linear symbols in modules.">gs1_encoder_getMaxUcc128LinHeight()</a>.</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#a98ec3ef7dacc0cc936c41b44482e2922" title="Get the height of GS1-128 linear symbols in modules.">gs1_encoder_getUcc128LinHeight()</a> </dd>
-<dd>
-<a class="el" href="gs1encoders_8h.html#a2c44d5445a9e07db7a0586c7d4942f14" title="Get the maximum height of GS1-128 linear symbols in modules.">gs1_encoder_getMaxUcc128LinHeight()</a></dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">ctx</td><td><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34" title="A gs1_encoder context.">gs1_encoder</a> context </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">ucc128linHeight</td><td>height in modules </td></tr>
   </table>
   </dd>
 </dl>
@@ -2153,16 +2166,17 @@ The library is thread-safe provided that each thread operates on its own instanc
 </div>
 </div>
 </div><!-- contents -->
-<div class="ttc" id="ags1encoders_8h_html_a34f786d8479759fd8894c6d22a9f5c34"><div class="ttname"><a href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a></div><div class="ttdeci">struct gs1_encoder gs1_encoder</div><div class="ttdoc">A gs1_encoder context.</div><div class="ttdef"><b>Definition:</b> gs1encoders.h:166</div></div>
+<div class="ttc" id="ags1encoders_8h_html_a34f786d8479759fd8894c6d22a9f5c34"><div class="ttname"><a href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a></div><div class="ttdeci">struct gs1_encoder gs1_encoder</div><div class="ttdoc">A gs1_encoder context.</div><div class="ttdef"><b>Definition:</b> gs1encoders.h:181</div></div>
 <div class="ttc" id="ags1encoders_8h_html_afd581bb226f56c149cc1f903cbd77ca5"><div class="ttname"><a href="gs1encoders_8h.html#afd581bb226f56c149cc1f903cbd77ca5">gs1_encoder_instanceSize</a></div><div class="ttdeci">GS1_ENCODERS_API size_t gs1_encoder_instanceSize(void)</div><div class="ttdoc">Find the memory storage requirements for an instance of gs1_encoder.</div></div>
-<div class="ttc" id="ags1encoders_8h_html_a190f26971a88a11a2faed3182a9157c8ae133b476dcbc3d56579df62d6a08ba6d"><div class="ttname"><a href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8ae133b476dcbc3d56579df62d6a08ba6d">gs1_encoder_sDM</a></div><div class="ttdeci">@ gs1_encoder_sDM</div><div class="ttdoc">(GS1) Data Matrix</div><div class="ttdef"><b>Definition:</b> gs1encoders.h:115</div></div>
-<div class="ttc" id="ags1encoders_8h_html_a190f26971a88a11a2faed3182a9157c8a05cad5357f37d39d1a9b10db759fb4a2"><div class="ttname"><a href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8a05cad5357f37d39d1a9b10db759fb4a2">gs1_encoder_sEAN13</a></div><div class="ttdeci">@ gs1_encoder_sEAN13</div><div class="ttdoc">EAN-13.</div><div class="ttdef"><b>Definition:</b> gs1encoders.h:110</div></div>
-<div class="ttc" id="ags1encoders_8h_html_a12f58149bb2cdab504621ba5b390ef64a8b3eb847583daabfc11b8622736656ed"><div class="ttname"><a href="gs1encoders_8h.html#a12f58149bb2cdab504621ba5b390ef64a8b3eb847583daabfc11b8622736656ed">gs1_encoder_dRAW</a></div><div class="ttdeci">@ gs1_encoder_dRAW</div><div class="ttdoc">TIFF, without header (1-bit per pixel matrix with byte-aligned rows)</div><div class="ttdef"><b>Definition:</b> gs1encoders.h:125</div></div>
+<div class="ttc" id="ags1encoders_8h_html"><div class="ttname"><a href="gs1encoders_8h.html">gs1encoders.h</a></div></div>
+<div class="ttc" id="ags1encoders_8h_html_a190f26971a88a11a2faed3182a9157c8ae133b476dcbc3d56579df62d6a08ba6d"><div class="ttname"><a href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8ae133b476dcbc3d56579df62d6a08ba6d">gs1_encoder_sDM</a></div><div class="ttdeci">@ gs1_encoder_sDM</div><div class="ttdoc">(GS1) Data Matrix</div><div class="ttdef"><b>Definition:</b> gs1encoders.h:129</div></div>
+<div class="ttc" id="ags1encoders_8h_html_a190f26971a88a11a2faed3182a9157c8a05cad5357f37d39d1a9b10db759fb4a2"><div class="ttname"><a href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8a05cad5357f37d39d1a9b10db759fb4a2">gs1_encoder_sEAN13</a></div><div class="ttdeci">@ gs1_encoder_sEAN13</div><div class="ttdoc">EAN-13.</div><div class="ttdef"><b>Definition:</b> gs1encoders.h:124</div></div>
+<div class="ttc" id="ags1encoders_8h_html_a12f58149bb2cdab504621ba5b390ef64a8b3eb847583daabfc11b8622736656ed"><div class="ttname"><a href="gs1encoders_8h.html#a12f58149bb2cdab504621ba5b390ef64a8b3eb847583daabfc11b8622736656ed">gs1_encoder_dRAW</a></div><div class="ttdeci">@ gs1_encoder_dRAW</div><div class="ttdoc">TIFF, without header (1-bit per pixel matrix with byte-aligned rows)</div><div class="ttdef"><b>Definition:</b> gs1encoders.h:139</div></div>
 <div class="ttc" id="ags1encoders_8h_html_afaa932adfe73b0b5b33f89c03be8a441"><div class="ttname"><a href="gs1encoders_8h.html#afaa932adfe73b0b5b33f89c03be8a441">gs1_encoder_getBufferStrings</a></div><div class="ttdeci">GS1_ENCODERS_API size_t gs1_encoder_getBufferStrings(gs1_encoder *ctx, char ***strings)</div><div class="ttdoc">Return the output buffer represented as an array of strings.</div></div>
 <div class="ttc" id="ags1encoders_8h_html_a3b0f42977b787a19c8526037d6f9a4df"><div class="ttname"><a href="gs1encoders_8h.html#a3b0f42977b787a19c8526037d6f9a4df">gs1_encoder_getBuffer</a></div><div class="ttdeci">GS1_ENCODERS_API size_t gs1_encoder_getBuffer(gs1_encoder *ctx, void **buffer)</div><div class="ttdoc">Get the output buffer.</div></div>
 <div class="ttc" id="ags1encoders_8h_html_a0078a51318ba3551052c309fe48110ae"><div class="ttname"><a href="gs1encoders_8h.html#a0078a51318ba3551052c309fe48110ae">gs1_encoder_free</a></div><div class="ttdeci">GS1_ENCODERS_API void gs1_encoder_free(gs1_encoder *ctx)</div><div class="ttdoc">Destroy a gs1_encoder instance.</div></div>
 <div class="ttc" id="ags1encoders_8h_html_a1d385f9b4244e6b88e855da230246e01"><div class="ttname"><a href="gs1encoders_8h.html#a1d385f9b4244e6b88e855da230246e01">gs1_encoder_setFormat</a></div><div class="ttdeci">GS1_ENCODERS_API bool gs1_encoder_setFormat(gs1_encoder *ctx, int format)</div><div class="ttdoc">Set the output format for the barcode symbol.</div></div>
-<div class="ttc" id="ags1encoders_8h_html_a12f58149bb2cdab504621ba5b390ef64a8e5e88196a4041bc8e95ec27965b60e4"><div class="ttname"><a href="gs1encoders_8h.html#a12f58149bb2cdab504621ba5b390ef64a8e5e88196a4041bc8e95ec27965b60e4">gs1_encoder_dBMP</a></div><div class="ttdeci">@ gs1_encoder_dBMP</div><div class="ttdoc">BMP format.</div><div class="ttdef"><b>Definition:</b> gs1encoders.h:123</div></div>
+<div class="ttc" id="ags1encoders_8h_html_a12f58149bb2cdab504621ba5b390ef64a8e5e88196a4041bc8e95ec27965b60e4"><div class="ttname"><a href="gs1encoders_8h.html#a12f58149bb2cdab504621ba5b390ef64a8e5e88196a4041bc8e95ec27965b60e4">gs1_encoder_dBMP</a></div><div class="ttdeci">@ gs1_encoder_dBMP</div><div class="ttdoc">BMP format.</div><div class="ttdef"><b>Definition:</b> gs1encoders.h:137</div></div>
 <div class="ttc" id="ags1encoders_8h_html_a6e10980e07a7e70d81592243171e9cff"><div class="ttname"><a href="gs1encoders_8h.html#a6e10980e07a7e70d81592243171e9cff">gs1_encoder_init</a></div><div class="ttdeci">GS1_ENCODERS_API gs1_encoder * gs1_encoder_init(void *mem)</div><div class="ttdoc">Initialise a new gs1_encoder context.</div></div>
 <div class="ttc" id="ags1encoders_8h_html_a65d8546a9ec715462c424c35dbe910d8"><div class="ttname"><a href="gs1encoders_8h.html#a65d8546a9ec715462c424c35dbe910d8">gs1_encoder_setOutFile</a></div><div class="ttdeci">GS1_ENCODERS_API bool gs1_encoder_setOutFile(gs1_encoder *ctx, char *outFile)</div><div class="ttdoc">Set the output file for the barcode symbol.</div></div>
 <div class="ttc" id="ags1encoders_8h_html_ae3ec8ae78be621eab641b03b560eccfc"><div class="ttname"><a href="gs1encoders_8h.html#ae3ec8ae78be621eab641b03b560eccfc">gs1_encoder_encode</a></div><div class="ttdeci">GS1_ENCODERS_API bool gs1_encoder_encode(gs1_encoder *ctx)</div><div class="ttdoc">Generate a barcode symbol representing the given input data.</div></div>
