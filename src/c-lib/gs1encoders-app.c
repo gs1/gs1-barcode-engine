@@ -27,6 +27,8 @@
 
 #define RELEASE __DATE__
 
+static char *inpStr;
+
 static const char* SYMBOLOGY_NAMES[] =
 {
 	"GS1 DataBar",
@@ -53,7 +55,7 @@ static char* _gets(char* in) {
 
 	char* s;
 
-	s = fgets(in, GS1_ENCODERS_MAX_DATA+1, stdin);
+	s = fgets(in, gs1_encoder_getMaxInputBuffer()+1, stdin);
 	if (s != NULL) {
 		s[strcspn(s, "\r\n")] = 0;
 	}
@@ -63,7 +65,6 @@ static char* _gets(char* in) {
 
 static bool getSym(gs1_encoder *ctx) {
 
-	char inpStr[GS1_ENCODERS_MAX_DATA+1];
 	int i;
 	int sym;
 
@@ -96,7 +97,6 @@ static bool userInt(gs1_encoder *ctx) {
 
 	int inMenu = true;
 	int retFlag = true; // return is false if exit program
-	char inpStr[GS1_ENCODERS_MAX_DATA+1];
 	int menuVal, i;
 
 	while (inMenu) {
@@ -208,7 +208,7 @@ static bool userInt(gs1_encoder *ctx) {
 				int x = gs1_encoder_getXundercut(ctx);
 				int y = gs1_encoder_getXundercut(ctx);
 				int s = gs1_encoder_getSepHt(ctx);
-				printf("\nEnter pixels per X. 1-%d valid: ",GS1_ENCODERS_MAX_PIXMULT);
+				printf("\nEnter pixels per X. 1-%d valid: ", gs1_encoder_getMaxPixMult());
 				if (gets(inpStr) == NULL)
 					return false;
 				i = atoi(inpStr);
@@ -323,7 +323,7 @@ static bool userInt(gs1_encoder *ctx) {
 				}
 			 }
 			 else if ((gs1_encoder_getSym(ctx) == gs1_encoder_sUCC128_CCA) || (gs1_encoder_getSym(ctx) == gs1_encoder_sUCC128_CCC)) {
-				printf("\nEnter UCC/EAN-128 height in X. 1-%d valid: ",GS1_ENCODERS_MAX_LINHT);
+				printf("\nEnter UCC/EAN-128 height in X. 1-%d valid: ", gs1_encoder_getMaxUcc128LinHeight());
 				if (gets(inpStr) == NULL)
 					return false;
 				i = atoi(inpStr);
@@ -405,6 +405,12 @@ static bool userInt(gs1_encoder *ctx) {
 
 int main(int argc, char *argv[]) {
 
+	inpStr = malloc((size_t)(gs1_encoder_getMaxInputBuffer()+1));
+	if (inpStr == NULL) {
+		printf("Failed to allocate the input buffer!\n");
+		return 1;
+	}
+
 	gs1_encoder* ctx = gs1_encoder_init(NULL);
 	if (ctx == NULL) {
 		printf("Failed to initialise GS1 Encoders library!\n");
@@ -429,6 +435,7 @@ int main(int argc, char *argv[]) {
 out:
 
 	gs1_encoder_free(ctx);
+	free(inpStr);
 
 	return 0;
 }
