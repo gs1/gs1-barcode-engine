@@ -120,7 +120,7 @@ jobs:
         src\dotnet\bin\Release\gs1encoders-dotnet.exe --version
 
     - name: ZIP development libs
-      working-directory: src/c-lib/build/console-app/x64/Release
+      working-directory: src/c-lib/build/library/x64/Release
       run: |
         7z a gs1encoders-windows-libs.zip gs1encoders.h gs1encoders.lib gs1encoders.dll
 
@@ -133,7 +133,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: windows-libs
-        path: src/c-lib/build/console-app/x64/Release/gs1encoders-windows-libs.zip
+        path: src/c-lib/build/library/x64/Release/gs1encoders-windows-libs.zip
 
     - name: Store Windows app
       uses: actions/upload-artifact@v2
