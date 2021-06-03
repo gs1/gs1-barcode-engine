@@ -186,10 +186,9 @@ typedef struct gs1_encoder gs1_encoder;
  *
  * This is typically the build date.
  *
- * @param[in,out] ctx instance of ::gs1_encoder
  * @return pointer to a string containing the version of the library
  */
-GS1_ENCODERS_API char* gs1_encoder_getVersion(gs1_encoder *ctx);
+GS1_ENCODERS_API char* gs1_encoder_getVersion(void);
 
 
 /**

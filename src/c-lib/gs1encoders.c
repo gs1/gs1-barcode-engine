@@ -100,8 +100,6 @@ GS1_ENCODERS_API gs1_encoder* gs1_encoder_init(void *mem) {
 
 	reset_error(ctx);
 
-	strcpy(ctx->VERSION, __DATE__);
-
 	// Set default parameters
 	ctx->sym = gs1_encoder_sNONE;
 	ctx->pixMult = 1;
@@ -141,10 +139,8 @@ GS1_ENCODERS_API void gs1_encoder_free(gs1_encoder *ctx) {
 }
 
 
-GS1_ENCODERS_API char* gs1_encoder_getVersion(gs1_encoder *ctx) {
-	assert(ctx);
-	reset_error(ctx);
-	return ctx->VERSION;
+GS1_ENCODERS_API char* gs1_encoder_getVersion(void) {
+	return __DATE__;
 }
 
 
@@ -690,17 +686,9 @@ char bigbuffer[MAX_DATA+2];
 
 
 void test_api_getVersion(void) {
+	char *version = gs1_encoder_getVersion();
 
-	gs1_encoder* ctx;
-	char* version;
-
-	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
-
-	version = gs1_encoder_getVersion(ctx);
-	TEST_CHECK(version != NULL && strlen(version) > 0);
-
-	gs1_encoder_free(ctx);
-
+	TEST_CHECK(version != NULL && strcmp(version, __DATE__) == 0);
 }
 
 
