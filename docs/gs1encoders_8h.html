@@ -75,9 +75,9 @@ Overview</h2>
 <div class="fragment"><div class="line"><span class="preprocessor">#import &quot;<a class="code" href="gs1encoders_8h.html">gs1encoders.h</a>&quot;</span></div>
 <div class="line"> </div>
 <div class="line"><a class="code" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx = <a class="code" href="gs1encoders_8h.html#a6e10980e07a7e70d81592243171e9cff">gs1_encoder_init</a>(NULL);           <span class="comment">// Create a new instance of the library</span></div>
-<div class="line"><a class="code" href="gs1encoders_8h.html#a1d385f9b4244e6b88e855da230246e01">gs1_encoder_setFormat</a>(ctx, <a class="code" href="gs1encoders_8h.html#a12f58149bb2cdab504621ba5b390ef64a8e5e88196a4041bc8e95ec27965b60e4">gs1_encoder_dBMP</a>);        <span class="comment">// Select BMP output</span></div>
+<div class="line"><a class="code" href="gs1encoders_8h.html#a1d385f9b4244e6b88e855da230246e01">gs1_encoder_setFormat</a>(ctx, <a class="code" href="gs1encoders_8h.html#a884bdcb0ef8dafc0fc1a45d1c5cfac17a8e5e88196a4041bc8e95ec27965b60e4">gs1_encoder_dBMP</a>);        <span class="comment">// Select BMP output</span></div>
 <div class="line"><a class="code" href="gs1encoders_8h.html#a65d8546a9ec715462c424c35dbe910d8">gs1_encoder_setOutFile</a>(ctx, <span class="stringliteral">&quot;out.bmp&quot;</span>);              <span class="comment">// Select output to a file</span></div>
-<div class="line"><a class="code" href="gs1encoders_8h.html#a4c6e9e761ef9d0be70222b5b15767d7f">gs1_encoder_setSym</a>(ctx, <a class="code" href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8ae133b476dcbc3d56579df62d6a08ba6d">gs1_encoder_sDM</a>);            <span class="comment">// Choose the Data Matrix symbology</span></div>
+<div class="line"><a class="code" href="gs1encoders_8h.html#a4c6e9e761ef9d0be70222b5b15767d7f">gs1_encoder_setSym</a>(ctx, <a class="code" href="gs1encoders_8h.html#a7dab341c6821917b8eddfd1d17de4053ae133b476dcbc3d56579df62d6a08ba6d">gs1_encoder_sDM</a>);            <span class="comment">// Choose the Data Matrix symbology</span></div>
 <div class="line">gs1_encoder_setGS1DataStr(ctx,                       <span class="comment">// Data provided in GS1 AI syntax</span></div>
 <div class="line">       <span class="stringliteral">&quot;(01)12345678901231(10)ABC123(11)210630&quot;</span>);</div>
 <div class="line"><a class="code" href="gs1encoders_8h.html#ae3ec8ae78be621eab641b03b560eccfc">gs1_encoder_encode</a>(ctx);                             <span class="comment">// Generate the image, writing the file</span></div>
@@ -86,9 +86,9 @@ Overview</h2>
 <div class="fragment"><div class="line"><span class="preprocessor">#import &quot;<a class="code" href="gs1encoders_8h.html">gs1encoders.h</a>&quot;</span></div>
 <div class="line"> </div>
 <div class="line"><a class="code" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx = <a class="code" href="gs1encoders_8h.html#a6e10980e07a7e70d81592243171e9cff">gs1_encoder_init</a>(NULL);           <span class="comment">// Create a new instance of the library</span></div>
-<div class="line"><a class="code" href="gs1encoders_8h.html#a1d385f9b4244e6b88e855da230246e01">gs1_encoder_setFormat</a>(ctx, <a class="code" href="gs1encoders_8h.html#a12f58149bb2cdab504621ba5b390ef64a8b3eb847583daabfc11b8622736656ed">gs1_encoder_dRAW</a>);        <span class="comment">// Select RAW output (no graphical header)</span></div>
+<div class="line"><a class="code" href="gs1encoders_8h.html#a1d385f9b4244e6b88e855da230246e01">gs1_encoder_setFormat</a>(ctx, <a class="code" href="gs1encoders_8h.html#a884bdcb0ef8dafc0fc1a45d1c5cfac17a8b3eb847583daabfc11b8622736656ed">gs1_encoder_dRAW</a>);        <span class="comment">// Select RAW output (no graphical header)</span></div>
 <div class="line"><a class="code" href="gs1encoders_8h.html#a65d8546a9ec715462c424c35dbe910d8">gs1_encoder_setOutFile</a>(ctx, <span class="stringliteral">&quot;&quot;</span>);                     <span class="comment">// Select output to a buffer</span></div>
-<div class="line"><a class="code" href="gs1encoders_8h.html#a4c6e9e761ef9d0be70222b5b15767d7f">gs1_encoder_setSym</a>(ctx, <a class="code" href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8a05cad5357f37d39d1a9b10db759fb4a2">gs1_encoder_sEAN13</a>;          <span class="comment">// Choose the EAN-13 symbology</span></div>
+<div class="line"><a class="code" href="gs1encoders_8h.html#a4c6e9e761ef9d0be70222b5b15767d7f">gs1_encoder_setSym</a>(ctx, <a class="code" href="gs1encoders_8h.html#a7dab341c6821917b8eddfd1d17de4053a05cad5357f37d39d1a9b10db759fb4a2">gs1_encoder_sEAN13</a>;          <span class="comment">// Choose the EAN-13 symbology</span></div>
 <div class="line">gs1_encoder_setGS1DataStr(ctx, <span class="stringliteral">&quot;2112345678900&quot;</span>);     <span class="comment">// Data provided in plain syntax</span></div>
 <div class="line"><a class="code" href="gs1encoders_8h.html#ae3ec8ae78be621eab641b03b560eccfc">gs1_encoder_encode</a>(ctx);                             <span class="comment">// Generate the image, writing the buffer</span></div>
 <div class="line">size = <a class="code" href="gs1encoders_8h.html#a3b0f42977b787a19c8526037d6f9a4df">gs1_encoder_getBuffer</a>(ctx, buffer);           <span class="comment">// Read from the buffer</span></div>
@@ -105,47 +105,173 @@ Typedefs</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
 Enumerations</h2></td></tr>
-<tr class="memitem:a190f26971a88a11a2faed3182a9157c8"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8">symbologies</a> { <br />
-&#160;&#160;<a class="el" href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8a5df1931a2be629e0cba82a5ac392e18d">gs1_encoder_sNONE</a> = -1, 
-<a class="el" href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8a18aef6a5b8d04d5222d6495b9156685b">gs1_encoder_sDataBarOmni</a>, 
-<a class="el" href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8a014910ca17a30e70183b9d1e3fcc490a">gs1_encoder_sDataBarTruncated</a>, 
-<a class="el" href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8a3125c0fefeefc444f0e158f74add53db">gs1_encoder_sDataBarStacked</a>, 
+<tr class="memitem:a7dab341c6821917b8eddfd1d17de4053"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#a7dab341c6821917b8eddfd1d17de4053">gs1_encoder_symbologies</a> { <br />
+&#160;&#160;<a class="el" href="gs1encoders_8h.html#a7dab341c6821917b8eddfd1d17de4053a5df1931a2be629e0cba82a5ac392e18d">gs1_encoder_sNONE</a> = -1, 
+<a class="el" href="gs1encoders_8h.html#a7dab341c6821917b8eddfd1d17de4053a18aef6a5b8d04d5222d6495b9156685b">gs1_encoder_sDataBarOmni</a>, 
+<a class="el" href="gs1encoders_8h.html#a7dab341c6821917b8eddfd1d17de4053a014910ca17a30e70183b9d1e3fcc490a">gs1_encoder_sDataBarTruncated</a>, 
+<a class="el" href="gs1encoders_8h.html#a7dab341c6821917b8eddfd1d17de4053a3125c0fefeefc444f0e158f74add53db">gs1_encoder_sDataBarStacked</a>, 
 <br />
-&#160;&#160;<a class="el" href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8a5e00ff4a90615fca1dde472eb847fe4b">gs1_encoder_sDataBarStackedOmni</a>, 
-<a class="el" href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8a94a6d06a4195f0bd7bf5975d27ab8070">gs1_encoder_sDataBarLimited</a>, 
-<a class="el" href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8acf7f816a924a4e9d0dd8d4d39f709847">gs1_encoder_sDataBarExpanded</a>, 
-<a class="el" href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8a3e2e190205c38c82a0f384c361dc227f">gs1_encoder_sUPCA</a>, 
+&#160;&#160;<a class="el" href="gs1encoders_8h.html#a7dab341c6821917b8eddfd1d17de4053a5e00ff4a90615fca1dde472eb847fe4b">gs1_encoder_sDataBarStackedOmni</a>, 
+<a class="el" href="gs1encoders_8h.html#a7dab341c6821917b8eddfd1d17de4053a94a6d06a4195f0bd7bf5975d27ab8070">gs1_encoder_sDataBarLimited</a>, 
+<a class="el" href="gs1encoders_8h.html#a7dab341c6821917b8eddfd1d17de4053acf7f816a924a4e9d0dd8d4d39f709847">gs1_encoder_sDataBarExpanded</a>, 
+<a class="el" href="gs1encoders_8h.html#a7dab341c6821917b8eddfd1d17de4053a3e2e190205c38c82a0f384c361dc227f">gs1_encoder_sUPCA</a>, 
 <br />
-&#160;&#160;<a class="el" href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8adedd4d65ff3420f9e56c9c7edd177d92">gs1_encoder_sUPCE</a>, 
-<a class="el" href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8a05cad5357f37d39d1a9b10db759fb4a2">gs1_encoder_sEAN13</a>, 
-<a class="el" href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8ac582b7f1d7e748f14b98a40a9610ae44">gs1_encoder_sEAN8</a>, 
-<a class="el" href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8a7a6e74c2cad48bb27a00a067947a1c8d">gs1_encoder_sGS1_128_CCA</a>, 
+&#160;&#160;<a class="el" href="gs1encoders_8h.html#a7dab341c6821917b8eddfd1d17de4053adedd4d65ff3420f9e56c9c7edd177d92">gs1_encoder_sUPCE</a>, 
+<a class="el" href="gs1encoders_8h.html#a7dab341c6821917b8eddfd1d17de4053a05cad5357f37d39d1a9b10db759fb4a2">gs1_encoder_sEAN13</a>, 
+<a class="el" href="gs1encoders_8h.html#a7dab341c6821917b8eddfd1d17de4053ac582b7f1d7e748f14b98a40a9610ae44">gs1_encoder_sEAN8</a>, 
+<a class="el" href="gs1encoders_8h.html#a7dab341c6821917b8eddfd1d17de4053a7a6e74c2cad48bb27a00a067947a1c8d">gs1_encoder_sGS1_128_CCA</a>, 
 <br />
-&#160;&#160;<a class="el" href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8a9d95e648588c4e2cab744a969e9cc049">gs1_encoder_sGS1_128_CCC</a>, 
-<a class="el" href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8a2ff3d6b47e141e82f74795d9834560c3">gs1_encoder_sQR</a>, 
-<a class="el" href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8ae133b476dcbc3d56579df62d6a08ba6d">gs1_encoder_sDM</a>, 
-<a class="el" href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8a89eba163f359c68083143631f5164255">gs1_encoder_sNUMSYMS</a>
+&#160;&#160;<a class="el" href="gs1encoders_8h.html#a7dab341c6821917b8eddfd1d17de4053a9d95e648588c4e2cab744a969e9cc049">gs1_encoder_sGS1_128_CCC</a>, 
+<a class="el" href="gs1encoders_8h.html#a7dab341c6821917b8eddfd1d17de4053a2ff3d6b47e141e82f74795d9834560c3">gs1_encoder_sQR</a>, 
+<a class="el" href="gs1encoders_8h.html#a7dab341c6821917b8eddfd1d17de4053ae133b476dcbc3d56579df62d6a08ba6d">gs1_encoder_sDM</a>, 
+<a class="el" href="gs1encoders_8h.html#a7dab341c6821917b8eddfd1d17de4053a89eba163f359c68083143631f5164255">gs1_encoder_sNUMSYMS</a>
 <br />
  }</td></tr>
-<tr class="memdesc:a190f26971a88a11a2faed3182a9157c8"><td class="mdescLeft">&#160;</td><td class="mdescRight">All of the major GS1 barcode formats ("symbologies") are supported by this library.  <a href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8">More...</a><br /></td></tr>
-<tr class="separator:a190f26971a88a11a2faed3182a9157c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a12f58149bb2cdab504621ba5b390ef64"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#a12f58149bb2cdab504621ba5b390ef64">formats</a> { <a class="el" href="gs1encoders_8h.html#a12f58149bb2cdab504621ba5b390ef64a8e5e88196a4041bc8e95ec27965b60e4">gs1_encoder_dBMP</a> = 0, 
-<a class="el" href="gs1encoders_8h.html#a12f58149bb2cdab504621ba5b390ef64ab80d6391fa9fcd12fe7b45321b5dc809">gs1_encoder_dTIF</a> = 1, 
-<a class="el" href="gs1encoders_8h.html#a12f58149bb2cdab504621ba5b390ef64a8b3eb847583daabfc11b8622736656ed">gs1_encoder_dRAW</a> = 2
+<tr class="memdesc:a7dab341c6821917b8eddfd1d17de4053"><td class="mdescLeft">&#160;</td><td class="mdescRight">All of the major GS1 barcode formats ("symbologies") are supported by this library.  <a href="gs1encoders_8h.html#a7dab341c6821917b8eddfd1d17de4053">More...</a><br /></td></tr>
+<tr class="separator:a7dab341c6821917b8eddfd1d17de4053"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a884bdcb0ef8dafc0fc1a45d1c5cfac17"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#a884bdcb0ef8dafc0fc1a45d1c5cfac17">gs1_encoder_formats</a> { <a class="el" href="gs1encoders_8h.html#a884bdcb0ef8dafc0fc1a45d1c5cfac17a8e5e88196a4041bc8e95ec27965b60e4">gs1_encoder_dBMP</a> = 0, 
+<a class="el" href="gs1encoders_8h.html#a884bdcb0ef8dafc0fc1a45d1c5cfac17ab80d6391fa9fcd12fe7b45321b5dc809">gs1_encoder_dTIF</a> = 1, 
+<a class="el" href="gs1encoders_8h.html#a884bdcb0ef8dafc0fc1a45d1c5cfac17a8b3eb847583daabfc11b8622736656ed">gs1_encoder_dRAW</a> = 2
  }</td></tr>
-<tr class="separator:a12f58149bb2cdab504621ba5b390ef64"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5f453073111a11cc4b3f81bae7b5c1b7"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#a5f453073111a11cc4b3f81bae7b5c1b7">qrEClevel</a> { <a class="el" href="gs1encoders_8h.html#a5f453073111a11cc4b3f81bae7b5c1b7ace87b696810b0311f877044f09b2dd3d">gs1_encoder_qrEClevelL</a> = 1, 
-<a class="el" href="gs1encoders_8h.html#a5f453073111a11cc4b3f81bae7b5c1b7aaa88336f28e223605448ce8c9d61736c">gs1_encoder_qrEClevelM</a>, 
-<a class="el" href="gs1encoders_8h.html#a5f453073111a11cc4b3f81bae7b5c1b7a64bc781df25a9b5b95155b16afdf3b1a">gs1_encoder_qrEClevelQ</a>, 
-<a class="el" href="gs1encoders_8h.html#a5f453073111a11cc4b3f81bae7b5c1b7a43eb13ec50fecd313958fc0cfb81a161">gs1_encoder_qrEClevelH</a>
+<tr class="separator:a884bdcb0ef8dafc0fc1a45d1c5cfac17"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a77bc3a6b7c0c213036ed0781a38cf667"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#a77bc3a6b7c0c213036ed0781a38cf667">gs1_encoder_dmRows</a> { <br />
+&#160;&#160;<a class="el" href="gs1encoders_8h.html#a77bc3a6b7c0c213036ed0781a38cf667add6d478c426009e6231b875743ac3b80">gs1_encoder_dmRowsAutomatic</a> = 0, 
+<a class="el" href="gs1encoders_8h.html#a77bc3a6b7c0c213036ed0781a38cf667a1ef9aa325899b6ba7301fd2a5bd43001">gs1_encoder_dmRows8</a> = 8, 
+<a class="el" href="gs1encoders_8h.html#a77bc3a6b7c0c213036ed0781a38cf667a795b73b18e406d6be588b9450d5ee19a">gs1_encoder_dmRows10</a> = 10, 
+<a class="el" href="gs1encoders_8h.html#a77bc3a6b7c0c213036ed0781a38cf667ad0765ecfd48732472a46bd27866a3ba1">gs1_encoder_dmRows12</a> = 12, 
+<br />
+&#160;&#160;<a class="el" href="gs1encoders_8h.html#a77bc3a6b7c0c213036ed0781a38cf667a4d9c7ceeb83d1d7c3c6a3a91b6a7cdf4">gs1_encoder_dmRows14</a> = 14, 
+<a class="el" href="gs1encoders_8h.html#a77bc3a6b7c0c213036ed0781a38cf667ab60363735bc58730c477f42ab0576b90">gs1_encoder_dmRows16</a> = 16, 
+<a class="el" href="gs1encoders_8h.html#a77bc3a6b7c0c213036ed0781a38cf667a203e5534c3f59ed6bcc1dea23c8855fe">gs1_encoder_dmRows18</a> = 18, 
+<a class="el" href="gs1encoders_8h.html#a77bc3a6b7c0c213036ed0781a38cf667aab965e7d96c966a5ca46e76287170b6a">gs1_encoder_dmRows20</a> = 20, 
+<br />
+&#160;&#160;<a class="el" href="gs1encoders_8h.html#a77bc3a6b7c0c213036ed0781a38cf667a532721d2dfd7dd4a651a1c76cb4725a7">gs1_encoder_dmRows22</a> = 22, 
+<a class="el" href="gs1encoders_8h.html#a77bc3a6b7c0c213036ed0781a38cf667ae9182ec7eca943fcc7406812ce78a18a">gs1_encoder_dmRows24</a> = 24, 
+<a class="el" href="gs1encoders_8h.html#a77bc3a6b7c0c213036ed0781a38cf667a5a32bdfffa9a92540bad2381b8c9c26b">gs1_encoder_dmRows26</a> = 26, 
+<a class="el" href="gs1encoders_8h.html#a77bc3a6b7c0c213036ed0781a38cf667a85ccbdb909593fb668290e3595cda849">gs1_encoder_dmRows32</a> = 32, 
+<br />
+&#160;&#160;<a class="el" href="gs1encoders_8h.html#a77bc3a6b7c0c213036ed0781a38cf667a7e938d54a1efea9b5023801a5465e712">gs1_encoder_dmRows36</a> = 36, 
+<a class="el" href="gs1encoders_8h.html#a77bc3a6b7c0c213036ed0781a38cf667abf28dd50fbd3eb66ad8bed7881cf8678">gs1_encoder_dmRows40</a> = 40, 
+<a class="el" href="gs1encoders_8h.html#a77bc3a6b7c0c213036ed0781a38cf667a78aae58325c46ef49af81c4caed1e21d">gs1_encoder_dmRows44</a> = 44, 
+<a class="el" href="gs1encoders_8h.html#a77bc3a6b7c0c213036ed0781a38cf667a8078b6518a1dbbd49d55e709bc1dad9a">gs1_encoder_dmRows48</a> = 48, 
+<br />
+&#160;&#160;<a class="el" href="gs1encoders_8h.html#a77bc3a6b7c0c213036ed0781a38cf667acc589fdee23062d4ceef74d6d552d73f">gs1_encoder_dmRows52</a> = 52, 
+<a class="el" href="gs1encoders_8h.html#a77bc3a6b7c0c213036ed0781a38cf667a5d87c1c1c84ba055ed0232a9d993e60e">gs1_encoder_dmRows64</a> = 64, 
+<a class="el" href="gs1encoders_8h.html#a77bc3a6b7c0c213036ed0781a38cf667a8df63c3a015f45c248818326632d4f5b">gs1_encoder_dmRows72</a> = 72, 
+<a class="el" href="gs1encoders_8h.html#a77bc3a6b7c0c213036ed0781a38cf667a76d83ab31f523f7b4aa84d29f9e69342">gs1_encoder_dmRows80</a> = 80, 
+<br />
+&#160;&#160;<a class="el" href="gs1encoders_8h.html#a77bc3a6b7c0c213036ed0781a38cf667af25a2131222d4bfe14893bec9135e556">gs1_encoder_dmRows88</a> = 88, 
+<a class="el" href="gs1encoders_8h.html#a77bc3a6b7c0c213036ed0781a38cf667a198a1548b9b0039c45e7309936aacfe7">gs1_encoder_dmRows96</a> = 96, 
+<a class="el" href="gs1encoders_8h.html#a77bc3a6b7c0c213036ed0781a38cf667a6fd67ec1931ab58a9a76ff4a9bbbaf9f">gs1_encoder_dmRows104</a> = 104, 
+<a class="el" href="gs1encoders_8h.html#a77bc3a6b7c0c213036ed0781a38cf667a204569856c12eaeb37b2321a6d5feafb">gs1_encoder_dmRows120</a> = 120, 
+<br />
+&#160;&#160;<a class="el" href="gs1encoders_8h.html#a77bc3a6b7c0c213036ed0781a38cf667a76998bd533a0a7f0ff4b317c2abd5bcb">gs1_encoder_dmRows132</a> = 132, 
+<a class="el" href="gs1encoders_8h.html#a77bc3a6b7c0c213036ed0781a38cf667a53929071acbd58af9fdbb87f9ffceb25">gs1_encoder_dmRows144</a> = 144
+<br />
  }</td></tr>
-<tr class="separator:a5f453073111a11cc4b3f81bae7b5c1b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:a77bc3a6b7c0c213036ed0781a38cf667"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7598dacdce15b33ef77e2deb181e2e29"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#a7598dacdce15b33ef77e2deb181e2e29">gs1_encoder_dmColumns</a> { <br />
+&#160;&#160;<a class="el" href="gs1encoders_8h.html#a7598dacdce15b33ef77e2deb181e2e29a0342cf145d55fd36367baee6ecbb653f">gs1_encoder_dmColumnsAutomatic</a> = 0, 
+<a class="el" href="gs1encoders_8h.html#a7598dacdce15b33ef77e2deb181e2e29a4820b8ba26e7c2eecbcc61dece530f8e">gs1_encoder_dmColumns10</a> = 10, 
+<a class="el" href="gs1encoders_8h.html#a7598dacdce15b33ef77e2deb181e2e29a2d6dca6ccf5d6fe98cbde97a8b7465c4">gs1_encoder_dmColumns12</a> = 12, 
+<a class="el" href="gs1encoders_8h.html#a7598dacdce15b33ef77e2deb181e2e29a929d8c56a44aa17b522fc47be0b10c2f">gs1_encoder_dmColumns14</a> = 14, 
+<br />
+&#160;&#160;<a class="el" href="gs1encoders_8h.html#a7598dacdce15b33ef77e2deb181e2e29aafe14b7187c2c877d4622942269ef369">gs1_encoder_dmColumns16</a> = 16, 
+<a class="el" href="gs1encoders_8h.html#a7598dacdce15b33ef77e2deb181e2e29a080459fb70f636df1def19c244f8a0a0">gs1_encoder_dmColumns18</a> = 18, 
+<a class="el" href="gs1encoders_8h.html#a7598dacdce15b33ef77e2deb181e2e29a1c42f0cb3fb75de724475b68467e66df">gs1_encoder_dmColumns20</a> = 20, 
+<a class="el" href="gs1encoders_8h.html#a7598dacdce15b33ef77e2deb181e2e29a21793248ecd0a593fbb590eb909351f0">gs1_encoder_dmColumns22</a> = 22, 
+<br />
+&#160;&#160;<a class="el" href="gs1encoders_8h.html#a7598dacdce15b33ef77e2deb181e2e29ae744e2f6ed705d50d2b622fadbea0183">gs1_encoder_dmColumns24</a> = 24, 
+<a class="el" href="gs1encoders_8h.html#a7598dacdce15b33ef77e2deb181e2e29afd9998db0b20c1bac2209f558fb3274e">gs1_encoder_dmColumns26</a> = 26, 
+<a class="el" href="gs1encoders_8h.html#a7598dacdce15b33ef77e2deb181e2e29ab51f26ed57189e92dadd86cc533461e0">gs1_encoder_dmColumns32</a> = 32, 
+<a class="el" href="gs1encoders_8h.html#a7598dacdce15b33ef77e2deb181e2e29ac5cdd2e871f054815c25529f547cf9d6">gs1_encoder_dmColumns36</a> = 36, 
+<br />
+&#160;&#160;<a class="el" href="gs1encoders_8h.html#a7598dacdce15b33ef77e2deb181e2e29ab0c37ee1894d9143d7e1d97f1703f98f">gs1_encoder_dmColumns40</a> = 40, 
+<a class="el" href="gs1encoders_8h.html#a7598dacdce15b33ef77e2deb181e2e29a248f2cb23777226bdb0dd19cc004981d">gs1_encoder_dmColumns44</a> = 44, 
+<a class="el" href="gs1encoders_8h.html#a7598dacdce15b33ef77e2deb181e2e29a8342bda3585ef174341147d3cec5f960">gs1_encoder_dmColumns48</a> = 48, 
+<a class="el" href="gs1encoders_8h.html#a7598dacdce15b33ef77e2deb181e2e29aa05dd24c71185f9afa5be6c8f36c5637">gs1_encoder_dmColumns52</a> = 52, 
+<br />
+&#160;&#160;<a class="el" href="gs1encoders_8h.html#a7598dacdce15b33ef77e2deb181e2e29a359edd1375f28ff51a1f34fcacb6b052">gs1_encoder_dmColumns64</a> = 64, 
+<a class="el" href="gs1encoders_8h.html#a7598dacdce15b33ef77e2deb181e2e29a4a9ef34a94283029cf53f8a51e468cb7">gs1_encoder_dmColumns72</a> = 72, 
+<a class="el" href="gs1encoders_8h.html#a7598dacdce15b33ef77e2deb181e2e29a2cdddbd9517246e3c86dfd0e635ae703">gs1_encoder_dmColumns80</a> = 80, 
+<a class="el" href="gs1encoders_8h.html#a7598dacdce15b33ef77e2deb181e2e29afc187ad30c5574fdd236f427999e2fbf">gs1_encoder_dmColumns88</a> = 88, 
+<br />
+&#160;&#160;<a class="el" href="gs1encoders_8h.html#a7598dacdce15b33ef77e2deb181e2e29ae593dc6d694e42c77884dbd91bc708d9">gs1_encoder_dmColumns96</a> = 96, 
+<a class="el" href="gs1encoders_8h.html#a7598dacdce15b33ef77e2deb181e2e29a62babc80956f17202e84a7a42a29a330">gs1_encoder_dmColumns104</a> = 104, 
+<a class="el" href="gs1encoders_8h.html#a7598dacdce15b33ef77e2deb181e2e29af520f357e92255f84428f057dc8b5d86">gs1_encoder_dmColumns120</a> = 120, 
+<a class="el" href="gs1encoders_8h.html#a7598dacdce15b33ef77e2deb181e2e29acecc73334a6457f393bd73a475a5c945">gs1_encoder_dmColumns132</a> = 132, 
+<br />
+&#160;&#160;<a class="el" href="gs1encoders_8h.html#a7598dacdce15b33ef77e2deb181e2e29ace9e5314183c3fde0a59d6c6a5160111">gs1_encoder_dmColumns144</a> = 144
+<br />
+ }</td></tr>
+<tr class="separator:a7598dacdce15b33ef77e2deb181e2e29"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a02da27b0e3e00e72b2f6f20d4ae3bf53"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#a02da27b0e3e00e72b2f6f20d4ae3bf53">gs1_encoder_qrEClevel</a> { <a class="el" href="gs1encoders_8h.html#a02da27b0e3e00e72b2f6f20d4ae3bf53ace87b696810b0311f877044f09b2dd3d">gs1_encoder_qrEClevelL</a> = 1, 
+<a class="el" href="gs1encoders_8h.html#a02da27b0e3e00e72b2f6f20d4ae3bf53aaa88336f28e223605448ce8c9d61736c">gs1_encoder_qrEClevelM</a>, 
+<a class="el" href="gs1encoders_8h.html#a02da27b0e3e00e72b2f6f20d4ae3bf53a64bc781df25a9b5b95155b16afdf3b1a">gs1_encoder_qrEClevelQ</a>, 
+<a class="el" href="gs1encoders_8h.html#a02da27b0e3e00e72b2f6f20d4ae3bf53a43eb13ec50fecd313958fc0cfb81a161">gs1_encoder_qrEClevelH</a>
+ }</td></tr>
+<tr class="separator:a02da27b0e3e00e72b2f6f20d4ae3bf53"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac8dbf00bb4f37536706cdf421ddd2d04"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#ac8dbf00bb4f37536706cdf421ddd2d04">gs1_encoder_qrVersion</a> { <br />
+&#160;&#160;<a class="el" href="gs1encoders_8h.html#ac8dbf00bb4f37536706cdf421ddd2d04a472d18d419f818231b7c9508b338e8f7">gs1_encoder_qrVersionAutomatic</a> = 0, 
+<a class="el" href="gs1encoders_8h.html#ac8dbf00bb4f37536706cdf421ddd2d04a8c7539c9a5c502845dd428e8b68a6b19">gs1_encoder_qrVersion1</a>, 
+<a class="el" href="gs1encoders_8h.html#ac8dbf00bb4f37536706cdf421ddd2d04a4cbbcdd605d79cc7b769309f0bca2277">gs1_encoder_qrVersion2</a>, 
+<a class="el" href="gs1encoders_8h.html#ac8dbf00bb4f37536706cdf421ddd2d04a423fb7d814e746b0fab41e776e0a04d5">gs1_encoder_qrVersion3</a>, 
+<br />
+&#160;&#160;<a class="el" href="gs1encoders_8h.html#ac8dbf00bb4f37536706cdf421ddd2d04a1ed2c9cacff6038069a6da9556c9bf42">gs1_encoder_qrVersion4</a>, 
+<a class="el" href="gs1encoders_8h.html#ac8dbf00bb4f37536706cdf421ddd2d04a5c17c0416e52a58eb1215ec1cb393f58">gs1_encoder_qrVersion5</a>, 
+<a class="el" href="gs1encoders_8h.html#ac8dbf00bb4f37536706cdf421ddd2d04a438c47ac1e26b7d7acb55d09418501da">gs1_encoder_qrVersion6</a>, 
+<a class="el" href="gs1encoders_8h.html#ac8dbf00bb4f37536706cdf421ddd2d04a1cf1bfb9432cf961e2d88cfd869826ba">gs1_encoder_qrVersion7</a>, 
+<br />
+&#160;&#160;<a class="el" href="gs1encoders_8h.html#ac8dbf00bb4f37536706cdf421ddd2d04a128aad1f7f64a86faf76e917c99cee09">gs1_encoder_qrVersion8</a>, 
+<a class="el" href="gs1encoders_8h.html#ac8dbf00bb4f37536706cdf421ddd2d04a59ecac2df8b817cc776bfe1f67bd97ab">gs1_encoder_qrVersion9</a>, 
+<a class="el" href="gs1encoders_8h.html#ac8dbf00bb4f37536706cdf421ddd2d04aac747a6dcc9b01ad71f43949dd7e41f1">gs1_encoder_qrVersion10</a>, 
+<a class="el" href="gs1encoders_8h.html#ac8dbf00bb4f37536706cdf421ddd2d04ab8df7fe2784394a160f4c648aa0657e0">gs1_encoder_qrVersion11</a>, 
+<br />
+&#160;&#160;<a class="el" href="gs1encoders_8h.html#ac8dbf00bb4f37536706cdf421ddd2d04a33ae98d9fda15118fae45f290c3a2044">gs1_encoder_qrVersion12</a>, 
+<a class="el" href="gs1encoders_8h.html#ac8dbf00bb4f37536706cdf421ddd2d04af78c002d957276d12b5eb88e82cd9eb8">gs1_encoder_qrVersion13</a>, 
+<a class="el" href="gs1encoders_8h.html#ac8dbf00bb4f37536706cdf421ddd2d04a1c88af57a1093bdcdcee13b55a622b0e">gs1_encoder_qrVersion14</a>, 
+<a class="el" href="gs1encoders_8h.html#ac8dbf00bb4f37536706cdf421ddd2d04a9134dc3249635045d5fd9e37ea2e8093">gs1_encoder_qrVersion15</a>, 
+<br />
+&#160;&#160;<a class="el" href="gs1encoders_8h.html#ac8dbf00bb4f37536706cdf421ddd2d04a8e9d0f07e0af03bf5b4a2c9c43262071">gs1_encoder_qrVersion16</a>, 
+<a class="el" href="gs1encoders_8h.html#ac8dbf00bb4f37536706cdf421ddd2d04a30d04b736f46f0fd240d7e214c90e9c9">gs1_encoder_qrVersion17</a>, 
+<a class="el" href="gs1encoders_8h.html#ac8dbf00bb4f37536706cdf421ddd2d04a356dda3681a85a6b88c10440584a7d27">gs1_encoder_qrVersion18</a>, 
+<a class="el" href="gs1encoders_8h.html#ac8dbf00bb4f37536706cdf421ddd2d04a7d797c1171ac4fdd5ad8a875cdf31858">gs1_encoder_qrVersion19</a>, 
+<br />
+&#160;&#160;<a class="el" href="gs1encoders_8h.html#ac8dbf00bb4f37536706cdf421ddd2d04a4c3b490f84c913ad62d44b4407f4a393">gs1_encoder_qrVersion20</a>, 
+<a class="el" href="gs1encoders_8h.html#ac8dbf00bb4f37536706cdf421ddd2d04aeba22c83381e45293275d2984acaf998">gs1_encoder_qrVersion21</a>, 
+<a class="el" href="gs1encoders_8h.html#ac8dbf00bb4f37536706cdf421ddd2d04a895e844b7692d1343a642ebdb606a1e3">gs1_encoder_qrVersion22</a>, 
+<a class="el" href="gs1encoders_8h.html#ac8dbf00bb4f37536706cdf421ddd2d04ac2dfe5920e702160712aabcd6c97cf3f">gs1_encoder_qrVersion23</a>, 
+<br />
+&#160;&#160;<a class="el" href="gs1encoders_8h.html#ac8dbf00bb4f37536706cdf421ddd2d04aa996974ccc7dfbb5d17b27b471325968">gs1_encoder_qrVersion24</a>, 
+<a class="el" href="gs1encoders_8h.html#ac8dbf00bb4f37536706cdf421ddd2d04a672863966313fc8cc44545efe4c21dd2">gs1_encoder_qrVersion25</a>, 
+<a class="el" href="gs1encoders_8h.html#ac8dbf00bb4f37536706cdf421ddd2d04a92176247a0a6a8c194f0ce4add7c7a6b">gs1_encoder_qrVersion26</a>, 
+<a class="el" href="gs1encoders_8h.html#ac8dbf00bb4f37536706cdf421ddd2d04a857b4aa2c4ce8d54405b43b0852ca50c">gs1_encoder_qrVersion27</a>, 
+<br />
+&#160;&#160;<a class="el" href="gs1encoders_8h.html#ac8dbf00bb4f37536706cdf421ddd2d04afc01050e7d4a14798f6e58d42a87fc03">gs1_encoder_qrVersion28</a>, 
+<a class="el" href="gs1encoders_8h.html#ac8dbf00bb4f37536706cdf421ddd2d04affe7d25ce5acdcf1a34d3bb5173b0bf2">gs1_encoder_qrVersion29</a>, 
+<a class="el" href="gs1encoders_8h.html#ac8dbf00bb4f37536706cdf421ddd2d04a97e781f9fed174d76f9d2a0c23b43e66">gs1_encoder_qrVersion30</a>, 
+<a class="el" href="gs1encoders_8h.html#ac8dbf00bb4f37536706cdf421ddd2d04ad9ff56958387b033cfc5e05e1ccc3d6e">gs1_encoder_qrVersion31</a>, 
+<br />
+&#160;&#160;<a class="el" href="gs1encoders_8h.html#ac8dbf00bb4f37536706cdf421ddd2d04afc3644137d856e258569a3d6e06dc184">gs1_encoder_qrVersion32</a>, 
+<a class="el" href="gs1encoders_8h.html#ac8dbf00bb4f37536706cdf421ddd2d04a7a82babcf936aabe916c512eae8a9da9">gs1_encoder_qrVersion33</a>, 
+<a class="el" href="gs1encoders_8h.html#ac8dbf00bb4f37536706cdf421ddd2d04a5c7572dc428946e427b0214b7775e610">gs1_encoder_qrVersion34</a>, 
+<a class="el" href="gs1encoders_8h.html#ac8dbf00bb4f37536706cdf421ddd2d04a23cf0c79b5eedc4d13e5a332bb369937">gs1_encoder_qrVersion35</a>, 
+<br />
+&#160;&#160;<a class="el" href="gs1encoders_8h.html#ac8dbf00bb4f37536706cdf421ddd2d04aa0752bc87795f91522570fd34690ed0b">gs1_encoder_qrVersion36</a>, 
+<a class="el" href="gs1encoders_8h.html#ac8dbf00bb4f37536706cdf421ddd2d04a6f2db30be26bd6d78843f46a9b66eb21">gs1_encoder_qrVersion37</a>, 
+<a class="el" href="gs1encoders_8h.html#ac8dbf00bb4f37536706cdf421ddd2d04a65458e6b762b7811fb2605b9fcd11bae">gs1_encoder_qrVersion38</a>, 
+<a class="el" href="gs1encoders_8h.html#ac8dbf00bb4f37536706cdf421ddd2d04ac2e9e6922ecfb248de93e170c5e80510">gs1_encoder_qrVersion39</a>, 
+<br />
+&#160;&#160;<a class="el" href="gs1encoders_8h.html#ac8dbf00bb4f37536706cdf421ddd2d04a8ae3fe251107c85c5540a62c413bef66">gs1_encoder_qrVersion40</a>
+<br />
+ }</td></tr>
+<tr class="separator:ac8dbf00bb4f37536706cdf421ddd2d04"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a76a7de37dd312a05b472a1418e367692"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#a76a7de37dd312a05b472a1418e367692">gs1_encoder_getVersion</a> (<a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx)</td></tr>
-<tr class="memdesc:a76a7de37dd312a05b472a1418e367692"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the version string of the library.  <a href="gs1encoders_8h.html#a76a7de37dd312a05b472a1418e367692">More...</a><br /></td></tr>
-<tr class="separator:a76a7de37dd312a05b472a1418e367692"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afc91b40899a42359874c854629c98a7d"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#afc91b40899a42359874c854629c98a7d">gs1_encoder_getVersion</a> (void)</td></tr>
+<tr class="memdesc:afc91b40899a42359874c854629c98a7d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the version string of the library.  <a href="gs1encoders_8h.html#afc91b40899a42359874c854629c98a7d">More...</a><br /></td></tr>
+<tr class="separator:afc91b40899a42359874c854629c98a7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afd581bb226f56c149cc1f903cbd77ca5"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#afd581bb226f56c149cc1f903cbd77ca5">gs1_encoder_instanceSize</a> (void)</td></tr>
 <tr class="memdesc:afd581bb226f56c149cc1f903cbd77ca5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find the memory storage requirements for an instance of <a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34" title="A gs1_encoder context.">gs1_encoder</a>.  <a href="gs1encoders_8h.html#afd581bb226f56c149cc1f903cbd77ca5">More...</a><br /></td></tr>
 <tr class="separator:afd581bb226f56c149cc1f903cbd77ca5"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -316,99 +442,334 @@ The library is thread-safe provided that each thread operates on its own instanc
 </div>
 </div>
 <h2 class="groupheader">Enumeration Type Documentation</h2>
-<a id="a12f58149bb2cdab504621ba5b390ef64"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a12f58149bb2cdab504621ba5b390ef64">&#9670;&nbsp;</a></span>formats</h2>
+<a id="a7598dacdce15b33ef77e2deb181e2e29"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7598dacdce15b33ef77e2deb181e2e29">&#9670;&nbsp;</a></span>gs1_encoder_dmColumns</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">enum <a class="el" href="gs1encoders_8h.html#a12f58149bb2cdab504621ba5b390ef64">formats</a></td>
+          <td class="memname">enum <a class="el" href="gs1encoders_8h.html#a7598dacdce15b33ef77e2deb181e2e29">gs1_encoder_dmColumns</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>The Data Matrix symbols may only be generated with a specific number of columns. </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a7598dacdce15b33ef77e2deb181e2e29a0342cf145d55fd36367baee6ecbb653f"></a>gs1_encoder_dmColumnsAutomatic&#160;</td><td class="fielddoc"><p>Automatic, based on barcode data. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a7598dacdce15b33ef77e2deb181e2e29a4820b8ba26e7c2eecbcc61dece530f8e"></a>gs1_encoder_dmColumns10&#160;</td><td class="fielddoc"><p>10x10 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a7598dacdce15b33ef77e2deb181e2e29a2d6dca6ccf5d6fe98cbde97a8b7465c4"></a>gs1_encoder_dmColumns12&#160;</td><td class="fielddoc"><p>12x12 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a7598dacdce15b33ef77e2deb181e2e29a929d8c56a44aa17b522fc47be0b10c2f"></a>gs1_encoder_dmColumns14&#160;</td><td class="fielddoc"><p>14x14 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a7598dacdce15b33ef77e2deb181e2e29aafe14b7187c2c877d4622942269ef369"></a>gs1_encoder_dmColumns16&#160;</td><td class="fielddoc"><p>16x16, 16x36, 16x48 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a7598dacdce15b33ef77e2deb181e2e29a080459fb70f636df1def19c244f8a0a0"></a>gs1_encoder_dmColumns18&#160;</td><td class="fielddoc"><p>18x18 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a7598dacdce15b33ef77e2deb181e2e29a1c42f0cb3fb75de724475b68467e66df"></a>gs1_encoder_dmColumns20&#160;</td><td class="fielddoc"><p>20x20 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a7598dacdce15b33ef77e2deb181e2e29a21793248ecd0a593fbb590eb909351f0"></a>gs1_encoder_dmColumns22&#160;</td><td class="fielddoc"><p>22x22 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a7598dacdce15b33ef77e2deb181e2e29ae744e2f6ed705d50d2b622fadbea0183"></a>gs1_encoder_dmColumns24&#160;</td><td class="fielddoc"><p>24x24 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a7598dacdce15b33ef77e2deb181e2e29afd9998db0b20c1bac2209f558fb3274e"></a>gs1_encoder_dmColumns26&#160;</td><td class="fielddoc"><p>26x26, 12x26 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a7598dacdce15b33ef77e2deb181e2e29ab51f26ed57189e92dadd86cc533461e0"></a>gs1_encoder_dmColumns32&#160;</td><td class="fielddoc"><p>32x32 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a7598dacdce15b33ef77e2deb181e2e29ac5cdd2e871f054815c25529f547cf9d6"></a>gs1_encoder_dmColumns36&#160;</td><td class="fielddoc"><p>36x36, 12x36, 16x36 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a7598dacdce15b33ef77e2deb181e2e29ab0c37ee1894d9143d7e1d97f1703f98f"></a>gs1_encoder_dmColumns40&#160;</td><td class="fielddoc"><p>40x40 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a7598dacdce15b33ef77e2deb181e2e29a248f2cb23777226bdb0dd19cc004981d"></a>gs1_encoder_dmColumns44&#160;</td><td class="fielddoc"><p>44x44 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a7598dacdce15b33ef77e2deb181e2e29a8342bda3585ef174341147d3cec5f960"></a>gs1_encoder_dmColumns48&#160;</td><td class="fielddoc"><p>48x48, 16x48 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a7598dacdce15b33ef77e2deb181e2e29aa05dd24c71185f9afa5be6c8f36c5637"></a>gs1_encoder_dmColumns52&#160;</td><td class="fielddoc"><p>52x52 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a7598dacdce15b33ef77e2deb181e2e29a359edd1375f28ff51a1f34fcacb6b052"></a>gs1_encoder_dmColumns64&#160;</td><td class="fielddoc"><p>64x64 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a7598dacdce15b33ef77e2deb181e2e29a4a9ef34a94283029cf53f8a51e468cb7"></a>gs1_encoder_dmColumns72&#160;</td><td class="fielddoc"><p>72x72 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a7598dacdce15b33ef77e2deb181e2e29a2cdddbd9517246e3c86dfd0e635ae703"></a>gs1_encoder_dmColumns80&#160;</td><td class="fielddoc"><p>80x80 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a7598dacdce15b33ef77e2deb181e2e29afc187ad30c5574fdd236f427999e2fbf"></a>gs1_encoder_dmColumns88&#160;</td><td class="fielddoc"><p>88x88 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a7598dacdce15b33ef77e2deb181e2e29ae593dc6d694e42c77884dbd91bc708d9"></a>gs1_encoder_dmColumns96&#160;</td><td class="fielddoc"><p>96x96 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a7598dacdce15b33ef77e2deb181e2e29a62babc80956f17202e84a7a42a29a330"></a>gs1_encoder_dmColumns104&#160;</td><td class="fielddoc"><p>104x104 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a7598dacdce15b33ef77e2deb181e2e29af520f357e92255f84428f057dc8b5d86"></a>gs1_encoder_dmColumns120&#160;</td><td class="fielddoc"><p>120x120 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a7598dacdce15b33ef77e2deb181e2e29acecc73334a6457f393bd73a475a5c945"></a>gs1_encoder_dmColumns132&#160;</td><td class="fielddoc"><p>132x132 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a7598dacdce15b33ef77e2deb181e2e29ace9e5314183c3fde0a59d6c6a5160111"></a>gs1_encoder_dmColumns144&#160;</td><td class="fielddoc"><p>144x144 </p>
+</td></tr>
+</table>
+
+</div>
+</div>
+<a id="a77bc3a6b7c0c213036ed0781a38cf667"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a77bc3a6b7c0c213036ed0781a38cf667">&#9670;&nbsp;</a></span>gs1_encoder_dmRows</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="gs1encoders_8h.html#a77bc3a6b7c0c213036ed0781a38cf667">gs1_encoder_dmRows</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>The Data Matrix symbols may only be generated with a specific number of rows. </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a77bc3a6b7c0c213036ed0781a38cf667add6d478c426009e6231b875743ac3b80"></a>gs1_encoder_dmRowsAutomatic&#160;</td><td class="fielddoc"><p>Automatic, based on barcode data. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a77bc3a6b7c0c213036ed0781a38cf667a1ef9aa325899b6ba7301fd2a5bd43001"></a>gs1_encoder_dmRows8&#160;</td><td class="fielddoc"><p>8x18, 8x32 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a77bc3a6b7c0c213036ed0781a38cf667a795b73b18e406d6be588b9450d5ee19a"></a>gs1_encoder_dmRows10&#160;</td><td class="fielddoc"><p>10x10 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a77bc3a6b7c0c213036ed0781a38cf667ad0765ecfd48732472a46bd27866a3ba1"></a>gs1_encoder_dmRows12&#160;</td><td class="fielddoc"><p>12x12, 12x26, 12x36 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a77bc3a6b7c0c213036ed0781a38cf667a4d9c7ceeb83d1d7c3c6a3a91b6a7cdf4"></a>gs1_encoder_dmRows14&#160;</td><td class="fielddoc"><p>14x14 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a77bc3a6b7c0c213036ed0781a38cf667ab60363735bc58730c477f42ab0576b90"></a>gs1_encoder_dmRows16&#160;</td><td class="fielddoc"><p>16x16, 16x36, 16x48 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a77bc3a6b7c0c213036ed0781a38cf667a203e5534c3f59ed6bcc1dea23c8855fe"></a>gs1_encoder_dmRows18&#160;</td><td class="fielddoc"><p>18x18 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a77bc3a6b7c0c213036ed0781a38cf667aab965e7d96c966a5ca46e76287170b6a"></a>gs1_encoder_dmRows20&#160;</td><td class="fielddoc"><p>20x20 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a77bc3a6b7c0c213036ed0781a38cf667a532721d2dfd7dd4a651a1c76cb4725a7"></a>gs1_encoder_dmRows22&#160;</td><td class="fielddoc"><p>22x22 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a77bc3a6b7c0c213036ed0781a38cf667ae9182ec7eca943fcc7406812ce78a18a"></a>gs1_encoder_dmRows24&#160;</td><td class="fielddoc"><p>24x24 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a77bc3a6b7c0c213036ed0781a38cf667a5a32bdfffa9a92540bad2381b8c9c26b"></a>gs1_encoder_dmRows26&#160;</td><td class="fielddoc"><p>26x26 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a77bc3a6b7c0c213036ed0781a38cf667a85ccbdb909593fb668290e3595cda849"></a>gs1_encoder_dmRows32&#160;</td><td class="fielddoc"><p>32x32 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a77bc3a6b7c0c213036ed0781a38cf667a7e938d54a1efea9b5023801a5465e712"></a>gs1_encoder_dmRows36&#160;</td><td class="fielddoc"><p>36x36 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a77bc3a6b7c0c213036ed0781a38cf667abf28dd50fbd3eb66ad8bed7881cf8678"></a>gs1_encoder_dmRows40&#160;</td><td class="fielddoc"><p>40x40 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a77bc3a6b7c0c213036ed0781a38cf667a78aae58325c46ef49af81c4caed1e21d"></a>gs1_encoder_dmRows44&#160;</td><td class="fielddoc"><p>44x44 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a77bc3a6b7c0c213036ed0781a38cf667a8078b6518a1dbbd49d55e709bc1dad9a"></a>gs1_encoder_dmRows48&#160;</td><td class="fielddoc"><p>48x48 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a77bc3a6b7c0c213036ed0781a38cf667acc589fdee23062d4ceef74d6d552d73f"></a>gs1_encoder_dmRows52&#160;</td><td class="fielddoc"><p>52x52 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a77bc3a6b7c0c213036ed0781a38cf667a5d87c1c1c84ba055ed0232a9d993e60e"></a>gs1_encoder_dmRows64&#160;</td><td class="fielddoc"><p>64x64 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a77bc3a6b7c0c213036ed0781a38cf667a8df63c3a015f45c248818326632d4f5b"></a>gs1_encoder_dmRows72&#160;</td><td class="fielddoc"><p>72x72 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a77bc3a6b7c0c213036ed0781a38cf667a76d83ab31f523f7b4aa84d29f9e69342"></a>gs1_encoder_dmRows80&#160;</td><td class="fielddoc"><p>80x80 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a77bc3a6b7c0c213036ed0781a38cf667af25a2131222d4bfe14893bec9135e556"></a>gs1_encoder_dmRows88&#160;</td><td class="fielddoc"><p>88x88 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a77bc3a6b7c0c213036ed0781a38cf667a198a1548b9b0039c45e7309936aacfe7"></a>gs1_encoder_dmRows96&#160;</td><td class="fielddoc"><p>96x96 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a77bc3a6b7c0c213036ed0781a38cf667a6fd67ec1931ab58a9a76ff4a9bbbaf9f"></a>gs1_encoder_dmRows104&#160;</td><td class="fielddoc"><p>104x104 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a77bc3a6b7c0c213036ed0781a38cf667a204569856c12eaeb37b2321a6d5feafb"></a>gs1_encoder_dmRows120&#160;</td><td class="fielddoc"><p>120x120 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a77bc3a6b7c0c213036ed0781a38cf667a76998bd533a0a7f0ff4b317c2abd5bcb"></a>gs1_encoder_dmRows132&#160;</td><td class="fielddoc"><p>132x132 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a77bc3a6b7c0c213036ed0781a38cf667a53929071acbd58af9fdbb87f9ffceb25"></a>gs1_encoder_dmRows144&#160;</td><td class="fielddoc"><p>144x144 </p>
+</td></tr>
+</table>
+
+</div>
+</div>
+<a id="a884bdcb0ef8dafc0fc1a45d1c5cfac17"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a884bdcb0ef8dafc0fc1a45d1c5cfac17">&#9670;&nbsp;</a></span>gs1_encoder_formats</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="gs1encoders_8h.html#a884bdcb0ef8dafc0fc1a45d1c5cfac17">gs1_encoder_formats</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
 <p>Barcode images can be written in common BMP and TIFF graphical formats, as well as output as a headerless matrix. </p>
 <table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a12f58149bb2cdab504621ba5b390ef64a8e5e88196a4041bc8e95ec27965b60e4"></a>gs1_encoder_dBMP&#160;</td><td class="fielddoc"><p>BMP format. </p>
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a884bdcb0ef8dafc0fc1a45d1c5cfac17a8e5e88196a4041bc8e95ec27965b60e4"></a>gs1_encoder_dBMP&#160;</td><td class="fielddoc"><p>BMP format. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a12f58149bb2cdab504621ba5b390ef64ab80d6391fa9fcd12fe7b45321b5dc809"></a>gs1_encoder_dTIF&#160;</td><td class="fielddoc"><p>TIFF format. </p>
+<tr><td class="fieldname"><a id="a884bdcb0ef8dafc0fc1a45d1c5cfac17ab80d6391fa9fcd12fe7b45321b5dc809"></a>gs1_encoder_dTIF&#160;</td><td class="fielddoc"><p>TIFF format. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a12f58149bb2cdab504621ba5b390ef64a8b3eb847583daabfc11b8622736656ed"></a>gs1_encoder_dRAW&#160;</td><td class="fielddoc"><p>TIFF, without header (1-bit per pixel matrix with byte-aligned rows) </p>
+<tr><td class="fieldname"><a id="a884bdcb0ef8dafc0fc1a45d1c5cfac17a8b3eb847583daabfc11b8622736656ed"></a>gs1_encoder_dRAW&#160;</td><td class="fielddoc"><p>TIFF, without header (1-bit per pixel matrix with byte-aligned rows) </p>
 </td></tr>
 </table>
 
 </div>
 </div>
-<a id="a5f453073111a11cc4b3f81bae7b5c1b7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5f453073111a11cc4b3f81bae7b5c1b7">&#9670;&nbsp;</a></span>qrEClevel</h2>
+<a id="a02da27b0e3e00e72b2f6f20d4ae3bf53"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a02da27b0e3e00e72b2f6f20d4ae3bf53">&#9670;&nbsp;</a></span>gs1_encoder_qrEClevel</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">enum <a class="el" href="gs1encoders_8h.html#a5f453073111a11cc4b3f81bae7b5c1b7">qrEClevel</a></td>
+          <td class="memname">enum <a class="el" href="gs1encoders_8h.html#a02da27b0e3e00e72b2f6f20d4ae3bf53">gs1_encoder_qrEClevel</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
 <p>The QR Code symbology supports several error correction levels which allow differing amount of unreadable data to be reconstructed. </p>
 <table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a5f453073111a11cc4b3f81bae7b5c1b7ace87b696810b0311f877044f09b2dd3d"></a>gs1_encoder_qrEClevelL&#160;</td><td class="fielddoc"><p>Low error correction (7% damage recovery) </p>
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a02da27b0e3e00e72b2f6f20d4ae3bf53ace87b696810b0311f877044f09b2dd3d"></a>gs1_encoder_qrEClevelL&#160;</td><td class="fielddoc"><p>Low error correction (7% damage recovery) </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a5f453073111a11cc4b3f81bae7b5c1b7aaa88336f28e223605448ce8c9d61736c"></a>gs1_encoder_qrEClevelM&#160;</td><td class="fielddoc"><p>Medium error correction (15% damage recovery) </p>
+<tr><td class="fieldname"><a id="a02da27b0e3e00e72b2f6f20d4ae3bf53aaa88336f28e223605448ce8c9d61736c"></a>gs1_encoder_qrEClevelM&#160;</td><td class="fielddoc"><p>Medium error correction (15% damage recovery) </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a5f453073111a11cc4b3f81bae7b5c1b7a64bc781df25a9b5b95155b16afdf3b1a"></a>gs1_encoder_qrEClevelQ&#160;</td><td class="fielddoc"><p>Quartile error correction (25% damage recovery) </p>
+<tr><td class="fieldname"><a id="a02da27b0e3e00e72b2f6f20d4ae3bf53a64bc781df25a9b5b95155b16afdf3b1a"></a>gs1_encoder_qrEClevelQ&#160;</td><td class="fielddoc"><p>Quartile error correction (25% damage recovery) </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a5f453073111a11cc4b3f81bae7b5c1b7a43eb13ec50fecd313958fc0cfb81a161"></a>gs1_encoder_qrEClevelH&#160;</td><td class="fielddoc"><p>High error correction (30% damage recovery) </p>
+<tr><td class="fieldname"><a id="a02da27b0e3e00e72b2f6f20d4ae3bf53a43eb13ec50fecd313958fc0cfb81a161"></a>gs1_encoder_qrEClevelH&#160;</td><td class="fielddoc"><p>High error correction (30% damage recovery) </p>
 </td></tr>
 </table>
 
 </div>
 </div>
-<a id="a190f26971a88a11a2faed3182a9157c8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a190f26971a88a11a2faed3182a9157c8">&#9670;&nbsp;</a></span>symbologies</h2>
+<a id="ac8dbf00bb4f37536706cdf421ddd2d04"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac8dbf00bb4f37536706cdf421ddd2d04">&#9670;&nbsp;</a></span>gs1_encoder_qrVersion</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">enum <a class="el" href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8">symbologies</a></td>
+          <td class="memname">enum <a class="el" href="gs1encoders_8h.html#ac8dbf00bb4f37536706cdf421ddd2d04">gs1_encoder_qrVersion</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>The QR Code symbology supports several versions that specify the size of the symbol. </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="ac8dbf00bb4f37536706cdf421ddd2d04a472d18d419f818231b7c9508b338e8f7"></a>gs1_encoder_qrVersionAutomatic&#160;</td><td class="fielddoc"><p>Automatic, based on barcode data. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ac8dbf00bb4f37536706cdf421ddd2d04a8c7539c9a5c502845dd428e8b68a6b19"></a>gs1_encoder_qrVersion1&#160;</td><td class="fielddoc"><p>Version 1, 21x21. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ac8dbf00bb4f37536706cdf421ddd2d04a4cbbcdd605d79cc7b769309f0bca2277"></a>gs1_encoder_qrVersion2&#160;</td><td class="fielddoc"><p>Version 2, 25x25. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ac8dbf00bb4f37536706cdf421ddd2d04a423fb7d814e746b0fab41e776e0a04d5"></a>gs1_encoder_qrVersion3&#160;</td><td class="fielddoc"><p>Version 3, 29x29. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ac8dbf00bb4f37536706cdf421ddd2d04a1ed2c9cacff6038069a6da9556c9bf42"></a>gs1_encoder_qrVersion4&#160;</td><td class="fielddoc"><p>Version 4, 33x33. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ac8dbf00bb4f37536706cdf421ddd2d04a5c17c0416e52a58eb1215ec1cb393f58"></a>gs1_encoder_qrVersion5&#160;</td><td class="fielddoc"><p>Version 5, 37x37. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ac8dbf00bb4f37536706cdf421ddd2d04a438c47ac1e26b7d7acb55d09418501da"></a>gs1_encoder_qrVersion6&#160;</td><td class="fielddoc"><p>Version 6, 41x41. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ac8dbf00bb4f37536706cdf421ddd2d04a1cf1bfb9432cf961e2d88cfd869826ba"></a>gs1_encoder_qrVersion7&#160;</td><td class="fielddoc"><p>Version 7, 45x45. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ac8dbf00bb4f37536706cdf421ddd2d04a128aad1f7f64a86faf76e917c99cee09"></a>gs1_encoder_qrVersion8&#160;</td><td class="fielddoc"><p>Version 8, 49x49. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ac8dbf00bb4f37536706cdf421ddd2d04a59ecac2df8b817cc776bfe1f67bd97ab"></a>gs1_encoder_qrVersion9&#160;</td><td class="fielddoc"><p>Version 9, 53x53. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ac8dbf00bb4f37536706cdf421ddd2d04aac747a6dcc9b01ad71f43949dd7e41f1"></a>gs1_encoder_qrVersion10&#160;</td><td class="fielddoc"><p>Version 10, 57x57. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ac8dbf00bb4f37536706cdf421ddd2d04ab8df7fe2784394a160f4c648aa0657e0"></a>gs1_encoder_qrVersion11&#160;</td><td class="fielddoc"><p>Version 11, 61x61. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ac8dbf00bb4f37536706cdf421ddd2d04a33ae98d9fda15118fae45f290c3a2044"></a>gs1_encoder_qrVersion12&#160;</td><td class="fielddoc"><p>Version 12, 65x65. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ac8dbf00bb4f37536706cdf421ddd2d04af78c002d957276d12b5eb88e82cd9eb8"></a>gs1_encoder_qrVersion13&#160;</td><td class="fielddoc"><p>Version 13, 69x69. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ac8dbf00bb4f37536706cdf421ddd2d04a1c88af57a1093bdcdcee13b55a622b0e"></a>gs1_encoder_qrVersion14&#160;</td><td class="fielddoc"><p>Version 14, 73x73. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ac8dbf00bb4f37536706cdf421ddd2d04a9134dc3249635045d5fd9e37ea2e8093"></a>gs1_encoder_qrVersion15&#160;</td><td class="fielddoc"><p>Version 15, 77x77. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ac8dbf00bb4f37536706cdf421ddd2d04a8e9d0f07e0af03bf5b4a2c9c43262071"></a>gs1_encoder_qrVersion16&#160;</td><td class="fielddoc"><p>Version 16, 81x81. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ac8dbf00bb4f37536706cdf421ddd2d04a30d04b736f46f0fd240d7e214c90e9c9"></a>gs1_encoder_qrVersion17&#160;</td><td class="fielddoc"><p>Version 17, 85x85. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ac8dbf00bb4f37536706cdf421ddd2d04a356dda3681a85a6b88c10440584a7d27"></a>gs1_encoder_qrVersion18&#160;</td><td class="fielddoc"><p>Version 18, 89x89. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ac8dbf00bb4f37536706cdf421ddd2d04a7d797c1171ac4fdd5ad8a875cdf31858"></a>gs1_encoder_qrVersion19&#160;</td><td class="fielddoc"><p>Version 19, 93x93. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ac8dbf00bb4f37536706cdf421ddd2d04a4c3b490f84c913ad62d44b4407f4a393"></a>gs1_encoder_qrVersion20&#160;</td><td class="fielddoc"><p>Version 20, 97x97. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ac8dbf00bb4f37536706cdf421ddd2d04aeba22c83381e45293275d2984acaf998"></a>gs1_encoder_qrVersion21&#160;</td><td class="fielddoc"><p>Version 21, 101x101. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ac8dbf00bb4f37536706cdf421ddd2d04a895e844b7692d1343a642ebdb606a1e3"></a>gs1_encoder_qrVersion22&#160;</td><td class="fielddoc"><p>Version 22, 105x105. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ac8dbf00bb4f37536706cdf421ddd2d04ac2dfe5920e702160712aabcd6c97cf3f"></a>gs1_encoder_qrVersion23&#160;</td><td class="fielddoc"><p>Version 23, 109x109. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ac8dbf00bb4f37536706cdf421ddd2d04aa996974ccc7dfbb5d17b27b471325968"></a>gs1_encoder_qrVersion24&#160;</td><td class="fielddoc"><p>Version 24, 113x113. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ac8dbf00bb4f37536706cdf421ddd2d04a672863966313fc8cc44545efe4c21dd2"></a>gs1_encoder_qrVersion25&#160;</td><td class="fielddoc"><p>Version 25, 117x117. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ac8dbf00bb4f37536706cdf421ddd2d04a92176247a0a6a8c194f0ce4add7c7a6b"></a>gs1_encoder_qrVersion26&#160;</td><td class="fielddoc"><p>Version 26, 121x121. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ac8dbf00bb4f37536706cdf421ddd2d04a857b4aa2c4ce8d54405b43b0852ca50c"></a>gs1_encoder_qrVersion27&#160;</td><td class="fielddoc"><p>Version 27, 125x125. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ac8dbf00bb4f37536706cdf421ddd2d04afc01050e7d4a14798f6e58d42a87fc03"></a>gs1_encoder_qrVersion28&#160;</td><td class="fielddoc"><p>Version 28, 129x129. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ac8dbf00bb4f37536706cdf421ddd2d04affe7d25ce5acdcf1a34d3bb5173b0bf2"></a>gs1_encoder_qrVersion29&#160;</td><td class="fielddoc"><p>Version 29, 133x133. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ac8dbf00bb4f37536706cdf421ddd2d04a97e781f9fed174d76f9d2a0c23b43e66"></a>gs1_encoder_qrVersion30&#160;</td><td class="fielddoc"><p>Version 30, 137x137. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ac8dbf00bb4f37536706cdf421ddd2d04ad9ff56958387b033cfc5e05e1ccc3d6e"></a>gs1_encoder_qrVersion31&#160;</td><td class="fielddoc"><p>Version 31, 141x141. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ac8dbf00bb4f37536706cdf421ddd2d04afc3644137d856e258569a3d6e06dc184"></a>gs1_encoder_qrVersion32&#160;</td><td class="fielddoc"><p>Version 32, 145x145. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ac8dbf00bb4f37536706cdf421ddd2d04a7a82babcf936aabe916c512eae8a9da9"></a>gs1_encoder_qrVersion33&#160;</td><td class="fielddoc"><p>Version 33, 149x149. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ac8dbf00bb4f37536706cdf421ddd2d04a5c7572dc428946e427b0214b7775e610"></a>gs1_encoder_qrVersion34&#160;</td><td class="fielddoc"><p>Version 34, 153x153. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ac8dbf00bb4f37536706cdf421ddd2d04a23cf0c79b5eedc4d13e5a332bb369937"></a>gs1_encoder_qrVersion35&#160;</td><td class="fielddoc"><p>Version 35, 157x157. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ac8dbf00bb4f37536706cdf421ddd2d04aa0752bc87795f91522570fd34690ed0b"></a>gs1_encoder_qrVersion36&#160;</td><td class="fielddoc"><p>Version 36, 161x161. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ac8dbf00bb4f37536706cdf421ddd2d04a6f2db30be26bd6d78843f46a9b66eb21"></a>gs1_encoder_qrVersion37&#160;</td><td class="fielddoc"><p>Version 37, 165x165. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ac8dbf00bb4f37536706cdf421ddd2d04a65458e6b762b7811fb2605b9fcd11bae"></a>gs1_encoder_qrVersion38&#160;</td><td class="fielddoc"><p>Version 38, 169x169. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ac8dbf00bb4f37536706cdf421ddd2d04ac2e9e6922ecfb248de93e170c5e80510"></a>gs1_encoder_qrVersion39&#160;</td><td class="fielddoc"><p>Version 39, 173x173. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ac8dbf00bb4f37536706cdf421ddd2d04a8ae3fe251107c85c5540a62c413bef66"></a>gs1_encoder_qrVersion40&#160;</td><td class="fielddoc"><p>Version 49, 177x177. </p>
+</td></tr>
+</table>
+
+</div>
+</div>
+<a id="a7dab341c6821917b8eddfd1d17de4053"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7dab341c6821917b8eddfd1d17de4053">&#9670;&nbsp;</a></span>gs1_encoder_symbologies</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="gs1encoders_8h.html#a7dab341c6821917b8eddfd1d17de4053">gs1_encoder_symbologies</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 <p>All of the major GS1 barcode formats ("symbologies") are supported by this library. </p>
 <table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a190f26971a88a11a2faed3182a9157c8a5df1931a2be629e0cba82a5ac392e18d"></a>gs1_encoder_sNONE&#160;</td><td class="fielddoc"><p>None defined. </p>
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a7dab341c6821917b8eddfd1d17de4053a5df1931a2be629e0cba82a5ac392e18d"></a>gs1_encoder_sNONE&#160;</td><td class="fielddoc"><p>None defined. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a190f26971a88a11a2faed3182a9157c8a18aef6a5b8d04d5222d6495b9156685b"></a>gs1_encoder_sDataBarOmni&#160;</td><td class="fielddoc"><p>GS1 DataBar Omnidirectional. </p>
+<tr><td class="fieldname"><a id="a7dab341c6821917b8eddfd1d17de4053a18aef6a5b8d04d5222d6495b9156685b"></a>gs1_encoder_sDataBarOmni&#160;</td><td class="fielddoc"><p>GS1 DataBar Omnidirectional. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a190f26971a88a11a2faed3182a9157c8a014910ca17a30e70183b9d1e3fcc490a"></a>gs1_encoder_sDataBarTruncated&#160;</td><td class="fielddoc"><p>GS1 DataBar Truncated. </p>
+<tr><td class="fieldname"><a id="a7dab341c6821917b8eddfd1d17de4053a014910ca17a30e70183b9d1e3fcc490a"></a>gs1_encoder_sDataBarTruncated&#160;</td><td class="fielddoc"><p>GS1 DataBar Truncated. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a190f26971a88a11a2faed3182a9157c8a3125c0fefeefc444f0e158f74add53db"></a>gs1_encoder_sDataBarStacked&#160;</td><td class="fielddoc"><p>GS1 DataBar Stacked. </p>
+<tr><td class="fieldname"><a id="a7dab341c6821917b8eddfd1d17de4053a3125c0fefeefc444f0e158f74add53db"></a>gs1_encoder_sDataBarStacked&#160;</td><td class="fielddoc"><p>GS1 DataBar Stacked. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a190f26971a88a11a2faed3182a9157c8a5e00ff4a90615fca1dde472eb847fe4b"></a>gs1_encoder_sDataBarStackedOmni&#160;</td><td class="fielddoc"><p>GS1 DataBar Stacked Omnidirectional. </p>
+<tr><td class="fieldname"><a id="a7dab341c6821917b8eddfd1d17de4053a5e00ff4a90615fca1dde472eb847fe4b"></a>gs1_encoder_sDataBarStackedOmni&#160;</td><td class="fielddoc"><p>GS1 DataBar Stacked Omnidirectional. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a190f26971a88a11a2faed3182a9157c8a94a6d06a4195f0bd7bf5975d27ab8070"></a>gs1_encoder_sDataBarLimited&#160;</td><td class="fielddoc"><p>GS1 DataBar Limited. </p>
+<tr><td class="fieldname"><a id="a7dab341c6821917b8eddfd1d17de4053a94a6d06a4195f0bd7bf5975d27ab8070"></a>gs1_encoder_sDataBarLimited&#160;</td><td class="fielddoc"><p>GS1 DataBar Limited. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a190f26971a88a11a2faed3182a9157c8acf7f816a924a4e9d0dd8d4d39f709847"></a>gs1_encoder_sDataBarExpanded&#160;</td><td class="fielddoc"><p>GS1 DataBar Expanded (Stacked) </p>
+<tr><td class="fieldname"><a id="a7dab341c6821917b8eddfd1d17de4053acf7f816a924a4e9d0dd8d4d39f709847"></a>gs1_encoder_sDataBarExpanded&#160;</td><td class="fielddoc"><p>GS1 DataBar Expanded (Stacked) </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a190f26971a88a11a2faed3182a9157c8a3e2e190205c38c82a0f384c361dc227f"></a>gs1_encoder_sUPCA&#160;</td><td class="fielddoc"><p>UPC-A. </p>
+<tr><td class="fieldname"><a id="a7dab341c6821917b8eddfd1d17de4053a3e2e190205c38c82a0f384c361dc227f"></a>gs1_encoder_sUPCA&#160;</td><td class="fielddoc"><p>UPC-A. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a190f26971a88a11a2faed3182a9157c8adedd4d65ff3420f9e56c9c7edd177d92"></a>gs1_encoder_sUPCE&#160;</td><td class="fielddoc"><p>UPC-E. </p>
+<tr><td class="fieldname"><a id="a7dab341c6821917b8eddfd1d17de4053adedd4d65ff3420f9e56c9c7edd177d92"></a>gs1_encoder_sUPCE&#160;</td><td class="fielddoc"><p>UPC-E. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a190f26971a88a11a2faed3182a9157c8a05cad5357f37d39d1a9b10db759fb4a2"></a>gs1_encoder_sEAN13&#160;</td><td class="fielddoc"><p>EAN-13. </p>
+<tr><td class="fieldname"><a id="a7dab341c6821917b8eddfd1d17de4053a05cad5357f37d39d1a9b10db759fb4a2"></a>gs1_encoder_sEAN13&#160;</td><td class="fielddoc"><p>EAN-13. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a190f26971a88a11a2faed3182a9157c8ac582b7f1d7e748f14b98a40a9610ae44"></a>gs1_encoder_sEAN8&#160;</td><td class="fielddoc"><p>EAN-8. </p>
+<tr><td class="fieldname"><a id="a7dab341c6821917b8eddfd1d17de4053ac582b7f1d7e748f14b98a40a9610ae44"></a>gs1_encoder_sEAN8&#160;</td><td class="fielddoc"><p>EAN-8. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a190f26971a88a11a2faed3182a9157c8a7a6e74c2cad48bb27a00a067947a1c8d"></a>gs1_encoder_sGS1_128_CCA&#160;</td><td class="fielddoc"><p>GS1-128 with CC-A or CC-B. </p>
+<tr><td class="fieldname"><a id="a7dab341c6821917b8eddfd1d17de4053a7a6e74c2cad48bb27a00a067947a1c8d"></a>gs1_encoder_sGS1_128_CCA&#160;</td><td class="fielddoc"><p>GS1-128 with CC-A or CC-B. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a190f26971a88a11a2faed3182a9157c8a9d95e648588c4e2cab744a969e9cc049"></a>gs1_encoder_sGS1_128_CCC&#160;</td><td class="fielddoc"><p>GS1-128 with CC-C. </p>
+<tr><td class="fieldname"><a id="a7dab341c6821917b8eddfd1d17de4053a9d95e648588c4e2cab744a969e9cc049"></a>gs1_encoder_sGS1_128_CCC&#160;</td><td class="fielddoc"><p>GS1-128 with CC-C. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a190f26971a88a11a2faed3182a9157c8a2ff3d6b47e141e82f74795d9834560c3"></a>gs1_encoder_sQR&#160;</td><td class="fielddoc"><p>(GS1) QR Code </p>
+<tr><td class="fieldname"><a id="a7dab341c6821917b8eddfd1d17de4053a2ff3d6b47e141e82f74795d9834560c3"></a>gs1_encoder_sQR&#160;</td><td class="fielddoc"><p>(GS1) QR Code </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a190f26971a88a11a2faed3182a9157c8ae133b476dcbc3d56579df62d6a08ba6d"></a>gs1_encoder_sDM&#160;</td><td class="fielddoc"><p>(GS1) Data Matrix </p>
+<tr><td class="fieldname"><a id="a7dab341c6821917b8eddfd1d17de4053ae133b476dcbc3d56579df62d6a08ba6d"></a>gs1_encoder_sDM&#160;</td><td class="fielddoc"><p>(GS1) Data Matrix </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a190f26971a88a11a2faed3182a9157c8a89eba163f359c68083143631f5164255"></a>gs1_encoder_sNUMSYMS&#160;</td><td class="fielddoc"><p>Value is the number of symbologies. </p>
+<tr><td class="fieldname"><a id="a7dab341c6821917b8eddfd1d17de4053a89eba163f359c68083143631f5164255"></a>gs1_encoder_sNUMSYMS&#160;</td><td class="fielddoc"><p>Value is the number of symbologies. </p>
 </td></tr>
 </table>
 
@@ -907,7 +1268,7 @@ The library is thread-safe provided that each thread operates on its own instanc
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>output format, one of <a class="el" href="gs1encoders_8h.html#a12f58149bb2cdab504621ba5b390ef64">formats</a> </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>output format, one of <a class="el" href="gs1encoders_8h.html#a884bdcb0ef8dafc0fc1a45d1c5cfac17">gs1_encoder_formats</a> </dd></dl>
 
 </div>
 </div>
@@ -1116,7 +1477,7 @@ The library is thread-safe provided that each thread operates on its own instanc
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>current error correction level, one of <a class="el" href="gs1encoders_8h.html#a5f453073111a11cc4b3f81bae7b5c1b7">qrEClevel</a> </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>current error correction level, one of <a class="el" href="gs1encoders_8h.html#a02da27b0e3e00e72b2f6f20d4ae3bf53">gs1_encoder_qrEClevel</a> </dd></dl>
 
 </div>
 </div>
@@ -1144,7 +1505,7 @@ The library is thread-safe provided that each thread operates on its own instanc
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>current version number, or 0 if automatic </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>current version number, one of <a class="el" href="gs1encoders_8h.html#ac8dbf00bb4f37536706cdf421ddd2d04">gs1_encoder_qrVersion</a> </dd></dl>
 
 </div>
 </div>
@@ -1200,12 +1561,12 @@ The library is thread-safe provided that each thread operates on its own instanc
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>symbology type, one of <a class="el" href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8" title="All of the major GS1 barcode formats (&quot;symbologies&quot;) are supported by this library.">symbologies</a> </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>symbology type, one of <a class="el" href="gs1encoders_8h.html#a7dab341c6821917b8eddfd1d17de4053" title="All of the major GS1 barcode formats (&quot;symbologies&quot;) are supported by this library.">gs1_encoder_symbologies</a> </dd></dl>
 
 </div>
 </div>
-<a id="a76a7de37dd312a05b472a1418e367692"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a76a7de37dd312a05b472a1418e367692">&#9670;&nbsp;</a></span>gs1_encoder_getVersion()</h2>
+<a id="afc91b40899a42359874c854629c98a7d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afc91b40899a42359874c854629c98a7d">&#9670;&nbsp;</a></span>gs1_encoder_getVersion()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1213,8 +1574,8 @@ The library is thread-safe provided that each thread operates on its own instanc
         <tr>
           <td class="memname">GS1_ENCODERS_API char* gs1_encoder_getVersion </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *&#160;</td>
-          <td class="paramname"><em>ctx</em></td><td>)</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -1222,12 +1583,6 @@ The library is thread-safe provided that each thread operates on its own instanc
 
 <p>Get the version string of the library. </p>
 <p>This is typically the build date.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">ctx</td><td>instance of <a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34" title="A gs1_encoder context.">gs1_encoder</a> </td></tr>
-  </table>
-  </dd>
-</dl>
 <dl class="section return"><dt>Returns</dt><dd>pointer to a string containing the version of the library </dd></dl>
 
 </div>
@@ -1710,17 +2065,17 @@ The library is thread-safe provided that each thread operates on its own instanc
 </div><div class="memdoc">
 
 <p>Set the output format for the barcode symbol. </p>
-<p>This allows the output format to be specified as any one of the known <a class="el" href="gs1encoders_8h.html#a12f58149bb2cdab504621ba5b390ef64">formats</a>:</p>
+<p>This allows the output format to be specified as any one of the known <a class="el" href="gs1encoders_8h.html#a884bdcb0ef8dafc0fc1a45d1c5cfac17">gs1_encoder_formats</a>:</p>
 <ul>
-<li><a class="el" href="gs1encoders_8h.html#a12f58149bb2cdab504621ba5b390ef64a8e5e88196a4041bc8e95ec27965b60e4" title="BMP format.">gs1_encoder_dBMP</a>: BMP format</li>
-<li><a class="el" href="gs1encoders_8h.html#a12f58149bb2cdab504621ba5b390ef64ab80d6391fa9fcd12fe7b45321b5dc809" title="TIFF format.">gs1_encoder_dTIF</a>: TIFF format</li>
-<li><a class="el" href="gs1encoders_8h.html#a12f58149bb2cdab504621ba5b390ef64a8b3eb847583daabfc11b8622736656ed" title="TIFF, without header (1-bit per pixel matrix with byte-aligned rows)">gs1_encoder_dRAW</a>: TIFF format, without the header</li>
+<li><a class="el" href="gs1encoders_8h.html#a884bdcb0ef8dafc0fc1a45d1c5cfac17a8e5e88196a4041bc8e95ec27965b60e4" title="BMP format.">gs1_encoder_dBMP</a>: BMP format</li>
+<li><a class="el" href="gs1encoders_8h.html#a884bdcb0ef8dafc0fc1a45d1c5cfac17ab80d6391fa9fcd12fe7b45321b5dc809" title="TIFF format.">gs1_encoder_dTIF</a>: TIFF format</li>
+<li><a class="el" href="gs1encoders_8h.html#a884bdcb0ef8dafc0fc1a45d1c5cfac17a8b3eb847583daabfc11b8622736656ed" title="TIFF, without header (1-bit per pixel matrix with byte-aligned rows)">gs1_encoder_dRAW</a>: TIFF format, without the header</li>
 </ul>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#ad12c7a5f32647e854c0fa693ce9bb0f9" title="Get the current output format type.">gs1_encoder_getFormat()</a></dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in,out]</td><td class="paramname">ctx</td><td><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34" title="A gs1_encoder context.">gs1_encoder</a> context </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">format</td><td>output format </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">format</td><td>output format, one of <a class="el" href="gs1encoders_8h.html#a884bdcb0ef8dafc0fc1a45d1c5cfac17">gs1_encoder_formats</a> </td></tr>
   </table>
   </dd>
 </dl>
@@ -1802,7 +2157,7 @@ The library is thread-safe provided that each thread operates on its own instanc
 </div><!-- fragment --><p>This syntax harmonises the format for the input accepted by all symbologies. For example the following input is acceptable for EAN-13, UPC-A, UPC-E and any variant of the GS1 DataBar family:</p>
 <div class="fragment"><div class="line">(01)00031234000054</div>
 </div><!-- fragment --><p>The input is immediately parsed and the resulting encoding is available via <a class="el" href="gs1encoders_8h.html#a6ab16e68827bb7adc811e8e5ec6cc369" title="Reads the barcode data buffer.">gs1_encoder_getDataStr()</a>.</p>
-<p>For symbologies that support a composite component (all except <a class="el" href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8ae133b476dcbc3d56579df62d6a08ba6d" title="(GS1) Data Matrix">gs1_encoder_sDM</a> and <a class="el" href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8a2ff3d6b47e141e82f74795d9834560c3" title="(GS1) QR Code">gs1_encoder_sQR</a>), the data for the linear and 2D components can be separated by a "|" character, for example:</p>
+<p>For symbologies that support a composite component (all except <a class="el" href="gs1encoders_8h.html#a7dab341c6821917b8eddfd1d17de4053ae133b476dcbc3d56579df62d6a08ba6d" title="(GS1) Data Matrix">gs1_encoder_sDM</a> and <a class="el" href="gs1encoders_8h.html#a7dab341c6821917b8eddfd1d17de4053a2ff3d6b47e141e82f74795d9834560c3" title="(GS1) QR Code">gs1_encoder_sQR</a>), the data for the linear and 2D components can be separated by a "|" character, for example:</p>
 <div class="fragment"><div class="line">(01)12345678901231|(10)ABC123(11)210630</div>
 </div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>The ultimate length of the encoded data must be less that the value returned by <a class="el" href="gs1encoders_8h.html#aa24d43ed449f07eae209f974686b195c" title="Get the maximum size of the input data buffer for barcode message content.">gs1_encoder_getMaxDataStrLength()</a>.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#ad0e7c44b083e541810cb58eeef3028c6" title="Sets the raw data in the buffer that is used when buffer input is selected.">gs1_encoder_setDataStr()</a> </dd>
@@ -1942,14 +2297,14 @@ The library is thread-safe provided that each thread operates on its own instanc
 
 <p>Set the error correction level for QR Code symbols. </p>
 <p>This determines what proportion of a symbols data can be reliably reconstructed if it is damaged.</p>
-<p>Default is <a class="el" href="gs1encoders_8h.html#a5f453073111a11cc4b3f81bae7b5c1b7aaa88336f28e223605448ce8c9d61736c" title="Medium error correction (15% damage recovery)">gs1_encoder_qrEClevelM</a></p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#a5f453073111a11cc4b3f81bae7b5c1b7">qrEClevel</a> </dd>
+<p>Default is <a class="el" href="gs1encoders_8h.html#a02da27b0e3e00e72b2f6f20d4ae3bf53aaa88336f28e223605448ce8c9d61736c" title="Medium error correction (15% damage recovery)">gs1_encoder_qrEClevelM</a></p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#a02da27b0e3e00e72b2f6f20d4ae3bf53">gs1_encoder_qrEClevel</a> </dd>
 <dd>
 <a class="el" href="gs1encoders_8h.html#a833963ac7dd50acd5109285679d2d443" title="Get the current error correction level for QR Code symbols.">gs1_encoder_getQrEClevel()</a></dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in,out]</td><td class="paramname">ctx</td><td><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34" title="A gs1_encoder context.">gs1_encoder</a> context </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">ecLevel</td><td>error correction level, one of <a class="el" href="gs1encoders_8h.html#a5f453073111a11cc4b3f81bae7b5c1b7">qrEClevel</a> </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">ecLevel</td><td>error correction level, one of <a class="el" href="gs1encoders_8h.html#a02da27b0e3e00e72b2f6f20d4ae3bf53">gs1_encoder_qrEClevel</a> </td></tr>
   </table>
   </dd>
 </dl>
@@ -1984,12 +2339,15 @@ The library is thread-safe provided that each thread operates on its own instanc
 </div><div class="memdoc">
 
 <p>Set a fixed version number for QR Code symbols. </p>
+<p>Default is <a class="el" href="gs1encoders_8h.html#ac8dbf00bb4f37536706cdf421ddd2d04a472d18d419f818231b7c9508b338e8f7" title="Automatic, based on barcode data.">gs1_encoder_qrVersionAutomatic</a></p>
 <dl class="section note"><dt>Note</dt><dd>Valid values are 1 to 40, or 0 for automatic</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#a8c5de2523180d61924ab15d98a4555c1" title="Get the current fixed version number for QR Code symbols.">gs1_encoder_getQrVersion()</a></dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#ac8dbf00bb4f37536706cdf421ddd2d04">gs1_encoder_qrVersion</a> </dd>
+<dd>
+<a class="el" href="gs1encoders_8h.html#a8c5de2523180d61924ab15d98a4555c1" title="Get the current fixed version number for QR Code symbols.">gs1_encoder_getQrVersion()</a></dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in,out]</td><td class="paramname">ctx</td><td><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34" title="A gs1_encoder context.">gs1_encoder</a> context </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">version</td><td>fixed version number, or 0 for automatic </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">version</td><td>fixed version number, one of <a class="el" href="gs1encoders_8h.html#ac8dbf00bb4f37536706cdf421ddd2d04">gs1_encoder_qrVersion</a> </td></tr>
   </table>
   </dd>
 </dl>
@@ -2066,8 +2424,10 @@ The library is thread-safe provided that each thread operates on its own instanc
 </div><div class="memdoc">
 
 <p>Set the symbology type. </p>
-<p>This allows the symbology to be specified as any one of the known <a class="el" href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8" title="All of the major GS1 barcode formats (&quot;symbologies&quot;) are supported by this library.">symbologies</a> other than <a class="el" href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8a5df1931a2be629e0cba82a5ac392e18d" title="None defined.">gs1_encoder_sNONE</a> or <a class="el" href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8a89eba163f359c68083143631f5164255" title="Value is the number of symbologies.">gs1_encoder_sNUMSYMS</a>.</p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#ae2ba9da9aff475c78d2e58bfc1632056" title="Get the current symbology type.">gs1_encoder_getSym()</a></dd></dl>
+<p>This allows the symbology to be specified as any one of the known <a class="el" href="gs1encoders_8h.html#a7dab341c6821917b8eddfd1d17de4053" title="All of the major GS1 barcode formats (&quot;symbologies&quot;) are supported by this library.">gs1_encoder_symbologies</a> other than <a class="el" href="gs1encoders_8h.html#a7dab341c6821917b8eddfd1d17de4053a5df1931a2be629e0cba82a5ac392e18d" title="None defined.">gs1_encoder_sNONE</a> or <a class="el" href="gs1encoders_8h.html#a7dab341c6821917b8eddfd1d17de4053a89eba163f359c68083143631f5164255" title="Value is the number of symbologies.">gs1_encoder_sNUMSYMS</a>.</p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#a7dab341c6821917b8eddfd1d17de4053" title="All of the major GS1 barcode formats (&quot;symbologies&quot;) are supported by this library.">gs1_encoder_symbologies</a> </dd>
+<dd>
+<a class="el" href="gs1encoders_8h.html#ae2ba9da9aff475c78d2e58bfc1632056" title="Get the current symbology type.">gs1_encoder_getSym()</a></dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in,out]</td><td class="paramname">ctx</td><td><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34" title="A gs1_encoder context.">gs1_encoder</a> context </td></tr>
@@ -2166,17 +2526,17 @@ The library is thread-safe provided that each thread operates on its own instanc
 </div>
 </div>
 </div><!-- contents -->
-<div class="ttc" id="ags1encoders_8h_html_a34f786d8479759fd8894c6d22a9f5c34"><div class="ttname"><a href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a></div><div class="ttdeci">struct gs1_encoder gs1_encoder</div><div class="ttdoc">A gs1_encoder context.</div><div class="ttdef"><b>Definition:</b> gs1encoders.h:181</div></div>
+<div class="ttc" id="ags1encoders_8h_html_a7dab341c6821917b8eddfd1d17de4053ae133b476dcbc3d56579df62d6a08ba6d"><div class="ttname"><a href="gs1encoders_8h.html#a7dab341c6821917b8eddfd1d17de4053ae133b476dcbc3d56579df62d6a08ba6d">gs1_encoder_sDM</a></div><div class="ttdeci">@ gs1_encoder_sDM</div><div class="ttdoc">(GS1) Data Matrix</div><div class="ttdef"><b>Definition:</b> gs1encoders.h:129</div></div>
+<div class="ttc" id="ags1encoders_8h_html_a34f786d8479759fd8894c6d22a9f5c34"><div class="ttname"><a href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a></div><div class="ttdeci">struct gs1_encoder gs1_encoder</div><div class="ttdoc">A gs1_encoder context.</div><div class="ttdef"><b>Definition:</b> gs1encoders.h:291</div></div>
+<div class="ttc" id="ags1encoders_8h_html_a7dab341c6821917b8eddfd1d17de4053a05cad5357f37d39d1a9b10db759fb4a2"><div class="ttname"><a href="gs1encoders_8h.html#a7dab341c6821917b8eddfd1d17de4053a05cad5357f37d39d1a9b10db759fb4a2">gs1_encoder_sEAN13</a></div><div class="ttdeci">@ gs1_encoder_sEAN13</div><div class="ttdoc">EAN-13.</div><div class="ttdef"><b>Definition:</b> gs1encoders.h:124</div></div>
 <div class="ttc" id="ags1encoders_8h_html_afd581bb226f56c149cc1f903cbd77ca5"><div class="ttname"><a href="gs1encoders_8h.html#afd581bb226f56c149cc1f903cbd77ca5">gs1_encoder_instanceSize</a></div><div class="ttdeci">GS1_ENCODERS_API size_t gs1_encoder_instanceSize(void)</div><div class="ttdoc">Find the memory storage requirements for an instance of gs1_encoder.</div></div>
 <div class="ttc" id="ags1encoders_8h_html"><div class="ttname"><a href="gs1encoders_8h.html">gs1encoders.h</a></div></div>
-<div class="ttc" id="ags1encoders_8h_html_a190f26971a88a11a2faed3182a9157c8ae133b476dcbc3d56579df62d6a08ba6d"><div class="ttname"><a href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8ae133b476dcbc3d56579df62d6a08ba6d">gs1_encoder_sDM</a></div><div class="ttdeci">@ gs1_encoder_sDM</div><div class="ttdoc">(GS1) Data Matrix</div><div class="ttdef"><b>Definition:</b> gs1encoders.h:129</div></div>
-<div class="ttc" id="ags1encoders_8h_html_a190f26971a88a11a2faed3182a9157c8a05cad5357f37d39d1a9b10db759fb4a2"><div class="ttname"><a href="gs1encoders_8h.html#a190f26971a88a11a2faed3182a9157c8a05cad5357f37d39d1a9b10db759fb4a2">gs1_encoder_sEAN13</a></div><div class="ttdeci">@ gs1_encoder_sEAN13</div><div class="ttdoc">EAN-13.</div><div class="ttdef"><b>Definition:</b> gs1encoders.h:124</div></div>
-<div class="ttc" id="ags1encoders_8h_html_a12f58149bb2cdab504621ba5b390ef64a8b3eb847583daabfc11b8622736656ed"><div class="ttname"><a href="gs1encoders_8h.html#a12f58149bb2cdab504621ba5b390ef64a8b3eb847583daabfc11b8622736656ed">gs1_encoder_dRAW</a></div><div class="ttdeci">@ gs1_encoder_dRAW</div><div class="ttdoc">TIFF, without header (1-bit per pixel matrix with byte-aligned rows)</div><div class="ttdef"><b>Definition:</b> gs1encoders.h:139</div></div>
+<div class="ttc" id="ags1encoders_8h_html_a884bdcb0ef8dafc0fc1a45d1c5cfac17a8e5e88196a4041bc8e95ec27965b60e4"><div class="ttname"><a href="gs1encoders_8h.html#a884bdcb0ef8dafc0fc1a45d1c5cfac17a8e5e88196a4041bc8e95ec27965b60e4">gs1_encoder_dBMP</a></div><div class="ttdeci">@ gs1_encoder_dBMP</div><div class="ttdoc">BMP format.</div><div class="ttdef"><b>Definition:</b> gs1encoders.h:137</div></div>
 <div class="ttc" id="ags1encoders_8h_html_afaa932adfe73b0b5b33f89c03be8a441"><div class="ttname"><a href="gs1encoders_8h.html#afaa932adfe73b0b5b33f89c03be8a441">gs1_encoder_getBufferStrings</a></div><div class="ttdeci">GS1_ENCODERS_API size_t gs1_encoder_getBufferStrings(gs1_encoder *ctx, char ***strings)</div><div class="ttdoc">Return the output buffer represented as an array of strings.</div></div>
 <div class="ttc" id="ags1encoders_8h_html_a3b0f42977b787a19c8526037d6f9a4df"><div class="ttname"><a href="gs1encoders_8h.html#a3b0f42977b787a19c8526037d6f9a4df">gs1_encoder_getBuffer</a></div><div class="ttdeci">GS1_ENCODERS_API size_t gs1_encoder_getBuffer(gs1_encoder *ctx, void **buffer)</div><div class="ttdoc">Get the output buffer.</div></div>
+<div class="ttc" id="ags1encoders_8h_html_a884bdcb0ef8dafc0fc1a45d1c5cfac17a8b3eb847583daabfc11b8622736656ed"><div class="ttname"><a href="gs1encoders_8h.html#a884bdcb0ef8dafc0fc1a45d1c5cfac17a8b3eb847583daabfc11b8622736656ed">gs1_encoder_dRAW</a></div><div class="ttdeci">@ gs1_encoder_dRAW</div><div class="ttdoc">TIFF, without header (1-bit per pixel matrix with byte-aligned rows)</div><div class="ttdef"><b>Definition:</b> gs1encoders.h:139</div></div>
 <div class="ttc" id="ags1encoders_8h_html_a0078a51318ba3551052c309fe48110ae"><div class="ttname"><a href="gs1encoders_8h.html#a0078a51318ba3551052c309fe48110ae">gs1_encoder_free</a></div><div class="ttdeci">GS1_ENCODERS_API void gs1_encoder_free(gs1_encoder *ctx)</div><div class="ttdoc">Destroy a gs1_encoder instance.</div></div>
 <div class="ttc" id="ags1encoders_8h_html_a1d385f9b4244e6b88e855da230246e01"><div class="ttname"><a href="gs1encoders_8h.html#a1d385f9b4244e6b88e855da230246e01">gs1_encoder_setFormat</a></div><div class="ttdeci">GS1_ENCODERS_API bool gs1_encoder_setFormat(gs1_encoder *ctx, int format)</div><div class="ttdoc">Set the output format for the barcode symbol.</div></div>
-<div class="ttc" id="ags1encoders_8h_html_a12f58149bb2cdab504621ba5b390ef64a8e5e88196a4041bc8e95ec27965b60e4"><div class="ttname"><a href="gs1encoders_8h.html#a12f58149bb2cdab504621ba5b390ef64a8e5e88196a4041bc8e95ec27965b60e4">gs1_encoder_dBMP</a></div><div class="ttdeci">@ gs1_encoder_dBMP</div><div class="ttdoc">BMP format.</div><div class="ttdef"><b>Definition:</b> gs1encoders.h:137</div></div>
 <div class="ttc" id="ags1encoders_8h_html_a6e10980e07a7e70d81592243171e9cff"><div class="ttname"><a href="gs1encoders_8h.html#a6e10980e07a7e70d81592243171e9cff">gs1_encoder_init</a></div><div class="ttdeci">GS1_ENCODERS_API gs1_encoder * gs1_encoder_init(void *mem)</div><div class="ttdoc">Initialise a new gs1_encoder context.</div></div>
 <div class="ttc" id="ags1encoders_8h_html_a65d8546a9ec715462c424c35dbe910d8"><div class="ttname"><a href="gs1encoders_8h.html#a65d8546a9ec715462c424c35dbe910d8">gs1_encoder_setOutFile</a></div><div class="ttdeci">GS1_ENCODERS_API bool gs1_encoder_setOutFile(gs1_encoder *ctx, char *outFile)</div><div class="ttdoc">Set the output file for the barcode symbol.</div></div>
 <div class="ttc" id="ags1encoders_8h_html_ae3ec8ae78be621eab641b03b560eccfc"><div class="ttname"><a href="gs1encoders_8h.html#ae3ec8ae78be621eab641b03b560eccfc">gs1_encoder_encode</a></div><div class="ttdeci">GS1_ENCODERS_API bool gs1_encoder_encode(gs1_encoder *ctx)</div><div class="ttdoc">Generate a barcode symbol representing the given input data.</div></div>
