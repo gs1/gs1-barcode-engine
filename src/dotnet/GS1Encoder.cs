@@ -40,7 +40,7 @@ namespace gs1encoders_dotnet
         private static extern System.IntPtr gs1_encoder_init(IntPtr mem);
 
         [DllImport(gs1_dll, EntryPoint = "gs1_encoder_getVersion", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern IntPtr gs1_encoder_getVersion(IntPtr ctx);
+        private static extern IntPtr gs1_encoder_getVersion();
 
         [DllImport(gs1_dll, EntryPoint = "gs1_encoder_getErrMsg", CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr gs1_encoder_getErrMsg(IntPtr ctx);
@@ -193,7 +193,7 @@ namespace gs1encoders_dotnet
 
         public string GetVersion()
         {
-            return System.Runtime.InteropServices.Marshal.PtrToStringAnsi(gs1_encoder_getVersion(ctx));
+            return System.Runtime.InteropServices.Marshal.PtrToStringAnsi(gs1_encoder_getVersion());
         }
 
         public string GetErrMsg()

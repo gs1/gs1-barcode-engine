@@ -419,7 +419,7 @@ int main(int argc, char *argv[]) {
 
 	if (argc == 2 && strcmp(argv[1],"--version") == 0) {
 		printf("Application version: " RELEASE "\n");
-		printf("Library version: %s\n", gs1_encoder_getVersion(ctx));
+		printf("Library version: %s\n", gs1_encoder_getVersion());
 		goto out;
 	}
 
