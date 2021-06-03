@@ -111,7 +111,7 @@ extern "C" {
 
 
 /// All of the major GS1 barcode formats ("symbologies") are supported by this library.
-enum symbologies {
+enum gs1_encoder_symbologies {
 	gs1_encoder_sNONE = -1,			///< None defined
 	gs1_encoder_sDataBarOmni,		///< GS1 DataBar Omnidirectional
 	gs1_encoder_sDataBarTruncated,		///< GS1 DataBar Truncated
@@ -133,20 +133,130 @@ enum symbologies {
 
 /// Barcode images can be written in common BMP and TIFF graphical formats, as
 /// well as output as a headerless matrix.
-enum formats {
+enum gs1_encoder_formats {
 	gs1_encoder_dBMP = 0,		///< BMP format
 	gs1_encoder_dTIF = 1,		///< TIFF format
 	gs1_encoder_dRAW = 2,		///< TIFF, without header (1-bit per pixel matrix with byte-aligned rows)
 };
 
 
+/// The Data Matrix symbols may only be generated with a specific number of
+/// rows.
+enum gs1_encoder_dmRows {
+	gs1_encoder_dmRowsAutomatic = 0,	///< Automatic, based on barcode data
+	gs1_encoder_dmRows8 = 8,		///< 8x18, 8x32
+	gs1_encoder_dmRows10 = 10,		///< 10x10
+	gs1_encoder_dmRows12 = 12,		///< 12x12, 12x26, 12x36
+	gs1_encoder_dmRows14 = 14,		///< 14x14
+	gs1_encoder_dmRows16 = 16,		///< 16x16, 16x36, 16x48
+	gs1_encoder_dmRows18 = 18,		///< 18x18
+	gs1_encoder_dmRows20 = 20,		///< 20x20
+	gs1_encoder_dmRows22 = 22,		///< 22x22
+	gs1_encoder_dmRows24 = 24,		///< 24x24
+	gs1_encoder_dmRows26 = 26,		///< 26x26
+	gs1_encoder_dmRows32 = 32,		///< 32x32
+	gs1_encoder_dmRows36 = 36,		///< 36x36
+	gs1_encoder_dmRows40 = 40,		///< 40x40
+	gs1_encoder_dmRows44 = 44,		///< 44x44
+	gs1_encoder_dmRows48 = 48,		///< 48x48
+	gs1_encoder_dmRows52 = 52,		///< 52x52
+	gs1_encoder_dmRows64 = 64,		///< 64x64
+	gs1_encoder_dmRows72 = 72,		///< 72x72
+	gs1_encoder_dmRows80 = 80,		///< 80x80
+	gs1_encoder_dmRows88 = 88,		///< 88x88
+	gs1_encoder_dmRows96 = 96,		///< 96x96
+	gs1_encoder_dmRows104 = 104,		///< 104x104
+	gs1_encoder_dmRows120 = 120,		///< 120x120
+	gs1_encoder_dmRows132 = 132,		///< 132x132
+	gs1_encoder_dmRows144 = 144,		///< 144x144
+};
+
+
+/// The Data Matrix symbols may only be generated with a specific number of
+/// columns.
+enum gs1_encoder_dmColumns {
+	gs1_encoder_dmColumnsAutomatic = 0,	///< Automatic, based on barcode data
+	gs1_encoder_dmColumns10 = 10,		///< 10x10
+	gs1_encoder_dmColumns12 = 12,		///< 12x12
+	gs1_encoder_dmColumns14 = 14,		///< 14x14
+	gs1_encoder_dmColumns16 = 16,		///< 16x16, 16x36, 16x48
+	gs1_encoder_dmColumns18 = 18,		///< 18x18
+	gs1_encoder_dmColumns20 = 20,		///< 20x20
+	gs1_encoder_dmColumns22 = 22,		///< 22x22
+	gs1_encoder_dmColumns24 = 24,		///< 24x24
+	gs1_encoder_dmColumns26 = 26,		///< 26x26, 12x26
+	gs1_encoder_dmColumns32 = 32,		///< 32x32
+	gs1_encoder_dmColumns36 = 36,		///< 36x36, 12x36, 16x36
+	gs1_encoder_dmColumns40 = 40,		///< 40x40
+	gs1_encoder_dmColumns44 = 44,		///< 44x44
+	gs1_encoder_dmColumns48 = 48,		///< 48x48, 16x48
+	gs1_encoder_dmColumns52 = 52,		///< 52x52
+	gs1_encoder_dmColumns64 = 64,		///< 64x64
+	gs1_encoder_dmColumns72 = 72,		///< 72x72
+	gs1_encoder_dmColumns80 = 80,		///< 80x80
+	gs1_encoder_dmColumns88 = 88,		///< 88x88
+	gs1_encoder_dmColumns96 = 96,		///< 96x96
+	gs1_encoder_dmColumns104 = 104,		///< 104x104
+	gs1_encoder_dmColumns120 = 120,		///< 120x120
+	gs1_encoder_dmColumns132 = 132,		///< 132x132
+	gs1_encoder_dmColumns144 = 144,		///< 144x144
+};
+
+
 /// The QR Code symbology supports several error correction levels which allow
 /// differing amount of unreadable data to be reconstructed.
-enum qrEClevel {
+enum gs1_encoder_qrEClevel {
 	gs1_encoder_qrEClevelL = 1,	///< Low error correction (7% damage recovery)
 	gs1_encoder_qrEClevelM,		///< Medium error correction (15% damage recovery)
 	gs1_encoder_qrEClevelQ,		///< Quartile error correction (25% damage recovery)
 	gs1_encoder_qrEClevelH,		///< High error correction (30% damage recovery)
+};
+
+
+/// The QR Code symbology supports several versions that specify the size of
+/// the symbol.
+enum gs1_encoder_qrVersion {
+	gs1_encoder_qrVersionAutomatic = 0,	///< Automatic, based on barcode data
+	gs1_encoder_qrVersion1,			///< Version 1, 21x21
+	gs1_encoder_qrVersion2,			///< Version 2, 25x25
+	gs1_encoder_qrVersion3,			///< Version 3, 29x29
+	gs1_encoder_qrVersion4,			///< Version 4, 33x33
+	gs1_encoder_qrVersion5,			///< Version 5, 37x37
+	gs1_encoder_qrVersion6,			///< Version 6, 41x41
+	gs1_encoder_qrVersion7,			///< Version 7, 45x45
+	gs1_encoder_qrVersion8,			///< Version 8, 49x49
+	gs1_encoder_qrVersion9,			///< Version 9, 53x53
+	gs1_encoder_qrVersion10,		///< Version 10, 57x57
+	gs1_encoder_qrVersion11,		///< Version 11, 61x61
+	gs1_encoder_qrVersion12,		///< Version 12, 65x65
+	gs1_encoder_qrVersion13,		///< Version 13, 69x69
+	gs1_encoder_qrVersion14,		///< Version 14, 73x73
+	gs1_encoder_qrVersion15,		///< Version 15, 77x77
+	gs1_encoder_qrVersion16,		///< Version 16, 81x81
+	gs1_encoder_qrVersion17,		///< Version 17, 85x85
+	gs1_encoder_qrVersion18,		///< Version 18, 89x89
+	gs1_encoder_qrVersion19,		///< Version 19, 93x93
+	gs1_encoder_qrVersion20,		///< Version 20, 97x97
+	gs1_encoder_qrVersion21,		///< Version 21, 101x101
+	gs1_encoder_qrVersion22,		///< Version 22, 105x105
+	gs1_encoder_qrVersion23,		///< Version 23, 109x109
+	gs1_encoder_qrVersion24,		///< Version 24, 113x113
+	gs1_encoder_qrVersion25,		///< Version 25, 117x117
+	gs1_encoder_qrVersion26,		///< Version 26, 121x121
+	gs1_encoder_qrVersion27,		///< Version 27, 125x125
+	gs1_encoder_qrVersion28,		///< Version 28, 129x129
+	gs1_encoder_qrVersion29,		///< Version 29, 133x133
+	gs1_encoder_qrVersion30,		///< Version 30, 137x137
+	gs1_encoder_qrVersion31,		///< Version 31, 141x141
+	gs1_encoder_qrVersion32,		///< Version 32, 145x145
+	gs1_encoder_qrVersion33,		///< Version 33, 149x149
+	gs1_encoder_qrVersion34,		///< Version 34, 153x153
+	gs1_encoder_qrVersion35,		///< Version 35, 157x157
+	gs1_encoder_qrVersion36,		///< Version 36, 161x161
+	gs1_encoder_qrVersion37,		///< Version 37, 165x165
+	gs1_encoder_qrVersion38,		///< Version 38, 169x169
+	gs1_encoder_qrVersion39,		///< Version 39, 173x173
+	gs1_encoder_qrVersion40,		///< Version 49, 177x177
 };
 
 
@@ -331,7 +441,7 @@ GS1_ENCODERS_API char* gs1_encoder_getErrMsg(gs1_encoder *ctx);
  * @see gs1_encoder_setSym()
  *
  * @param [in,out] ctx ::gs1_encoder context
- * @return symbology type, one of ::symbologies
+ * @return symbology type, one of ::gs1_encoder_symbologies
  */
 GS1_ENCODERS_API int gs1_encoder_getSym(gs1_encoder *ctx);
 
@@ -340,8 +450,9 @@ GS1_ENCODERS_API int gs1_encoder_getSym(gs1_encoder *ctx);
  * @brief Set the symbology type.
  *
  * This allows the symbology to be specified as any one of the known
- * ::symbologies other than ::gs1_encoder_sNONE or ::gs1_encoder_sNUMSYMS.
+ * ::gs1_encoder_symbologies other than ::gs1_encoder_sNONE or ::gs1_encoder_sNUMSYMS.
  *
+ * @see ::gs1_encoder_symbologies
  * @see gs1_encoder_getSym()
  *
  * @param [in,out] ctx ::gs1_encoder context
@@ -585,7 +696,7 @@ GS1_ENCODERS_API bool gs1_encoder_setDmColumns(gs1_encoder *ctx, int columns);
  * @see gs1_encoder_setQrVersion()
  *
  * @param [in,out] ctx ::gs1_encoder context
- * @return current version number, or 0 if automatic
+ * @return current version number, one of ::gs1_encoder_qrVersion
  */
 GS1_ENCODERS_API int gs1_encoder_getQrVersion(gs1_encoder *ctx);
 
@@ -593,13 +704,16 @@ GS1_ENCODERS_API int gs1_encoder_getQrVersion(gs1_encoder *ctx);
 /**
  * @brief Set a fixed version number for QR Code symbols.
  *
+ * Default is ::gs1_encoder_qrVersionAutomatic
+ *
  * \note
  * Valid values are 1 to 40, or 0 for automatic
  *
+ * @see ::gs1_encoder_qrVersion
  * @see gs1_encoder_getQrVersion()
  *
  * @param [in,out] ctx ::gs1_encoder context
- * @param [in] version fixed version number, or 0 for automatic
+ * @param [in] version fixed version number, one of ::gs1_encoder_qrVersion
  * @return true on success, otherwise false and an error message is set
  */
 GS1_ENCODERS_API bool gs1_encoder_setQrVersion(gs1_encoder *ctx, int version);
@@ -611,7 +725,7 @@ GS1_ENCODERS_API bool gs1_encoder_setQrVersion(gs1_encoder *ctx, int version);
  * @see gs1_encoder_setQrEClevel()
  *
  * @param [in,out] ctx ::gs1_encoder context
- * @return current error correction level, one of ::qrEClevel
+ * @return current error correction level, one of ::gs1_encoder_qrEClevel
  */
 GS1_ENCODERS_API int gs1_encoder_getQrEClevel(gs1_encoder *ctx);
 
@@ -624,11 +738,11 @@ GS1_ENCODERS_API int gs1_encoder_getQrEClevel(gs1_encoder *ctx);
  *
  * Default is ::gs1_encoder_qrEClevelM
  *
- * @see ::qrEClevel
+ * @see ::gs1_encoder_qrEClevel
  * @see gs1_encoder_getQrEClevel()
  *
  * @param [in,out] ctx ::gs1_encoder context
- * @param [in] ecLevel error correction level, one of ::qrEClevel
+ * @param [in] ecLevel error correction level, one of ::gs1_encoder_qrEClevel
  * @return true on success, otherwise false and an error message is set
  */
 GS1_ENCODERS_API bool gs1_encoder_setQrEClevel(gs1_encoder *ctx, int ecLevel);
@@ -862,7 +976,7 @@ GS1_ENCODERS_API bool gs1_encoder_setDataFile(gs1_encoder *ctx, char* dataFile);
  * @see gs1_encoder_setFormat()
  *
  * @param [in,out] ctx ::gs1_encoder context
- * @return output format, one of ::formats
+ * @return output format, one of ::gs1_encoder_formats
  */
 GS1_ENCODERS_API int gs1_encoder_getFormat(gs1_encoder *ctx);
 
@@ -871,7 +985,7 @@ GS1_ENCODERS_API int gs1_encoder_getFormat(gs1_encoder *ctx);
  * @brief Set the output format for the barcode symbol.
  *
  * This allows the output format to be specified as any one of the known
- * ::formats:
+ * ::gs1_encoder_formats:
  *
  *   * ::gs1_encoder_dBMP: BMP format
  *   * ::gs1_encoder_dTIF: TIFF format
@@ -880,7 +994,7 @@ GS1_ENCODERS_API int gs1_encoder_getFormat(gs1_encoder *ctx);
  * @see gs1_encoder_getFormat()
  *
  * @param [in,out] ctx ::gs1_encoder context
- * @param [in] format output format
+ * @param [in] format output format, one of ::gs1_encoder_formats
  * @return true on success, otherwise false and an error message is set
  */
 GS1_ENCODERS_API bool gs1_encoder_setFormat(gs1_encoder *ctx, int format);

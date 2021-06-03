@@ -294,12 +294,40 @@ GS1_ENCODERS_API int gs1_encoder_getDmRows(gs1_encoder *ctx) {
 GS1_ENCODERS_API bool gs1_encoder_setDmRows(gs1_encoder *ctx, int rows) {
 	assert(ctx);
 	reset_error(ctx);
-	if (rows != 0 && (rows < 8 || rows > 144)) {
-		strcpy(ctx->errMsg, "Valid number of Data Matrix rows range is 10 to 144, or 0");
-		ctx->errFlag = true;
-		return false;
+	switch (rows) {
+		case gs1_encoder_dmRowsAutomatic:
+		case gs1_encoder_dmRows8:
+		case gs1_encoder_dmRows10:
+		case gs1_encoder_dmRows12:
+		case gs1_encoder_dmRows14:
+		case gs1_encoder_dmRows16:
+		case gs1_encoder_dmRows18:
+		case gs1_encoder_dmRows20:
+		case gs1_encoder_dmRows22:
+		case gs1_encoder_dmRows24:
+		case gs1_encoder_dmRows26:
+		case gs1_encoder_dmRows32:
+		case gs1_encoder_dmRows36:
+		case gs1_encoder_dmRows40:
+		case gs1_encoder_dmRows44:
+		case gs1_encoder_dmRows48:
+		case gs1_encoder_dmRows52:
+		case gs1_encoder_dmRows64:
+		case gs1_encoder_dmRows72:
+		case gs1_encoder_dmRows80:
+		case gs1_encoder_dmRows88:
+		case gs1_encoder_dmRows96:
+		case gs1_encoder_dmRows104:
+		case gs1_encoder_dmRows120:
+		case gs1_encoder_dmRows132:
+		case gs1_encoder_dmRows144:
+			ctx->dmRows = rows;
+			break;
+		default:
+			strcpy(ctx->errMsg, "Valid number of Data Matrix rows range is 8 to 144, or 0");
+			ctx->errFlag = true;
+			return false;
 	}
-	ctx->dmRows = rows;
 	return true;
 }
 
@@ -312,12 +340,39 @@ GS1_ENCODERS_API int gs1_encoder_getDmColumns(gs1_encoder *ctx) {
 GS1_ENCODERS_API bool gs1_encoder_setDmColumns(gs1_encoder *ctx, int columns) {
 	assert(ctx);
 	reset_error(ctx);
-	if (columns != 0 && (columns < 10 || columns > 144)) {
-		strcpy(ctx->errMsg, "Valid number of Data Matrix columns range is 10 to 144, or 0");
-		ctx->errFlag = true;
-		return false;
+	switch (columns) {
+		case gs1_encoder_dmColumnsAutomatic:
+		case gs1_encoder_dmColumns10:
+		case gs1_encoder_dmColumns12:
+		case gs1_encoder_dmColumns14:
+		case gs1_encoder_dmColumns16:
+		case gs1_encoder_dmColumns18:
+		case gs1_encoder_dmColumns20:
+		case gs1_encoder_dmColumns22:
+		case gs1_encoder_dmColumns24:
+		case gs1_encoder_dmColumns26:
+		case gs1_encoder_dmColumns32:
+		case gs1_encoder_dmColumns36:
+		case gs1_encoder_dmColumns40:
+		case gs1_encoder_dmColumns44:
+		case gs1_encoder_dmColumns48:
+		case gs1_encoder_dmColumns52:
+		case gs1_encoder_dmColumns64:
+		case gs1_encoder_dmColumns72:
+		case gs1_encoder_dmColumns80:
+		case gs1_encoder_dmColumns88:
+		case gs1_encoder_dmColumns96:
+		case gs1_encoder_dmColumns104:
+		case gs1_encoder_dmColumns120:
+		case gs1_encoder_dmColumns132:
+		case gs1_encoder_dmColumns144:
+			ctx->dmCols = columns;
+			break;
+		default:
+			strcpy(ctx->errMsg, "Valid number of Data Matrix columns range is 10 to 144, or 0");
+			ctx->errFlag = true;
+			return false;
 	}
-	ctx->dmCols = columns;
 	return true;
 }
 
@@ -330,12 +385,55 @@ GS1_ENCODERS_API int gs1_encoder_getQrVersion(gs1_encoder *ctx) {
 GS1_ENCODERS_API bool gs1_encoder_setQrVersion(gs1_encoder *ctx, int version) {
 	assert(ctx);
 	reset_error(ctx);
-	if (version < 0 || version > 40) {
-		strcpy(ctx->errMsg, "Valid QR Code version 1 to 40, or 0");
-		ctx->errFlag = true;
-		return false;
+	switch (version) {
+		case gs1_encoder_qrVersionAutomatic:
+		case gs1_encoder_qrVersion1:
+		case gs1_encoder_qrVersion2:
+		case gs1_encoder_qrVersion3:
+		case gs1_encoder_qrVersion4:
+		case gs1_encoder_qrVersion5:
+		case gs1_encoder_qrVersion6:
+		case gs1_encoder_qrVersion7:
+		case gs1_encoder_qrVersion8:
+		case gs1_encoder_qrVersion9:
+		case gs1_encoder_qrVersion10:
+		case gs1_encoder_qrVersion11:
+		case gs1_encoder_qrVersion12:
+		case gs1_encoder_qrVersion13:
+		case gs1_encoder_qrVersion14:
+		case gs1_encoder_qrVersion15:
+		case gs1_encoder_qrVersion16:
+		case gs1_encoder_qrVersion17:
+		case gs1_encoder_qrVersion18:
+		case gs1_encoder_qrVersion19:
+		case gs1_encoder_qrVersion20:
+		case gs1_encoder_qrVersion21:
+		case gs1_encoder_qrVersion22:
+		case gs1_encoder_qrVersion23:
+		case gs1_encoder_qrVersion24:
+		case gs1_encoder_qrVersion25:
+		case gs1_encoder_qrVersion26:
+		case gs1_encoder_qrVersion27:
+		case gs1_encoder_qrVersion28:
+		case gs1_encoder_qrVersion29:
+		case gs1_encoder_qrVersion30:
+		case gs1_encoder_qrVersion31:
+		case gs1_encoder_qrVersion32:
+		case gs1_encoder_qrVersion33:
+		case gs1_encoder_qrVersion34:
+		case gs1_encoder_qrVersion35:
+		case gs1_encoder_qrVersion36:
+		case gs1_encoder_qrVersion37:
+		case gs1_encoder_qrVersion38:
+		case gs1_encoder_qrVersion39:
+		case gs1_encoder_qrVersion40:
+			ctx->qrVersion = version;
+			break;
+		default:
+			strcpy(ctx->errMsg, "Valid QR Code version 1 to 40, or 0");
+			ctx->errFlag = true;
+			return false;
 	}
-	ctx->qrVersion = version;
 	return true;
 }
 
@@ -947,30 +1045,32 @@ void test_api_dmRowsColumns(void) {
 
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
 
-	TEST_CHECK(gs1_encoder_getDmRows(ctx) == 0);	// Default
-	TEST_CHECK(gs1_encoder_getDmColumns(ctx) == 0);	// Default
+	// Default
+	TEST_CHECK(gs1_encoder_getDmRows(ctx) == gs1_encoder_dmRowsAutomatic);
+	TEST_CHECK(gs1_encoder_getDmColumns(ctx) == gs1_encoder_dmColumnsAutomatic);
 
 	// Extents
-	TEST_CHECK(gs1_encoder_setDmRows(ctx, 8));
-	TEST_CHECK(gs1_encoder_getDmRows(ctx) == 8);
-	TEST_CHECK(gs1_encoder_setDmRows(ctx, 144));
-	TEST_CHECK(gs1_encoder_getDmRows(ctx) == 144);
-	TEST_CHECK(gs1_encoder_setDmColumns(ctx, 10));
-	TEST_CHECK(gs1_encoder_getDmColumns(ctx) == 10);
-	TEST_CHECK(gs1_encoder_setDmColumns(ctx, 144));
-	TEST_CHECK(gs1_encoder_getDmColumns(ctx) == 144);
+	TEST_CHECK(gs1_encoder_setDmRows(ctx, gs1_encoder_dmRows8));
+	TEST_CHECK(gs1_encoder_getDmRows(ctx) == gs1_encoder_dmRows8);
+	TEST_CHECK(gs1_encoder_setDmRows(ctx, gs1_encoder_dmRows144));
+	TEST_CHECK(gs1_encoder_getDmRows(ctx) == gs1_encoder_dmRows144);
+	TEST_CHECK(gs1_encoder_setDmColumns(ctx, gs1_encoder_dmColumns10));
+	TEST_CHECK(gs1_encoder_getDmColumns(ctx) == gs1_encoder_dmColumns10);
+	TEST_CHECK(gs1_encoder_setDmColumns(ctx, gs1_encoder_dmColumns144));
+	TEST_CHECK(gs1_encoder_getDmColumns(ctx) == gs1_encoder_dmColumns144);
 
 	// Invalid
-	TEST_CHECK(!gs1_encoder_setDmRows(ctx, 7));
-	TEST_CHECK(!gs1_encoder_setDmRows(ctx, 145));
-	TEST_CHECK(!gs1_encoder_setDmColumns(ctx, 9));
-	TEST_CHECK(!gs1_encoder_setDmColumns(ctx, 145));
+	TEST_CHECK(!gs1_encoder_setDmRows(ctx, gs1_encoder_dmRowsAutomatic - 1));
+	TEST_CHECK(!gs1_encoder_setDmRows(ctx, gs1_encoder_dmRows8 - 1));
+	TEST_CHECK(!gs1_encoder_setDmRows(ctx, gs1_encoder_dmRows144 + 1));
+	TEST_CHECK(!gs1_encoder_setDmColumns(ctx, gs1_encoder_dmColumns10 - 1));
+	TEST_CHECK(!gs1_encoder_setDmColumns(ctx, gs1_encoder_dmColumns144 + 1));
 
 	// Back to automatic
-	TEST_CHECK(gs1_encoder_setDmRows(ctx, 0));
-	TEST_CHECK(gs1_encoder_getDmRows(ctx) == 0);
-	TEST_CHECK(gs1_encoder_setDmColumns(ctx, 0));
-	TEST_CHECK(gs1_encoder_getDmColumns(ctx) == 0);
+	TEST_CHECK(gs1_encoder_setDmRows(ctx, gs1_encoder_dmRowsAutomatic));
+	TEST_CHECK(gs1_encoder_getDmRows(ctx) == gs1_encoder_dmRowsAutomatic);
+	TEST_CHECK(gs1_encoder_setDmColumns(ctx, gs1_encoder_dmColumnsAutomatic));
+	TEST_CHECK(gs1_encoder_getDmColumns(ctx) == gs1_encoder_dmColumnsAutomatic);
 
 	gs1_encoder_free(ctx);
 
@@ -983,21 +1083,21 @@ void test_api_qrVersion(void) {
 
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
 
-	TEST_CHECK(gs1_encoder_getQrVersion(ctx) == 0);  // Default
+	TEST_CHECK(gs1_encoder_getQrVersion(ctx) == gs1_encoder_qrVersionAutomatic);  // Default
 
 	// Extents
-	TEST_CHECK(gs1_encoder_setQrVersion(ctx, 1));
-	TEST_CHECK(gs1_encoder_getQrVersion(ctx) == 1);
-	TEST_CHECK(gs1_encoder_setQrVersion(ctx, 40));
-	TEST_CHECK(gs1_encoder_getQrVersion(ctx) == 40);
+	TEST_CHECK(gs1_encoder_setQrVersion(ctx, gs1_encoder_qrVersion1));
+	TEST_CHECK(gs1_encoder_getQrVersion(ctx) == gs1_encoder_qrVersion1);
+	TEST_CHECK(gs1_encoder_setQrVersion(ctx, gs1_encoder_qrVersion40));
+	TEST_CHECK(gs1_encoder_getQrVersion(ctx) == gs1_encoder_qrVersion40);
 
 	// Invalid
-	TEST_CHECK(!gs1_encoder_setQrVersion(ctx, -1));
-	TEST_CHECK(!gs1_encoder_setQrVersion(ctx, 41));
+	TEST_CHECK(!gs1_encoder_setQrVersion(ctx, gs1_encoder_qrVersionAutomatic - 1));
+	TEST_CHECK(!gs1_encoder_setQrVersion(ctx, gs1_encoder_qrVersion40 + 1));
 
 	// Back to automatic
-	TEST_CHECK(gs1_encoder_setQrVersion(ctx, 0));
-	TEST_CHECK(gs1_encoder_getQrVersion(ctx) == 0);
+	TEST_CHECK(gs1_encoder_setQrVersion(ctx, gs1_encoder_qrVersionAutomatic));
+	TEST_CHECK(gs1_encoder_getQrVersion(ctx) == gs1_encoder_qrVersionAutomatic);
 
 	gs1_encoder_free(ctx);
 
