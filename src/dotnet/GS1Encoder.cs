@@ -8,26 +8,147 @@ using System.Runtime.InteropServices;
 namespace gs1encoders_dotnet
 {
 
-    public enum symbology : short
-    {
-        gs1_encoder_sNONE = -1,         // none defined
-        gs1_encoder_sRSS14,             // RSS-14
-        gs1_encoder_sRSS14T,            // RSS-14 Truncated
-        gs1_encoder_sRSS14S,            // RSS-14 Stacked
-        gs1_encoder_sRSS14SO,           // RSS-14 Stacked Omnidirectional
-        gs1_encoder_sRSSLIM,            // RSS Limited
-        gs1_encoder_sRSSEXP,            // RSS Expanded
-        gs1_encoder_sUPCA,              // UPC-A
-        gs1_encoder_sUPCE,              // UPC-E
-        gs1_encoder_sEAN13,             // EAN-13
-        gs1_encoder_sEAN8,              // EAN-8
-        gs1_encoder_sUCC128_CCA,        // UCC/EAN-128 with CC-A or CC-B
-        gs1_encoder_sUCC128_CCC,        // UCC/EAN-128 with CC-C
-        gs1_encoder_sNUMSYMS,           // Number of symbologies
-    };
-
     public class GS1Encoder
     {
+
+        public enum Symbology
+        {
+            NONE = -1,
+            DataBarOmni,
+            DataBarTruncated,
+            DataBarStacked,
+            DataBarStackedOmni,
+            DataBarLimited,
+            DataBarExpanded,
+            UPCA,
+            UPCE,
+            EAN13,
+            EAN8,
+            GS1_128_CCA,
+            GS1_128_CCC,
+            QR,
+            DM,
+            NUMSYMS,
+        };
+
+        public enum Formats
+        {
+            BMP = 0,
+            TIF = 1,
+            RAW = 2,
+        };
+
+        public enum DMrows
+        {
+            Automatic = 0,              ///< Automatic, based on barcode data
+            Rows8 = 8,                ///< 8x18, 8x32
+            Rows10 = 10,              ///< 10x10
+            Rows12 = 12,              ///< 12x12, 12x26, 12x36
+            Rows14 = 14,              ///< 14x14
+            Rows16 = 16,              ///< 16x16, 16x36, 16x48
+            Rows18 = 18,              ///< 18x18
+            Rows20 = 20,              ///< 20x20
+            Rows22 = 22,              ///< 22x22
+            Rows24 = 24,              ///< 24x24
+            Rows26 = 26,              ///< 26x26
+            Rows32 = 32,              ///< 32x32
+            Rows36 = 36,              ///< 36x36
+            Rows40 = 40,              ///< 40x40
+            Rows44 = 44,              ///< 44x44
+            Rows48 = 48,              ///< 48x48
+            Rows52 = 52,              ///< 52x52
+            Rows64 = 64,              ///< 64x64
+            Rows72 = 72,              ///< 72x72
+            Rows80 = 80,              ///< 80x80
+            Rows88 = 88,              ///< 88x88
+            Rows96 = 96,              ///< 96x96
+            Rows104 = 104,            ///< 104x104
+            Rows120 = 120,            ///< 120x120
+            Rows132 = 132,            ///< 132x132
+            Rows144 = 144,            ///< 144x144
+        };
+
+        public enum DMcolumns
+        {
+            Automatic = 0,              ///< Automatic, based on barcode data
+            Columns10 = 10,           ///< 10x10
+            Columns12 = 12,           ///< 12x12
+            Columns14 = 14,           ///< 14x14
+            Columns16 = 16,           ///< 16x16, 16x36, 16x48
+            Columns18 = 18,           ///< 18x18
+            Columns20 = 20,           ///< 20x20
+            Columns22 = 22,           ///< 22x22
+            Columns24 = 24,           ///< 24x24
+            Columns26 = 26,           ///< 26x26, 12x26
+            Columns32 = 32,           ///< 32x32
+            Columns36 = 36,           ///< 36x36, 12x36, 16x36
+            Columns40 = 40,           ///< 40x40
+            Columns44 = 44,           ///< 44x44
+            Columns48 = 48,           ///< 48x48, 16x48
+            Columns52 = 52,           ///< 52x52
+            Columns64 = 64,           ///< 64x64
+            Columns72 = 72,           ///< 72x72
+            Columns80 = 80,           ///< 80x80
+            Columns88 = 88,           ///< 88x88
+            Columns96 = 96,           ///< 96x96
+            Columns104 = 104,         ///< 104x104
+            Columns120 = 120,         ///< 120x120
+            Columns132 = 132,         ///< 132x132
+            Columns144 = 144,         ///< 144x144
+        };
+
+        public enum QReclevel
+        {
+            L = 1,     ///< Low error correction (7% damage recovery)
+            M,         ///< Medium error correction (15% damage recovery)
+            Q,         ///< Quartile error correction (25% damage recovery)
+            H,         ///< High error correction (30% damage recovery)
+        };
+
+        public enum QRversion
+        {
+            Automatic = 0,     ///< Automatic, based on barcode data
+            Version1,                 ///< Version 1, 21x21
+            Version2,                 ///< Version 2, 25x25
+            Version3,                 ///< Version 3, 29x29
+            Version4,                 ///< Version 4, 33x33
+            Version5,                 ///< Version 5, 37x37
+            Version6,                 ///< Version 6, 41x41
+            Version7,                 ///< Version 7, 45x45
+            Version8,                 ///< Version 8, 49x49
+            Version9,                 ///< Version 9, 53x53
+            Version10,                ///< Version 10, 57x57
+            Version11,                ///< Version 11, 61x61
+            Version12,                ///< Version 12, 65x65
+            Version13,                ///< Version 13, 69x69
+            Version14,                ///< Version 14, 73x73
+            Version15,                ///< Version 15, 77x77
+            Version16,                ///< Version 16, 81x81
+            Version17,                ///< Version 17, 85x85
+            Version18,                ///< Version 18, 89x89
+            Version19,                ///< Version 19, 93x93
+            Version20,                ///< Version 20, 97x97
+            Version21,                ///< Version 21, 101x101
+            Version22,                ///< Version 22, 105x105
+            Version23,                ///< Version 23, 109x109
+            Version24,                ///< Version 24, 113x113
+            Version25,                ///< Version 25, 117x117
+            Version26,                ///< Version 26, 121x121
+            Version27,                ///< Version 27, 125x125
+            Version28,                ///< Version 28, 129x129
+            Version29,                ///< Version 29, 133x133
+            Version30,                ///< Version 30, 137x137
+            Version31,                ///< Version 31, 141x141
+            Version32,                ///< Version 32, 145x145
+            Version33,                ///< Version 33, 149x149
+            Version34,                ///< Version 34, 153x153
+            Version35,                ///< Version 35, 157x157
+            Version36,                ///< Version 36, 161x161
+            Version37,                ///< Version 37, 165x165
+            Version38,                ///< Version 38, 169x169
+            Version39,                ///< Version 39, 173x173
+            Version40,                ///< Version 49, 177x177
+        };
 
         private readonly IntPtr ctx;
         private const String gs1_dll = "gs1encoders.dll";
@@ -124,7 +245,7 @@ namespace gs1encoders_dotnet
 
         [DllImport(gs1_dll, EntryPoint = "gs1_encoder_getAddCheckDigit", CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.U1)]
-        private static extern bool gs1_encoder_getAddCheckDigit(IntPtr ctx);        
+        private static extern bool gs1_encoder_getAddCheckDigit(IntPtr ctx);
 
         [DllImport(gs1_dll, EntryPoint = "gs1_encoder_setAddCheckDigit", CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.U1)]
@@ -191,215 +312,256 @@ namespace gs1encoders_dotnet
                 throw new GS1EncoderGeneralException("Failed to initalise GS1 Encoder library");
         }
 
-        public string GetVersion()
+        public string Version
         {
-            return System.Runtime.InteropServices.Marshal.PtrToStringAnsi(gs1_encoder_getVersion());
+            get
+            {
+                return System.Runtime.InteropServices.Marshal.PtrToStringAnsi(gs1_encoder_getVersion(ctx));
+            }
         }
 
-        public string GetErrMsg()
+        public string ErrMsg
         {
-            return System.Runtime.InteropServices.Marshal.PtrToStringAnsi(gs1_encoder_getErrMsg(ctx));
+            get
+            {
+                return System.Runtime.InteropServices.Marshal.PtrToStringAnsi(gs1_encoder_getErrMsg(ctx));
+            }
         }
 
-        public int GetSym()
+        public int Sym
         {
-            return gs1_encoder_getSym(ctx);
+            get
+            {
+                return gs1_encoder_getSym(ctx);
+            }
+            set
+            {
+                if (!gs1_encoder_setSym(ctx, value))
+                    throw new GS1EncoderParameterException(ErrMsg);
+            }
         }
 
-        public void SetSym(int sym)
+        public int PixMult
         {
-            if (!gs1_encoder_setSym(ctx, sym))
-                throw new GS1EncoderParameterException(GetErrMsg());
+            get
+            {
+                return gs1_encoder_getPixMult(ctx);
+            }
+            set
+            {
+                if (!gs1_encoder_setPixMult(ctx, value))
+                    throw new GS1EncoderParameterException(ErrMsg);
+            }
         }
 
-        public int GetPixMult()
+        public int Xundercut
         {
-            return gs1_encoder_getPixMult(ctx);
+            get
+            {
+                return gs1_encoder_getXundercut(ctx);
+            }
+            set
+            {
+                if (!gs1_encoder_setXundercut(ctx, value))
+                    throw new GS1EncoderParameterException(ErrMsg);
+            }
         }
 
-        public void SetPixMult(int pixMult)
+        public int Yundercut
         {
-            if (!gs1_encoder_setPixMult(ctx, pixMult))
-                throw new GS1EncoderParameterException(GetErrMsg());
+            get
+            {
+                return gs1_encoder_getYundercut(ctx);
+            }
+            set
+            {
+                if (!gs1_encoder_setYundercut(ctx, value))
+                    throw new GS1EncoderParameterException(ErrMsg);
+            }
         }
 
-        public int GetXundercut()
+        public int SepHt
         {
-            return gs1_encoder_getXundercut(ctx);
+            get
+            {
+                return gs1_encoder_getSepHt(ctx);
+            }
+            set
+            {
+                if (!gs1_encoder_setSepHt(ctx, value))
+                    throw new GS1EncoderParameterException(ErrMsg);
+            }
         }
 
-        public void SetXundercut(int Xundercut)
+        public int DataBarExpandedSegmentsWidth
         {
-            if (!gs1_encoder_setXundercut(ctx, Xundercut))
-                throw new GS1EncoderParameterException(GetErrMsg());
-        }
-        public int GetYundercut()
-        {
-            return gs1_encoder_getYundercut(ctx);
-        }
-
-        public void SetYundercut(int Yundercut)
-        {
-            if (!gs1_encoder_setYundercut(ctx, Yundercut))
-                throw new GS1EncoderParameterException(GetErrMsg());
+            get {
+                return gs1_encoder_getDataBarExpandedSegmentsWidth(ctx);
+            }
+            set {
+                if (!gs1_encoder_setDataBarExpandedSegmentsWidth(ctx, value))
+                    throw new GS1EncoderParameterException(ErrMsg);
+            }
         }
 
-        public int GetSepHt()
+        public int GS1_128LinearHeight
         {
-            return gs1_encoder_getSepHt(ctx);
+            get
+            {
+                return gs1_encoder_getGS1_128LinearHeight(ctx);
+            }
+            set
+            {
+                if (!gs1_encoder_setGS1_128LinearHeight(ctx, value))
+                    throw new GS1EncoderParameterException(ErrMsg);
+            }
         }
 
-        public void SetSepHt(int sepHt)
+        public int QrVersion
         {
-            if (!gs1_encoder_setSepHt(ctx, sepHt))
-                throw new GS1EncoderParameterException(GetErrMsg());
+            get
+            {
+                return gs1_encoder_getQrVersion(ctx);
+            }
+            set
+            {
+                if (!gs1_encoder_setQrVersion(ctx, value))
+                    throw new GS1EncoderParameterException(ErrMsg);
+            }
         }
 
-        public int GetDataBarExpandedSegmentsWidth()
+        public int QrEClevel
         {
-            return gs1_encoder_getDataBarExpandedSegmentsWidth(ctx);
+            get
+            {
+                return gs1_encoder_getQrEClevel(ctx);
+            }
+            set {
+                if (!gs1_encoder_setQrEClevel(ctx, value))
+                    throw new GS1EncoderParameterException(ErrMsg);
+            }
         }
 
-        public void SetDataBarExpandedSegmentsWidth(int segWidth)
+        public bool AddCheckDigit
         {
-            if (!gs1_encoder_setDataBarExpandedSegmentsWidth(ctx, segWidth))
-                throw new GS1EncoderParameterException(GetErrMsg());
+            get
+            {
+                return gs1_encoder_getAddCheckDigit(ctx);
+            }
+            set
+            {
+                if (!gs1_encoder_setAddCheckDigit(ctx, value))
+                    throw new GS1EncoderParameterException(ErrMsg);
+            }
         }
 
-        public int GetGS1_128LinearHeight()
+        public int DmRows
         {
-            return gs1_encoder_getGS1_128LinearHeight(ctx);
+            get
+            {
+                return gs1_encoder_getDmRows(ctx);
+            }
+            set
+            {
+                if (!gs1_encoder_setDmRows(ctx, value))
+                    throw new GS1EncoderParameterException(ErrMsg);
+            }
         }
 
-        public void SetGS1_128LinearHeight(int linHeight)
+        public int DmColumns
         {
-            if (!gs1_encoder_setGS1_128LinearHeight(ctx, linHeight))
-                throw new GS1EncoderParameterException(GetErrMsg());
+            get
+            {
+                return gs1_encoder_getDmColumns(ctx);
+            }
+            set
+            {
+                if (!gs1_encoder_setDmColumns(ctx, value))
+                    throw new GS1EncoderParameterException(ErrMsg);
+            }
         }
 
-        public int GetQrVersion()
+        public bool FileInputFlag
         {
-            return gs1_encoder_getQrVersion(ctx);
+            get
+            {
+                return gs1_encoder_getFileInputFlag(ctx);
+            }
+            set
+            {
+                if (!gs1_encoder_setFileInputFlag(ctx, value))
+                    throw new GS1EncoderParameterException(ErrMsg);
+            }
         }
 
-        public void SetQrVersion(int version)
+        public string DataStr
         {
-            if (!gs1_encoder_setQrVersion(ctx, version))
-                throw new GS1EncoderParameterException(GetErrMsg());
+            get
+            {
+                return System.Runtime.InteropServices.Marshal.PtrToStringAnsi(gs1_encoder_getDataStr(ctx));
+            }
+            set
+            {
+                if (!gs1_encoder_setDataStr(ctx, value))
+                    throw new GS1EncoderParameterException(ErrMsg);
+            }
         }
 
-        public int GetQrEClevel()
+        public string GS1dataStr
         {
-            return gs1_encoder_getQrEClevel(ctx);
+            private get { return ""; }
+            set
+            {
+                if (!gs1_encoder_setGS1dataStr(ctx, value))
+                    throw new GS1EncoderParameterException(ErrMsg);
+            }
         }
 
-        public void SetQrEClevel(int eclevel)
+        public string DataFile
         {
-            if (!gs1_encoder_setQrEClevel(ctx, eclevel))
-                throw new GS1EncoderParameterException(GetErrMsg());
+            get
+            {
+                return System.Runtime.InteropServices.Marshal.PtrToStringAnsi(gs1_encoder_getDataFile(ctx));
+            }
+            set
+            {
+                if (!gs1_encoder_setDataFile(ctx, value))
+                    throw new GS1EncoderParameterException(ErrMsg);
+            }
         }
 
-        public bool GetAddCheckDigit()
+        public int Format
         {
-            return gs1_encoder_getAddCheckDigit(ctx);
+            get {
+                return gs1_encoder_getFormat(ctx);
+            }
+            set
+            {
+                if (!gs1_encoder_setFormat(ctx, value))
+                    throw new GS1EncoderParameterException(ErrMsg);
+            }
         }
 
-        public void SetAddCheckDigit(bool addCheckDigit)
+        public string OutFile
         {
-            if (!gs1_encoder_setAddCheckDigit(ctx, addCheckDigit))
-                throw new GS1EncoderParameterException(GetErrMsg());
-        }
-
-        public int GetDmRows()
-        {
-            return gs1_encoder_getDmRows(ctx);
-        }
-
-        public void SetDmRows(int rows)
-        {
-            if (!gs1_encoder_setDmRows(ctx, rows))
-                throw new GS1EncoderParameterException(GetErrMsg());
-        }
-
-        public int GetDmColumns()
-        {
-            return gs1_encoder_getDmColumns(ctx);
-        }
-
-        public void SetDmColumns(int columns)
-        {
-            if (!gs1_encoder_setDmColumns(ctx, columns))
-                throw new GS1EncoderParameterException(GetErrMsg());
-        }
-
-        public bool GetFileInputFlag()
-        {
-            return gs1_encoder_getFileInputFlag(ctx);
-        }
-
-        public void SetFileInputFlag(bool fileInputFlag)
-        {
-            if (!gs1_encoder_setFileInputFlag(ctx, fileInputFlag))
-                throw new GS1EncoderParameterException(GetErrMsg());
-        }
-
-        public string GetDataStr()
-        {
-            return System.Runtime.InteropServices.Marshal.PtrToStringAnsi(gs1_encoder_getDataStr(ctx));
-        }
-
-        public void SetDataStr(string dataStr)
-        {
-            if (!gs1_encoder_setDataStr(ctx, dataStr))
-                throw new GS1EncoderParameterException(GetErrMsg());
-        }
-        public void SetGS1dataStr(string gs1data)
-        {
-            if (!gs1_encoder_setGS1dataStr(ctx, gs1data))
-                throw new GS1EncoderParameterException(GetErrMsg());
-        }
-
-        public string GetDataFile()
-        {
-            return System.Runtime.InteropServices.Marshal.PtrToStringAnsi(gs1_encoder_getDataFile(ctx));
-        }
-
-        public void SetDataFile(string dataFile)
-        {
-            if (!gs1_encoder_setDataFile(ctx, dataFile))
-                throw new GS1EncoderParameterException(GetErrMsg());
-        }
-
-        public int GetFormat()
-        {
-            return gs1_encoder_getFormat(ctx);
-        }
-
-        public void SetFormat(int format)
-        {
-            if (!gs1_encoder_setFormat(ctx, format))
-                throw new GS1EncoderParameterException(GetErrMsg());
-        }
-
-        public string GetOutFile()
-        {
-            return System.Runtime.InteropServices.Marshal.PtrToStringAnsi(gs1_encoder_getOutFile(ctx));
-        }
-
-        public void SetOutFile(string outFile)
-        {
-            if (!gs1_encoder_setOutFile(ctx, outFile))
-                throw new GS1EncoderParameterException(GetErrMsg());
+            get
+            {
+                return System.Runtime.InteropServices.Marshal.PtrToStringAnsi(gs1_encoder_getOutFile(ctx));
+            }
+            set
+            {
+                if (!gs1_encoder_setOutFile(ctx, value))
+                   throw new GS1EncoderParameterException(ErrMsg);
+            }
         }
 
         public void Encode()
         {
             if (!gs1_encoder_encode(ctx))
-                throw new GS1EncoderEncodeException(GetErrMsg());
+                throw new GS1EncoderEncodeException(ErrMsg);
         }
         public byte[] GetBuffer()
         {
-
             IntPtr buf = new IntPtr();
             int size = gs1_encoder_getBuffer(ctx, ref buf);
 
@@ -409,7 +571,6 @@ namespace gs1encoders_dotnet
             byte[] data = new byte[size];
             Marshal.Copy(buf, data, 0, size);
             return data;
-
         }
 
         ~GS1Encoder()

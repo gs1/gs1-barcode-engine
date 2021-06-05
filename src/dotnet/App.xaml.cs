@@ -37,24 +37,26 @@ namespace gs1encoders_dotnet
             if (arguments.Length == 2 && arguments[1].Equals("--version"))
             {
                 AttachConsole(ATTACH_PARENT_PROCESS);
-                Console.WriteLine("pinvoked DLL version: " + gs1Encoder.GetVersion());
+                Console.WriteLine("pinvoked DLL version: " + gs1Encoder.Version);
                 FreeConsole();
                 Shutdown(0);
                 return;
             }
 
-            MainWindow mw = new MainWindow();
-            mw.Title = "GS1 Encoders | Library release: " + gs1Encoder.GetVersion();
+            MainWindow mw = new MainWindow
+            {
+                Title = "GS1 Encoders | Library release: " + gs1Encoder.Version
+            };
             mw.Show();
 
-            gs1Encoder.SetFileInputFlag(false);
-            gs1Encoder.SetOutFile("");
-            gs1Encoder.SetFormat(0);  // BMP
-            gs1Encoder.SetPixMult(2);
+            gs1Encoder.FileInputFlag = false;
+            gs1Encoder.OutFile = "";
+            gs1Encoder.Format = (int)GS1Encoder.Formats.BMP;
+            gs1Encoder.PixMult = 2;
 
-            gs1Encoder.SetSym(12);  // TODO enums
-            mw.dataStrTextBox.Text = "(01)12345678901231";
-            gs1Encoder.SetGS1dataStr(mw.dataStrTextBox.Text);
+            gs1Encoder.Sym = (int)GS1Encoder.Symbology.DM;
+            mw.dataStrTextBox.Text = "(01)02112345678900";
+            gs1Encoder.GS1dataStr = mw.dataStrTextBox.Text;
             
             mw.LoadControls();
 

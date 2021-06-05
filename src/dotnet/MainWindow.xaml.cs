@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.IO;
+using System.Globalization;
 
 namespace gs1encoders_dotnet
 {
@@ -28,17 +29,17 @@ namespace gs1encoders_dotnet
 
         public void LoadControls()
         {
-            symbologyComboBox.SelectedIndex = App.gs1Encoder.GetSym();
-            rawDataLabel.Content = "Raw data (FNC1 = \"#\"):   " + App.gs1Encoder.GetDataStr();            
-            pixMultTextBox.Text = App.gs1Encoder.GetPixMult().ToString();
-            XundercutTextBox.Text = App.gs1Encoder.GetXundercut().ToString();
-            YundercutTextBox.Text = App.gs1Encoder.GetYundercut().ToString();
-            sepHtTextBox.Text = App.gs1Encoder.GetSepHt().ToString();
-            segWidthComboBox.SelectedValue = App.gs1Encoder.GetDataBarExpandedSegmentsWidth().ToString();
-            linHeightTextBox.Text = App.gs1Encoder.GetGS1_128LinearHeight().ToString();
-            qrVersionComboBox.SelectedValue = App.gs1Encoder.GetQrVersion().ToString();
-            qrEClevelComboBox.SelectedValue = App.gs1Encoder.GetQrEClevel().ToString();
-            dmRowsComboBox.SelectedValue = App.gs1Encoder.GetDmRows().ToString();
+            symbologyComboBox.SelectedIndex = App.gs1Encoder.Sym;
+            rawDataLabel.Content = "Raw data (FNC1 = \"#\"):   " + App.gs1Encoder.DataStr;
+            pixMultTextBox.Text = App.gs1Encoder.PixMult.ToString(CultureInfo.InvariantCulture);
+            XundercutTextBox.Text = App.gs1Encoder.Xundercut.ToString(CultureInfo.InvariantCulture);
+            YundercutTextBox.Text = App.gs1Encoder.Yundercut.ToString(CultureInfo.InvariantCulture);
+            sepHtTextBox.Text = App.gs1Encoder.SepHt.ToString(CultureInfo.InvariantCulture);
+            segWidthComboBox.SelectedValue = App.gs1Encoder.DataBarExpandedSegmentsWidth.ToString(CultureInfo.InvariantCulture);
+            linHeightTextBox.Text = App.gs1Encoder.GS1_128LinearHeight.ToString(CultureInfo.InvariantCulture);
+            qrVersionComboBox.SelectedValue = App.gs1Encoder.QrVersion.ToString(CultureInfo.InvariantCulture);
+            qrEClevelComboBox.SelectedValue = App.gs1Encoder.QrEClevel.ToString(CultureInfo.InvariantCulture);
+            dmRowsComboBox.SelectedValue = App.gs1Encoder.DmRows.ToString(CultureInfo.InvariantCulture);
         }
 
         private void generateButton_Click(object sender, RoutedEventArgs e)
@@ -49,25 +50,25 @@ namespace gs1encoders_dotnet
 
             try
             {
-                App.gs1Encoder.SetSym(symbologyComboBox.SelectedIndex);
+                int v;
+                App.gs1Encoder.Sym = symbologyComboBox.SelectedIndex;
                 if (dataStrTextBox.Text.Length > 0 && dataStrTextBox.Text[0] == '(')
                 {
-                    App.gs1Encoder.SetGS1dataStr(dataStrTextBox.Text);
+                    App.gs1Encoder.GS1dataStr = dataStrTextBox.Text;
                 }
                 else
                 {
-                    App.gs1Encoder.SetDataStr(dataStrTextBox.Text);
+                    App.gs1Encoder.DataStr = dataStrTextBox.Text;
                 }
-                int v;
-                if (Int32.TryParse(pixMultTextBox.Text, out v)) App.gs1Encoder.SetPixMult(v);
-                if (Int32.TryParse(XundercutTextBox.Text, out v)) App.gs1Encoder.SetXundercut(v);
-                if (Int32.TryParse(YundercutTextBox.Text, out v)) App.gs1Encoder.SetYundercut(v);
-                if (Int32.TryParse(sepHtTextBox.Text, out v)) App.gs1Encoder.SetSepHt(v);
-                if (Int32.TryParse((string)segWidthComboBox.SelectedValue, out v)) App.gs1Encoder.SetDataBarExpandedSegmentsWidth(v);
-                if (Int32.TryParse(linHeightTextBox.Text, out v)) App.gs1Encoder.SetGS1_128LinearHeight(v);
-                if (Int32.TryParse((string)qrVersionComboBox.SelectedValue, out v)) App.gs1Encoder.SetQrVersion(v);
-                if (Int32.TryParse((string)qrEClevelComboBox.SelectedValue, out v)) App.gs1Encoder.SetQrEClevel(v);
-                if (Int32.TryParse((string)dmRowsComboBox.SelectedValue, out v)) App.gs1Encoder.SetDmRows(v);
+                if (Int32.TryParse(pixMultTextBox.Text, out v)) App.gs1Encoder.PixMult = v;
+                if (Int32.TryParse(XundercutTextBox.Text, out v)) App.gs1Encoder.Xundercut = v;
+                if (Int32.TryParse(YundercutTextBox.Text, out v)) App.gs1Encoder.Yundercut = v;
+                if (Int32.TryParse(sepHtTextBox.Text, out v)) App.gs1Encoder.SepHt = v;
+                if (Int32.TryParse((string)segWidthComboBox.SelectedValue, out v)) App.gs1Encoder.DataBarExpandedSegmentsWidth = v;
+                if (Int32.TryParse(linHeightTextBox.Text, out v)) App.gs1Encoder.GS1_128LinearHeight = v;
+                if (Int32.TryParse((string)qrVersionComboBox.SelectedValue, out v)) App.gs1Encoder.QrVersion = v;
+                if (Int32.TryParse((string)qrEClevelComboBox.SelectedValue, out v)) App.gs1Encoder.QrEClevel = v;
+                if (Int32.TryParse((string)dmRowsComboBox.SelectedValue, out v)) App.gs1Encoder.DmRows = v;
             }
             catch (GS1EncoderParameterException E)
             {
@@ -89,8 +90,10 @@ namespace gs1encoders_dotnet
 
             byte[] imageData = App.gs1Encoder.GetBuffer();
 
+            /*
             try
             {
+            */
                 using (MemoryStream ms = new MemoryStream(imageData))
                 {
 
@@ -103,13 +106,15 @@ namespace gs1encoders_dotnet
                         img.Freeze();
                     barcodeImage.Source = img;
                 }
-            }
+        /*  
+            }        
             catch (Exception)
             {
                 errorMessageLabel.Content = "An error occurred generating the barcode image";
                 LoadControls();
                 return;
             }
+        */
 
             LoadControls();
 
