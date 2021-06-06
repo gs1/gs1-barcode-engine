@@ -316,7 +316,7 @@ namespace gs1encoders_dotnet
         {
             get
             {
-                return System.Runtime.InteropServices.Marshal.PtrToStringAnsi(gs1_encoder_getVersion(ctx));
+                return System.Runtime.InteropServices.Marshal.PtrToStringAnsi(gs1_encoder_getVersion());
             }
         }
 
