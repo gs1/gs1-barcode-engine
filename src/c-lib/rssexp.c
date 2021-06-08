@@ -183,9 +183,7 @@ static int RSS14Eenc(gs1_encoder *ctx, uint8_t string[], uint8_t bars[RSSEXP_MAX
 		ctx->errFlag = true;
 		return(0);
 	}
-#if PRNT
-	printf("%s\n", string);
-#endif
+
 	gs1_putBits(ctx, bitField, 0, 1, (uint16_t)ccFlag); // 2D linkage bit
 	size = gs1_pack(ctx, string, bitField);
 	if (size < 0) {
