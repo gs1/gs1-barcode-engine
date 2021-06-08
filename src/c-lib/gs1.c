@@ -135,7 +135,8 @@ static bool lint_csum(gs1_encoder *ctx, const struct ai_entry *entry, char *val)
 		},												\
 		.title = t,											\
 	}
-#define AI(...) AI_VA(__VA_ARGS__)
+#define PASS_ON(...) __VA_ARGS__
+#define AI(...) PASS_ON(AI_VA(__VA_ARGS__))
 #define cset_0 0
 #define lint__ 0
 #define __ 0,0,0,_
