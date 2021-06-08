@@ -550,29 +550,75 @@ GS1_ENCODERS_API char* gs1_encoder_getDataStr(gs1_encoder *ctx) {
 	return ctx->dataStr;
 }
 GS1_ENCODERS_API bool gs1_encoder_setDataStr(gs1_encoder *ctx, char* dataStr) {
+
 	assert(ctx);
 	reset_error(ctx);
+
+	char *cc;
+
 	if (strlen(dataStr) > MAX_DATA) {
 		sprintf(ctx->errMsg, "Maximum data length is %d characters", MAX_DATA);
 		ctx->errFlag = true;
 		return false;
 	}
 	strcpy(ctx->dataStr, dataStr);
+
+	if (*ctx->dataStr != '#')	// If not GS1 data then we're done
+		return true;
+
+	// Validate GS1 data
+	if ((cc = strchr(ctx->dataStr, '|')) != NULL)		// Composite symbol
+	{
+		*cc = '\0';					// Delimit end of linear component
+		if (!gs1_processGS1data(ctx, ctx->dataStr) ||
+		    !gs1_processGS1data(ctx, cc+1)) {
+			*ctx->dataStr = '\0';
+			return false;
+		}
+		*cc = '|'			;		// Restore orginal "|"
+	}
+	else {							// Linear-only symbol
+		if (!gs1_processGS1data(ctx, ctx->dataStr)) {
+			*ctx->dataStr = '\0';
+			return false;
+		}
+	}
+
 	return true;
+
 }
 
 
 GS1_ENCODERS_API bool gs1_encoder_setGS1dataStr(gs1_encoder *ctx, char* gs1data) {
+
 	assert(ctx);
 	reset_error(ctx);
 
-	if (!gs1_parseGS1data(gs1data, ctx->dataStr)) {
-		strcpy(ctx->errMsg, "Invalid GS1 data");
-		ctx->errFlag = true;
-		return false;
+	char *cc;
+
+	// Validate GS1 data
+	if ((cc = strchr(gs1data, '|')) != NULL)		// Composite symbol
+	{
+		*cc = '\0';					// Delimit end of linear component
+		if (!gs1_parseGS1data(ctx, gs1data, ctx->dataStr)) {
+			*ctx->dataStr = '\0';
+			return false;
+		}
+		strcat(ctx->dataStr, "|");
+		if (!gs1_parseGS1data(ctx, cc+1, ctx->dataStr + strlen(ctx->dataStr))) {
+			*ctx->dataStr = '\0';
+			return false;
+		}
+		*cc = '|';					// Restore orginal "|"
+	}
+	else {							// Linear-only symbol
+		if (!gs1_parseGS1data(ctx, gs1data, ctx->dataStr)) {
+			return false;
+		}
 	}
 
 	return true;
+
 }
 
 
@@ -1295,6 +1341,8 @@ void test_api_dataStr(void) {
 	TEST_CHECK(strcmp(gs1_encoder_getDataStr(ctx), "barcode") == 0);
 	TEST_CHECK(gs1_encoder_setDataStr(ctx, ""));
 	TEST_CHECK(gs1_encoder_setDataStr(ctx, "a"));
+	TEST_CHECK(gs1_encoder_setDataStr(ctx, "129912253123000123|99123123"));
+	TEST_CHECK(gs1_encoder_setDataStr(ctx, "#129912253123000123|#99123123"));
 
 	for (i = 0; i <= MAX_DATA; i++) {
 		bigbuffer[i]='a';

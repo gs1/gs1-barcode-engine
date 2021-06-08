@@ -174,6 +174,7 @@ TEST_LIST = {
      *
      */
     { "gs1_gs1_parseGS1data", test_gs1_parseGS1data },
+    { "gs1_gs1_processGS1data", test_gs1_processGS1data },
     { "gs1_validateParity", test_gs1_validateParity },
 
 

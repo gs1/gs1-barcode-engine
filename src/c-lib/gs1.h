@@ -24,8 +24,10 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "gs1encoders.h"
 
-bool gs1_parseGS1data(char *gs1Data, char *dataStr);
+bool gs1_parseGS1data(gs1_encoder *ctx, char *gs1Data, char *dataStr);
+bool gs1_processGS1data(gs1_encoder *ctx, char *dataStr);
 bool gs1_validateParity(uint8_t *str);
 bool gs1_allDigits(uint8_t *str);
 
@@ -33,6 +35,7 @@ bool gs1_allDigits(uint8_t *str);
 #ifdef UNIT_TESTS
 
 void test_gs1_parseGS1data(void);
+void test_gs1_processGS1data(void);
 void test_gs1_validateParity(void);
 
 #endif

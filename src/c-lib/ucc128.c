@@ -618,18 +618,42 @@ void test_ucc_UCC128A_encode(void) {
 	TEST_CHECK(test_encode(ctx, gs1_encoder_sGS1_128_CCA, "testing", expect));
 
 	expect = (char*[]){
-"                    XX XX XXX XXX  XX XXX XXXX X   X X     X    X  XXX X  XX  XX    XX  XX XXXX  XXXX  X X  XX XX   X X                        ",
-"                    XX XX XXX XXX  XX XXX XXXX X   X X     X    X  XXX X  XX  XX    XX  XX XXXX  XXXX  X X  XX XX   X X                        ",
-"                    XX XX XX  XXXX XX  XX   X  XXX X XXXX   XXX X  XX  X  X XXXXX  X   XXX XXXXX X   XX XXX XX  X   X X                        ",
-"                    XX XX XX  XXXX XX  XX   X  XXX X XXXX   XXX X  XX  X  X XXXXX  X   XXX XXXXX X   XX XXX XX  X   X X                        ",
-"                    XX XX X   X  XX  X XXX     XXX   X XXXXX  X X  XX  XX X XX X    XXX    XX XXXXXX XX X   XXX X   X X                        ",
-"                    XX XX X   X  XX  X XXX     XXX   X XXXXX  X X  XX  XX X XX X    XXX    XX XXXXXX XX X   XXX X   X X                        ",
-"            X XX   XX    X X   X X  XX   XX  X  XXX  X   X  X   X X  XX   XX  X  XXX  X   X  X   X   X X    X    X XX XX  XXX   X X            ",
-"          XX X  XXX  XXXX X XXX X XX  XXX  XX XX   XX XXX XX XXX X XX  XXX  XX XX   XX XXX XX XXX XXX X XXXX XXXX X  X  XX   XXX X XX          ",
-"vvv",
+"                                          XX XX XXX XXX  XX XXX XXXX X   X X     X    X  XXX X  XX  XX    XX  XX XXXX  XXXX  X X  XX XX   X X                                              ",
+"                                          XX XX XXX XXX  XX XXX XXXX X   X X     X    X  XXX X  XX  XX    XX  XX XXXX  XXXX  X X  XX XX   X X                                              ",
+"                                          XX XX XX  XXXX XX  XX   X  XXX X XXXX   XXX X  XX  X  X XXXXX  X   XXX XXXXX X   XX XXX XX  X   X X                                              ",
+"                                          XX XX XX  XXXX XX  XX   X  XXX X XXXX   XXX X  XX  X  X XXXXX  X   XXX XXXXX X   XX XXX XX  X   X X                                              ",
+"                                          XX XX X   X  XX  X XXX     XXX   X XXXXX  X X  XX  XX X XX X    XXX    XX XXXXXX XX X   XXX X   X X                                              ",
+"                                          XX XX X   X  XX  X XXX     XXX   X XXXXX  X X  XX  XX X XX X    XXX    XX XXXXXX XX X   XXX X   X X                                              ",
+"            X XX   XX    X X   X  X  XX  XX XX XX  XXX  XX  X  XX   X  X   X X   X  XXX XXXX X  XX  X  X    X  XX  X  XX   X  X   X  XXX X XXX   X X    X XX  XXXX X  XXX   X X            ",
+"          XX X  XXX  XXXX X XXX XX XX  XX  X  X  XX   XX  XX XX  XXX XX XXX X XXX XX   X    X XX  XX XX XXXX XX  XX XX  XXX XX XXX XX   X X   XXX X XXXX X  XX    X XX   XXX X XX          ",
+"          XX X  XXX  XXXX X XXX XX XX  XX  X  X  XX   XX  XX XX  XXX XX XXX X XXX XX   X    X XX  XX XX XXXX XX  XX XX  XXX XX XXX XX   X X   XXX X XXXX X  XX    X XX   XXX X XX          ",
+"          XX X  XXX  XXXX X XXX XX XX  XX  X  X  XX   XX  XX XX  XXX XX XXX X XXX XX   X    X XX  XX XX XXXX XX  XX XX  XXX XX XXX XX   X X   XXX X XXXX X  XX    X XX   XXX X XX          ",
+"          XX X  XXX  XXXX X XXX XX XX  XX  X  X  XX   XX  XX XX  XXX XX XXX X XXX XX   X    X XX  XX XX XXXX XX  XX XX  XXX XX XXX XX   X X   XXX X XXXX X  XX    X XX   XXX X XX          ",
+"          XX X  XXX  XXXX X XXX XX XX  XX  X  X  XX   XX  XX XX  XXX XX XXX X XXX XX   X    X XX  XX XX XXXX XX  XX XX  XXX XX XXX XX   X X   XXX X XXXX X  XX    X XX   XXX X XX          ",
+"          XX X  XXX  XXXX X XXX XX XX  XX  X  X  XX   XX  XX XX  XXX XX XXX X XXX XX   X    X XX  XX XX XXXX XX  XX XX  XXX XX XXX XX   X X   XXX X XXXX X  XX    X XX   XXX X XX          ",
+"          XX X  XXX  XXXX X XXX XX XX  XX  X  X  XX   XX  XX XX  XXX XX XXX X XXX XX   X    X XX  XX XX XXXX XX  XX XX  XXX XX XXX XX   X X   XXX X XXXX X  XX    X XX   XXX X XX          ",
+"          XX X  XXX  XXXX X XXX XX XX  XX  X  X  XX   XX  XX XX  XXX XX XXX X XXX XX   X    X XX  XX XX XXXX XX  XX XX  XXX XX XXX XX   X X   XXX X XXXX X  XX    X XX   XXX X XX          ",
+"          XX X  XXX  XXXX X XXX XX XX  XX  X  X  XX   XX  XX XX  XXX XX XXX X XXX XX   X    X XX  XX XX XXXX XX  XX XX  XXX XX XXX XX   X X   XXX X XXXX X  XX    X XX   XXX X XX          ",
+"          XX X  XXX  XXXX X XXX XX XX  XX  X  X  XX   XX  XX XX  XXX XX XXX X XXX XX   X    X XX  XX XX XXXX XX  XX XX  XXX XX XXX XX   X X   XXX X XXXX X  XX    X XX   XXX X XX          ",
+"          XX X  XXX  XXXX X XXX XX XX  XX  X  X  XX   XX  XX XX  XXX XX XXX X XXX XX   X    X XX  XX XX XXXX XX  XX XX  XXX XX XXX XX   X X   XXX X XXXX X  XX    X XX   XXX X XX          ",
+"          XX X  XXX  XXXX X XXX XX XX  XX  X  X  XX   XX  XX XX  XXX XX XXX X XXX XX   X    X XX  XX XX XXXX XX  XX XX  XXX XX XXX XX   X X   XXX X XXXX X  XX    X XX   XXX X XX          ",
+"          XX X  XXX  XXXX X XXX XX XX  XX  X  X  XX   XX  XX XX  XXX XX XXX X XXX XX   X    X XX  XX XX XXXX XX  XX XX  XXX XX XXX XX   X X   XXX X XXXX X  XX    X XX   XXX X XX          ",
+"          XX X  XXX  XXXX X XXX XX XX  XX  X  X  XX   XX  XX XX  XXX XX XXX X XXX XX   X    X XX  XX XX XXXX XX  XX XX  XXX XX XXX XX   X X   XXX X XXXX X  XX    X XX   XXX X XX          ",
+"          XX X  XXX  XXXX X XXX XX XX  XX  X  X  XX   XX  XX XX  XXX XX XXX X XXX XX   X    X XX  XX XX XXXX XX  XX XX  XXX XX XXX XX   X X   XXX X XXXX X  XX    X XX   XXX X XX          ",
+"          XX X  XXX  XXXX X XXX XX XX  XX  X  X  XX   XX  XX XX  XXX XX XXX X XXX XX   X    X XX  XX XX XXXX XX  XX XX  XXX XX XXX XX   X X   XXX X XXXX X  XX    X XX   XXX X XX          ",
+"          XX X  XXX  XXXX X XXX XX XX  XX  X  X  XX   XX  XX XX  XXX XX XXX X XXX XX   X    X XX  XX XX XXXX XX  XX XX  XXX XX XXX XX   X X   XXX X XXXX X  XX    X XX   XXX X XX          ",
+"          XX X  XXX  XXXX X XXX XX XX  XX  X  X  XX   XX  XX XX  XXX XX XXX X XXX XX   X    X XX  XX XX XXXX XX  XX XX  XXX XX XXX XX   X X   XXX X XXXX X  XX    X XX   XXX X XX          ",
+"          XX X  XXX  XXXX X XXX XX XX  XX  X  X  XX   XX  XX XX  XXX XX XXX X XXX XX   X    X XX  XX XX XXXX XX  XX XX  XXX XX XXX XX   X X   XXX X XXXX X  XX    X XX   XXX X XX          ",
+"          XX X  XXX  XXXX X XXX XX XX  XX  X  X  XX   XX  XX XX  XXX XX XXX X XXX XX   X    X XX  XX XX XXXX XX  XX XX  XXX XX XXX XX   X X   XXX X XXXX X  XX    X XX   XXX X XX          ",
+"          XX X  XXX  XXXX X XXX XX XX  XX  X  X  XX   XX  XX XX  XXX XX XXX X XXX XX   X    X XX  XX XX XXXX XX  XX XX  XXX XX XXX XX   X X   XXX X XXXX X  XX    X XX   XXX X XX          ",
+"          XX X  XXX  XXXX X XXX XX XX  XX  X  X  XX   XX  XX XX  XXX XX XXX X XXX XX   X    X XX  XX XX XXXX XX  XX XX  XXX XX XXX XX   X X   XXX X XXXX X  XX    X XX   XXX X XX          ",
+"          XX X  XXX  XXXX X XXX XX XX  XX  X  X  XX   XX  XX XX  XXX XX XXX X XXX XX   X    X XX  XX XX XXXX XX  XX XX  XXX XX XXX XX   X X   XXX X XXXX X  XX    X XX   XXX X XX          ",
+"          XX X  XXX  XXXX X XXX XX XX  XX  X  X  XX   XX  XX XX  XXX XX XXX X XXX XX   X    X XX  XX XX XXXX XX  XX XX  XXX XX XXX XX   X X   XXX X XXXX X  XX    X XX   XXX X XX          ",
+"          XX X  XXX  XXXX X XXX XX XX  XX  X  X  XX   XX  XX XX  XXX XX XXX X XXX XX   X    X XX  XX XX XXXX XX  XX XX  XXX XX XXX XX   X X   XXX X XXXX X  XX    X XX   XXX X XX          ",
+NULL
 	};
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sGS1_128_CCA, "123123123123|99123123", expect));
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sGS1_128_CCA, "#123123123123|#99123123", expect));
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sGS1_128_CCA, "00030123456789012340|99123123", expect));
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sGS1_128_CCA, "#00030123456789012340|#99123123", expect));
 
 	gs1_encoder_free(ctx);
 
