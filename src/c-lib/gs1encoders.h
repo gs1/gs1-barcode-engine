@@ -841,6 +841,11 @@ GS1_ENCODERS_API char* gs1_encoder_getDataStr(gs1_encoder *ctx);
  * separate fields that are not specified as being pre-defined length from
  * subsequent fields.
  *
+ * Inputs beginning with "#" will be validated against certain data syntax
+ * rules for GS1 AIs. If the input is invalid then this function will return
+ * false and an error message will be set that can be read using
+ * gs1_encoder_getErrMsg().
+ *
  * It is strongly advised that GS1 data input is instead specified using
  * gs1_encoder_setGS1dataStr() which takes care of the AI encoding rules
  * automatically, including insertion of FNC1 characters where required. This
@@ -909,8 +914,11 @@ GS1_ENCODERS_API bool gs1_encoder_setDataStr(gs1_encoder *ctx, char* dataStr);
  * (01)00031234000054
  * \endcode
  *
- * The input is immediately parsed and the resulting encoding is available via
- * gs1_encoder_getDataStr().
+ * The input is immediately parsed and validated against certain rules for GS1
+ * AIs, after which the resulting encoding for valid inputs is available via
+ * gs1_encoder_getDataStr(). If the input is invalid then this function will
+ * return false and an error message will be set that can be read using
+ * gs1_encoder_getErrMsg().
  *
  * For symbologies that support a composite component (all except
  * ::gs1_encoder_sDM and ::gs1_encoder_sQR), the data for the linear and 2D
