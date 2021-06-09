@@ -32,9 +32,6 @@
 
 struct sPrints;
 
-#define min(X,Y) (((X) < (Y)) ? (X) : (Y))
-#define max(X,Y) (((X) > (Y)) ? (X) : (Y))
-
 // Syntactic sugar for return on failure
 #define gs1_driverInit(ctx, xdim, ydim) do {	\
 	if (!gs1_doDriverInit(ctx, xdim, ydim))	\
