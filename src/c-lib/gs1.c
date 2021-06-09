@@ -776,8 +776,10 @@ bool gs1_parseGS1data(gs1_encoder *ctx, char *gs1Data, char *dataStr) {
 	char *r, *q, *outval;
 	int i;
 	size_t vallen;
+	size_t maxlen;
 	bool fnc1req = true;
 	const struct ai_entry *entry;
+	int parts_len = sizeof(ai_table[0].parts) / sizeof(ai_table[0].parts[0]);
 
 	*dataStr = '\0';
 	*ctx->errMsg = '\0';
@@ -827,14 +829,26 @@ again:
 		if (p-q < 1) goto fail;				// Value cannot be empty
 		nwriteDataStr(r, (size_t)(p-r));		// Write the remainder of the value
 
-		// Validate the appended data
-		vallen = validate_ai_val(ctx, entry, outval, outval + strlen(outval));
-		if (vallen == 0)
-			goto fail;
-		if (vallen != strlen(outval)) {			// Validation did not consume all of the data
+		// Do an overall AI length check prior to validation of each
+		// component since reporting issues such as checksum failure
+		// isn't helpful when the AI is too long
+		maxlen = 0;
+		for (i = 0; i < parts_len; i++)
+			maxlen += entry->parts[i].max;
+		if (strlen(outval) > maxlen) {
 			sprintf(ctx->errMsg, "AI (%s) value is too long", entry->ai);
 			goto fail;
 		}
+
+		// Validate the appended data
+		vallen = validate_ai_val(ctx, entry, outval, outval + strlen(outval));
+
+		// Validation should either fail or consume all of the data
+		// because we already verified that the value is not oversized
+		assert(vallen == 0 || vallen == strlen(outval));
+
+		if (vallen == 0)				// Validation failed
+			goto fail;
 
 	}
 
