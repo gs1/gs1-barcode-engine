@@ -845,6 +845,9 @@ bool gs1_processGS1data(gs1_encoder *ctx, char *dataStr) {
 
 	assert(ctx);
 
+	ctx->numAIs = 0;
+	*ctx->errMsg = '\0';
+
 	// Ensure FNC1 in first
 	if (!*p || *p++ != '#') {
 		strcpy(ctx->errMsg, "Missing FNC1 in first position");
