@@ -83,7 +83,7 @@ static bool lint_csum(gs1_encoder *ctx, const struct aiEntry *entry, char *val) 
 	DEBUG_PRINT("      csum...");
 	if (!gs1_validateParity((uint8_t*)val)) {
 		DEBUG_PRINT(" failed\n");
-		sprintf(ctx->errMsg, "AI (%s): Incorrect check digit. Should be \"%s\"", entry->ai, val);
+		sprintf(ctx->errMsg, "AI (%s): Incorrect check digit", entry->ai);
 		ctx->errFlag = true;
 		return false;
 	};
