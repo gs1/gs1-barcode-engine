@@ -748,7 +748,7 @@ bool gs1_parseGS1data(gs1_encoder *ctx, char *gs1Data, char *dataStr) {
 	char *p = gs1Data;
 	char *r, *outval;
 	int i;
-	size_t maxlen;
+	size_t minlen, maxlen;
 	bool fnc1req = true;
 	const struct aiEntry *entry;
 	int parts_len = sizeof(ai_table[0].parts) / sizeof(ai_table[0].parts[0]);
@@ -801,9 +801,16 @@ again:
 		// Do an overall AI length check prior to performing
 		// component-based validation since reporting issues such as
 		// checksum failure isn't helpful when the AI is too long
+		minlen = 0;
 		maxlen = 0;
-		for (i = 0; i < parts_len; i++)
+		for (i = 0; i < parts_len; i++) {
+			minlen += entry->parts[i].min;
 			maxlen += entry->parts[i].max;
+		}
+		if (strlen(outval) < minlen) {
+			sprintf(ctx->errMsg, "AI (%s) value is too short", entry->ai);
+			goto fail;
+		}
 		if (strlen(outval) > maxlen) {
 			sprintf(ctx->errMsg, "AI (%s) value is too long", entry->ai);
 			goto fail;
@@ -991,6 +998,7 @@ void test_gs1_parseGS1data(void) {
 	test_parseGS1data(ctx, false, "(1", "");							// AI must terminate
 	test_parseGS1data(ctx, false, "(", "");								// AI must terminate
 	test_parseGS1data(ctx, false, "(01)123456789012312(10)12345", "");				// Fixed-length AI too long
+	test_parseGS1data(ctx, false, "(17)9(90)217", "");						// Should not parse to #17990217
 
 	gs1_encoder_free(ctx);
 
