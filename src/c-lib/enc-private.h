@@ -84,6 +84,8 @@ struct gs1_encoder {
 	int bufferWidth;	// Width of a raw format buffer
 	int bufferHeight;	// Height of a raw format buffer
 	char **bufferStrings;	// We may allocate output as a set of strings
+	char outStr[2*MAX_DATA+1];	// Buffer to return formatted HRI data
+	char *outHRI[MAX_AIS];		// Array of AI element string for HRI printing
 	char VERSION[16];
 
 	// per-instance globals
@@ -150,6 +152,8 @@ void test_api_addCheckDigit(void);
 void test_api_outFile(void);
 void test_api_dataFile(void);
 void test_api_dataStr(void);
+void test_api_getGS1dataStr(void);
+void test_api_getHRI(void);
 void test_api_format(void);
 void test_api_getBuffer(void);
 

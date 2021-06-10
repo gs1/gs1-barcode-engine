@@ -631,6 +631,51 @@ GS1_ENCODERS_API bool gs1_encoder_setGS1dataStr(gs1_encoder *ctx, char* gs1data)
 }
 
 
+GS1_ENCODERS_API char* gs1_encoder_getGS1dataStr(gs1_encoder *ctx) {
+
+	int i;
+	struct aiValue ai;
+	char *p = ctx->outStr;
+
+	assert(ctx);
+	assert(ctx->numAIs <= MAX_AIS);
+	reset_error(ctx);
+
+	*p = '\0';
+	for (i = 0; i < ctx->numAIs; i++) {
+		ai = ctx->aiData[i];
+		p += sprintf(p, "(%s)%.*s", ai.aiEntry->ai, ai.vallen, ai.value);
+	}
+
+	return ctx->outStr;
+
+}
+
+
+GS1_ENCODERS_API int gs1_encoder_getHRI(gs1_encoder *ctx, char*** out) {
+
+	int i;
+	struct aiValue ai;
+	char *p = ctx->outStr;
+
+	assert(ctx);
+	assert(ctx->numAIs <= MAX_AIS);
+	reset_error(ctx);
+
+	*p = '\0';
+	for (i = 0; i < ctx->numAIs; i++) {
+		ctx->outHRI[i] = p;
+		ai = ctx->aiData[i];
+		p += sprintf(p, "(%s) %.*s", ai.aiEntry->ai, ai.vallen, ai.value);
+		*p++ = '\0';
+	}
+
+	*out = ctx->outHRI;
+	return ctx->numAIs;
+
+}
+
+
 GS1_ENCODERS_API char* gs1_encoder_getDataFile(gs1_encoder *ctx) {
 	assert(ctx);
 	reset_error(ctx);
@@ -1343,7 +1388,6 @@ void test_api_dataFile(void) {
 void test_api_dataStr(void) {
 
 	gs1_encoder* ctx;
-
 	int i;
 
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
@@ -1363,6 +1407,43 @@ void test_api_dataStr(void) {
 
 	bigbuffer[MAX_DATA]='\0';
 	TEST_CHECK(gs1_encoder_setDataStr(ctx, bigbuffer));   // Maximun length
+
+	gs1_encoder_free(ctx);
+
+}
+
+
+// TODO expand
+void test_api_getGS1dataStr(void) {
+
+	gs1_encoder* ctx;
+	char *out;
+
+	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+
+	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "#011231231231233310ABC123"));
+	TEST_ASSERT((out = gs1_encoder_getGS1dataStr(ctx)) != NULL);
+	TEST_CHECK(strcmp(out, "(01)12312312312333(10)ABC123") == 0);
+
+	gs1_encoder_free(ctx);
+
+}
+
+
+// TODO expand
+void test_api_getHRI(void) {
+
+	gs1_encoder* ctx;
+	int numAIs;
+	char **hri;
+
+	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+
+	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "#011231231231233310ABC123"));
+	TEST_ASSERT((numAIs = gs1_encoder_getHRI(ctx, &hri)) == 2);
+	TEST_ASSERT(hri != NULL);
+	TEST_CHECK(strcmp(hri[0], "(01) 12312312312333") == 0);
+	TEST_CHECK(strcmp(hri[1], "(10) ABC123") == 0);
 
 	gs1_encoder_free(ctx);
 
