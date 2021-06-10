@@ -270,6 +270,9 @@ namespace gs1encoders_dotnet
         [return: MarshalAs(UnmanagedType.U1)]
         private static extern bool gs1_encoder_setGS1dataStr(IntPtr ctx, string gs1data);
 
+        [DllImport(gs1_dll, EntryPoint = "gs1_encoder_getGS1dataStr", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr gs1_encoder_getGS1dataStr(IntPtr ctx);
+
         [DllImport(gs1_dll, EntryPoint = "gs1_encoder_getDataFile", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr gs1_encoder_getDataFile(IntPtr ctx);
 
@@ -509,7 +512,9 @@ namespace gs1encoders_dotnet
 
         public string GS1dataStr
         {
-            private get { return ""; }
+            get {
+                return System.Runtime.InteropServices.Marshal.PtrToStringAnsi(gs1_encoder_getGS1dataStr(ctx));
+            }
             set
             {
                 if (!gs1_encoder_setGS1dataStr(ctx, value))

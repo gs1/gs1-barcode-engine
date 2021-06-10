@@ -140,6 +140,6 @@
             <ComboBoxItem Content="132" Tag="132" HorizontalAlignment="Left" Width="66"/>
             <ComboBoxItem Content="144" Tag="144" HorizontalAlignment="Left" Width="66"/>
         </ComboBox>
-        <Label x:Name="rawDataLabel" Content="" HorizontalAlignment="Center" Margin="29,57,30,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Height="28" Width="733"/>
+        <Label x:Name="infoLabel" Content="" HorizontalAlignment="Center" Margin="29,57,30,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Height="28" Width="733"/>
     </Grid>
 </Window>

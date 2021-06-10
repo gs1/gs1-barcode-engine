@@ -30,7 +30,23 @@ namespace gs1encoders_dotnet
         public void LoadControls()
         {
             symbologyComboBox.SelectedIndex = App.gs1Encoder.Sym;
-            rawDataLabel.Content = "Raw data (FNC1 = \"#\"):   " + App.gs1Encoder.DataStr;
+
+            infoLabel.Content = "";
+            if (App.gs1Encoder.DataStr.Length > 0 && App.gs1Encoder.DataStr[0] == '#' && dataStrTextBox.Text.Length > 0)  // AI data
+            {
+                switch (dataStrTextBox.Text[0])
+                {
+                    case '#':
+                        infoLabel.Content = "AI data:   " + App.gs1Encoder.GS1dataStr;
+                        break;
+                    case '(':
+                        infoLabel.Content = "Raw data (FNC1 = \"#\"):   " + App.gs1Encoder.DataStr;
+                        break;
+                    default:
+                        break;
+                }
+            }
+
             pixMultTextBox.Text = App.gs1Encoder.PixMult.ToString(CultureInfo.InvariantCulture);
             XundercutTextBox.Text = App.gs1Encoder.Xundercut.ToString(CultureInfo.InvariantCulture);
             YundercutTextBox.Text = App.gs1Encoder.Yundercut.ToString(CultureInfo.InvariantCulture);
@@ -45,7 +61,7 @@ namespace gs1encoders_dotnet
         private void generateButton_Click(object sender, RoutedEventArgs e)
         {
             barcodeImage.Source = null;
-            rawDataLabel.Content = "";
+            infoLabel.Content = "";
             errorMessageLabel.Content = "";
 
             try
