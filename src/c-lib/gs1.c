@@ -816,6 +816,12 @@ again:
 			goto fail;
 		}
 
+		// Also forbid data "#" characters at this stage so we don't conflate with FNC1
+		if (strchr(outval, '#') != NULL) {
+			sprintf(ctx->errMsg, "AI (%s) contains illegal # character", entry->ai);
+			goto fail;
+		}
+
 	}
 
 	DEBUG_PRINT("Parsing successful: %s\n", dataStr);
@@ -1001,6 +1007,7 @@ void test_gs1_parseGS1data(void) {
 	test_parseGS1data(ctx, false, "(1", "");							// AI must terminate
 	test_parseGS1data(ctx, false, "(", "");								// AI must terminate
 	test_parseGS1data(ctx, false, "(01)123456789012312(10)12345", "");				// Fixed-length AI too long
+	test_parseGS1data(ctx, false, "(10)12345#", "");						// Reject "#": Conflated with FNC1
 	test_parseGS1data(ctx, false, "(17)9(90)217", "");						// Should not parse to #17990217
 
 	gs1_encoder_free(ctx);
