@@ -115,6 +115,7 @@ GS1_ENCODERS_API gs1_encoder* gs1_encoder_init(void *mem) {
 	ctx->addCheckDigit = false;
 	ctx->format = gs1_encoder_dTIF;
 	strcpy(ctx->dataStr, "");
+	ctx->numAIs = 0;
 	strcpy(ctx->dataFile, "data.txt");
 	ctx->fileInputFlag = false; // for kbd input
 	strcpy(ctx->outFile, DEFAULT_TIF_FILE);
@@ -561,7 +562,9 @@ GS1_ENCODERS_API bool gs1_encoder_setDataStr(gs1_encoder *ctx, char* dataStr) {
 		ctx->errFlag = true;
 		return false;
 	}
-	strcpy(ctx->dataStr, dataStr);
+	if (ctx->dataStr != dataStr)				// For file input we are given ctx->dataStr
+		strcpy(ctx->dataStr, dataStr);
+	ctx->numAIs = 0;
 
 	if (*ctx->dataStr != '#')	// If not GS1 data then we're done
 		return true;
@@ -573,6 +576,7 @@ GS1_ENCODERS_API bool gs1_encoder_setDataStr(gs1_encoder *ctx, char* dataStr) {
 		if (!gs1_processGS1data(ctx, ctx->dataStr) ||
 		    !gs1_processGS1data(ctx, cc+1)) {
 			*ctx->dataStr = '\0';
+			ctx->numAIs = 0;
 			return false;
 		}
 		*cc = '|'			;		// Restore orginal "|"
@@ -580,6 +584,7 @@ GS1_ENCODERS_API bool gs1_encoder_setDataStr(gs1_encoder *ctx, char* dataStr) {
 	else {							// Linear-only symbol
 		if (!gs1_processGS1data(ctx, ctx->dataStr)) {
 			*ctx->dataStr = '\0';
+			ctx->numAIs = 0;
 			return false;
 		}
 	}
@@ -602,17 +607,21 @@ GS1_ENCODERS_API bool gs1_encoder_setGS1dataStr(gs1_encoder *ctx, char* gs1data)
 		*cc = '\0';					// Delimit end of linear component
 		if (!gs1_parseGS1data(ctx, gs1data, ctx->dataStr)) {
 			*ctx->dataStr = '\0';
+			ctx->numAIs = 0;
 			return false;
 		}
 		strcat(ctx->dataStr, "|");
 		if (!gs1_parseGS1data(ctx, cc+1, ctx->dataStr + strlen(ctx->dataStr))) {
 			*ctx->dataStr = '\0';
+			ctx->numAIs = 0;
 			return false;
 		}
 		*cc = '|';					// Restore orginal "|"
 	}
 	else {							// Linear-only symbol
 		if (!gs1_parseGS1data(ctx, gs1data, ctx->dataStr)) {
+			*ctx->dataStr = '\0';
+			ctx->numAIs = 0;
 			return false;
 		}
 	}

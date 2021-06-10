@@ -50,6 +50,7 @@ struct sPrints {
 #include "dm.h"
 #include "driver.h"
 #include "ean.h"
+#include "gs1.h"
 #include "mtx.h"
 #include "qr.h"
 #include "rss14.h"
@@ -88,6 +89,8 @@ struct gs1_encoder {
 	// per-instance globals
 	bool localAlloc;	// True if we malloc()ed this struct
 	FILE *outfp;
+	struct aiValue aiData[MAX_AIS];	// List of AI components
+	int numAIs;
 	size_t bufferCap;
 	size_t bufferSize;
 	int errFlag;

@@ -49,65 +49,37 @@ static const char* fixedAIprefixes[22] = {
 static const char* cset82 = "!\"%&'()*+,-./0123456789:;<=>?ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz";
 
 
-struct ai_val {
-	char *ai;
-	char *val;
-};
-
-typedef enum {
-	cset_none = 0,
-	cset_X,
-	cset_N,
-	cset_C,
-} cset_t;
-
-
-struct ai_entry;
-
-typedef bool (*linter_t)(gs1_encoder *ctx, const struct ai_entry *entry, char *val);
-
-struct ai_comp {
-	cset_t cset;
-	uint8_t min;
-	uint8_t max;
-	linter_t linters[1];
-};
-
-struct ai_entry {
-	char *ai;
-	bool fnc1;
-	struct ai_comp parts[5];
-	char *title;
-};
-
-
 /* "Linter" functions
  *
  * Used to validate AI components
  *
  */
 
-static bool lint_cset82(gs1_encoder *ctx, const struct ai_entry *entry, char *val) {
+static bool lint_cset82(gs1_encoder *ctx, const struct aiEntry *entry, char *val) {
+	DEBUG_PRINT("      cset82...");
 	if (strspn(val, cset82) != strlen(val)) {
 		sprintf(ctx->errMsg, "AI (%s): Incorrect CSET 82 character", entry->ai);
 		ctx->errFlag = true;
 		return false;
 	}
+	DEBUG_PRINT(" success\n");
 	return true;
 }
 
 
-static bool lint_csetNumeric(gs1_encoder *ctx, const struct ai_entry *entry, char *val) {
+static bool lint_csetNumeric(gs1_encoder *ctx, const struct aiEntry *entry, char *val) {
+	DEBUG_PRINT("      csetNumeric...");
 	if (!gs1_allDigits((uint8_t*)val)) {
 		sprintf(ctx->errMsg, "AI (%s): Illegal non-digit character", entry->ai);
 		ctx->errFlag = true;
 		return false;
 	}
+	DEBUG_PRINT(" success\n");
 	return true;
 }
 
 
-static bool lint_csum(gs1_encoder *ctx, const struct ai_entry *entry, char *val) {
+static bool lint_csum(gs1_encoder *ctx, const struct aiEntry *entry, char *val) {
 	DEBUG_PRINT("      csum...");
 	if (!gs1_validateParity((uint8_t*)val)) {
 		DEBUG_PRINT(" failed\n");
@@ -142,7 +114,7 @@ static bool lint_csum(gs1_encoder *ctx, const struct ai_entry *entry, char *val)
 #define lint__ 0
 #define __ 0,0,0,_
 
-static const struct ai_entry ai_table[] = {
+static const struct aiEntry ai_table[] = {
 	AI( "00"  , NO_FNC1, N,18,18,csum, __, __, __, __,                "SSCC"                      ),
 	AI( "01"  , NO_FNC1, N,14,14,csum, __, __, __, __,                "GTIN"                      ),
 	AI( "02"  , NO_FNC1, N,14,14,csum, __, __, __, __,                "CONTENT"                   ),
@@ -658,11 +630,11 @@ static const struct ai_entry ai_table[] = {
 };
 
 
-static const struct ai_entry* lookup_ai_entry(char *p, bool prefix) {
+static const struct aiEntry* lookup_ai_entry(char *p, bool prefix) {
 
 	int ai_table_len = sizeof(ai_table) / sizeof(ai_table[0]);
 	int i;
-	const struct ai_entry *entry;
+	const struct aiEntry *entry;
 	size_t ailen;
 
 	// Walk the AI table to find a (prefix) match
@@ -689,9 +661,9 @@ static const struct ai_entry* lookup_ai_entry(char *p, bool prefix) {
  *  Validate string between start and end pointers according to rules for an AI
  *
  */
-static size_t validate_ai_val(gs1_encoder *ctx, const struct ai_entry *entry, char *start, char *end) {
+static size_t validate_ai_val(gs1_encoder *ctx, const struct aiEntry *entry, char *start, char *end) {
 
-	const struct ai_comp *part;
+	const struct aiComponent *part;
 	int parts_len = sizeof(ai_table[0].parts) / sizeof(ai_table[0].parts[0]);
 	int linters_len = sizeof(ai_table[0].parts[0].linters) / sizeof(ai_table[0].parts[0].linters[0]);
 	int i, j;
@@ -778,7 +750,7 @@ bool gs1_parseGS1data(gs1_encoder *ctx, char *gs1Data, char *dataStr) {
 	int i;
 	size_t maxlen;
 	bool fnc1req = true;
-	const struct ai_entry *entry;
+	const struct aiEntry *entry;
 	int parts_len = sizeof(ai_table[0].parts) / sizeof(ai_table[0].parts[0]);
 
 	*dataStr = '\0';
@@ -862,7 +834,7 @@ bool gs1_processGS1data(gs1_encoder *ctx, char *dataStr) {
 
 	char *p = dataStr, *r;
 	size_t vallen;
-	const struct ai_entry *entry;
+	const struct aiEntry *entry;
 
 	assert(ctx);
 
@@ -898,9 +870,20 @@ bool gs1_processGS1data(gs1_encoder *ctx, char *dataStr) {
 		if ((vallen = validate_ai_val(ctx, entry, p, r)) == 0)
 			return false;
 
-		p += vallen;
+		// Add to the aiData
+		if (ctx->numAIs < MAX_AIS) {
+			ctx->aiData[ctx->numAIs].aiEntry = entry;
+			ctx->aiData[ctx->numAIs].value = p;
+			ctx->aiData[ctx->numAIs].vallen = (uint8_t)vallen;
+			ctx->numAIs++;
+		} else {
+			strcpy(ctx->errMsg, "Too many AIs");
+			ctx->errFlag = true;
+			return false;
+		}
 
 		// After AIs requiring FNC1, we expect to find an FNC1 or be at the end
+		p += vallen;
 		if (entry->fnc1 && *p != '#' && *p != '\0') {
 			sprintf(ctx->errMsg, "AI (%s) data is too long", entry->ai);
 			ctx->errFlag = true;

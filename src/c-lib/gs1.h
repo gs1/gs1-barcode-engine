@@ -24,6 +24,45 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#define MAX_AIS	64
+
+
+typedef enum {
+	cset_none = 0,
+	cset_X,
+	cset_N,
+	cset_C,
+} cset_t;
+
+
+struct aiEntry;		// Must forward declare
+
+typedef bool (*linter_t)(gs1_encoder *ctx, const struct aiEntry *entry, char *val);
+
+
+// A single AI may consist of multiple concatenated components
+struct aiComponent {
+	cset_t cset;
+	uint8_t min;
+	uint8_t max;
+	linter_t linters[1];
+};
+
+
+struct aiEntry {
+	char *ai;
+	bool fnc1;
+	struct aiComponent parts[5];
+	char *title;
+};
+
+struct aiValue {
+	const struct aiEntry *aiEntry;
+	char *value;
+	uint8_t vallen;
+};
+
+
 #include "gs1encoders.h"
 
 bool gs1_parseGS1data(gs1_encoder *ctx, char *gs1Data, char *dataStr);
