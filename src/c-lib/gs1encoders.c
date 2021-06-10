@@ -633,7 +633,7 @@ GS1_ENCODERS_API bool gs1_encoder_setGS1dataStr(gs1_encoder *ctx, char* gs1data)
 
 GS1_ENCODERS_API char* gs1_encoder_getGS1dataStr(gs1_encoder *ctx) {
 
-	int i;
+	int i, j;
 	struct aiValue ai;
 	char *p = ctx->outStr;
 
@@ -641,11 +641,16 @@ GS1_ENCODERS_API char* gs1_encoder_getGS1dataStr(gs1_encoder *ctx) {
 	assert(ctx->numAIs <= MAX_AIS);
 	reset_error(ctx);
 
-	*p = '\0';
 	for (i = 0; i < ctx->numAIs; i++) {
 		ai = ctx->aiData[i];
-		p += sprintf(p, "(%s)%.*s", ai.aiEntry->ai, ai.vallen, ai.value);
+		p += sprintf(p, "(%s)", ai.aiEntry->ai);
+		for (j = 0; j < ai.vallen; j++) {
+			if (ai.value[j] == '(')		// Escape data "("
+				*p++ = '\\';
+			*p++ = ai.value[j];
+		}
 	}
+	*p = '\0';
 
 	return ctx->outStr;
 
@@ -1413,7 +1418,6 @@ void test_api_dataStr(void) {
 }
 
 
-// TODO expand
 void test_api_getGS1dataStr(void) {
 
 	gs1_encoder* ctx;
@@ -1424,6 +1428,11 @@ void test_api_getGS1dataStr(void) {
 	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "#011231231231233310ABC123"));
 	TEST_ASSERT((out = gs1_encoder_getGS1dataStr(ctx)) != NULL);
 	TEST_CHECK(strcmp(out, "(01)12312312312333(10)ABC123") == 0);
+
+	// Escape data "(" characters
+	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "#10ABC(123"));
+	TEST_ASSERT((out = gs1_encoder_getGS1dataStr(ctx)) != NULL);
+	TEST_CHECK(strcmp(out, "(10)ABC\\(123") == 0);
 
 	gs1_encoder_free(ctx);
 
