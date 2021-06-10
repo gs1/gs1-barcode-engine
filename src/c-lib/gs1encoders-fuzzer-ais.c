@@ -25,12 +25,7 @@
 #include <string.h>
 
 #include "gs1encoders.h"
-
-
-#ifndef SYMBOLOGY
-#error
-#endif
-
+#include "enc-private.h"
 
 static gs1_encoder *ctx = NULL;
 
@@ -41,8 +36,6 @@ int LLVMFuzzerInitialize(int *argc, char ***argv) {
 	(void)argv;
 
 	ctx = gs1_encoder_init(NULL);
-	gs1_encoder_setFormat(ctx, gs1_encoder_dRAW);
-	gs1_encoder_setSym(ctx, SYMBOLOGY);
 
 	return 0;
 
@@ -51,13 +44,22 @@ int LLVMFuzzerInitialize(int *argc, char ***argv) {
 
 int LLVMFuzzerTestOneInput(const uint8_t *buf, size_t len) {
 
-	char string[8192];
+	char in[MAX_DATA+1];
+	char *out;
 
-	memcpy(string, buf, len);
-	string[len] = '\0';
+	if (len > MAX_DATA)
+		return 0;
 
-	gs1_encoder_setDataStr(ctx, string);
-	gs1_encoder_encode(ctx);
+	memcpy(in, buf, len);
+	in[len] = '\0';
+
+	if (!gs1_encoder_setGS1dataStr(ctx, in))
+		return 0;
+	out = gs1_encoder_getGS1dataStr(ctx);
+	if (strcmp(in, out) != 0) {
+		printf("\nIN:  %s\nOUT: %s\n", in, out);
+		abort();
+	}
 
 	return 0;
 

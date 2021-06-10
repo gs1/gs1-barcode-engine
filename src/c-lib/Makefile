@@ -76,18 +76,19 @@ APP_OBJ = $(BUILD_DIR)/$(APP_SRC:.c=.o)
 TEST_SRC = gs1encoders-test.c
 TEST_OBJ = $(BUILD_DIR)/$(TEST_SRC:.c=.o)
 
-FUZZER_SRC = gs1encoders-fuzzer.c
+FUZZER_ENCODERS_SRC = gs1encoders-fuzzer-encoders.c
+FUZZER_SRCS = $(FUZZER_ENCODERS_SRC) gs1encoders-fuzzer-ais.c
 
-FUZZER_SYM = QR DM EAN13 EAN8 UPCA UPCE RSS14 RSS14T RSS14S RSS14SO RSSLIM RSSEXP UCC128_CCA UCC128_CCC
+FUZZER_SYM = QR DM EAN13 EAN8 UPCA UPCE DataBarOmni DataBarTruncated DataBarStacked DataBarStackedOmni DataBarLimited DataBarExpanded GS1_128_CCA GS1_128_CCC
 FUZZER_PREFIX = $(NAME)-fuzzer-
-FUZZER_BINS = $(addprefix $(BUILD_DIR)/$(FUZZER_PREFIX),$(FUZZER_SYM))
-FUZZER_OBJS = $(addsuffix .o, $(addprefix $(BUILD_DIR)/$(FUZZER_PREFIX),$(FUZZER_SYM)))
+FUZZER_BINS = $(addprefix $(BUILD_DIR)/$(FUZZER_PREFIX),$(FUZZER_SYM)) $(BUILD_DIR)/$(FUZZER_PREFIX)ais
+FUZZER_OBJS = $(addsuffix .o, $(FUZZER_BINS))
 
 FUZZER_CORPUS_PREFIX = corpus-
-FUZZER_CORPUSES = $(addsuffix /, $(addprefix $(FUZZER_CORPUS_PREFIX),$(FUZZER_SYM)))
+FUZZER_CORPUSES = $(addsuffix /, $(addprefix $(FUZZER_CORPUS_PREFIX),$(FUZZER_SYM))) $(FUZZER_CORPUS_PREFIX)ais/
 
 ALL_SRCS = $(wildcard *.c)
-SRCS = $(filter-out $(APP_SRC) $(TEST_SRC) $(FUZZER_SRC), $(ALL_SRCS))
+SRCS = $(filter-out $(APP_SRC) $(TEST_SRC) $(FUZZER_SRCS), $(ALL_SRCS))
 OBJS = $(addprefix $(BUILD_DIR)/, $(SRCS:.c=.o))
 DEPS = $(addprefix $(BUILD_DIR)/, $(ALL_SRCS:.c=.d)) $(FUZZER_OBJS:.o=.d)
 
@@ -152,14 +153,14 @@ $(TEST_BIN): $(OBJS) $(TEST_OBJ)
 
 
 #
-#  Fuzzer binary
+#  Fuzzer binaries
 #
 
 define gen-fuzzer-target
 $$(FUZZER_CORPUS_PREFIX)$1/:
 	mkdir -p $$(FUZZER_CORPUS_PREFIX)$1
 
-$$(BUILD_DIR)/$$(FUZZER_PREFIX)$1.o : $$(FUZZER_SRC)
+$$(BUILD_DIR)/$$(FUZZER_PREFIX)$1.o : $$(FUZZER_ENCODERS_SRC)
 	$$(CC) $$(CFLAGS) -DSYMBOLOGY=gs1_encoder_s$1 -c $$< -o $$@
 
 $$(BUILD_DIR)/$$(FUZZER_PREFIX)$1: $$(OBJS) $$(BUILD_DIR)/$$(FUZZER_PREFIX)$1.o
@@ -167,6 +168,13 @@ $$(BUILD_DIR)/$$(FUZZER_PREFIX)$1: $$(OBJS) $$(BUILD_DIR)/$$(FUZZER_PREFIX)$1.o
 endef
 
 $(foreach sym,$(FUZZER_SYM),$(eval $(call gen-fuzzer-target,$(sym))))
+
+
+$(FUZZER_CORPUS_PREFIX)ais/:
+	mkdir -p $@
+
+$(BUILD_DIR)/$(FUZZER_PREFIX)ais: $(OBJS) $(BUILD_DIR)/$(FUZZER_PREFIX)ais.o
+	$(CC) $(CFLAGS) $(OBJS) $(BUILD_DIR)/$(FUZZER_PREFIX)ais.o -o $(BUILD_DIR)/$(FUZZER_PREFIX)ais
 
 
 #
