@@ -602,6 +602,7 @@ GS1_ENCODERS_API bool gs1_encoder_setGS1dataStr(gs1_encoder *ctx, char* gs1data)
 	char *cc;
 
 	// Validate GS1 data
+	ctx->numAIs = 0;
 	if ((cc = strchr(gs1data, '|')) != NULL)		// Composite symbol
 	{
 		*cc = '\0';					// Delimit end of linear component
@@ -611,6 +612,7 @@ GS1_ENCODERS_API bool gs1_encoder_setGS1dataStr(gs1_encoder *ctx, char* gs1data)
 			return false;
 		}
 		strcat(ctx->dataStr, "|");
+		ctx->aiData[ctx->numAIs++].aiEntry = NULL;   // Indicate separator in HRI
 		if (!gs1_parseGS1data(ctx, cc+1, ctx->dataStr + strlen(ctx->dataStr))) {
 			*ctx->dataStr = '\0';
 			ctx->numAIs = 0;
@@ -671,7 +673,10 @@ GS1_ENCODERS_API int gs1_encoder_getHRI(gs1_encoder *ctx, char*** out) {
 	for (i = 0; i < ctx->numAIs; i++) {
 		ctx->outHRI[i] = p;
 		ai = ctx->aiData[i];
-		p += sprintf(p, "(%s) %.*s", ai.aiEntry->ai, ai.vallen, ai.value);
+		if (ai.aiEntry)
+			p += sprintf(p, "(%s) %.*s", ai.aiEntry->ai, ai.vallen, ai.value);
+		else
+			p += sprintf(p, "--");
 		*p++ = '\0';
 	}
 
