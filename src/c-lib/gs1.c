@@ -827,7 +827,7 @@ again:
 	DEBUG_PRINT("Parsing successful: %s\n", dataStr);
 
 	// Now validate the data that we have written
-	return gs1_processGS1data(ctx, ctx->dataStr);
+	return gs1_processGS1data(ctx, dataStr);
 
 fail:
 
@@ -851,7 +851,6 @@ bool gs1_processGS1data(gs1_encoder *ctx, char *dataStr) {
 
 	assert(ctx);
 
-	ctx->numAIs = 0;
 	*ctx->errMsg = '\0';
 
 	// Ensure FNC1 in first
