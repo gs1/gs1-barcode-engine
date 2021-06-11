@@ -273,6 +273,9 @@ namespace gs1encoders_dotnet
         [DllImport(gs1_dll, EntryPoint = "gs1_encoder_getGS1dataStr", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr gs1_encoder_getGS1dataStr(IntPtr ctx);
 
+        [DllImport(gs1_dll, EntryPoint = "gs1_encoder_getHRI", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        private static extern int gs1_encoder_getHRI(IntPtr ctx, ref IntPtr hri);
+
         [DllImport(gs1_dll, EntryPoint = "gs1_encoder_getDataFile", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr gs1_encoder_getDataFile(IntPtr ctx);
 
@@ -519,6 +522,23 @@ namespace gs1encoders_dotnet
             {
                 if (!gs1_encoder_setGS1dataStr(ctx, value))
                     throw new GS1EncoderParameterException(ErrMsg);
+            }
+        }
+
+        public string[] HRI
+        {
+            get
+            {
+                IntPtr p = IntPtr.Zero;
+                int numAIs = gs1_encoder_getHRI(ctx, ref p);
+                IntPtr[] pAI = new IntPtr[numAIs];
+                Marshal.Copy(p, pAI, 0, numAIs);
+                string[] hri = new string[numAIs];
+                for (int i = 0; i < numAIs; i++) 
+                {
+                    hri[i] = Marshal.PtrToStringAnsi(pAI[i]);
+                }       
+                return hri;
             }
         }
 

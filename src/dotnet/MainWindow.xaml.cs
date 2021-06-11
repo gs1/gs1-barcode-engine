@@ -56,6 +56,14 @@ namespace gs1encoders_dotnet
             qrVersionComboBox.SelectedValue = App.gs1Encoder.QrVersion.ToString(CultureInfo.InvariantCulture);
             qrEClevelComboBox.SelectedValue = App.gs1Encoder.QrEClevel.ToString(CultureInfo.InvariantCulture);
             dmRowsComboBox.SelectedValue = App.gs1Encoder.DmRows.ToString(CultureInfo.InvariantCulture);
+
+            string[] hri = App.gs1Encoder.HRI;
+            hriTextBox.Text = "";
+            foreach (string ai in hri)
+            {
+                hriTextBox.Text += ai + "\n";
+            }
+
         }
 
         private void generateButton_Click(object sender, RoutedEventArgs e)
