@@ -948,6 +948,9 @@ GS1_ENCODERS_API bool gs1_encoder_setGS1dataStr(gs1_encoder *ctx, char* dataStr)
 GS1_ENCODERS_API char* gs1_encoder_getGS1dataStr(gs1_encoder *ctx);
 
 
+// TODO
+GS1_ENCODERS_API int gs1_encoder_getHRI(gs1_encoder* ctx, char*** out);
+
 /**
  * @brief Gets the filename for a file containing the barcode data when file
  * input is selected.

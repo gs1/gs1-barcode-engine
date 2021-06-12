@@ -564,32 +564,31 @@ GS1_ENCODERS_API bool gs1_encoder_setDataStr(gs1_encoder *ctx, char* dataStr) {
 	}
 	if (ctx->dataStr != dataStr)				// For file input we are given ctx->dataStr
 		strcpy(ctx->dataStr, dataStr);
+
+	// Validate and process data, including extraction of HRI
 	ctx->numAIs = 0;
-
-	if (*ctx->dataStr != '#')	// If not GS1 data then we're done
-		return true;
-
-	// Validate GS1 data
 	if ((cc = strchr(ctx->dataStr, '|')) != NULL)		// Composite symbol
 	{
 		*cc = '\0';					// Delimit end of linear component
-		if (!gs1_processGS1data(ctx, ctx->dataStr) ||
-		    !gs1_processGS1data(ctx, cc+1)) {
-			*ctx->dataStr = '\0';
-			ctx->numAIs = 0;
-			return false;
-		}
-		*cc = '|'			;		// Restore orginal "|"
+		if (*ctx->dataStr == '#' && !gs1_processGS1data(ctx, ctx->dataStr))
+			goto fail;
+		ctx->aiData[ctx->numAIs++].aiEntry = NULL;	// Indicate separator in HRI
+		if (!gs1_processGS1data(ctx, cc + 1))
+			goto fail;
+		*cc = '|';					// Restore orginal "|"
 	}
 	else {							// Linear-only symbol
-		if (!gs1_processGS1data(ctx, ctx->dataStr)) {
-			*ctx->dataStr = '\0';
-			ctx->numAIs = 0;
-			return false;
-		}
+		if (*ctx->dataStr == '#' && !gs1_processGS1data(ctx, ctx->dataStr))
+			goto fail;
 	}
 
 	return true;
+
+fail:
+
+	*ctx->dataStr = '\0';
+	ctx->numAIs = 0;
+	return false;
 
 }
 
@@ -612,7 +611,7 @@ GS1_ENCODERS_API bool gs1_encoder_setGS1dataStr(gs1_encoder *ctx, char* gs1data)
 			return false;
 		}
 		strcat(ctx->dataStr, "|");
-		ctx->aiData[ctx->numAIs++].aiEntry = NULL;   // Indicate separator in HRI
+		ctx->aiData[ctx->numAIs++].aiEntry = NULL;	// Indicate separator in HRI
 		if (!gs1_parseGS1data(ctx, cc+1, ctx->dataStr + strlen(ctx->dataStr))) {
 			*ctx->dataStr = '\0';
 			ctx->numAIs = 0;
@@ -1453,11 +1452,13 @@ void test_api_getHRI(void) {
 
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
 
-	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "#011231231231233310ABC123"));
-	TEST_ASSERT((numAIs = gs1_encoder_getHRI(ctx, &hri)) == 2);
+	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "#011231231231233310ABC123|#99COMPOSITE"));
+	TEST_ASSERT((numAIs = gs1_encoder_getHRI(ctx, &hri)) == 4);
 	TEST_ASSERT(hri != NULL);
 	TEST_CHECK(strcmp(hri[0], "(01) 12312312312333") == 0);
 	TEST_CHECK(strcmp(hri[1], "(10) ABC123") == 0);
+	TEST_CHECK(strcmp(hri[2], "--") == 0);
+	TEST_CHECK(strcmp(hri[3], "(99) COMPOSITE") == 0);
 
 	gs1_encoder_free(ctx);
 
