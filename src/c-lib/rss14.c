@@ -368,6 +368,50 @@ static bool RSS14enc(gs1_encoder *ctx, uint8_t string[], uint8_t bars[], int ccF
 	return(true);
 }
 
+bool gs1_normaliseRSS14(gs1_encoder *ctx, char *dataStr, char *primaryStr) {
+
+	if (strlen(dataStr) >= 3 && strncmp(dataStr, "#01", 3) == 0)
+		dataStr += 3;
+
+	if (!ctx->addCheckDigit) {
+		if (strlen(dataStr) != 14) {
+			strcpy(ctx->errMsg, "primary data must be a GTIN-14");
+			ctx->errFlag = true;
+			*primaryStr = '\0';
+			return false;
+		}
+	}
+	else {
+		if (strlen(dataStr) != 13) {
+			strcpy(ctx->errMsg, "primary data must be a GTIN-14 without check digit");
+			ctx->errFlag = true;
+			*primaryStr = '\0';
+			return false;
+		}
+	}
+
+	if (!gs1_allDigits((uint8_t*)dataStr)) {
+		strcpy(ctx->errMsg, "primary data must be all digits");
+		ctx->errFlag = true;
+		*primaryStr = '\0';
+		return false;
+	}
+
+	strcpy(primaryStr, dataStr);
+
+	if (ctx->addCheckDigit)
+		strcat(primaryStr, "-");
+
+	if (!gs1_validateParity((uint8_t*)primaryStr) && !ctx->addCheckDigit) {
+		strcpy(ctx->errMsg, "primary data check digit is incorrect");
+		ctx->errFlag = true;
+		*primaryStr = '\0';
+		return false;
+	}
+
+	return true;
+
+}
 
 void gs1_RSS14(gs1_encoder *ctx) {
 
@@ -384,19 +428,9 @@ void gs1_RSS14(gs1_encoder *ctx) {
 	int i;
 	int rows, ccFlag;
 	char *ccStr;
-	int symHt;
+	int symHt = ctx->sym == gs1_encoder_sDataBarOmni ? RSS14_SYM_H : RSS14_TRNC_H;
 
 	DEBUG_PRINT("\nData: %s\n", dataStr);
-
-	if (ctx->sym == gs1_encoder_sDataBarOmni) {
-		symHt = RSS14_SYM_H;
-	}
-	else {
-		symHt = RSS14_TRNC_H;
-	}
-
-	if (strlen(dataStr) >= 3 && strncmp(dataStr, "#01", 3) == 0)
-		dataStr += 3;
 
 	ccStr = strchr(dataStr, '|');
 	if (ccStr == NULL) ccFlag = false;
@@ -408,37 +442,8 @@ void gs1_RSS14(gs1_encoder *ctx) {
 		DEBUG_PRINT("CC: %s\n", ccStr);
 	}
 
-	if (!ctx->addCheckDigit) {
-		if (strlen(dataStr) != 14) {
-			strcpy(ctx->errMsg, "primary data must be a GTIN-14");
-			ctx->errFlag = true;
-			goto out;
-		}
-	}
-	else {
-		if (strlen(dataStr) != 13) {
-			strcpy(ctx->errMsg, "primary data must be a GTIN-14 without check digit");
-			ctx->errFlag = true;
-			goto out;
-		}
-	}
-
-	if (!gs1_allDigits((uint8_t*)dataStr)) {
-		strcpy(ctx->errMsg, "primary data must be all digits");
-		ctx->errFlag = true;
+	if (!gs1_normaliseRSS14(ctx, dataStr, primaryStr))
 		goto out;
-	}
-
-	strcpy(primaryStr, dataStr);
-
-	if (ctx->addCheckDigit)
-		strcat(primaryStr, "-");
-
-	if (!gs1_validateParity((uint8_t*)primaryStr) && !ctx->addCheckDigit) {
-		strcpy(ctx->errMsg, "primary data check digit is incorrect");
-		ctx->errFlag = true;
-		goto out;
-	}
 
 	DEBUG_PRINT("Checked: %s\n", primaryStr);
 
@@ -525,9 +530,6 @@ void gs1_RSS14S(gs1_encoder *ctx) {
 
 	DEBUG_PRINT("\nData: %s\n", dataStr);
 
-	if (strlen(dataStr) >= 3 && strncmp(dataStr, "#01", 3) == 0)
-		dataStr += 3;
-
 	ccStr = strchr(dataStr, '|');
 	if (ccStr == NULL) ccFlag = false;
 	else {
@@ -538,37 +540,8 @@ void gs1_RSS14S(gs1_encoder *ctx) {
 		DEBUG_PRINT("CC: %s\n", ccStr);
 	}
 
-	if (!ctx->addCheckDigit) {
-		if (strlen(dataStr) != 14) {
-			strcpy(ctx->errMsg, "primary data must be 14 digits");
-			ctx->errFlag = true;
-			goto out;
-		}
-	}
-	else {
-		if (strlen(dataStr) != 13) {
-			strcpy(ctx->errMsg, "primary data must be 13 digits without check digit");
-			ctx->errFlag = true;
-			goto out;
-		}
-	}
-
-	if (!gs1_allDigits((uint8_t*)dataStr)) {
-		strcpy(ctx->errMsg, "primary data must be all digits");
-		ctx->errFlag = true;
+	if (!gs1_normaliseRSS14(ctx, dataStr, primaryStr))
 		goto out;
-	}
-
-	strcpy(primaryStr, dataStr);
-
-	if (ctx->addCheckDigit)
-		strcat(primaryStr, "-");
-
-	if (!gs1_validateParity((uint8_t*)primaryStr) && !ctx->addCheckDigit) {
-		strcpy(ctx->errMsg, "primary data check digit is incorrect");
-		ctx->errFlag = true;
-		goto out;
-	}
 
 	DEBUG_PRINT("Checked: %s\n", primaryStr);
 
@@ -689,9 +662,6 @@ void gs1_RSS14SO(gs1_encoder *ctx) {
 	chexPrnts.rightPad = 0; // assume not a composite for now
 	chexPrnts.reverse = false;
 
-	if (strlen(dataStr) >= 3 && strncmp(dataStr, "#01", 3) == 0)
-		dataStr += 3;
-
 	ccStr = strchr(dataStr, '|');
 	if (ccStr == NULL) ccFlag = false;
 	else {
@@ -702,37 +672,8 @@ void gs1_RSS14SO(gs1_encoder *ctx) {
 		DEBUG_PRINT("CC: %s\n", ccStr);
 	}
 
-	if (!ctx->addCheckDigit) {
-		if (strlen(dataStr) != 14) {
-			strcpy(ctx->errMsg, "primary data must be 14 digits");
-			ctx->errFlag = true;
-			goto out;
-		}
-	}
-	else {
-		if (strlen(dataStr) != 13) {
-			strcpy(ctx->errMsg, "primary data must be 13 digits without check digit");
-			ctx->errFlag = true;
-			goto out;
-		}
-	}
-
-	if (!gs1_allDigits((uint8_t*)dataStr)) {
-		strcpy(ctx->errMsg, "primary data must be all digits");
-		ctx->errFlag = true;
+	if (!gs1_normaliseRSS14(ctx, dataStr, primaryStr))
 		goto out;
-	}
-
-	strcpy(primaryStr, dataStr);
-
-	if (ctx->addCheckDigit)
-		strcat(primaryStr, "-");
-
-	if (!gs1_validateParity((uint8_t*)primaryStr) && !ctx->addCheckDigit) {
-		strcpy(ctx->errMsg, "primary data check digit is incorrect");
-		ctx->errFlag = true;
-		goto out;
-	}
 
 	DEBUG_PRINT("Checked: %s\n", primaryStr);
 
@@ -887,8 +828,10 @@ void test_rss14_RSS14_encode(void) {
 " X X    X  X   XXX  XXXXX      X XXXX   X X  XX XX X  X XXXXX  X XXXXX     XXX XX XXXXX X XXXX X",
 NULL
 	};
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sDataBarOmni, "24012345678905", expect));
 	TEST_CHECK(test_encode(ctx, gs1_encoder_sDataBarOmni, "#0124012345678905", expect));
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sDataBarOmni, "24012345678905", expect));
+	gs1_encoder_setAddCheckDigit(ctx, true);
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sDataBarOmni, "2401234567890", expect));
 
 	gs1_encoder_free(ctx);
 
@@ -917,8 +860,10 @@ void test_rss14_RSS14T_encode(void) {
 " X X    X  X   XXX  XXXXX      X XXXX   X X  XX XX X  X XXXXX  X XXXXX     XXX XX XXXXX X XXXX X",
 NULL
 	};
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sDataBarTruncated, "24012345678905", expect));
 	TEST_CHECK(test_encode(ctx, gs1_encoder_sDataBarTruncated, "#0124012345678905", expect));
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sDataBarTruncated, "24012345678905", expect));
+	gs1_encoder_setAddCheckDigit(ctx, true);
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sDataBarTruncated, "2401234567890", expect));
 
 	gs1_encoder_free(ctx);
 
@@ -947,8 +892,10 @@ void test_rss14_RSS14S_encode(void) {
 "X XX X  X XXXXX  X XXXXX     XXX XX XXXXX X XXXX X",
 NULL
 	};
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sDataBarStacked, "24012345678905", expect));
 	TEST_CHECK(test_encode(ctx, gs1_encoder_sDataBarStacked, "#0124012345678905", expect));
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sDataBarStacked, "24012345678905", expect));
+	gs1_encoder_setAddCheckDigit(ctx, true);
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sDataBarStacked, "2401234567890", expect));
 
 	gs1_encoder_free(ctx);
 
@@ -1033,8 +980,10 @@ void test_rss14_RSS14SO_encode(void) {
 "X XX X  X XXXXX  X XXXXX     XXX XX XXXXX X XXXX X",
 NULL
 	};
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sDataBarStackedOmni, "24012345678905", expect));
 	TEST_CHECK(test_encode(ctx, gs1_encoder_sDataBarStackedOmni, "#0124012345678905", expect));
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sDataBarStackedOmni, "24012345678905", expect));
+	gs1_encoder_setAddCheckDigit(ctx, true);
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sDataBarStackedOmni, "2401234567890", expect));
 
 	gs1_encoder_free(ctx);
 

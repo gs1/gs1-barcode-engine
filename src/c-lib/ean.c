@@ -90,6 +90,55 @@ static bool EAN13enc(uint8_t *str, uint8_t pattern[] ) {
 	return(true);
 }
 
+bool gs1_normaliseEAN13(gs1_encoder *ctx, char *dataStr, char *primaryStr) {
+
+	unsigned int digits = ctx->sym == gs1_encoder_sEAN13 ? 13 : 12;
+
+	if (strlen(dataStr) >= 17-digits && strncmp(dataStr, "#0100", 17-digits) == 0)
+		dataStr += 17-digits;
+
+	if (!ctx->addCheckDigit) {
+		if (strlen(dataStr) != digits) {
+			sprintf(ctx->errMsg, "primary data must be %d digits", digits);
+			ctx->errFlag = true;
+			*primaryStr = '\0';
+			return false;
+		}
+	}
+	else {
+		if (strlen(dataStr) != digits-1) {
+			sprintf(ctx->errMsg, "primary data must be %d digits without check digit", digits-1);
+			ctx->errFlag = true;
+			*primaryStr = '\0';
+			return false;
+		}
+	}
+
+	if (!gs1_allDigits((uint8_t*)dataStr)) {
+		strcpy(ctx->errMsg, "primary data must be all digits");
+		ctx->errFlag = true;
+			*primaryStr = '\0';
+		return false;
+	}
+
+	primaryStr[0] = ctx->sym == gs1_encoder_sEAN13 ? '\0' : '0';  // Convert GTIN-12 to GTIN-13 if UPC-A
+	primaryStr[1] = '\0';
+	strcat(primaryStr, dataStr);
+
+	if (ctx->addCheckDigit)
+		strcat(primaryStr, "-");
+
+	if (!gs1_validateParity((uint8_t*)primaryStr) && !ctx->addCheckDigit) {
+		strcpy(ctx->errMsg, "primary data check digit is incorrect");
+		ctx->errFlag = true;
+			*primaryStr = '\0';
+		return false;
+	}
+
+	return true;
+
+}
+
 void gs1_EAN13(gs1_encoder *ctx) {
 
 	struct sPrints prints;
@@ -108,12 +157,7 @@ void gs1_EAN13(gs1_encoder *ctx) {
 	int rows, ccFlag;
 	char *ccStr;
 
-	unsigned int digits = ctx->sym == gs1_encoder_sEAN13 ? 13 : 12;
-
 	DEBUG_PRINT("\nData: %s\n", dataStr);
-
-	if (strlen(dataStr) >= 17-digits && strncmp(dataStr, "#0100", 17-digits) == 0)
-		dataStr += 17-digits;
 
 	ccStr = strchr(dataStr, '|');
 	if (ccStr == NULL) ccFlag = false;
@@ -125,39 +169,8 @@ void gs1_EAN13(gs1_encoder *ctx) {
 		DEBUG_PRINT("CC: %s\n", ccStr);
 	}
 
-	if (!ctx->addCheckDigit) {
-		if (strlen(dataStr) != digits) {
-			sprintf(ctx->errMsg, "primary data must be %d digits", digits);
-			ctx->errFlag = true;
-			goto out;
-		}
-	}
-	else {
-		if (strlen(dataStr) != digits-1) {
-			sprintf(ctx->errMsg, "primary data must be %d digits without check digit", digits-1);
-			ctx->errFlag = true;
-			goto out;
-		}
-	}
-
-	if (!gs1_allDigits((uint8_t*)dataStr)) {
-		strcpy(ctx->errMsg, "primary data must be all digits");
-		ctx->errFlag = true;
+	if (!gs1_normaliseEAN13(ctx, dataStr, primaryStr))
 		goto out;
-	}
-
-	primaryStr[0] = ctx->sym == gs1_encoder_sEAN13 ? '\0' : '0';  // Convert GTIN-12 to GTIN-13 if UPC-A
-	primaryStr[1] = '\0';
-	strcat(primaryStr, dataStr);
-
-	if (ctx->addCheckDigit)
-		strcat(primaryStr, "-");
-
-	if (!gs1_validateParity((uint8_t*)primaryStr) && !ctx->addCheckDigit) {
-		strcpy(ctx->errMsg, "primary data check digit is incorrect");
-		ctx->errFlag = true;
-		goto out;
-	}
 
 	DEBUG_PRINT("Checked: %s\n", primaryStr);
 
@@ -288,6 +301,51 @@ static bool EAN8enc(uint8_t str[], uint8_t pattern[] ) {
 	return(true);
 }
 
+bool gs1_normaliseEAN8(gs1_encoder *ctx, char* dataStr, char* primaryStr) {
+
+	if (strlen(dataStr) >= 9 && strncmp(dataStr, "#01000000", 9) == 0)
+		dataStr += 9;
+
+	if (!ctx->addCheckDigit) {
+		if (strlen(dataStr) != 8) {
+			strcpy(ctx->errMsg, "primary data must be 8 digits");
+			ctx->errFlag = true;
+			*primaryStr = '\0';
+			return false;
+		}
+	}
+	else {
+		if (strlen(dataStr) != 7) {
+			strcpy(ctx->errMsg, "primary data must be 7 digits without check digit");
+			ctx->errFlag = true;
+			*primaryStr = '\0';
+			return false;
+		}
+	}
+
+	if (!gs1_allDigits((uint8_t*)dataStr)) {
+		strcpy(ctx->errMsg, "primary data must be all digits");
+		ctx->errFlag = true;
+		*primaryStr = '\0';
+		return false;
+	}
+
+	strcpy(primaryStr, dataStr);
+
+	if (ctx->addCheckDigit)
+		strcat(primaryStr, "-");
+
+	if (!gs1_validateParity((uint8_t*)primaryStr) && !ctx->addCheckDigit) {
+		strcpy(ctx->errMsg, "primary data check digit is incorrect");
+		ctx->errFlag = true;
+		*primaryStr = '\0';
+		return false;
+	}
+
+	return true;
+
+}
+
 void gs1_EAN8(gs1_encoder *ctx) {
 
 	struct sPrints prints;
@@ -311,9 +369,6 @@ void gs1_EAN8(gs1_encoder *ctx) {
 
 	DEBUG_PRINT("\nData: %s\n", dataStr);
 
-	if (strlen(dataStr) >= 9 && strncmp(dataStr, "#01000000", 9) == 0)
-		dataStr += 9;
-
 	ccStr = strchr(dataStr, '|');
 	if (ccStr == NULL) ccFlag = false;
 	else {
@@ -324,37 +379,8 @@ void gs1_EAN8(gs1_encoder *ctx) {
 		DEBUG_PRINT("CC: %s\n", ccStr);
 	}
 
-	if (!ctx->addCheckDigit) {
-		if (strlen(dataStr) != 8) {
-			strcpy(ctx->errMsg, "primary data must be 8 digits");
-			ctx->errFlag = true;
-			goto out;
-		}
-	}
-	else {
-		if (strlen(dataStr) != 7) {
-			strcpy(ctx->errMsg, "primary data must be 7 digits without check digit");
-			ctx->errFlag = true;
-			goto out;
-		}
-	}
-
-	if (!gs1_allDigits((uint8_t*)dataStr)) {
-		strcpy(ctx->errMsg, "primary data must be all digits");
-		ctx->errFlag = true;
+	if (!gs1_normaliseEAN8(ctx, dataStr, primaryStr))
 		goto out;
-	}
-
-	strcpy(primaryStr, dataStr);
-
-	if (ctx->addCheckDigit)
-		strcat(primaryStr, "-");
-
-	if (!gs1_validateParity((uint8_t*)primaryStr) && !ctx->addCheckDigit) {
-		strcpy(ctx->errMsg, "primary data check digit is incorrect");
-		ctx->errFlag = true;
-		goto out;
-	}
 
 	DEBUG_PRINT("Checked: %s\n", primaryStr);
 
@@ -549,6 +575,50 @@ static bool zeroCompress(char *primaryStr, char *data7) {
 
 }
 
+bool gs1_normaliseUPCE(gs1_encoder *ctx, char *dataStr, char *primaryStr) {
+
+	if (strlen(dataStr) >= 5 && strncmp(dataStr, "#0100", 5) == 0)
+		dataStr += 5;
+
+	if (!ctx->addCheckDigit) {
+		if (strlen(dataStr) != 12) {
+			strcpy(ctx->errMsg, "primary data must be 12 digits");
+			ctx->errFlag = true;
+			*primaryStr = '\0';
+			return false;
+		}
+	}
+	else {
+		if (strlen(dataStr) != 11) {
+			strcpy(ctx->errMsg, "primary data must be 11 digits without check digit");
+			ctx->errFlag = true;
+			*primaryStr = '\0';
+			return false;
+		}
+	}
+
+	if (!gs1_allDigits((uint8_t*)dataStr)) {
+		strcpy(ctx->errMsg, "primary data must be all digits");
+		ctx->errFlag = true;
+		*primaryStr = '\0';
+		return false;
+	}
+
+	strcpy(primaryStr, dataStr);
+
+	if (ctx->addCheckDigit)
+		strcat(primaryStr, "-");
+
+	if (!gs1_validateParity((uint8_t*)primaryStr) && !ctx->addCheckDigit) {
+		strcpy(ctx->errMsg, "primary data check digit is incorrect");
+		ctx->errFlag = true;
+		*primaryStr = '\0';
+		return false;
+	}
+
+	return true;
+
+}
 
 void gs1_UPCE(gs1_encoder *ctx) {
 
@@ -571,9 +641,6 @@ void gs1_UPCE(gs1_encoder *ctx) {
 
 	DEBUG_PRINT("\nData: %s\n", dataStr);
 
-	if (strlen(dataStr) >= 5 && strncmp(dataStr, "#0100", 5) == 0)
-		dataStr += 5;
-
 	ccStr = strchr(dataStr, '|');
 	if (ccStr == NULL) ccFlag = false;
 	else {
@@ -584,37 +651,8 @@ void gs1_UPCE(gs1_encoder *ctx) {
 		DEBUG_PRINT("CC: %s\n", ccStr);
 	}
 
-	if (!ctx->addCheckDigit) {
-		if (strlen(dataStr) != 12) {
-			strcpy(ctx->errMsg, "primary data must be 12 digits");
-			ctx->errFlag = true;
-			goto out;
-		}
-	}
-	else {
-		if (strlen(dataStr) != 11) {
-			strcpy(ctx->errMsg, "primary data must be 11 digits without check digit");
-			ctx->errFlag = true;
-			goto out;
-		}
-	}
-
-	if (!gs1_allDigits((uint8_t*)dataStr)) {
-		strcpy(ctx->errMsg, "primary data must be all digits");
-		ctx->errFlag = true;
+	if (!gs1_normaliseUPCE(ctx, dataStr, primaryStr))
 		goto out;
-	}
-
-	strcpy(primaryStr, dataStr);
-
-	if (ctx->addCheckDigit)
-		strcat(primaryStr, "-");
-
-	if (!gs1_validateParity((uint8_t*)primaryStr) && !ctx->addCheckDigit) {
-		strcpy(ctx->errMsg, "primary data check digit is incorrect");
-		ctx->errFlag = true;
-		goto out;
-	}
 
 	DEBUG_PRINT("Checked: %s\n", primaryStr);
 
@@ -794,8 +832,10 @@ void test_ean_EAN13_encode_ean13(void) {
 "       X X  XX  X  XX  X  XX XX X    X X   XX XXX  X X X X X    X   X  X  X   XXX X  XXX  X XXX  X X X       ",
 NULL
 	};
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sEAN13, "2112345678900", expect));
 	TEST_CHECK(test_encode(ctx, gs1_encoder_sEAN13, "#0102112345678900", expect));
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sEAN13, "2112345678900", expect));
+	gs1_encoder_setAddCheckDigit(ctx, true);
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sEAN13, "211234567890", expect));
 
 	gs1_encoder_free(ctx);
 
@@ -885,8 +925,10 @@ void test_ean_EAN13_encode_upca(void) {
 "       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
 NULL
 	};
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sUPCA, "416000336108", expect));
 	TEST_CHECK(test_encode(ctx, gs1_encoder_sUPCA, "#0100416000336108", expect));
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sUPCA, "416000336108", expect));
+	gs1_encoder_setAddCheckDigit(ctx, true);
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sUPCA, "41600033610", expect));
 
 	gs1_encoder_free(ctx);
 
@@ -962,8 +1004,10 @@ void test_ean_EAN8_encode(void) {
 "       X X   XX X  X  XX XXXX X X   XX X X X  XXX X X    X   X  X    X X X       ",
 NULL
 	};
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sEAN8, "02345673", expect));
 	TEST_CHECK(test_encode(ctx, gs1_encoder_sEAN8, "#0100000002345673", expect));
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sEAN8, "02345673", expect));
+	gs1_encoder_setAddCheckDigit(ctx, true);
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sEAN8, "0234567", expect));
 
 	gs1_encoder_free(ctx);
 
@@ -1053,8 +1097,10 @@ void test_ean_UPCA_encode(void) {
 "       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
 NULL
 	};
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sUPCA, "416000336108", expect));
 	TEST_CHECK(test_encode(ctx, gs1_encoder_sUPCA, "#0100416000336108", expect));
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sUPCA, "416000336108", expect));
+	gs1_encoder_setAddCheckDigit(ctx, true);
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sUPCA, "41600033610", expect));
 
 	gs1_encoder_free(ctx);
 
@@ -1211,7 +1257,10 @@ void test_ean_UPCE_encode(void) {
 "       X X X  XXX  XX  X  XX XX XXXX X  XXX X XX   X X X X       ",
 NULL
 	};
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sUPCE, "#0100001234000057", expect));
 	TEST_CHECK(test_encode(ctx, gs1_encoder_sUPCE, "001234000057", expect));
+	gs1_encoder_setAddCheckDigit(ctx, true);
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sUPCE, "00123400005", expect));
 
 	gs1_encoder_free(ctx);
 

@@ -295,6 +295,57 @@ static bool RSSLimEnc(gs1_encoder *ctx, uint8_t string[], uint8_t bars[], int cc
 	return(true);
 }
 
+bool gs1_normaliseRSSLim(gs1_encoder *ctx, char *dataStr, char *primaryStr) {
+
+	if (strlen(dataStr) >= 3 && strncmp(dataStr, "#01", 3) == 0)
+	dataStr += 3;
+
+	if (!ctx->addCheckDigit) {
+		if (strlen(dataStr) != 14) {
+			strcpy(ctx->errMsg, "primary data must be 14 digits");
+			ctx->errFlag = true;
+			*primaryStr = '\0';
+			return false;
+		}
+	}
+	else {
+		if (strlen(dataStr) != 13) {
+			strcpy(ctx->errMsg, "primary data must be 13 digits without check digit");
+			ctx->errFlag = true;
+			*primaryStr = '\0';
+			return false;
+		}
+	}
+
+	if (!gs1_allDigits((uint8_t*)dataStr)) {
+		strcpy(ctx->errMsg, "primary data must be all digits");
+		ctx->errFlag = true;
+		*primaryStr = '\0';
+		return false;
+	}
+
+	strcpy(primaryStr, dataStr);
+
+	if (ctx->addCheckDigit)
+		strcat(primaryStr, "-");
+
+	if (!gs1_validateParity((uint8_t*)primaryStr) && !ctx->addCheckDigit) {
+		strcpy(ctx->errMsg, "primary data check digit is incorrect");
+		ctx->errFlag = true;
+		*primaryStr = '\0';
+		return false;
+	}
+
+	if (atof((char*)primaryStr) > 19999999999999.) {
+		strcpy(ctx->errMsg, "primary data item value is too large");
+		ctx->errFlag = true;
+		*primaryStr = '\0';
+		return false;
+	}
+
+	return true;
+
+}
 
 void gs1_RSSLim(gs1_encoder *ctx) {
 
@@ -314,9 +365,6 @@ void gs1_RSSLim(gs1_encoder *ctx) {
 
 	DEBUG_PRINT("\nData: %s\n", dataStr);
 
-	if (strlen(dataStr) >= 3 && strncmp(dataStr, "#01", 3) == 0)
-	dataStr += 3;
-
 	ccStr = strchr(dataStr, '|');
 	if (ccStr == NULL) ccFlag = false;
 	else {
@@ -327,45 +375,10 @@ void gs1_RSSLim(gs1_encoder *ctx) {
 		DEBUG_PRINT("CC: %s\n", ccStr);
 	}
 
-	if (!ctx->addCheckDigit) {
-		if (strlen(dataStr) != 14) {
-			strcpy(ctx->errMsg, "primary data must be 14 digits");
-			ctx->errFlag = true;
-			goto out;
-		}
-	}
-	else {
-		if (strlen(dataStr) != 13) {
-			strcpy(ctx->errMsg, "primary data must be 13 digits without check digit");
-			ctx->errFlag = true;
-			goto out;
-		}
-	}
-
-	if (!gs1_allDigits((uint8_t*)dataStr)) {
-		strcpy(ctx->errMsg, "primary data must be all digits");
-		ctx->errFlag = true;
+	if (!gs1_normaliseRSSLim(ctx, dataStr, primaryStr))
 		goto out;
-	}
-
-	strcpy(primaryStr, dataStr);
-
-	if (ctx->addCheckDigit)
-		strcat(primaryStr, "-");
-
-	if (!gs1_validateParity((uint8_t*)primaryStr) && !ctx->addCheckDigit) {
-		strcpy(ctx->errMsg, "primary data check digit is incorrect");
-		ctx->errFlag = true;
-		goto out;
-	}
 
 	DEBUG_PRINT("Checked: %s\n", primaryStr);
-
-	if (atof((char*)primaryStr) > 19999999999999.) {
-		strcpy(ctx->errMsg, "primary data item value is too large");
-		ctx->errFlag = true;
-		goto out;
-	}
 
 	if (!RSSLimEnc(ctx, (uint8_t*)primaryStr, linPattern, ccFlag) || ctx->errFlag) goto out;
 
@@ -491,8 +504,10 @@ void test_rsslim_RSSLIM_encode(void) {
 " X   XX  XX   XX XX X X  XXX X  X X XX X  XX X  X  X XX   XX XXX  XX  XX X",
 NULL
 	};
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sDataBarLimited, "15012345678907", expect));
 	TEST_CHECK(test_encode(ctx, gs1_encoder_sDataBarLimited, "#0115012345678907", expect));
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sDataBarLimited, "15012345678907", expect));
+	gs1_encoder_setAddCheckDigit(ctx, true);
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sDataBarLimited, "1501234567890", expect));
 
 	gs1_encoder_free(ctx);
 
