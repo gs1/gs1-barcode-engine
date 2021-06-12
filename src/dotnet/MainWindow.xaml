@@ -49,7 +49,7 @@
         <Label x:Name="label_Copy5" Content="QR Code version" HorizontalAlignment="Left" Margin="20,334,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Width="163" Height="30"/>
         <Label x:Name="label_Copy6" Content="QR Code EC level" HorizontalAlignment="Left" Margin="20,369,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Width="163" Height="30"/>
         <Label x:Name="label_Copy7" Content="DataMatrix rows" HorizontalAlignment="Left" Margin="20,404,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Width="163" Height="30"/>
-        <ScrollViewer Grid.Column="1" Margin="273,115,30,30" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" MinWidth="477" MinHeight="371">
+        <ScrollViewer Grid.Column="1" Margin="273,121,30,24" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" MinWidth="477" MinHeight="371">
             <Image x:Name="barcodeImage" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="None"/>
         </ScrollViewer>
         <ComboBox x:Name="qrEClevelComboBox" Grid.Column="1" HorizontalAlignment="Left" Margin="180,372,0,0" VerticalAlignment="Top" Width="66" RenderTransformOrigin="0.5,0.5" Height="23" SelectedValuePath="Tag">

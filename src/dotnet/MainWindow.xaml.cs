@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.IO;
 using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace gs1encoders_dotnet
 {
@@ -40,7 +41,7 @@ namespace gs1encoders_dotnet
                         infoLabel.Content = "AI data:   " + App.gs1Encoder.GS1dataStr;
                         break;
                     case '(':
-                        infoLabel.Content = "Raw data (FNC1 = \"#\"):   " + App.gs1Encoder.DataStr;
+                        infoLabel.Content = "Encoded data (FNC1 = \"#\"):   " + App.gs1Encoder.DataStr;
                         break;
                     default:
                         break;
@@ -104,6 +105,9 @@ namespace gs1encoders_dotnet
             try
             { 
                 App.gs1Encoder.Encode();
+                string scan = App.gs1Encoder.ScanData;
+                scan = Regex.Replace(scan, @"\p{Cc}", a => "{" + string.Format("%{0:X2}", (byte)a.Value[0]) + "}");
+                errorMessageLabel.Content = "Scan data: " + scan;
             }
             catch (GS1EncoderEncodeException E)
             {
