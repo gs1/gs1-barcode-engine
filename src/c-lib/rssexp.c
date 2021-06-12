@@ -271,8 +271,12 @@ void gs1_RSSExp(gs1_encoder *ctx) {
 
 	DEBUG_PRINT("\nData: %s\n", dataStr);
 
-	if (*dataStr == '#')
-		dataStr++;
+	if (*dataStr != '#') {
+		strcpy(ctx->errMsg, "primary data must be AI syntax (FNC1 in first position)");
+		ctx->errFlag = true;
+		return;
+	}
+	dataStr++;
 
 	ccStr = strchr(dataStr, '|');
 	if (ccStr == NULL) ccFlag = false;
@@ -506,7 +510,7 @@ void test_rssexp_RSSEXP_encode(void) {
 " X X   X   XXXX   X XXXXXXXX    X X XXX     XX   X XXX   XX   X  XX X XXXX      XXX  X XXX   XXX XXX XXXX X XXXX   XX   XXXXXX    X X   X  X      XX X ",
 NULL
 	};
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sDataBarExpanded, "01950123456789033103000123", expect));
+	TEST_CHECK(test_encode(ctx, gs1_encoder_sDataBarExpanded, "#01950123456789033103000123", expect));
 
 	gs1_encoder_setDataBarExpandedSegmentsWidth(ctx, 4);
 	expect = (char*[]){
@@ -583,7 +587,6 @@ NULL
 "  X XXXX X XXXX   XX   XXXXXX    X X   X  X      XX X                                                 ",
 NULL
 	};
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sDataBarExpanded, "01950123456789033103000123", expect));
 	TEST_CHECK(test_encode(ctx, gs1_encoder_sDataBarExpanded, "#01950123456789033103000123", expect));
 
 	gs1_encoder_free(ctx);
