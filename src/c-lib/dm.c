@@ -193,7 +193,7 @@ static void createCodewords(gs1_encoder *ctx, uint8_t *string, uint8_t cws[MAX_D
 		gs1Mode = true;
 	} else if (strlen((char*)string) >= 2 && strncmp((char*)string, "\\#", 2) == 0) {	// "\#" => "#..."; not GS1 mode
 		string++;	// Skip '\' escape
-	} else if (strlen((char*)string) >= 3 && strncmp((char*)string, "\\\\#", 2) == 0) {	// "\\#" => "\#..."; not GS1 mode
+	} else if (strlen((char*)string) >= 3 && strncmp((char*)string, "\\\\#", 3) == 0) {	// "\\#" => "\#..."; not GS1 mode
 		string++;	// Skip '\' escape
 	}
 
