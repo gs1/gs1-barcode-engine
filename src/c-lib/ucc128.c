@@ -374,6 +374,12 @@ void gs1_U128A(gs1_encoder *ctx) {
 
 	DEBUG_PRINT("\nData: %s\n", ctx->dataStr);
 
+	if (*ctx->dataStr != '#') {
+		strcpy(ctx->errMsg, "primary data must be AI syntax (FNC1 in first position)");
+		ctx->errFlag = true;
+		return;
+	}
+
 	ccStr = strchr(ctx->dataStr, '|');
 	if (ccStr == NULL) ccFlag = false;
 	else {
@@ -390,13 +396,7 @@ void gs1_U128A(gs1_encoder *ctx) {
 		goto out;
 	}
 
-	// insert leading FNC1 if not already there
-	if (ctx->dataStr[0] != '#') {
-		strcpy(primaryStr, "#");
-	}
-	else {
-		primaryStr[0] = '\0';
-	}
+	primaryStr[0] = '\0';
 	strcat(primaryStr, ctx->dataStr);
 
 	if ((symChars = enc128((uint8_t*)primaryStr, linPattern, (ccFlag) ? 1 : 0)) <= 0) goto out;
@@ -492,6 +492,12 @@ void gs1_U128C(gs1_encoder *ctx) {
 
 	DEBUG_PRINT("\nData: %s\n", ctx->dataStr);
 
+	if (*ctx->dataStr != '#') {
+		strcpy(ctx->errMsg, "primary data must be AI syntax (FNC1 in first position)");
+		ctx->errFlag = true;
+		return;
+	}
+
 	ccStr = strchr(ctx->dataStr, '|');
 	if (ccStr == NULL) ccFlag = false;
 	else {
@@ -508,13 +514,7 @@ void gs1_U128C(gs1_encoder *ctx) {
 		return;
 	}
 
-	// insert leading FNC1 if not already there
-	if (ctx->dataStr[0] != '#') {
-		strcpy(primaryStr, "#");
-	}
-	else {
-		primaryStr[0] = '\0';
-	}
+	primaryStr[0] = '\0';	
 	strcat(primaryStr, ctx->dataStr);
 
 	if ((symChars = enc128((uint8_t*)primaryStr, linPattern, (ccFlag) ? 2 : 0)) <= 0) goto out;
@@ -612,12 +612,6 @@ void test_ucc_UCC128A_encode(void) {
 	gs1_encoder* ctx = gs1_encoder_init(NULL);
 
 	expect = (char*[]){
-"          XX X  X    XXXX X XXX X  XXXX X  X XX  X    X XXXX  X  X  XXXX X  X    XX X  XX    X X  X  XX X    XX  XX XX  XX   XXX X XX          ",
-"vvv",
-	};
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sGS1_128_CCA, "testing", expect));
-
-	expect = (char*[]){
 "                                          XX XX XXX XXX  XX XXX XXXX X   X X     X    X  XXX X  XX  XX    XX  XX XXXX  XXXX  X X  XX XX   X X                                              ",
 "                                          XX XX XXX XXX  XX XXX XXXX X   X X     X    X  XXX X  XX  XX    XX  XX XXXX  XXXX  X X  XX XX   X X                                              ",
 "                                          XX XX XX  XXXX XX  XX   X  XXX X XXXX   XXX X  XX  X  X XXXXX  X   XXX XXXXX X   XX XXX XX  X   X X                                              ",
@@ -652,7 +646,6 @@ void test_ucc_UCC128A_encode(void) {
 "          XX X  XXX  XXXX X XXX XX XX  XX  X  X  XX   XX  XX XX  XXX XX XXX X XXX XX   X    X XX  XX XX XXXX XX  XX XX  XXX XX XXX XX   X X   XXX X XXXX X  XX    X XX   XXX X XX          ",
 NULL
 	};
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sGS1_128_CCA, "00030123456789012340|99123123", expect));
 	TEST_CHECK(test_encode(ctx, gs1_encoder_sGS1_128_CCA, "#00030123456789012340|#99123123", expect));
 
 	gs1_encoder_free(ctx);
@@ -710,7 +703,6 @@ void test_ucc_UCC128C_encode(void) {
 "          XX X  XXX  XXXX X XXX XX XX  XX  X  X  XX   XX  XX XX  XXX XX XXX X XXX XX   X    X XX  XX XX XXXX XX  XX XX  XXX XX XXX XX   X X   X XXXX XXX XXX XXXX X XX   XXX X XX          ",
 NULL
 	};
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sGS1_128_CCC, "00030123456789012340|02130123456789093724#101234567ABCDEFG", expect));
 	TEST_CHECK(test_encode(ctx, gs1_encoder_sGS1_128_CCC, "#00030123456789012340|#02130123456789093724#101234567ABCDEFG", expect));
 
 	gs1_encoder_free(ctx);
