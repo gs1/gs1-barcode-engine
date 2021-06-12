@@ -99,6 +99,7 @@ bool test_encode(gs1_encoder *ctx, int sym, char* dataStr, char** expect) {
 	TEST_CHECK(gs1_encoder_setFormat(ctx, gs1_encoder_dRAW));
 	TEST_CHECK(gs1_encoder_setSym(ctx, sym));
 	TEST_CHECK(gs1_encoder_setDataStr(ctx, dataStr));
+    TEST_MSG("Error: %s", gs1_encoder_getErrMsg(ctx));
 
 	TEST_CHECK(gs1_encoder_encode(ctx));
 	TEST_MSG("Error: %s", gs1_encoder_getErrMsg(ctx));
