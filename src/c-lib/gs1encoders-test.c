@@ -167,6 +167,7 @@ TEST_LIST = {
     { "api_dataFile", test_api_dataFile },
     { "api_dataStr", test_api_dataStr },
     { "api_getGS1dataStr", test_api_getGS1dataStr },
+    { "api_getScanData", test_api_getScanData },
     { "api_getHRI", test_api_getHRI },
     { "api_format", test_api_format },
     { "api_getBuffer", test_api_getBuffer },

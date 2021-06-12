@@ -949,6 +949,10 @@ GS1_ENCODERS_API char* gs1_encoder_getGS1dataStr(gs1_encoder *ctx);
 
 
 // TODO
+GS1_ENCODERS_API char* gs1_encoder_getScanData(gs1_encoder* ctx);
+
+
+// TODO
 GS1_ENCODERS_API int gs1_encoder_getHRI(gs1_encoder* ctx, char*** out);
 
 /**

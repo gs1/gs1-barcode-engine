@@ -153,6 +153,7 @@ void test_api_outFile(void);
 void test_api_dataFile(void);
 void test_api_dataStr(void);
 void test_api_getGS1dataStr(void);
+void test_api_getScanData(void);
 void test_api_getHRI(void);
 void test_api_format(void);
 void test_api_getBuffer(void);
