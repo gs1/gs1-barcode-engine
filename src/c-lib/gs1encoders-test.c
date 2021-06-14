@@ -52,6 +52,7 @@
 #include "rss14.h"
 #include "rssexp.h"
 #include "rsslim.h"
+#include "scandata.h"
 #include "ucc128.h"
 
 
@@ -169,7 +170,7 @@ TEST_LIST = {
     { "api_dataFile", test_api_dataFile },
     { "api_dataStr", test_api_dataStr },
     { "api_getGS1dataStr", test_api_getGS1dataStr },
-    { "api_getScanData", test_api_getScanData },
+    { "api_generateScanData", test_api_generateScanData },
     { "api_getHRI", test_api_getHRI },
     { "api_format", test_api_format },
     { "api_getBuffer", test_api_getBuffer },
@@ -182,6 +183,13 @@ TEST_LIST = {
     { "gs1_gs1_parseGS1data", test_gs1_parseGS1data },
     { "gs1_gs1_processGS1data", test_gs1_processGS1data },
     { "gs1_validateParity", test_gs1_validateParity },
+
+
+    /*
+     * scandata.c
+     *
+     */
+    { "scandata_generateScanData", test_scandata_generateScanData },
 
 
     /*

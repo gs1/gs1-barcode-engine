@@ -57,6 +57,9 @@
     <ClCompile Include="gs1.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="scandata.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cc.h">
@@ -102,6 +105,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="gs1.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="scandata.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

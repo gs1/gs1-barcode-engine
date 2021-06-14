@@ -164,6 +164,7 @@
     <ClInclude Include="rssexp.h" />
     <ClInclude Include="rsslim.h" />
     <ClInclude Include="rssutil.h" />
+    <ClInclude Include="scandata.h" />
     <ClInclude Include="ucc128.h" />
   </ItemGroup>
   <ItemGroup>
@@ -181,6 +182,7 @@
     <ClCompile Include="rssexp.c" />
     <ClCompile Include="rsslim.c" />
     <ClCompile Include="rssutil.c" />
+    <ClCompile Include="scandata.c" />
     <ClCompile Include="ucc128.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
