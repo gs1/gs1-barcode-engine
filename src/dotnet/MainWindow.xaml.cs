@@ -58,13 +58,6 @@ namespace gs1encoders_dotnet
             qrEClevelComboBox.SelectedValue = App.gs1Encoder.QrEClevel.ToString(CultureInfo.InvariantCulture);
             dmRowsComboBox.SelectedValue = App.gs1Encoder.DmRows.ToString(CultureInfo.InvariantCulture);
 
-            string[] hri = App.gs1Encoder.HRI;
-            hriTextBox.Text = "";
-            foreach (string ai in hri)
-            {
-                hriTextBox.Text += ai + "\n";
-            }
-
         }
 
         private void generateButton_Click(object sender, RoutedEventArgs e)
@@ -72,6 +65,7 @@ namespace gs1encoders_dotnet
             barcodeImage.Source = null;
             infoLabel.Content = "";
             errorMessageLabel.Content = "";
+            hriTextBox.Text = "";
 
             try
             {
@@ -104,10 +98,20 @@ namespace gs1encoders_dotnet
 
             try
             { 
+               
+
                 App.gs1Encoder.Encode();
+
                 string scan = App.gs1Encoder.ScanData;
                 scan = Regex.Replace(scan, @"\p{Cc}", a => "{" + string.Format("%{0:X2}", (byte)a.Value[0]) + "}");
                 errorMessageLabel.Content = "Scan data: " + scan;
+
+                string[] hri = App.gs1Encoder.HRI;
+                hriTextBox.Text = "";
+                foreach (string ai in hri)
+                {
+                    hriTextBox.Text += ai + "\n";
+                }
             }
             catch (GS1EncoderEncodeException E)
             {
