@@ -472,6 +472,12 @@ static int DMenc(gs1_encoder *ctx, uint8_t string[], struct patternLength *pats)
 
 	DEBUG_PRINT("\nData: %s\n", string);
 
+	if (*string == '#' && strchr((char*)string, '|') != NULL) {
+		strcpy(ctx->errMsg, "Composite component is not supported for Data Matrix");
+		ctx->errFlag = true;
+		return 0;
+	}
+
 	createCodewords(ctx, string, cws, &cwslen);
 	if (cwslen == UINT16_MAX) {
 		strcpy(ctx->errMsg, "Data exceeds the capacity of any Data Matrix symbol");
@@ -610,7 +616,7 @@ void test_dm_DM_encode(void) {
 "                ",
 NULL
 	};
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sDM, "1501234567890", expect));
+	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sDM, "1501234567890", expect));
 
 	expect = (char*[]){
 "                      ",
@@ -637,7 +643,7 @@ NULL
 "                      ",
 NULL
 	};
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sDM, "#011234567890123110ABC123#11210630", expect));  // GS1 mode
+	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sDM, "#011234567890123110ABC123#11210630", expect));  // GS1 mode
 
 	gs1_encoder_free(ctx);
 

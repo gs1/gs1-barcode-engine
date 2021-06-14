@@ -815,6 +815,12 @@ static int QRenc(gs1_encoder *ctx, uint8_t string[], struct patternLength *pats)
 
 	DEBUG_PRINT("\nData: %s\n", string);
 
+	if (*string == '#' && strchr((char *)string, '|') != NULL) {
+		strcpy(ctx->errMsg, "Composite component is not supported for QR Code");
+		ctx->errFlag = true;
+		return 0;
+	}
+
 	createCodewords(ctx, string, cws_v, bits_v);
 	if (bits_v[0] == UINT16_MAX && bits_v[1] == UINT16_MAX && bits_v[2] == UINT16_MAX) {
 		strcpy(ctx->errMsg, "Data exceeds the capacity of any QR Code symbol");
@@ -1006,7 +1012,7 @@ void test_qr_QR_encode(void) {
 "                             ",
 NULL
 	};
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sQR, "ABC123", expect));
+	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sQR, "ABC123", expect));
 
 	expect = (char*[]){
 "                                     ",
@@ -1048,7 +1054,7 @@ NULL
 "                                     ",
 NULL
 	};
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sQR, "#011234567890123110ABC123#11210630", expect));  // GS1 mode
+	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sQR, "#011234567890123110ABC123#11210630", expect));  // GS1 mode
 
 	gs1_encoder_free(ctx);
 

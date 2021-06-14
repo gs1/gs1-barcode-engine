@@ -832,10 +832,10 @@ void test_ean_EAN13_encode_ean13(void) {
 "       X X  XX  X  XX  X  XX XX X    X X   XX XXX  X X X X X    X   X  X  X   XXX X  XXX  X XXX  X X X       ",
 NULL
 	};
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sEAN13, "#0102112345678900", expect));
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sEAN13, "2112345678900", expect));
+	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sEAN13, "#0102112345678900", expect));
+	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sEAN13, "2112345678900", expect));
 	gs1_encoder_setAddCheckDigit(ctx, true);
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sEAN13, "211234567890", expect));
+	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sEAN13, "211234567890", expect));
 
 	gs1_encoder_free(ctx);
 
@@ -925,10 +925,10 @@ void test_ean_EAN13_encode_upca(void) {
 "       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
 NULL
 	};
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sUPCA, "#0100416000336108", expect));
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sUPCA, "416000336108", expect));
+	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sUPCA, "#0100416000336108", expect));
+	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sUPCA, "416000336108", expect));
 	gs1_encoder_setAddCheckDigit(ctx, true);
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sUPCA, "41600033610", expect));
+	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sUPCA, "41600033610", expect));
 
 	gs1_encoder_free(ctx);
 
@@ -1004,10 +1004,10 @@ void test_ean_EAN8_encode(void) {
 "       X X   XX X  X  XX XXXX X X   XX X X X  XXX X X    X   X  X    X X X       ",
 NULL
 	};
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sEAN8, "#0100000002345673", expect));
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sEAN8, "02345673", expect));
+	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sEAN8, "#0100000002345673", expect));
+	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sEAN8, "02345673", expect));
 	gs1_encoder_setAddCheckDigit(ctx, true);
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sEAN8, "0234567", expect));
+	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sEAN8, "0234567", expect));
 
 	gs1_encoder_free(ctx);
 
@@ -1097,10 +1097,10 @@ void test_ean_UPCA_encode(void) {
 "       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
 NULL
 	};
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sUPCA, "#0100416000336108", expect));
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sUPCA, "416000336108", expect));
+	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sUPCA, "#0100416000336108", expect));
+	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sUPCA, "416000336108", expect));
 	gs1_encoder_setAddCheckDigit(ctx, true);
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sUPCA, "41600033610", expect));
+	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sUPCA, "41600033610", expect));
 
 	gs1_encoder_free(ctx);
 
@@ -1257,10 +1257,10 @@ void test_ean_UPCE_encode(void) {
 "       X X X  XXX  XX  X  XX XX XXXX X  XXX X XX   X X X X       ",
 NULL
 	};
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sUPCE, "#0100001234000057", expect));
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sUPCE, "001234000057", expect));
+	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sUPCE, "#0100001234000057", expect));
+	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sUPCE, "001234000057", expect));
 	gs1_encoder_setAddCheckDigit(ctx, true);
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sUPCE, "00123400005", expect));
+	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sUPCE, "00123400005", expect));
 
 	gs1_encoder_free(ctx);
 

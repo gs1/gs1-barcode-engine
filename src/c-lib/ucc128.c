@@ -646,7 +646,7 @@ void test_ucc_UCC128A_encode(void) {
 "          XX X  XXX  XXXX X XXX XX XX  XX  X  X  XX   XX  XX XX  XXX XX XXX X XXX XX   X    X XX  XX XX XXXX XX  XX XX  XXX XX XXX XX   X X   XXX X XXXX X  XX    X XX   XXX X XX          ",
 NULL
 	};
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sGS1_128_CCA, "#00030123456789012340|#99123123", expect));
+	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sGS1_128_CCA, "#00030123456789012340|#99123123", expect));
 
 	gs1_encoder_free(ctx);
 
@@ -703,7 +703,7 @@ void test_ucc_UCC128C_encode(void) {
 "          XX X  XXX  XXXX X XXX XX XX  XX  X  X  XX   XX  XX XX  XXX XX XXX X XXX XX   X    X XX  XX XX XXXX XX  XX XX  XXX XX XXX XX   X X   X XXXX XXX XXX XXXX X XX   XXX X XX          ",
 NULL
 	};
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sGS1_128_CCC, "#00030123456789012340|#02130123456789093724#101234567ABCDEFG", expect));
+	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sGS1_128_CCC, "#00030123456789012340|#02130123456789093724#101234567ABCDEFG", expect));
 
 	gs1_encoder_free(ctx);
 

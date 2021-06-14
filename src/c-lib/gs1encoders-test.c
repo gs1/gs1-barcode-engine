@@ -90,7 +90,7 @@ void test_print_strings(gs1_encoder *ctx) {
 }
 
 
-bool test_encode(gs1_encoder *ctx, int sym, char* dataStr, char** expect) {
+bool test_encode(gs1_encoder *ctx, bool should_succeed, int sym, char* dataStr, char** expect) {
 
 	char **strings;
 	char *tail;
@@ -99,10 +99,12 @@ bool test_encode(gs1_encoder *ctx, int sym, char* dataStr, char** expect) {
 	TEST_CHECK(gs1_encoder_setFormat(ctx, gs1_encoder_dRAW));
 	TEST_CHECK(gs1_encoder_setSym(ctx, sym));
 	TEST_CHECK(gs1_encoder_setDataStr(ctx, dataStr));
-    TEST_MSG("Error: %s", gs1_encoder_getErrMsg(ctx));
-
-	TEST_CHECK(gs1_encoder_encode(ctx));
 	TEST_MSG("Error: %s", gs1_encoder_getErrMsg(ctx));
+
+	TEST_CHECK(gs1_encoder_encode(ctx) ^ !should_succeed);
+	TEST_MSG("Error: %s", gs1_encoder_getErrMsg(ctx));
+	if (!should_succeed)
+		return true;
 
 	TEST_ASSERT(gs1_encoder_getBufferStrings(ctx, &strings) > 0);
 

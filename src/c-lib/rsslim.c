@@ -504,10 +504,10 @@ void test_rsslim_RSSLIM_encode(void) {
 " X   XX  XX   XX XX X X  XXX X  X X XX X  XX X  X  X XX   XX XXX  XX  XX X",
 NULL
 	};
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sDataBarLimited, "#0115012345678907", expect));
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sDataBarLimited, "15012345678907", expect));
+	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sDataBarLimited, "#0115012345678907", expect));
+	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sDataBarLimited, "15012345678907", expect));
 	gs1_encoder_setAddCheckDigit(ctx, true);
-	TEST_CHECK(test_encode(ctx, gs1_encoder_sDataBarLimited, "1501234567890", expect));
+	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sDataBarLimited, "1501234567890", expect));
 
 	gs1_encoder_free(ctx);
 
