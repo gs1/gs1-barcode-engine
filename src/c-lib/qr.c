@@ -1056,6 +1056,10 @@ NULL
 	};
 	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sQR, "#011234567890123110ABC123#11210630", expect));  // GS1 mode
 
+
+	TEST_CHECK(test_encode(ctx, false, gs1_encoder_sQR, "#0112345678901231|#99ABC", NULL));  // CC is invalid
+
+
 	gs1_encoder_free(ctx);
 
 }
