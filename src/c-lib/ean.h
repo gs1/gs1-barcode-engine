@@ -21,6 +21,8 @@
 #ifndef EAN_H
 #define EAN_H
 
+#include <stdbool.h>
+
 #include "gs1encoders.h"
 
 bool gs1_normaliseEAN13(gs1_encoder *ctx, char *dataStr, char *primaryStr);

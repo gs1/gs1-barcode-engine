@@ -21,6 +21,7 @@
 #ifndef RSSLIM_H
 #define RSSLIM_H
 
+#include <stdbool.h>
 
 #define RSSLIM_ELMNTS	(46-4)	// not including guard bars
 #define RSSLIM_SYM_W	74	// symbol width in modules including any quiet zones

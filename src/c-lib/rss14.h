@@ -21,6 +21,8 @@
 #ifndef RSS14_H
 #define RSS14_H
 
+#include <stdbool.h>
+
 
 #define RSS14_ELMNTS	(46-4)	// not including guard bars
 #define RSS14_SYM_W	96	// symbol width in modules including guard bars

@@ -535,6 +535,7 @@ GS1_ENCODERS_API char* gs1_encoder_getOutFile(gs1_encoder *ctx) {
 }
 GS1_ENCODERS_API bool gs1_encoder_setOutFile(gs1_encoder *ctx, char* outFile) {
 	assert(ctx);
+	assert(outFile);
 	reset_error(ctx);
 	if (strlen(outFile) > MAX_FNAME) {
 		sprintf(ctx->errMsg, "Maximum output file is %d characters", MAX_FNAME);
@@ -553,10 +554,11 @@ GS1_ENCODERS_API char* gs1_encoder_getDataStr(gs1_encoder *ctx) {
 }
 GS1_ENCODERS_API bool gs1_encoder_setDataStr(gs1_encoder *ctx, char* dataStr) {
 
-	assert(ctx);
-	reset_error(ctx);
-
 	char *cc;
+
+	assert(ctx);
+	assert(dataStr);
+	reset_error(ctx);
 
 	if (strlen(dataStr) > MAX_DATA) {
 		sprintf(ctx->errMsg, "Maximum data length is %d characters", MAX_DATA);
@@ -596,10 +598,11 @@ fail:
 
 GS1_ENCODERS_API bool gs1_encoder_setGS1dataStr(gs1_encoder *ctx, char* gs1data) {
 
-	assert(ctx);
-	reset_error(ctx);
-
 	char *cc;
+
+	assert(ctx);
+	assert(gs1data);
+	reset_error(ctx);
 
 	// Validate GS1 data
 	ctx->numAIs = 0;
