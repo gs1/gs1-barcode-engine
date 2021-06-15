@@ -327,6 +327,13 @@ bool gs1_processScanData(gs1_encoder* ctx, char* scanData) {
 
 	} else if (aiMode) {
 		*p++ = '#';
+
+		// Forbid data "#" characters at this stage so we don't conflate with FNC1
+		if (strchr(scanData, '#') != NULL) {
+			strcpy(ctx->errMsg, "Scan data contains illegal # character");
+			goto fail;
+		}
+
 		strcpy(p, scanData);
 		while (*p) {
 			if (*p == 0x1D)		// GS character represents FNC1
