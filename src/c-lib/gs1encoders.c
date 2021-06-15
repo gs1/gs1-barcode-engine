@@ -648,11 +648,15 @@ GS1_ENCODERS_API char* gs1_encoder_getGS1dataStr(gs1_encoder *ctx) {
 
 	for (i = 0; i < ctx->numAIs; i++) {
 		ai = ctx->aiData[i];
-		p += sprintf(p, "(%s)", ai.aiEntry->ai);
-		for (j = 0; j < ai.vallen; j++) {
-			if (ai.value[j] == '(')		// Escape data "("
-				*p++ = '\\';
-			*p++ = ai.value[j];
+		if (ai.aiEntry) {
+			p += sprintf(p, "(%s)", ai.aiEntry->ai);
+			for (j = 0; j < ai.vallen; j++) {
+				if (ai.value[j] == '(')		// Escape data "("
+					*p++ = '\\';
+				*p++ = ai.value[j];
+			}
+		} else {
+			*p++ = '|';
 		}
 	}
 	*p = '\0';
