@@ -668,7 +668,7 @@ GS1_ENCODERS_API char* gs1_encoder_getScanData(gs1_encoder* ctx) {
 }
 
 
-GS1_ENCODERS_API bool gs1_encoder_processScanData(gs1_encoder* ctx, char *scanData) {
+GS1_ENCODERS_API bool gs1_encoder_setScanData(gs1_encoder* ctx, char *scanData) {
 	assert(ctx);
 	assert(scanData);
 	return gs1_processScanData(ctx);
@@ -1460,7 +1460,7 @@ void test_api_getGS1dataStr(void) {
 }
 
 
-void test_api_generateScanData(void) {
+void test_api_getScanData(void) {
 
 	gs1_encoder* ctx;
 	char *out;
@@ -1477,13 +1477,13 @@ void test_api_generateScanData(void) {
 }
 
 
-void test_api_processScanData(void) {
+void test_api_setScanData(void) {
 
 	gs1_encoder* ctx;
 
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
 
-	TEST_ASSERT(gs1_encoder_processScanData(ctx, "]e0011231231231233310ABC123" "\x1D" "99XYZ"));
+	TEST_ASSERT(gs1_encoder_setScanData(ctx, "]e0011231231231233310ABC123" "\x1D" "99XYZ"));
 	TEST_CHECK(gs1_encoder_getSym(ctx) == gs1_encoder_sDataBarExpanded);
 	TEST_CHECK(strcmp(gs1_encoder_getDataStr(ctx), "#011231231231233310ABC123#99XYZ") == 0);
 
