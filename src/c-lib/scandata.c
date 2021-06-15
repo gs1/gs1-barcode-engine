@@ -48,8 +48,7 @@ struct symIdEntry {
 #define AI true
 #define NON_AI false
 
-static const struct symIdEntry symIdTable[9] = {
-	SYM( "]C0", NON_AI, gs1_encoder_sGS1_128_CCA ),
+static const struct symIdEntry symIdTable[] = {
 	SYM( "]C1", AI,     gs1_encoder_sGS1_128_CCA ),
 	SYM( "]E0", NON_AI, gs1_encoder_sEAN13 ),
 	SYM( "]E4", NON_AI, gs1_encoder_sEAN8 ),
