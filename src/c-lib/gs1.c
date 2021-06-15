@@ -755,6 +755,7 @@ bool gs1_parseGS1data(gs1_encoder *ctx, char *gs1Data, char *dataStr) {
 
 	*dataStr = '\0';
 	*ctx->errMsg = '\0';
+	ctx->errFlag = false;
 
 	DEBUG_PRINT("\nParsing GS1 data: %s\n", gs1Data);
 
@@ -852,6 +853,7 @@ bool gs1_processGS1data(gs1_encoder *ctx, char *dataStr) {
 	assert(ctx);
 
 	*ctx->errMsg = '\0';
+	ctx->errFlag = false;
 
 	// Ensure FNC1 in first
 	if (!*p || *p++ != '#') {
