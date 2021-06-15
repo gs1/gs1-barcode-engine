@@ -91,8 +91,8 @@ char* gs1_generateScanData(gs1_encoder* ctx) {
 	switch (ctx->sym) {
 
 	case gs1_encoder_sQR:
-		// "]Q0" for plain data; "]Q3" for GS1 data
-		strcat(ctx->outStr, *ctx->dataStr == '#' ? "]Q3" : "]Q0");
+		// "]Q1" for plain data; "]Q3" for GS1 data
+		strcat(ctx->outStr, *ctx->dataStr == '#' ? "]Q3" : "]Q1");
 		scancat(ctx->outStr, ctx->dataStr);
 		break;
 
