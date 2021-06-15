@@ -570,16 +570,20 @@ static void createCodewords(gs1_encoder *ctx, uint8_t *str, uint8_t cws_v[3][MAX
 
 	int i;
 	bool gs1Mode = false;
+	uint8_t *p;
 
-	(void) ctx;
+	(void) ctx;		// Silence compiler
 
-	if (*str == '#') {								// "#..." => GS1 mode
+	if (*str == '#') {		// "#..." => GS1 mode
 		gs1Mode = true;
 		str++;
-	} else if (strlen((char*)str) >= 2 && strncmp((char*)str, "\\#", 2) == 0) {	// "\#" => "#..."; not GS1 mode
-		str++;     // Skip '\' escape
-	} else if (strlen((char*)str) >= 3 && strncmp((char*)str, "\\\\#", 3) == 0) {	// "\\#" => "\#..."; not GS1 mode
-		str++;     // Skip '\' escape
+	} else {
+		// Unescape leading sequence "\\...#" -> "\...#"
+		p = str;
+		while (*p == '\\')
+			p++;
+		if (*p == '#')
+			str++;
 	}
 
 	/*

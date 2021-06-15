@@ -186,18 +186,22 @@ static void createCodewords(gs1_encoder *ctx, uint8_t *string, uint8_t cws[MAX_D
 
 	(void)ctx;
 
-	uint8_t *p = cws;
+	uint8_t *p;
 	bool gs1Mode = false;
 
-	if (*string == '#') {									// "#..." => GS1 mode
+	if (*string == '#') {		// "#..." => GS1 mode
 		gs1Mode = true;
-	} else if (strlen((char*)string) >= 2 && strncmp((char*)string, "\\#", 2) == 0) {	// "\#" => "#..."; not GS1 mode
-		string++;	// Skip '\' escape
-	} else if (strlen((char*)string) >= 3 && strncmp((char*)string, "\\\\#", 3) == 0) {	// "\\#" => "\#..."; not GS1 mode
-		string++;	// Skip '\' escape
+	} else {
+		// Unescape leading sequence "\\...#" -> "\...#"
+		p = string;
+		while (*p == '\\')
+			p++;
+		if (*p == '#')
+			string++;
 	}
 
 	// Encode the message in ASCII mode
+	p = cws;
 	while (*string && p-cws < MAX_DM_DAT_CWS) {
 		if (*string == '#' && gs1Mode) {
 			*p++ = 232;
