@@ -62,7 +62,7 @@ static const struct symIdEntry symIdTable[] = {
 
 static void scancat(char* out, const char* in) {
 
-	const char *p;
+	const char *p, *r;
 	char *q;
 
 	p = in;
@@ -84,12 +84,14 @@ static void scancat(char* out, const char* in) {
 			q--;
 	}
 	else {
-		if (strlen(p) >= 2 && strncmp(p, "\\#", 2) == 0) {		// "\#" -> "#..."
+
+		// Unescape leading sequence "\\...#" -> "\...#"
+		r = p;
+		while (*r == '\\')
+			r++;
+		if (*r == '#')
 			p++;
-		}
-		else if (strlen(p) >= 3 && strncmp(p, "\\\\#", 3) == 0) {	// "\\#" -> "\#..."
-			p++;
-		}
+
 		while (*p)
 			*q++ = *p++;
 	}
@@ -117,14 +119,18 @@ char* gs1_generateScanData(gs1_encoder* ctx) {
 	switch (ctx->sym) {
 
 	case gs1_encoder_sQR:
-		// "]Q1" for plain data; "]Q3" for GS1 data
-		strcat(ctx->outStr, *ctx->dataStr == '#' ? "]Q3" : "]Q1");
-		scancat(ctx->outStr, ctx->dataStr);
-		break;
-
 	case gs1_encoder_sDM:
-		// "]d1" for plain data; "]d2" for GS1 data
-		strcat(ctx->outStr, *ctx->dataStr == '#' ? "]d2" : "]d1");
+
+		// QR: "]Q1" for plain data; "]Q3" for GS1 data
+		// DM: "]d1" for plain data; "]d2" for GS1 data
+
+		if (*ctx->dataStr == '#') {
+			strcat(ctx->outStr, ctx->sym == gs1_encoder_sQR ? "]Q3" : "]d2");
+		} else {
+			strcat(ctx->outStr, ctx->sym == gs1_encoder_sQR ? "]Q1" : "]d1");
+			if (cc)
+				*(cc - 1) = '|';	// Plain data so put original character back
+		}
 		scancat(ctx->outStr, ctx->dataStr);
 		break;
 
@@ -250,7 +256,7 @@ bool gs1_processScanData(gs1_encoder* ctx, char* scanData) {
 	enum gs1_encoder_symbologies sym;
 	const struct symIdEntry *entry;
 	size_t symIdTable_len = sizeof(symIdTable) / sizeof(symIdTable[0]);
-	char *p, *cc = NULL;
+	char *p, *q, *cc = NULL;
 	size_t primaryLen;
 
 	assert(ctx);
@@ -312,20 +318,20 @@ bool gs1_processScanData(gs1_encoder* ctx, char* scanData) {
 			goto fail;
 		}
 
-		if (cc) {
-			strcat(p, "|#");
-			strcat(p, cc);
-			p += primaryLen + 1;
-			while (*p) {
-				if (*p == 0x1D)		// GS character represents FNC1
-					*p = '#';
-				p++;
-			}
-			if (!gs1_processGS1data(ctx, ctx->dataStr + primaryLen + 1))	// Validate CC
-				goto fail;
-		}
+		if (!cc)
+			return true;
 
-	} else if (aiMode) {
+		// Process CC as AI data
+		p += primaryLen;
+		*p++ = '|';
+		scanData = cc;
+		aiMode = true;
+
+	}
+
+	if (aiMode) {
+
+		q = p;
 		*p++ = '#';
 
 		// Forbid data "#" characters at this stage so we don't conflate with FNC1
@@ -340,12 +346,15 @@ bool gs1_processScanData(gs1_encoder* ctx, char* scanData) {
 				*p = '#';
 			p++;
 		}
-		if (!gs1_processGS1data(ctx, ctx->dataStr))	// Validate AI data
+		if (!gs1_processGS1data(ctx, q))	// Validate AI data
 			goto fail;
+
 	} else {
-		// Disambiguate from GS1 data: "#" -> "\#" ; "\#" -> "\\#"
-		if ( (strlen(scanData) >= 1 && *scanData == '#') ||
-		     (strlen(scanData) >= 2 && strncmp(scanData, "\\#", 2) == 0) )
+		// Disambiguate from GS1 data: "#" -> "\#" ; "\#" -> "\\#", etc
+		q = scanData;
+		while (*q == '\\')
+			q++;
+		if (*q == '#')
 			*p++ = '\\';
 		strcpy(p, scanData);
 	}
