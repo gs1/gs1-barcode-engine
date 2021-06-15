@@ -111,9 +111,6 @@ char* gs1_generateScanData(gs1_encoder* ctx) {
 
 	*ctx->outStr = '\0';
 
-	if (*ctx->dataStr == '\0')
-		return ctx->outStr;
-
 	if ((cc = strchr(ctx->dataStr, '|')) != NULL)		// Delimit end of linear data
 		*cc++ = '\0';
 
