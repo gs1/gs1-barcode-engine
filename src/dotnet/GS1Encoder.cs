@@ -276,6 +276,10 @@ namespace gs1encoders_dotnet
         [DllImport(gs1_dll, EntryPoint = "gs1_encoder_getScanData", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr gs1_encoder_getScanData(IntPtr ctx);
 
+        [DllImport(gs1_dll, EntryPoint = "gs1_encoder_setScanData", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.U1)]
+        private static extern bool gs1_encoder_setScanData(IntPtr ctx, string scanData);
+
         [DllImport(gs1_dll, EntryPoint = "gs1_encoder_getHRI", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int gs1_encoder_getHRI(IntPtr ctx, ref IntPtr hri);
 
@@ -533,7 +537,12 @@ namespace gs1encoders_dotnet
             get
             {
                 return System.Runtime.InteropServices.Marshal.PtrToStringAnsi(gs1_encoder_getScanData(ctx));
-            }            
+            }
+            set
+            {
+                if (!gs1_encoder_setScanData(ctx, value))
+                    throw new GS1EncoderParameterException(ErrMsg);
+            }
         }
 
         public string[] HRI
