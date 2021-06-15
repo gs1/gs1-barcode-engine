@@ -171,6 +171,7 @@ TEST_LIST = {
     { "api_dataStr", test_api_dataStr },
     { "api_getGS1dataStr", test_api_getGS1dataStr },
     { "api_generateScanData", test_api_generateScanData },
+    { "api_processScanData", test_api_processScanData },
     { "api_getHRI", test_api_getHRI },
     { "api_format", test_api_format },
     { "api_getBuffer", test_api_getBuffer },
@@ -190,6 +191,7 @@ TEST_LIST = {
      *
      */
     { "scandata_generateScanData", test_scandata_generateScanData },
+    { "scandata_processScanData", test_scandata_processScanData },
 
 
     /*

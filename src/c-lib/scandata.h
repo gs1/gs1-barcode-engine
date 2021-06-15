@@ -25,11 +25,13 @@
 #include "enc-private.h"
 
 char* gs1_generateScanData(gs1_encoder *ctx);
+char* gs1_processScanData(gs1_encoder *ctx);
 
 
 #ifdef UNIT_TESTS
 
 void test_scandata_generateScanData(void);
+void test_scandata_processScanData(void);
 
 #endif
 

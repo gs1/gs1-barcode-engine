@@ -671,7 +671,7 @@ GS1_ENCODERS_API char* gs1_encoder_getScanData(gs1_encoder* ctx) {
 GS1_ENCODERS_API bool gs1_encoder_processScanData(gs1_encoder* ctx, char *scanData) {
 	assert(ctx);
 	assert(scanData);
-	return gs1_generateScanData(ctx);
+	return gs1_processScanData(ctx);
 }
 
 
@@ -1471,6 +1471,21 @@ void test_api_generateScanData(void) {
 	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "#011231231231233310ABC123#11991225|#98COMPOSITE#97XYZ"));
 	TEST_ASSERT((out = gs1_encoder_getScanData(ctx)) != NULL);
 	TEST_CHECK(strcmp(out, "]e0011231231231233310ABC123" "\x1D" "1199122598COMPOSITE" "\x1D" "97XYZ") == 0);
+
+	gs1_encoder_free(ctx);
+
+}
+
+
+void test_api_processScanData(void) {
+
+	gs1_encoder* ctx;
+
+	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+
+	TEST_ASSERT(gs1_encoder_processScanData(ctx, "]e0011231231231233310ABC123" "\x1D" "99XYZ"));
+	TEST_CHECK(gs1_encoder_getSym(ctx) == gs1_encoder_sDataBarExpanded);
+	TEST_CHECK(strcmp(gs1_encoder_getDataStr(ctx), "#011231231231233310ABC123#99XYZ") == 0);
 
 	gs1_encoder_free(ctx);
 
