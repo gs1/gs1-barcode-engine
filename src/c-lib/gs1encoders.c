@@ -614,6 +614,13 @@ GS1_ENCODERS_API bool gs1_encoder_setGS1dataStr(gs1_encoder *ctx, char* gs1data)
 			ctx->numAIs = 0;
 			return false;
 		}
+		if (ctx->numAIs >= MAX_AIS) {
+			strcpy(ctx->errMsg, "Too many AIs");
+			ctx->errFlag = true;
+			*ctx->dataStr = '\0';
+			ctx->numAIs = 0;
+			return false;
+		}
 		strcat(ctx->dataStr, "|");
 		ctx->aiData[ctx->numAIs++].aiEntry = NULL;	// Indicate separator in HRI
 		if (!gs1_parseGS1data(ctx, cc+1, ctx->dataStr + strlen(ctx->dataStr))) {
