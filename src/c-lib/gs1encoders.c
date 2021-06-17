@@ -653,6 +653,9 @@ GS1_ENCODERS_API char* gs1_encoder_getGS1dataStr(gs1_encoder *ctx) {
 	assert(ctx->numAIs <= MAX_AIS);
 	reset_error(ctx);
 
+	if (ctx->numAIs == 0)		// Not GS1 data
+		return NULL;
+
 	for (i = 0; i < ctx->numAIs; i++) {
 		ai = ctx->aiData[i];
 		if (ai.aiEntry) {
@@ -1461,10 +1464,18 @@ void test_api_getGS1dataStr(void) {
 	TEST_ASSERT((out = gs1_encoder_getGS1dataStr(ctx)) != NULL);
 	TEST_CHECK(strcmp(out, "(01)12312312312333(10)ABC123") == 0);
 
+	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "TESTING"));
+	TEST_CHECK((out = gs1_encoder_getGS1dataStr(ctx)) == NULL);
+
 	// Escape data "(" characters
 	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "#10ABC(123"));
 	TEST_ASSERT((out = gs1_encoder_getGS1dataStr(ctx)) != NULL);
 	TEST_CHECK(strcmp(out, "(10)ABC\\(123") == 0);
+
+	// Composite strings
+	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "#011231231231233310ABC123|#99XYZ(TM)_CORP"));
+	TEST_ASSERT((out = gs1_encoder_getGS1dataStr(ctx)) != NULL);
+	TEST_CHECK(strcmp(out, "(01)12312312312333(10)ABC123|(99)XYZ\\(TM)_CORP") == 0);
 
 	gs1_encoder_free(ctx);
 
