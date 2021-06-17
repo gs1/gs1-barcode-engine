@@ -643,13 +643,14 @@ static const struct aiEntry* lookup_ai_entry(char *p, bool prefix) {
 		ailen = strlen(entry->ai);
 		if (strlen(p) < ailen)
 			continue;
-		if (prefix && strncmp(p, entry->ai, ailen) == 0)
+		if (prefix &&		// Lookup whether an AI is a prefix of a given message
+		    strncmp(p, entry->ai, ailen) == 0)
 			break;
-		else if (strcmp(p, entry->ai) == 0)
+		else if (strcmp(p, entry->ai) == 0)			// Given the entire AI
 			break;
 	}
 
-	if (i == ai_table_len)
+	if (i == ai_table_len)		// Not found
 		return NULL;
 
 	return entry;

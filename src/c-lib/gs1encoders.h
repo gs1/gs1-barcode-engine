@@ -28,7 +28,8 @@
  * --------
  *
  * The GS1 Barcode Encoder Library provides routines to generate GS1 barcode
- * symbols and to process GS1 data.
+ * symbols, process GS1 AI syntax data provided in raw or human-friendly
+ * formats, and process the scan data received from barcode readers.
  *
  * The supported symbologies are:
  *
@@ -39,14 +40,18 @@
  *   * Data Matrix
  *   * QR Code
  *
+ * The encoder implementations are intended for use with GS1 standards and
+ * applications and do not contain additional features that might be required
+ * for more general use.
+ *
  * The barcode input data can either be received from a string buffer or read
  * from a file as either a raw barcode message or in human-friendly GS1
  * Application Identifier syntax. The barcode symbols be written to a BMP or
  * TIFF file, or accessed by a buffer in either graphical format or as an array
  * of strings.
  *
- * This example use of the library low is to write the generated barcode image
- * directly to a file:
+ * This example use of the library shows how to write the generated barcode
+ * image directly to a file:
  *
  * \code
  * #import "gs1encoders.h"
@@ -73,8 +78,11 @@
  * gs1_encoder_setSym(ctx, gs1_encoder_sEAN13;          // Choose the EAN-13 symbology
  * gs1_encoder_setGS1DataStr(ctx, "2112345678900");     // Data provided in plain syntax
  * gs1_encoder_encode(ctx);                             // Generate the image, writing the buffer
+ *
  * size = gs1_encoder_getBuffer(ctx, buffer);           // Read from the buffer
- * rows = gs1_encoder_getBufferStrings(ctx, strings);   // Alternatively convert buffer to an array of strings
+ *
+ * rows = gs1_encoder_getBufferStrings(ctx, strings);   // Alternatively, convert buffer to an array of strings
+ *
  * ...
  * gs1_encoder_free(ctx);                               // Release the instance of the library
  * \endcode
@@ -134,9 +142,9 @@ enum gs1_encoder_symbologies {
 /// Barcode images can be written in common BMP and TIFF graphical formats, as
 /// well as output as a headerless matrix.
 enum gs1_encoder_formats {
-	gs1_encoder_dBMP = 0,		///< BMP format
-	gs1_encoder_dTIF = 1,		///< TIFF format
-	gs1_encoder_dRAW = 2,		///< TIFF, without header (1-bit per pixel matrix with byte-aligned rows)
+	gs1_encoder_dBMP = 0,			///< BMP format
+	gs1_encoder_dTIF = 1,			///< TIFF format
+	gs1_encoder_dRAW = 2,			///< TIFF, without header (1-bit per pixel matrix with byte-aligned rows)
 };
 
 
@@ -296,6 +304,8 @@ typedef struct gs1_encoder gs1_encoder;
  *
  * This is typically the build date.
  *
+ * The return data does not need to be free()ed.
+ *
  * @return pointer to a string containing the version of the library
  */
 GS1_ENCODERS_API char* gs1_encoder_getVersion(void);
@@ -427,7 +437,9 @@ GS1_ENCODERS_API gs1_encoder* gs1_encoder_init(void *mem);
  * generated which can be read using this function.
  *
  * \note
- * The pointer does not need to be free()ed.
+ * The return data does not need to be free()ed and the content should be
+ * copied if it must persist in user code after any subsequent library function
+ * calls.
  *
  * @param [in,out] ctx ::gs1_encoder context
  * @return pointer to error message string
@@ -457,7 +469,7 @@ GS1_ENCODERS_API int gs1_encoder_getSym(gs1_encoder *ctx);
  *
  * @param [in,out] ctx ::gs1_encoder context
  * @param [in] sym symbology type
- * @return true on success, otherwise false and an error message is set
+ * @return true on success, otherwise false and an error message is set that can be read using gs1_encoder_getErrMsg()
  */
 GS1_ENCODERS_API bool gs1_encoder_setSym(gs1_encoder *ctx, int sym);
 
@@ -488,7 +500,7 @@ GS1_ENCODERS_API int gs1_encoder_getPixMult(gs1_encoder *ctx);
  *
  * @param [in,out] ctx ::gs1_encoder context
  * @param [in] pixMult pixels per module
- * @return true on success, otherwise false and an error message is set
+ * @return true on success, otherwise false and an error message is set that can be read using gs1_encoder_getErrMsg()
  */
 GS1_ENCODERS_API bool gs1_encoder_setPixMult(gs1_encoder *ctx, int pixMult);
 
@@ -517,7 +529,7 @@ GS1_ENCODERS_API int gs1_encoder_getXundercut(gs1_encoder *ctx);
  *
  * @param [in,out] ctx ::gs1_encoder context
  * @param [in] Xundercut in pixels
- * @return true on success, otherwise false and an error message is set
+ * @return true on success, otherwise false and an error message is set that can be read using gs1_encoder_getErrMsg()
  */
 GS1_ENCODERS_API bool gs1_encoder_setXundercut(gs1_encoder *ctx, int Xundercut);
 
@@ -547,7 +559,7 @@ GS1_ENCODERS_API int gs1_encoder_getYundercut(gs1_encoder *ctx);
  *
  * @param [in,out] ctx ::gs1_encoder context
  * @param [in] Yundercut in pixels
- * @return true on success, otherwise false and an error message is set
+ * @return true on success, otherwise false and an error message is set that can be read using gs1_encoder_getErrMsg()
  */
 GS1_ENCODERS_API bool gs1_encoder_setYundercut(gs1_encoder *ctx, int Yundercut);
 
@@ -574,7 +586,7 @@ GS1_ENCODERS_API int gs1_encoder_getSepHt(gs1_encoder *ctx);
  *
  * @param [in,out] ctx ::gs1_encoder context
  * @param [in] sepHt in pixels
- * @return true on success, otherwise false and an error message is set
+ * @return true on success, otherwise false and an error message is set that can be read using gs1_encoder_getErrMsg()
  */
 GS1_ENCODERS_API bool gs1_encoder_setSepHt(gs1_encoder *ctx, int sepHt);
 
@@ -606,7 +618,7 @@ GS1_ENCODERS_API int gs1_encoder_getDataBarExpandedSegmentsWidth(gs1_encoder *ct
  *
  * @param [in,out] ctx ::gs1_encoder context
  * @param [in] dataBarExpandedSegmentsWidth segments per row
- * @return true on success, otherwise false and an error message is set
+ * @return true on success, otherwise false and an error message is set that can be read using gs1_encoder_getErrMsg()
  */
 GS1_ENCODERS_API bool gs1_encoder_setDataBarExpandedSegmentsWidth(gs1_encoder *ctx, int dataBarExpandedSegmentsWidth);
 
@@ -633,7 +645,7 @@ GS1_ENCODERS_API int gs1_encoder_getGS1_128LinearHeight(gs1_encoder *ctx);
  *
  * @param [in,out] ctx ::gs1_encoder context
  * @param [in] gs1_128LinearHeight height in modules
- * @return true on success, otherwise false and an error message is set
+ * @return true on success, otherwise false and an error message is set that can be read using gs1_encoder_getErrMsg()
  */
 GS1_ENCODERS_API bool gs1_encoder_setGS1_128LinearHeight(gs1_encoder *ctx, int gs1_128LinearHeight);
 
@@ -659,7 +671,7 @@ GS1_ENCODERS_API int gs1_encoder_getDmRows(gs1_encoder *ctx);
  *
  * @param [in,out] ctx ::gs1_encoder context
  * @param [in] rows number of fixed rows, or 0 for automatic
- * @return true on success, otherwise false and an error message is set
+ * @return true on success, otherwise false and an error message is set that can be read using gs1_encoder_getErrMsg()
  */
 GS1_ENCODERS_API bool gs1_encoder_setDmRows(gs1_encoder *ctx, int rows);
 
@@ -685,7 +697,7 @@ GS1_ENCODERS_API int gs1_encoder_getDmColumns(gs1_encoder *ctx);
  *
  * @param [in,out] ctx ::gs1_encoder context
  * @param [in] columns number of fixed columns, or 0 for automatic
- * @return true on success, otherwise false and an error message is set
+ * @return true on success, otherwise false and an error message is set that can be read using gs1_encoder_getErrMsg()
  */
 GS1_ENCODERS_API bool gs1_encoder_setDmColumns(gs1_encoder *ctx, int columns);
 
@@ -714,7 +726,7 @@ GS1_ENCODERS_API int gs1_encoder_getQrVersion(gs1_encoder *ctx);
  *
  * @param [in,out] ctx ::gs1_encoder context
  * @param [in] version fixed version number, one of ::gs1_encoder_qrVersion
- * @return true on success, otherwise false and an error message is set
+ * @return true on success, otherwise false and an error message is set that can be read using gs1_encoder_getErrMsg()
  */
 GS1_ENCODERS_API bool gs1_encoder_setQrVersion(gs1_encoder *ctx, int version);
 
@@ -743,7 +755,7 @@ GS1_ENCODERS_API int gs1_encoder_getQrEClevel(gs1_encoder *ctx);
  *
  * @param [in,out] ctx ::gs1_encoder context
  * @param [in] ecLevel error correction level, one of ::gs1_encoder_qrEClevel
- * @return true on success, otherwise false and an error message is set
+ * @return true on success, otherwise false and an error message is set that can be read using gs1_encoder_getErrMsg()
  */
 GS1_ENCODERS_API bool gs1_encoder_setQrEClevel(gs1_encoder *ctx, int ecLevel);
 
@@ -775,7 +787,7 @@ GS1_ENCODERS_API bool gs1_encoder_getAddCheckDigit(gs1_encoder *ctx);
  *
  * @param [in,out] ctx ::gs1_encoder context
  * @param [in] addCheckDigit enabled if true; disabled if false
- * @return true on success, otherwise false and an error message is set
+ * @return true on success, otherwise false and an error message is set that can be read using gs1_encoder_getErrMsg()
  */
 GS1_ENCODERS_API bool gs1_encoder_setAddCheckDigit(gs1_encoder *ctx, bool addCheckDigit);
 
@@ -802,7 +814,7 @@ GS1_ENCODERS_API bool gs1_encoder_getFileInputFlag(gs1_encoder *ctx);
  *     from barcode data input.
  *
  * \note
- * When a file is used for data input, any traling newline character is
+ * When a file is used for data input, any trailing newline character is
  * stripped.
  *
  * @see gs1_encoder_getFileInputFlag)
@@ -811,16 +823,19 @@ GS1_ENCODERS_API bool gs1_encoder_getFileInputFlag(gs1_encoder *ctx);
  *
  * @param [in,out] ctx ::gs1_encoder context
  * @param [in] fileInputFlag file input if true; buffer input if false
- * @return true on success, otherwise false and an error message is set
+ * @return true on success, otherwise false and an error message is set that can be read using gs1_encoder_getErrMsg()
  */
 GS1_ENCODERS_API bool gs1_encoder_setFileInputFlag(gs1_encoder *ctx, bool fileInputFlag);
 
 
 /**
- * @brief Reads the barcode data buffer.
+ * @brief Reads the raw barcode data input buffer.
  *
  * \note
- * The returned pointer does not need to be free()ed.
+ * The return data does not need to be free()ed and the content should be
+ * copied if it must persist in user code after subsequent calls to library
+ * function that modify the input data buffer such as gs1_encoder_setDataStr(),
+ * gs1_encoder_setGS1dataStr() and gs1_encoder_setScanData().
  *
  * @see gs1_encoder_getDataStr()
  * @see gs1_encoder_setFileInputFlag()
@@ -835,9 +850,16 @@ GS1_ENCODERS_API char* gs1_encoder_getDataStr(gs1_encoder *ctx);
  * @brief Sets the raw data in the buffer that is used when buffer input is
  * selected.
  *
- * When the input begins with the "#" character the data is considered to be in
- * GS1 Application Identifier syntax. In this case, all instances of the "#"
- * character are considered for be FNC1 non-data characters that are used to
+ * Each encoder accepts input in a format that is specific to the requirements
+ * of the symbology, as described below. Some accept "plain" data
+ * input such as a 13-character GTIN in the case of EAN-13. Some require AI
+ * syntax data such as the GS1 DataBar family. Others accept either an AI
+ * string or plain data containing a GS1 Digital Link URI, such as QR Code and
+ * Data Matrix.
+ *
+ * A "#" character at the start of the input indicates that the data is in GS1
+ * Application Identifier syntax. In this case, all subsequent instances of the
+ * "#" character represent the FNC1 non-data characters that are used to
  * separate fields that are not specified as being pre-defined length from
  * subsequent fields.
  *
@@ -867,16 +889,27 @@ GS1_ENCODERS_API char* gs1_encoder_getDataStr(gs1_encoder *ctx);
  *   * **Data Matrix**:: Plain string
  *   * **QR Code**:: Plain string
  *
- * 2D Component must be specified as GS1 AI syntax in raw form, with "#" = FNC1.
- * It must be separated from the primary linear components with a "|"
- * character, for example:
+ * In the interest of data harmony, the EAN/UPC symbologies will additionally
+ * accept a GTIN input, such as (01)00000002345673 for EAN-8.
+ *
+ * A 2D Component must be specified in AI syntax. It must be separated from the
+ * primary linear components with a "|" character and begin with an FNC1 in
+ * first position, for example:
  *
  * \code
  * #0112345678901231|#10ABC123#11210630
  * \endcode
  *
- * Again, for GS1 data it is simpler and less error prone to specify the input
- * in human-friendly GS1 AI syntax using gs1_encoder_setGS1dataStr().
+ * The above specifies a linear component representing "(01)12345678901231"
+ * together with a composite component representing "(10)ABC123(11)210630".
+ *
+ * **Again, for GS1 data it is simpler and less error prone to specify the input
+ * in human-friendly GS1 AI syntax using gs1_encoder_setGS1dataStr().**
+ *
+ * \note
+ * Plain data and AI data that is syntactically valid but unsuitable for the
+ * intended symbology will be accepted by this function and this fail when
+ * gs1_encoder_encode() is called.
  *
  * \note
  * The length of the data must be less that the value returned by
@@ -889,7 +922,7 @@ GS1_ENCODERS_API char* gs1_encoder_getDataStr(gs1_encoder *ctx);
  *
  * @param [in,out] ctx ::gs1_encoder context
  * @param [in] dataStr containing the raw barcode data
- * @return true on success, otherwise false and an error message is set
+ * @return true on success, otherwise false and an error message is set that can be read using gs1_encoder_getErrMsg()
  */
 GS1_ENCODERS_API bool gs1_encoder_setDataStr(gs1_encoder *ctx, char* dataStr);
 
@@ -907,8 +940,8 @@ GS1_ENCODERS_API bool gs1_encoder_setDataStr(gs1_encoder *ctx, char* dataStr);
  * \endcode
  *
  * This syntax harmonises the format for the input accepted by all symbologies.
- * For example the following input is acceptable for EAN-13, UPC-A, UPC-E and
- * any variant of the GS1 DataBar family:
+ * For example the following input is acceptable for EAN-13, UPC-A, UPC-E, any
+ * variant of the GS1 DataBar family, GS1 QR Code and GS1 DataMatrix:
  *
  * \code
  * (01)00031234000054
@@ -919,6 +952,9 @@ GS1_ENCODERS_API bool gs1_encoder_setDataStr(gs1_encoder *ctx, char* dataStr);
  * gs1_encoder_getDataStr(). If the input is invalid then this function will
  * return false and an error message will be set that can be read using
  * gs1_encoder_getErrMsg().
+ *
+ * Any "(" characters in AI element values must be escaped as "\(" to avoid
+ * conflating them with the start of the next AI.
  *
  * For symbologies that support a composite component (all except
  * ::gs1_encoder_sDM and ::gs1_encoder_sQR), the data for the linear and 2D
@@ -944,26 +980,193 @@ GS1_ENCODERS_API bool gs1_encoder_setDataStr(gs1_encoder *ctx, char* dataStr);
 GS1_ENCODERS_API bool gs1_encoder_setGS1dataStr(gs1_encoder *ctx, char* dataStr);
 
 
-// TODO
+/**
+ * @brief Return the barcode input data buffer in human-friendly AI syntax
+ *
+ * For example, if the input data buffer were to contain:
+ *
+ *     #011231231231233310ABC123|#99XYZ(TM) CORP
+ *
+ * Then this function would return:
+ *
+ *     (01)12312312312333(10)ABC123|(99)XYZ\(TM) CORP
+ *
+ * \note
+ * The return data does not need to be free()ed and the content should be
+ * copied if it must persist in user code after subsequent calls to library
+ * functions that modify the input data buffer such as
+ * gs1_encoder_setDataStr(), gs1_encoder_setGS1dataStr() and
+ * gs1_encoder_setScanData().
+ *
+ * \note
+ * The returned pointer should be checked for NULL which indicates non-AI input data.
+ *
+ * @see gs1_encoder_getDataStr()
+ *
+ * @param [in,out] ctx ::gs1_encoder context
+ * @return a pointer to a string representing the data input buffer in AI syntax, or a null pointer if the input data does not contain AI data
+ */
 GS1_ENCODERS_API char* gs1_encoder_getGS1dataStr(gs1_encoder *ctx);
 
 
-// TODO
+/**
+ * @brief Process scan data received from a barcode reader with reporting of
+ * AIM symbology identifiers enabled to extract the message data and perform
+ * syntax checks in the case of AI data.
+ *
+ * This function will process scan data (such as the output of a barcode
+ * reader) and process the received data, setting the data input buffer to the
+ * message received and setting the selected symbology to something that is
+ * able to carry the received data.
+ *
+ * \note
+ * In some instances the symbology determined by this library will not match
+ * that of the image that was scanned. The AIM symbology identifier prefix of the
+ * scan data does not always uniquely identify the symbology that was scanned.
+ * For example GS1-128 Composite symbols share the same symbology identifier as
+ * the GS1 DataBar family.
+ *
+ * A literal "|" character may be included in the scan data to indicates the
+ * separation between the first and second messages that would be transmitted
+ * by a reader that is configured to return the composite component when
+ * reading EAN/UPC symbols.
+ *
+ * This example use of the library processes a given scan data string, which is
+ * assumed to represent AI data in this instance, and then renders the AI data
+ * in human-friendly format.
+ *
+ * \code
+ * #import <stdio.h>
+ * #import "gs1encoders.h"
+ *
+ * gs1_encoder *ctx = gs1_encoder_init(NULL);                  // Create a new instance of the library
+ * if (!gs1_encoder_setScanData(ctx,                           // Process the scan data, setting dataStr and Sym)
+ *        "]C1011231231231233310ABC123{GS}99TESTING"))
+ *     exit 1;                                                 // Handle failure if bad AI data is received
+ * printf("AI data: %s\n", gs1_encoder_setGS1DataStr(ctx));    // Print the AI scan data in human-friendly format
+ * gs1_encoder_free(ctx);                                      // Release the instance of the library
+ * \endcode
+ *
+ * \note
+ * The return data does not need to be free()ed and the content should be
+ * copied if it must persist in user code after subsequent calls to library
+ * functions that modify the input data buffer such as
+ * gs1_encoder_setDataStr(), gs1_encoder_setGS1dataStr() and
+ * gs1_encoder_setScanData().
+ *
+ * @see gs1_encoder_setScanData()
+ * @see gs1_encoder_getDataStr()
+ * @see gs1_encoder_getGS1dataStr()
+ * @see gs1_encoder_getSym()
+ *
+ * @param [in,out] ctx ::gs1_encoder context
+ * @param [in] scanData the scan data input as read by a reader with AIM symbology identifiers enabled
+ * @return true on success, otherwise false and an error message is set
+ */
 GS1_ENCODERS_API bool gs1_encoder_setScanData(gs1_encoder* ctx, char *scanData);
 
-// TODO
+
+/**
+ * @brief Returns the string that should be returned by scanners when reading a
+ * symbol that is an instance of the selected symbology and contains the input
+ * data.
+ *
+ * Examples:
+ *
+ * Symbology                  | Input data                                     | Returned scan data
+ * -------------------------- | ---------------------------------------------- | -------------------------------------------------
+ * ::gs1_encoder_sEAN13       | 2112345678900                                  | ]E02112345678900
+ * ::gs1_encoder_sUPCA        | 416000336108                                   | ]E00416000336108
+ * ::gs1_encoder_sEAN8        | 02345673                                       | ]E402345673
+ * ::gs1_encoder_sEAN8        | 02345673\|#99COMPOSITE#98XYZ                   | ]E402345673\|]e099COMPOSITE{GS}98XYZ
+ * ::gs1_encoder_sGS1_128_CCA | #011231231231233310ABC123#99TESTING            | ]C1011231231231233310ABC123{GS}99TESTING
+ * ::gs1_encoder_sGS1_128_CCA | #0112312312312333\|#98COMPOSITE#97XYZ          | ]e00112312312312333{GS}98COMPOSITE{GS}97XYZ
+ * ::gs1_encoder_sQR          | https://example.org/01/12312312312333          | ]Q1https://example.org/01/12312312312333
+ * ::gs1_encoder_sQR          | #01123123123123338200http://example.com        | ]Q301123123123123338200http://example.com
+ * ::gs1_encoder_sDM          | https://example.com/gtin/09506000134352/lot/A1 | ]d1https://example.com/gtin/09506000134352/lot/A1
+ * ::gs1_encoder_sDM          | #011231231231233310ABC123#99TESTING            | ]d2011231231231233310ABC123{GS}99TESTING
+ *
+ * The output will be prefixed with the appropriate AIM symbology identifier.
+ *
+ * "{GS}" in the scan data output in the above table represents a literal GS
+ * character (ASCII 29) that is included in the returned data.
+ *
+ * The literal "|" character included in the scan data output for EAN/UPC
+ * Composite symbols indicates the separation between the first and second
+ * messages that would be transmitted by a reader that is configured to return
+ * the composite component.
+ *
+ * This example use of the library shows how to determine what data a scanner
+ * should provide when reading a certain symbol:
+ *
+ * \code
+ * #import <stdio.h>
+ * #import "gs1encoders.h"
+ *
+ * gs1_encoder *ctx = gs1_encoder_init(NULL);               // Create a new instance of the library
+ * gs1_encoder_setSym(ctx, gs1_encoder_sDataBarExpanded);   // Choose the symbology
+ * gs1_encoder_setGS1DataStr(ctx,                           // Set the input data (AI format on this occasion)
+ *        "(01)12345678901231(10)ABC123(11)210630");
+ * printf("Scan data: %s\n", gs1_encoder_getScanData(ctx)); // Print the scan data that a reader should return
+ * gs1_encoder_free(ctx);                                   // Release the instance of the library
+ * \endcode
+ *
+ * \note
+ * The return data does not need to be free()ed and the content should be
+ * copied if it must persist in user code after subsequent calls to library
+ * functions that modify the input data buffer such as
+ * gs1_encoder_setDataStr(), gs1_encoder_setGS1dataStr() and
+ * gs1_encoder_setScanData().
+ *
+ * @see gs1_encoder_setScanData()
+ * @see gs1_encoder_setDataStr()
+ * @see gs1_encoder_setGS1dataStr()
+ *
+ * @param [in,out] ctx ::gs1_encoder context
+ * @return a pointer to a string representing the scan data for the input data contained within symbols of the selected symbology
+ */
 GS1_ENCODERS_API char* gs1_encoder_getScanData(gs1_encoder* ctx);
 
 
-// TODO
-GS1_ENCODERS_API int gs1_encoder_getHRI(gs1_encoder* ctx, char*** out);
+/**
+ * @brief Update a given pointer towards an array of strings containing
+ * Human-Readable Interpretation ("HRI") text.
+ *
+ * For example, if the input data buffer were to contain:
+ *
+ *     #011231231231233310ABC123|#99XYZ(TM) CORP
+ *
+ * Then this function would return the following array of null-terminated
+ * strings:
+ *
+ *     "(01) 12312312312333"
+ *     "(10) ABC123"
+ *     "--"
+ *     "(99) XYZ(TM) CORP"
+ *
+ * \note
+ * The return data does not need to be free()ed and the content should be
+ * copied if it must persist in user code after subsequent calls to functions
+ * that modify the input data buffer such as gs1_encoder_setDataStr(),
+ * gs1_encoder_setGS1dataStr() or gs1_encoder_setScanData().
+ *
+ * @see gs1_encoder_getDataStr()
+ * @see gs1_encoder_setFileInputFlag()
+ *
+ * @param [in,out] ctx ::gs1_encoder context
+ * @param [out] hri Pointer to an array of HRI strings
+ * @return the number of HRI strings
+ */
+GS1_ENCODERS_API int gs1_encoder_getHRI(gs1_encoder* ctx, char*** hri);
 
 /**
  * @brief Gets the filename for a file containing the barcode data when file
  * input is selected.
  *
  * \note
- * The returned pointer does not need to be free()ed.
+ * The return data does not need to be free()ed and the content should be
+ * copied if it must persist in user code after subsequent calls to
+ * setDataFile().
  *
  * @see gs1_encoder_setDataFile()
  * @see gs1_encoder_setFileInputFlag()
@@ -1026,7 +1229,9 @@ GS1_ENCODERS_API bool gs1_encoder_setFormat(gs1_encoder *ctx, int format);
  * @brief Get the current output filename.
  *
  * \note
- * The returned pointer does not need to be free()ed.
+ * The return data does not need to be free()ed and the content should be
+ * copied if it must persist in user code after subsequent calls to
+ * setOutFile().
  *
  * @see gs1_encoder_setOutFile()
  *
@@ -1092,8 +1297,9 @@ GS1_ENCODERS_API bool gs1_encoder_encode(gs1_encoder *ctx);
  * @see gs1_encoder_setOutFile()
  *
  * \note
- * The storage for the string array is managed by the library and must not be
- * freed.
+ * The return data does not need to be free()ed and the content should be
+ * copied if it must persist in user code after subsequent library function
+ * calls.
  *
  * @param [in,out] ctx ::gs1_encoder context
  * @param [out] buffer a pointer to the buffer
