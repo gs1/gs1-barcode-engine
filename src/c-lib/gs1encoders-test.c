@@ -184,6 +184,7 @@ TEST_LIST = {
      * gs1.c
      *
      */
+    { "gs1_lookupAIentry", test_gs1_lookupAIentry },
     { "gs1_gs1_parseAIdata", test_gs1_parseAIdata },
     { "gs1_gs1_processAIdata", test_gs1_processAIdata },
     { "gs1_validateParity", test_gs1_validateParity },

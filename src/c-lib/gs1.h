@@ -73,6 +73,7 @@ bool gs1_allDigits(uint8_t *str);
 
 #ifdef UNIT_TESTS
 
+void test_gs1_lookupAIentry(void);
 void test_gs1_parseAIdata(void);
 void test_gs1_processAIdata(void);
 void test_gs1_validateParity(void);

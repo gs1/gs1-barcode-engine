@@ -630,23 +630,30 @@ static const struct aiEntry ai_table[] = {
 };
 
 
-static const struct aiEntry* lookup_ai_entry(char *p, bool prefix) {
+/*
+ * Lookup an AI table entry matching a given AI or matching prefix of given
+ * data
+ *
+ * For an exact AI lookup its length is given. Otherwise 0 length will look for
+ * an AI matching a prefix of the given data.
+ *
+ */
+static const struct aiEntry* lookupAIentry(char *p, size_t ailen) {
 
 	int ai_table_len = sizeof(ai_table) / sizeof(ai_table[0]);
 	int i;
 	const struct aiEntry *entry;
-	size_t ailen;
+	size_t entrylen;
 
-	// Walk the AI table to find a (prefix) match
+	assert(ailen <= strlen(p));
+
+	// Walk the AI table to find a match, or a prefix match when ailen == 0
 	for (i = 0; i < ai_table_len; i++) {
 		entry = &ai_table[i];
-		ailen = strlen(entry->ai);
-		if (strlen(p) < ailen)
+		entrylen = strlen(entry->ai);
+		if (ailen != 0 && ailen != entrylen)
 			continue;
-		if (prefix &&		// Lookup whether an AI is a prefix of a given message
-		    strncmp(p, entry->ai, ailen) == 0)
-			break;
-		else if (strcmp(p, entry->ai) == 0)			// Given the entire AI
+		if (strncmp(p, entry->ai, ailen > 0 ? ailen : entrylen) == 0)
 			break;
 	}
 
@@ -768,9 +775,7 @@ bool gs1_parseAIdata(gs1_encoder *ctx, char *aiData, char *dataStr) {
 		if (*p++ != '(') goto fail; 			// Expect start of AI
 		if (!(r = strchr(p, ')'))) goto fail;		// Find end of A
 
-		*r = '\0';					// Delimit the end of the AI pointed to by p
-		entry = lookup_ai_entry(p, false);
-		*r++ = ')';					// Put back the original ")"
+		entry = lookupAIentry(p, (size_t)(r++ - p));	// Advance to start of data after lookup
 		if (entry == NULL) {
 			sprintf(ctx->errMsg, "Unrecognised AI: %.4s", p);
 			goto fail;
@@ -878,7 +883,8 @@ bool gs1_processAIdata(gs1_encoder *ctx, char *dataStr) {
 
 	while (*p) {
 
-		if ((entry = lookup_ai_entry(p, true)) == NULL) {
+		// Find AI that matches a prefix of our data
+		if ((entry = lookupAIentry(p, 0)) == NULL) {
 			sprintf(ctx->errMsg, "Unrecognised AI: %.4s", p);
 			ctx->errFlag = true;
 			return false;
@@ -969,19 +975,43 @@ bool gs1_allDigits(uint8_t *str) {
 #include "acutest.h"
 
 
+void test_gs1_lookupAIentry(void) {
+
+	TEST_CHECK(strcmp(lookupAIentry("01",     2)->ai, "01") == 0);		// Exact lookup, data following
+	TEST_CHECK(strcmp(lookupAIentry("011234", 2)->ai, "01") == 0);		// Exact lookup, data following
+	TEST_CHECK(strcmp(lookupAIentry("011234", 0)->ai, "01") == 0);		// Prefix lookup, data following
+	TEST_CHECK(strcmp(lookupAIentry("8012",   0)->ai, "8012") == 0);	// Prefix lookup, data following
+
+	TEST_CHECK(lookupAIentry("2345XX", 4) == NULL);				// No such AI (2345)
+	TEST_CHECK(lookupAIentry("234XXX", 3) == NULL);				// No such AI (234)
+	TEST_CHECK(lookupAIentry("23XXXX", 2) == NULL);				// No such AI (23)
+	TEST_CHECK(lookupAIentry("2XXXXX", 1) == NULL);				// No such AI (2)
+	TEST_CHECK(lookupAIentry("XXXXXX", 0) == NULL);				// No matching prefix
+	TEST_CHECK(lookupAIentry("234567", 0) == NULL);				// No matching prefix
+
+	TEST_CHECK(strcmp(lookupAIentry("235XXX", 0)->ai, "235") == 0);		// Matching prefix
+	TEST_CHECK(lookupAIentry("235XXX", 2) == NULL);				// No such AI (23), even though data starts 235
+	TEST_CHECK(lookupAIentry("235XXX", 1) == NULL);				// No such AI (2), even though data starts 235
+
+	TEST_CHECK(strcmp(lookupAIentry("37123", 2)->ai, "37") == 0);		// Exact lookup
+	TEST_CHECK(lookupAIentry("37123", 3) == NULL);				// No such AI (371), even though there is AI (37)
+	TEST_CHECK(lookupAIentry("37123", 1) == NULL);				// No such AI (3), even though there is AI (37)
+
+}
+
+
 static void test_parseAIdata(gs1_encoder *ctx, bool should_succeed, char *aiData, char* expect) {
 
-	char in[256];
+	char out[256];
 	char casename[256];
 
 	sprintf(casename, "%s => %s", aiData, expect);
 	TEST_CASE(casename);
 
-	strcpy(in, aiData);
-	TEST_CHECK(gs1_parseAIdata(ctx, in, ctx->dataStr) ^ !should_succeed);
+	TEST_CHECK(gs1_parseAIdata(ctx, aiData, out) ^ !should_succeed);
 	if (should_succeed)
-		TEST_CHECK(strcmp(ctx->dataStr, expect) == 0);
-	TEST_MSG("Given: %s; Got: %s; Expected: %s; Err: %s", aiData, ctx->dataStr, expect, ctx->errMsg);
+		TEST_CHECK(strcmp(out, expect) == 0);
+	TEST_MSG("Given: %s; Got: %s; Expected: %s; Err: %s", aiData, out, expect, ctx->errMsg);
 
 }
 
@@ -1030,8 +1060,7 @@ static void test_processAIdata(gs1_encoder *ctx, bool should_succeed, char *data
 	sprintf(casename, "%s", dataStr);
 	TEST_CASE(casename);
 
-	strcpy(ctx->dataStr, dataStr);
-	TEST_CHECK(gs1_processAIdata(ctx, ctx->dataStr) ^ !should_succeed);
+	TEST_CHECK(gs1_processAIdata(ctx, dataStr) ^ !should_succeed);
 	TEST_MSG(ctx->errMsg);
 
 }
