@@ -205,7 +205,9 @@ TEST_LIST = {
      * dm.c
      *
      */
+#ifdef SLOW_TESTS
     { "dm_DM_dataLength", test_dm_DM_dataLength },
+#endif
     { "dm_DM_encode", test_dm_DM_encode },
 
 
@@ -249,8 +251,10 @@ TEST_LIST = {
      * qr.c
      *
      */
-    { "qr_QR_fixtures", test_qr_QR_fixtures },
+#ifdef SLOW_TESTS
     { "qr_QR_versions", test_qr_QR_versions },
+#endif
+    { "qr_QR_fixtures", test_qr_QR_fixtures },
     { "qr_QR_encode", test_qr_QR_encode },
 
 

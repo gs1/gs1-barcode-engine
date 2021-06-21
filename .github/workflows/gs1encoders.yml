@@ -20,7 +20,7 @@ jobs:
 
     - name: clang CI
       run: |
-        make -C src/c-lib -j `nproc` test CC=clang SANITIZE=yes
+        make -C src/c-lib -j `nproc` test CC=clang SANITIZE=yes SLOW_TESTS=yes
         make -C src/c-lib -j `nproc` lib CC=clang SANITIZE=yes
         make -C src/c-lib -j `nproc` app CC=clang SANITIZE=yes
         LD_LIBRARY_PATH=src/c-lib/build src/c-lib/build/gs1encoders.bin --version
@@ -37,7 +37,7 @@ jobs:
 
     - name: gcc CI
       run: |
-        make -C src/c-lib -j `nproc` test CC=gcc
+        make -C src/c-lib -j `nproc` test CC=gcc SLOW_TESTS=yes
         make -C src/c-lib -j `nproc` lib CC=gcc
         make -C src/c-lib -j `nproc` app CC=gcc
         LD_LIBRARY_PATH=src/c-lib/build src/c-lib/build/gs1encoders.bin --version
@@ -75,7 +75,7 @@ jobs:
         sudo apt-get update
         sudo apt-get -y --no-install-recommends install clang-tools
         scan-build -o plist make -C src/c-lib -j `nproc` all CC=clang
-        scan-build -o plist make -C src/c-lib -j `nproc` test CC=clang
+        scan-build -o plist make -C src/c-lib -j `nproc` test CC=clang SLOW_TESTS=yes
         [ "$(find plist/ -name *.html)" = '' ];
 
     - name: "clang static analyzer: Store assets on failure"
