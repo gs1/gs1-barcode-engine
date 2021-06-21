@@ -253,9 +253,9 @@ static const struct metric* selectVersion(gs1_encoder *ctx, const uint16_t cwsle
 
 // Add pseudo-random padding codewords to the bitstream then perform Reed
 // Solomon Error Correction
-static void finaliseCodewords(gs1_encoder *ctx, uint8_t *cws, const uint16_t *cwslen, const struct metric *m) {
+static void finaliseCodewords(gs1_encoder *ctx, uint8_t *cws, uint16_t *cwslen, const struct metric *m) {
 
-	uint8_t tmpcws[MAX_DM_DAT_CWS_PER_BLK+MAX_DM_ECC_CWS_PER_BLK];
+	uint8_t tmpcws[MAX_DM_DAT_CWS_PER_BLK+MAX_DM_ECC_CWS_PER_BLK] = { 0 };
 	uint8_t coeffs[MAX_DM_ECC_CWS_PER_BLK+1];
 	int i, j, pad, offset;
 	uint8_t *p;
