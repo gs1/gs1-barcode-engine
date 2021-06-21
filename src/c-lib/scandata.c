@@ -346,7 +346,7 @@ bool gs1_processScanData(gs1_encoder* ctx, char* scanData) {
 				*p = '#';
 			p++;
 		}
-		if (!gs1_processGS1data(ctx, q))	// Validate AI data
+		if (!gs1_processAIdata(ctx, q))		// Validate AI data
 			goto fail;
 
 	} else {

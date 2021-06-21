@@ -52,9 +52,9 @@ int LLVMFuzzerTestOneInput(const uint8_t *buf, size_t len) {
 	memcpy(in, buf, len);
 	in[len] = '\0';
 
-	if (!gs1_encoder_setGS1dataStr(ctx, in))
+	if (!gs1_encoder_setAIdataStr(ctx, in))
 		return 0;
-	out = gs1_encoder_getGS1dataStr(ctx);
+	out = gs1_encoder_getAIdataStr(ctx);
 	if (strcmp(in, out) != 0) {
 		printf("\nIN:  %s\nOUT: %s\n", in, out);
 		abort();

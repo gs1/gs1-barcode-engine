@@ -152,7 +152,7 @@ void test_api_addCheckDigit(void);
 void test_api_outFile(void);
 void test_api_dataFile(void);
 void test_api_dataStr(void);
-void test_api_getGS1dataStr(void);
+void test_api_getAIdataStr(void);
 void test_api_getScanData(void);
 void test_api_setScanData(void);
 void test_api_getHRI(void);

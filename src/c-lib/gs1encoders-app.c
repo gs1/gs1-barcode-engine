@@ -274,7 +274,7 @@ static bool userInt(gs1_encoder *ctx) {
 				if (gets(inpStr) == NULL)
 					return false;
 				if (strlen(inpStr) > 0 && *inpStr == '(') {
-					if (!gs1_encoder_setGS1dataStr(ctx, inpStr)) {
+					if (!gs1_encoder_setAIdataStr(ctx, inpStr)) {
 						printf("\nERROR: %s\n", gs1_encoder_getErrMsg(ctx));
 						continue;
 					}

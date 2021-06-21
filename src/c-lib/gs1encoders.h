@@ -835,7 +835,7 @@ GS1_ENCODERS_API bool gs1_encoder_setFileInputFlag(gs1_encoder *ctx, bool fileIn
  * The return data does not need to be free()ed and the content should be
  * copied if it must persist in user code after subsequent calls to library
  * function that modify the input data buffer such as gs1_encoder_setDataStr(),
- * gs1_encoder_setGS1dataStr() and gs1_encoder_setScanData().
+ * gs1_encoder_setAIdataStr() and gs1_encoder_setScanData().
  *
  * @see gs1_encoder_getDataStr()
  * @see gs1_encoder_setFileInputFlag()
@@ -869,7 +869,7 @@ GS1_ENCODERS_API char* gs1_encoder_getDataStr(gs1_encoder *ctx);
  * gs1_encoder_getErrMsg().
  *
  * It is strongly advised that GS1 data input is instead specified using
- * gs1_encoder_setGS1dataStr() which takes care of the AI encoding rules
+ * gs1_encoder_setAIdataStr() which takes care of the AI encoding rules
  * automatically, including insertion of FNC1 characters where required. This
  * can be used for all symbologies that accept GS1 AI syntax data.
  *
@@ -904,7 +904,7 @@ GS1_ENCODERS_API char* gs1_encoder_getDataStr(gs1_encoder *ctx);
  * together with a composite component representing "(10)ABC123(11)210630".
  *
  * **Again, for GS1 data it is simpler and less error prone to specify the input
- * in human-friendly GS1 AI syntax using gs1_encoder_setGS1dataStr().**
+ * in human-friendly GS1 AI syntax using gs1_encoder_setAIdataStr().**
  *
  * \note
  * Plain data and AI data that is syntactically valid but unsuitable for the
@@ -915,7 +915,7 @@ GS1_ENCODERS_API char* gs1_encoder_getDataStr(gs1_encoder *ctx);
  * The length of the data must be less that the value returned by
  * gs1_encoder_getMaxDataStrLength().
  *
- * @see gs1_encoder_setGS1dataStr()
+ * @see gs1_encoder_setAIdataStr()
  * @see gs1_encoder_getMaxDataStrLength()
  * @see gs1_encoder_getDataStr()
  * @see gs1_encoder_setFileInputFlag()
@@ -977,7 +977,7 @@ GS1_ENCODERS_API bool gs1_encoder_setDataStr(gs1_encoder *ctx, char* dataStr);
  * @param [in] dataStr the barcode input data in GS1 Application Identifier syntax
  * @return true on success, otherwise false and an error message is set
  */
-GS1_ENCODERS_API bool gs1_encoder_setGS1dataStr(gs1_encoder *ctx, char* dataStr);
+GS1_ENCODERS_API bool gs1_encoder_setAIdataStr(gs1_encoder *ctx, char* dataStr);
 
 
 /**
@@ -995,7 +995,7 @@ GS1_ENCODERS_API bool gs1_encoder_setGS1dataStr(gs1_encoder *ctx, char* dataStr)
  * The return data does not need to be free()ed and the content should be
  * copied if it must persist in user code after subsequent calls to library
  * functions that modify the input data buffer such as
- * gs1_encoder_setDataStr(), gs1_encoder_setGS1dataStr() and
+ * gs1_encoder_setDataStr(), gs1_encoder_setAIdataStr() and
  * gs1_encoder_setScanData().
  *
  * \note
@@ -1006,7 +1006,7 @@ GS1_ENCODERS_API bool gs1_encoder_setGS1dataStr(gs1_encoder *ctx, char* dataStr)
  * @param [in,out] ctx ::gs1_encoder context
  * @return a pointer to a string representing the data input buffer in AI syntax, or a null pointer if the input data does not contain AI data
  */
-GS1_ENCODERS_API char* gs1_encoder_getGS1dataStr(gs1_encoder *ctx);
+GS1_ENCODERS_API char* gs1_encoder_getAIdataStr(gs1_encoder *ctx);
 
 
 /**
@@ -1051,12 +1051,12 @@ GS1_ENCODERS_API char* gs1_encoder_getGS1dataStr(gs1_encoder *ctx);
  * The return data does not need to be free()ed and the content should be
  * copied if it must persist in user code after subsequent calls to library
  * functions that modify the input data buffer such as
- * gs1_encoder_setDataStr(), gs1_encoder_setGS1dataStr() and
+ * gs1_encoder_setDataStr(), gs1_encoder_setAIdataStr() and
  * gs1_encoder_setScanData().
  *
  * @see gs1_encoder_setScanData()
  * @see gs1_encoder_getDataStr()
- * @see gs1_encoder_getGS1dataStr()
+ * @see gs1_encoder_getAIdataStr()
  * @see gs1_encoder_getSym()
  *
  * @param [in,out] ctx ::gs1_encoder context
@@ -1115,12 +1115,12 @@ GS1_ENCODERS_API bool gs1_encoder_setScanData(gs1_encoder* ctx, char *scanData);
  * The return data does not need to be free()ed and the content should be
  * copied if it must persist in user code after subsequent calls to library
  * functions that modify the input data buffer such as
- * gs1_encoder_setDataStr(), gs1_encoder_setGS1dataStr() and
+ * gs1_encoder_setDataStr(), gs1_encoder_setAIdataStr() and
  * gs1_encoder_setScanData().
  *
  * @see gs1_encoder_setScanData()
  * @see gs1_encoder_setDataStr()
- * @see gs1_encoder_setGS1dataStr()
+ * @see gs1_encoder_setAIdataStr()
  *
  * @param [in,out] ctx ::gs1_encoder context
  * @return a pointer to a string representing the scan data for the input data contained within symbols of the selected symbology
@@ -1148,7 +1148,7 @@ GS1_ENCODERS_API char* gs1_encoder_getScanData(gs1_encoder* ctx);
  * The return data does not need to be free()ed and the content should be
  * copied if it must persist in user code after subsequent calls to functions
  * that modify the input data buffer such as gs1_encoder_setDataStr(),
- * gs1_encoder_setGS1dataStr() or gs1_encoder_setScanData().
+ * gs1_encoder_setAIdataStr() or gs1_encoder_setScanData().
  *
  * @see gs1_encoder_getDataStr()
  * @see gs1_encoder_setFileInputFlag()
@@ -1272,7 +1272,7 @@ GS1_ENCODERS_API bool gs1_encoder_setOutFile(gs1_encoder *ctx, char* outFile);
  *
  * This will create a barcode image for the symbology specified by
  * gs1_encoder_setSym() containing the data provided by
- * gs1_encoder_setDataStr() or gs1_encoder_setGS1dataStr().
+ * gs1_encoder_setDataStr() or gs1_encoder_setAIdataStr().
  *
  * If the input is valid for the selected symbology then the image output will
  * be written to the output file specified by gs1_encoder_setOutFile(), or to
@@ -1281,7 +1281,7 @@ GS1_ENCODERS_API bool gs1_encoder_setOutFile(gs1_encoder *ctx, char* outFile);
  *
  * @see gs1_encoder_setSym()
  * @see gs1_encoder_setDataStr()
- * @see gs1_encoder_setGS1dataStr()
+ * @see gs1_encoder_setAIdataStr()
  * @see gs1_encoder_setFormat()
  * @see gs1_encoder_setOutFile()
  *

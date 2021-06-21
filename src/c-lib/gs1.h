@@ -65,16 +65,16 @@ struct aiValue {
 
 #include "gs1encoders.h"
 
-bool gs1_parseGS1data(gs1_encoder *ctx, char *gs1Data, char *dataStr);
-bool gs1_processGS1data(gs1_encoder *ctx, char *dataStr);
+bool gs1_parseAIdata(gs1_encoder *ctx, char *aiData, char *dataStr);
+bool gs1_processAIdata(gs1_encoder *ctx, char *dataStr);
 bool gs1_validateParity(uint8_t *str);
 bool gs1_allDigits(uint8_t *str);
 
 
 #ifdef UNIT_TESTS
 
-void test_gs1_parseGS1data(void);
-void test_gs1_processGS1data(void);
+void test_gs1_parseAIdata(void);
+void test_gs1_processAIdata(void);
 void test_gs1_validateParity(void);
 
 #endif

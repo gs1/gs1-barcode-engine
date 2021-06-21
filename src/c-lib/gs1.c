@@ -741,12 +741,12 @@ static size_t validate_ai_val(gs1_encoder *ctx, const struct aiEntry *entry, cha
 
 
 // Convert GS1 AI syntax data to regular data string with # = FNC1
-bool gs1_parseGS1data(gs1_encoder *ctx, char *gs1Data, char *dataStr) {
+bool gs1_parseAIdata(gs1_encoder *ctx, char *aiData, char *dataStr) {
 
 	assert(ctx);
-	assert(gs1Data);
+	assert(aiData);
 
-	char *p = gs1Data;
+	char *p = aiData;
 	char *r, *outval;
 	int i;
 	size_t minlen, maxlen;
@@ -758,7 +758,7 @@ bool gs1_parseGS1data(gs1_encoder *ctx, char *gs1Data, char *dataStr) {
 	*ctx->errMsg = '\0';
 	ctx->errFlag = false;
 
-	DEBUG_PRINT("\nParsing GS1 data: %s\n", gs1Data);
+	DEBUG_PRINT("\nParsing AI data: %s\n", aiData);
 
 	while (*p) {
 
@@ -826,18 +826,18 @@ again:
 
 	}
 
-	DEBUG_PRINT("Parsing successful: %s\n", dataStr);
+	DEBUG_PRINT("Parsing AI data successful: %s\n", dataStr);
 
 	// Now validate the data that we have written
-	return gs1_processGS1data(ctx, dataStr);
+	return gs1_processAIdata(ctx, dataStr);
 
 fail:
 
 	if (*ctx->errMsg == '\0')
-		strcpy(ctx->errMsg, "Failed to parse GS1 data");
+		strcpy(ctx->errMsg, "Failed to parse AI data");
 	ctx->errFlag = true;
 
-	DEBUG_PRINT("Parsing failed: %s\n", ctx->errMsg);
+	DEBUG_PRINT("Parsing AI data failed: %s\n", ctx->errMsg);
 
 	*dataStr = '\0';
 	return false;
@@ -845,7 +845,7 @@ fail:
 }
 
 
-bool gs1_processGS1data(gs1_encoder *ctx, char *dataStr) {
+bool gs1_processAIdata(gs1_encoder *ctx, char *dataStr) {
 
 	char *p = dataStr, *r;
 	size_t vallen;
@@ -865,7 +865,7 @@ bool gs1_processGS1data(gs1_encoder *ctx, char *dataStr) {
 
 	// Must have some AI data
 	if (!*p) {
-		strcpy(ctx->errMsg, "The GS1 data is empty");
+		strcpy(ctx->errMsg, "The AI data is empty");
 		ctx->errFlag = true;
 		return false;
 	}
@@ -963,19 +963,19 @@ bool gs1_allDigits(uint8_t *str) {
 #include "acutest.h"
 
 
-static void test_parseGS1data(gs1_encoder *ctx, bool should_succeed, char *gs1data, char* expect) {
+static void test_parseAIdata(gs1_encoder *ctx, bool should_succeed, char *aiData, char* expect) {
 
 	char in[256];
 	char casename[256];
 
-	sprintf(casename, "%s => %s", gs1data, expect);
+	sprintf(casename, "%s => %s", aiData, expect);
 	TEST_CASE(casename);
 
-	strcpy(in, gs1data);
-	TEST_CHECK(gs1_parseGS1data(ctx, in, ctx->dataStr) ^ !should_succeed);
+	strcpy(in, aiData);
+	TEST_CHECK(gs1_parseAIdata(ctx, in, ctx->dataStr) ^ !should_succeed);
 	if (should_succeed)
 		TEST_CHECK(strcmp(ctx->dataStr, expect) == 0);
-	TEST_MSG("Given: %s; Got: %s; Expected: %s; Err: %s", gs1data, ctx->dataStr, expect, ctx->errMsg);
+	TEST_MSG("Given: %s; Got: %s; Expected: %s; Err: %s", aiData, ctx->dataStr, expect, ctx->errMsg);
 
 }
 
@@ -984,40 +984,40 @@ static void test_parseGS1data(gs1_encoder *ctx, bool should_succeed, char *gs1da
  *  Convert a human-readable AI string to plain format
  *
  */
-void test_gs1_parseGS1data(void) {
+void test_gs1_parseAIdata(void) {
 
 	gs1_encoder* ctx = gs1_encoder_init(NULL);
 
-	test_parseGS1data(ctx, true,  "(01)12345678901231", "#0112345678901231");
-	test_parseGS1data(ctx, true,  "(10)12345", "#1012345");
-	test_parseGS1data(ctx, true,  "(01)12345678901231(10)12345", "#01123456789012311012345");	// No FNC1 after (01)
-	test_parseGS1data(ctx, true,  "(3100)123456(10)12345", "#31001234561012345");			// No FNC1 after (3100)
-	test_parseGS1data(ctx, true,  "(10)12345(11)991225", "#1012345#11991225");			// FNC1 after (10)
-	test_parseGS1data(ctx, true,  "(3900)12345(11)991225", "#390012345#11991225");			// FNC1 after (3900)
-	test_parseGS1data(ctx, true,  "(10)12345\\(11)991225", "#1012345(11)991225");			// Escaped bracket
-	test_parseGS1data(ctx, true,  "(10)12345\\(", "#1012345(");					// At end if fine
+	test_parseAIdata(ctx, true,  "(01)12345678901231", "#0112345678901231");
+	test_parseAIdata(ctx, true,  "(10)12345", "#1012345");
+	test_parseAIdata(ctx, true,  "(01)12345678901231(10)12345", "#01123456789012311012345");	// No FNC1 after (01)
+	test_parseAIdata(ctx, true,  "(3100)123456(10)12345", "#31001234561012345");			// No FNC1 after (3100)
+	test_parseAIdata(ctx, true,  "(10)12345(11)991225", "#1012345#11991225");			// FNC1 after (10)
+	test_parseAIdata(ctx, true,  "(3900)12345(11)991225", "#390012345#11991225");			// FNC1 after (3900)
+	test_parseAIdata(ctx, true,  "(10)12345\\(11)991225", "#1012345(11)991225");			// Escaped bracket
+	test_parseAIdata(ctx, true,  "(10)12345\\(", "#1012345(");					// At end if fine
 
-	test_parseGS1data(ctx, false, "(10)(11)98765", "");						// Value must not be empty
-	test_parseGS1data(ctx, false, "(10)12345(11)", "");						// Value must not be empty
-	test_parseGS1data(ctx, false, "(1A)12345", "");							// AI must be numeric
-	test_parseGS1data(ctx, false, "1(12345", "");							// Must start with AI
-	test_parseGS1data(ctx, false, "12345", "");							// Must start with AI
-	test_parseGS1data(ctx, false, "()12345", "");							// AI too short
-	test_parseGS1data(ctx, false, "(1)12345", "");							// AI too short
-	test_parseGS1data(ctx, false, "(12345)12345", "");						// AI too long
-	test_parseGS1data(ctx, false, "(15", "");							// AI must terminate
-	test_parseGS1data(ctx, false, "(1", "");							// AI must terminate
-	test_parseGS1data(ctx, false, "(", "");								// AI must terminate
-	test_parseGS1data(ctx, false, "(01)123456789012312(10)12345", "");				// Fixed-length AI too long
-	test_parseGS1data(ctx, false, "(10)12345#", "");						// Reject "#": Conflated with FNC1
-	test_parseGS1data(ctx, false, "(17)9(90)217", "");						// Should not parse to #17990217
+	test_parseAIdata(ctx, false, "(10)(11)98765", "");						// Value must not be empty
+	test_parseAIdata(ctx, false, "(10)12345(11)", "");						// Value must not be empty
+	test_parseAIdata(ctx, false, "(1A)12345", "");							// AI must be numeric
+	test_parseAIdata(ctx, false, "1(12345", "");							// Must start with AI
+	test_parseAIdata(ctx, false, "12345", "");							// Must start with AI
+	test_parseAIdata(ctx, false, "()12345", "");							// AI too short
+	test_parseAIdata(ctx, false, "(1)12345", "");							// AI too short
+	test_parseAIdata(ctx, false, "(12345)12345", "");						// AI too long
+	test_parseAIdata(ctx, false, "(15", "");							// AI must terminate
+	test_parseAIdata(ctx, false, "(1", "");								// AI must terminate
+	test_parseAIdata(ctx, false, "(", "");								// AI must terminate
+	test_parseAIdata(ctx, false, "(01)123456789012312(10)12345", "");				// Fixed-length AI too long
+	test_parseAIdata(ctx, false, "(10)12345#", "");							// Reject "#": Conflated with FNC1
+	test_parseAIdata(ctx, false, "(17)9(90)217", "");						// Should not parse to #17990217
 
 	gs1_encoder_free(ctx);
 
 }
 
 
-static void test_processGS1data(gs1_encoder *ctx, bool should_succeed, char *dataStr) {
+static void test_processAIdata(gs1_encoder *ctx, bool should_succeed, char *dataStr) {
 
 	char casename[256];
 
@@ -1025,74 +1025,74 @@ static void test_processGS1data(gs1_encoder *ctx, bool should_succeed, char *dat
 	TEST_CASE(casename);
 
 	strcpy(ctx->dataStr, dataStr);
-	TEST_CHECK(gs1_processGS1data(ctx, ctx->dataStr) ^ !should_succeed);
+	TEST_CHECK(gs1_processAIdata(ctx, ctx->dataStr) ^ !should_succeed);
 	TEST_MSG(ctx->errMsg);
 
 }
 
 
-void test_gs1_processGS1data(void) {
+void test_gs1_processAIdata(void) {
 
 	gs1_encoder* ctx = gs1_encoder_init(NULL);
 
-	test_processGS1data(ctx, false, "");						// No FNC1 in first position
-	test_processGS1data(ctx, false, "991234");					// No FNC1 in first position
-	test_processGS1data(ctx, false, "#");						// FNC1 in first but no GS1 data
-	test_processGS1data(ctx, false, "#891234");					// No such AI
+	test_processAIdata(ctx, false, "");						// No FNC1 in first position
+	test_processAIdata(ctx, false, "991234");					// No FNC1 in first position
+	test_processAIdata(ctx, false, "#");						// FNC1 in first but no AIs
+	test_processAIdata(ctx, false, "#891234");					// No such AI
 
-	test_processGS1data(ctx, true,  "#991234");
+	test_processAIdata(ctx, true,  "#991234");
 
-	test_processGS1data(ctx, false, "#99~ABC");					// Bad CSET82 character
- 	test_processGS1data(ctx, false, "#99ABC~");					// Bad CSET82 character
+	test_processAIdata(ctx, false, "#99~ABC");					// Bad CSET82 character
+ 	test_processAIdata(ctx, false, "#99ABC~");					// Bad CSET82 character
 
-	test_processGS1data(ctx, true,  "#0112345678901231");				// N14, no FNC1 required
-	test_processGS1data(ctx, false, "#01A2345678901231");				// Bad numeric character
-	test_processGS1data(ctx, false, "#011234567890123A");				// Bad numeric character
-	test_processGS1data(ctx, false, "#0112345678901234");				// Incorrect check digit (csum linter)
-	test_processGS1data(ctx, false, "#011234567890123");				// Too short
-	test_processGS1data(ctx, false, "#01123456789012312");				// No such AI (2). Can't be "too long" since FNC1 not required
+	test_processAIdata(ctx, true,  "#0112345678901231");				// N14, no FNC1 required
+	test_processAIdata(ctx, false, "#01A2345678901231");				// Bad numeric character
+	test_processAIdata(ctx, false, "#011234567890123A");				// Bad numeric character
+	test_processAIdata(ctx, false, "#0112345678901234");				// Incorrect check digit (csum linter)
+	test_processAIdata(ctx, false, "#011234567890123");				// Too short
+	test_processAIdata(ctx, false, "#01123456789012312");				// No such AI (2). Can't be "too long" since FNC1 not required
 
-	test_processGS1data(ctx, true,  "#0112345678901231#");				// Tolerate superflous FNC1
-	test_processGS1data(ctx, false, "#011234567890123#");				// Short, with superflous FNC1
-	test_processGS1data(ctx, false, "#01123456789012345#");				// Long, with superflous FNC1 (no following AIs)
-	test_processGS1data(ctx, false, "#01123456789012345#991234");			// Long, with superflous FNC1 and meaningless AI (5#..)
+	test_processAIdata(ctx, true,  "#0112345678901231#");				// Tolerate superflous FNC1
+	test_processAIdata(ctx, false, "#011234567890123#");				// Short, with superflous FNC1
+	test_processAIdata(ctx, false, "#01123456789012345#");				// Long, with superflous FNC1 (no following AIs)
+	test_processAIdata(ctx, false, "#01123456789012345#991234");			// Long, with superflous FNC1 and meaningless AI (5#..)
 
-	test_processGS1data(ctx, true,  "#0112345678901231991234");			// Fixed-length, run into next AI (01)...(99)...
-	test_processGS1data(ctx, true,  "#0112345678901231#991234");			// Tolerate superflous FNC1
+	test_processAIdata(ctx, true,  "#0112345678901231991234");			// Fixed-length, run into next AI (01)...(99)...
+	test_processAIdata(ctx, true,  "#0112345678901231#991234");			// Tolerate superflous FNC1
 
-	test_processGS1data(ctx, true,  "#2421");					// N1..6; FNC1 required
-	test_processGS1data(ctx, true,  "#24212");
-	test_processGS1data(ctx, true,  "#242123");
-	test_processGS1data(ctx, true,  "#2421234");
-	test_processGS1data(ctx, true,  "#24212345");
-	test_processGS1data(ctx, true,  "#242123456");
-	test_processGS1data(ctx, true,  "#242123456#10ABC123");				// Limit, then following AI
-	test_processGS1data(ctx, true,  "#242123456#");					// Tolerant of FNC1 at end of data
-	test_processGS1data(ctx, false, "#2421234567");					// Data too long
+	test_processAIdata(ctx, true,  "#2421");					// N1..6; FNC1 required
+	test_processAIdata(ctx, true,  "#24212");
+	test_processAIdata(ctx, true,  "#242123");
+	test_processAIdata(ctx, true,  "#2421234");
+	test_processAIdata(ctx, true,  "#24212345");
+	test_processAIdata(ctx, true,  "#242123456");
+	test_processAIdata(ctx, true,  "#242123456#10ABC123");				// Limit, then following AI
+	test_processAIdata(ctx, true,  "#242123456#");					// Tolerant of FNC1 at end of data
+	test_processAIdata(ctx, false, "#2421234567");					// Data too long
 
-	test_processGS1data(ctx, true,  "#81111234");					// N4; FNC1 required
-	test_processGS1data(ctx, false, "#8111123");					// Too short
-	test_processGS1data(ctx, false, "#811112345");					// Too long
-	test_processGS1data(ctx, true,  "#81111234#10ABC123");				// Followed by another AI
+	test_processAIdata(ctx, true,  "#81111234");					// N4; FNC1 required
+	test_processAIdata(ctx, false, "#8111123");					// Too short
+	test_processAIdata(ctx, false, "#811112345");					// Too long
+	test_processAIdata(ctx, true,  "#81111234#10ABC123");				// Followed by another AI
 
-	test_processGS1data(ctx, true,  "#800112341234512398");				// N4-5-3-1-1; FNC1 required
-	test_processGS1data(ctx, false, "#80011234123451239");				// Too short
-	test_processGS1data(ctx, false, "#8001123412345123981");			// Too long
-	test_processGS1data(ctx, true,  "#800112341234512398#0112345678901231");
-	test_processGS1data(ctx, false, "#80011234123451239#0112345678901231");		// Too short
-	test_processGS1data(ctx, false, "#8001123412345123981#01123456789012312");	// Too long
+	test_processAIdata(ctx, true,  "#800112341234512398");				// N4-5-3-1-1; FNC1 required
+	test_processAIdata(ctx, false, "#80011234123451239");				// Too short
+	test_processAIdata(ctx, false, "#8001123412345123981");				// Too long
+	test_processAIdata(ctx, true,  "#800112341234512398#0112345678901231");
+	test_processAIdata(ctx, false, "#80011234123451239#0112345678901231");		// Too short
+	test_processAIdata(ctx, false, "#8001123412345123981#01123456789012312");	// Too long
 
-	test_processGS1data(ctx, true,  "#800302112345678900ABC");			// N1 N13,csum X0..16; FNC1 required
-	test_processGS1data(ctx, false, "#800302112345678901ABC");			// Bad check digit on N13 component
-	test_processGS1data(ctx, true,  "#800302112345678900");				// Empty final component
-	test_processGS1data(ctx, true,  "#800302112345678900#10ABC123");		// Empty final component and following AI
-	test_processGS1data(ctx, true,  "#800302112345678900ABCDEFGHIJKLMNOP");		// Empty final component and following AI
-	test_processGS1data(ctx, false, "#800302112345678900ABCDEFGHIJKLMNOPQ");	// Empty final component and following AI
+	test_processAIdata(ctx, true,  "#800302112345678900ABC");			// N1 N13,csum X0..16; FNC1 required
+	test_processAIdata(ctx, false, "#800302112345678901ABC");			// Bad check digit on N13 component
+	test_processAIdata(ctx, true,  "#800302112345678900");				// Empty final component
+	test_processAIdata(ctx, true,  "#800302112345678900#10ABC123");			// Empty final component and following AI
+	test_processAIdata(ctx, true,  "#800302112345678900ABCDEFGHIJKLMNOP");		// Empty final component and following AI
+	test_processAIdata(ctx, false, "#800302112345678900ABCDEFGHIJKLMNOPQ");		// Empty final component and following AI
 
-	test_processGS1data(ctx, true,  "#7230121234567890123456789012345678");		// X2 X1..28; FNC1 required
-	test_processGS1data(ctx, false, "#72301212345678901234567890123456789");	// Too long
-	test_processGS1data(ctx, true,  "#7230123");					// Shortest
-	test_processGS1data(ctx, false, "#723012");					// Too short
+	test_processAIdata(ctx, true,  "#7230121234567890123456789012345678");		// X2 X1..28; FNC1 required
+	test_processAIdata(ctx, false, "#72301212345678901234567890123456789");		// Too long
+	test_processAIdata(ctx, true,  "#7230123");					// Shortest
+	test_processAIdata(ctx, false, "#723012");					// Too short
 
 	gs1_encoder_free(ctx);
 

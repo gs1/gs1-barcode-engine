@@ -573,15 +573,15 @@ GS1_ENCODERS_API bool gs1_encoder_setDataStr(gs1_encoder *ctx, char* dataStr) {
 	if ((cc = strchr(ctx->dataStr, '|')) != NULL)		// Composite symbol
 	{
 		*cc = '\0';					// Delimit end of linear component
-		if (*ctx->dataStr == '#' && !gs1_processGS1data(ctx, ctx->dataStr))
+		if (*ctx->dataStr == '#' && !gs1_processAIdata(ctx, ctx->dataStr))
 			goto fail;
 		ctx->aiData[ctx->numAIs++].aiEntry = NULL;	// Indicate separator in HRI
-		if (!gs1_processGS1data(ctx, cc + 1))
+		if (!gs1_processAIdata(ctx, cc + 1))
 			goto fail;
 		*cc = '|';					// Restore orginal "|"
 	}
 	else {							// Linear-only symbol
-		if (*ctx->dataStr == '#' && !gs1_processGS1data(ctx, ctx->dataStr))
+		if (*ctx->dataStr == '#' && !gs1_processAIdata(ctx, ctx->dataStr))
 			goto fail;
 	}
 
@@ -596,7 +596,7 @@ fail:
 }
 
 
-GS1_ENCODERS_API bool gs1_encoder_setGS1dataStr(gs1_encoder *ctx, char* gs1data) {
+GS1_ENCODERS_API bool gs1_encoder_setAIdataStr(gs1_encoder *ctx, char* gs1data) {
 
 	char *cc;
 
@@ -609,7 +609,7 @@ GS1_ENCODERS_API bool gs1_encoder_setGS1dataStr(gs1_encoder *ctx, char* gs1data)
 	if ((cc = strchr(gs1data, '|')) != NULL)		// Composite symbol
 	{
 		*cc = '\0';					// Delimit end of linear component
-		if (!gs1_parseGS1data(ctx, gs1data, ctx->dataStr)) {
+		if (!gs1_parseAIdata(ctx, gs1data, ctx->dataStr)) {
 			*ctx->dataStr = '\0';
 			ctx->numAIs = 0;
 			return false;
@@ -623,7 +623,7 @@ GS1_ENCODERS_API bool gs1_encoder_setGS1dataStr(gs1_encoder *ctx, char* gs1data)
 		}
 		strcat(ctx->dataStr, "|");
 		ctx->aiData[ctx->numAIs++].aiEntry = NULL;	// Indicate separator in HRI
-		if (!gs1_parseGS1data(ctx, cc+1, ctx->dataStr + strlen(ctx->dataStr))) {
+		if (!gs1_parseAIdata(ctx, cc+1, ctx->dataStr + strlen(ctx->dataStr))) {
 			*ctx->dataStr = '\0';
 			ctx->numAIs = 0;
 			return false;
@@ -631,7 +631,7 @@ GS1_ENCODERS_API bool gs1_encoder_setGS1dataStr(gs1_encoder *ctx, char* gs1data)
 		*cc = '|';					// Restore orginal "|"
 	}
 	else {							// Linear-only symbol
-		if (!gs1_parseGS1data(ctx, gs1data, ctx->dataStr)) {
+		if (!gs1_parseAIdata(ctx, gs1data, ctx->dataStr)) {
 			*ctx->dataStr = '\0';
 			ctx->numAIs = 0;
 			return false;
@@ -643,7 +643,7 @@ GS1_ENCODERS_API bool gs1_encoder_setGS1dataStr(gs1_encoder *ctx, char* gs1data)
 }
 
 
-GS1_ENCODERS_API char* gs1_encoder_getGS1dataStr(gs1_encoder *ctx) {
+GS1_ENCODERS_API char* gs1_encoder_getAIdataStr(gs1_encoder *ctx) {
 
 	int i, j;
 	struct aiValue ai;
@@ -1453,7 +1453,7 @@ void test_api_dataStr(void) {
 }
 
 
-void test_api_getGS1dataStr(void) {
+void test_api_getAIdataStr(void) {
 
 	gs1_encoder* ctx;
 	char *out;
@@ -1461,20 +1461,20 @@ void test_api_getGS1dataStr(void) {
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
 
 	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "#011231231231233310ABC123"));
-	TEST_ASSERT((out = gs1_encoder_getGS1dataStr(ctx)) != NULL);
+	TEST_ASSERT((out = gs1_encoder_getAIdataStr(ctx)) != NULL);
 	TEST_CHECK(strcmp(out, "(01)12312312312333(10)ABC123") == 0);
 
 	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "TESTING"));
-	TEST_CHECK((out = gs1_encoder_getGS1dataStr(ctx)) == NULL);
+	TEST_CHECK((out = gs1_encoder_getAIdataStr(ctx)) == NULL);
 
 	// Escape data "(" characters
 	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "#10ABC(123"));
-	TEST_ASSERT((out = gs1_encoder_getGS1dataStr(ctx)) != NULL);
+	TEST_ASSERT((out = gs1_encoder_getAIdataStr(ctx)) != NULL);
 	TEST_CHECK(strcmp(out, "(10)ABC\\(123") == 0);
 
 	// Composite strings
 	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "#011231231231233310ABC123|#99XYZ(TM)_CORP"));
-	TEST_ASSERT((out = gs1_encoder_getGS1dataStr(ctx)) != NULL);
+	TEST_ASSERT((out = gs1_encoder_getAIdataStr(ctx)) != NULL);
 	TEST_CHECK(strcmp(out, "(01)12312312312333(10)ABC123|(99)XYZ\\(TM)_CORP") == 0);
 
 	gs1_encoder_free(ctx);
