@@ -34,7 +34,7 @@
 
 
 // RSS14 Stacked row separator pattern routine
-static struct sPrints *separator14S(gs1_encoder *ctx, struct sPrints *prints) {
+static struct sPrints *separator14S(gs1_encoder *ctx, const struct sPrints *prints) {
 
 	int i, j, k, lNdx, rNdx, sNdx, lWidth, rWidth, matchWidth;
 	uint8_t *sepPattern = ctx->rss14_sepPattern;
@@ -139,7 +139,7 @@ static struct sPrints *separator14S(gs1_encoder *ctx, struct sPrints *prints) {
 
 
 // call with str = 14-digit primary
-static bool RSS14enc(gs1_encoder *ctx, uint8_t string[], uint8_t bars[], int ccFlag) {
+static bool RSS14enc(gs1_encoder *ctx, uint8_t string[], uint8_t bars[], const int ccFlag) {
 
 	// stores even elements N & max, odd N & max, even mul, combos
 	static const int tbl154[4*6] = {
@@ -368,7 +368,7 @@ static bool RSS14enc(gs1_encoder *ctx, uint8_t string[], uint8_t bars[], int ccF
 	return(true);
 }
 
-bool gs1_normaliseRSS14(gs1_encoder *ctx, char *dataStr, char *primaryStr) {
+bool gs1_normaliseRSS14(gs1_encoder *ctx, const char *dataStr, char *primaryStr) {
 
 	if (strlen(dataStr) >= 3 && strncmp(dataStr, "#01", 3) == 0)
 		dataStr += 3;
@@ -788,11 +788,11 @@ out:
 
 void test_rss14_RSS14_encode(void) {
 
-	char** expect;
+	const char** expect;
 
 	gs1_encoder* ctx = gs1_encoder_init(NULL);
 
-	expect = (char*[]){
+	expect = (const char*[]){
 " X X    X  X   XXX  XXXXX      X XXXX   X X  XX XX X  X XXXXX  X XXXXX     XXX XX XXXXX X XXXX X",
 " X X    X  X   XXX  XXXXX      X XXXX   X X  XX XX X  X XXXXX  X XXXXX     XXX XX XXXXX X XXXX X",
 " X X    X  X   XXX  XXXXX      X XXXX   X X  XX XX X  X XXXXX  X XXXXX     XXX XX XXXXX X XXXX X",
@@ -840,11 +840,11 @@ NULL
 
 void test_rss14_RSS14T_encode(void) {
 
-	char** expect;
+	const char** expect;
 
 	gs1_encoder* ctx = gs1_encoder_init(NULL);
 
-	expect = (char*[]){
+	expect = (const char*[]){
 " X X    X  X   XXX  XXXXX      X XXXX   X X  XX XX X  X XXXXX  X XXXXX     XXX XX XXXXX X XXXX X",
 " X X    X  X   XXX  XXXXX      X XXXX   X X  XX XX X  X XXXXX  X XXXXX     XXX XX XXXXX X XXXX X",
 " X X    X  X   XXX  XXXXX      X XXXX   X X  XX XX X  X XXXXX  X XXXXX     XXX XX XXXXX X XXXX X",
@@ -872,11 +872,11 @@ NULL
 
 void test_rss14_RSS14S_encode(void) {
 
-	char** expect;
+	const char** expect;
 
 	gs1_encoder* ctx = gs1_encoder_init(NULL);
 
-	expect = (char*[]){
+	expect = (const char*[]){
 " X X    X  X   XXX  XXXXX      X XXXX   X X  XX X ",
 " X X    X  X   XXX  XXXXX      X XXXX   X X  XX X ",
 " X X    X  X   XXX  XXXXX      X XXXX   X X  XX X ",
@@ -904,11 +904,11 @@ NULL
 
 void test_rss14_RSS14SO_encode(void) {
 
-	char** expect;
+	const char** expect;
 
 	gs1_encoder* ctx = gs1_encoder_init(NULL);
 
-	expect = (char*[]){
+	expect = (const char*[]){
 " X X    X  X   XXX  XXXXX      X XXXX   X X  XX X ",
 " X X    X  X   XXX  XXXXX      X XXXX   X X  XX X ",
 " X X    X  X   XXX  XXXXX      X XXXX   X X  XX X ",

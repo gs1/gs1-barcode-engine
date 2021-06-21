@@ -33,6 +33,6 @@
 struct sPrints;
 
 int *gs1_getRSSwidths(gs1_encoder *ctx, int val, int n, int elements, int maxWidth, int noNarrow);
-struct sPrints *gs1_cnvSeparator(gs1_encoder *ctx, struct sPrints *prints);
+struct sPrints *gs1_cnvSeparator(gs1_encoder *ctx, const struct sPrints *prints);
 
 #endif /* RSSUTIL_H */

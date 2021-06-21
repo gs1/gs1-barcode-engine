@@ -28,7 +28,7 @@
 #include "driver.h"
 
 
-static bool emitData(gs1_encoder *ctx, void *data, size_t len) {
+static bool emitData(gs1_encoder *ctx, const void *data, const size_t len) {
 
 	uint8_t *buf;
 
@@ -57,7 +57,7 @@ static bool emitData(gs1_encoder *ctx, void *data, size_t len) {
 }
 
 
-static void bmpHeader(gs1_encoder *ctx, long xdim, long ydim) {
+static void bmpHeader(gs1_encoder *ctx, const long xdim, const long ydim) {
 
 	uint8_t id[2] = {'B','M'};
 	struct b_hdr {
@@ -91,7 +91,7 @@ static void bmpHeader(gs1_encoder *ctx, long xdim, long ydim) {
 }
 
 
-static void tifHeader(gs1_encoder *ctx, long xdim, long ydim) {
+static void tifHeader(gs1_encoder *ctx, const long xdim, const long ydim) {
 
 	struct t_hdr {
 		uint8_t endian[2];
@@ -158,7 +158,7 @@ static void tifHeader(gs1_encoder *ctx, long xdim, long ydim) {
 }
 
 
-static void printElm(gs1_encoder *ctx, int width, int color, int *bits, int *ndx, uint8_t xorMsk) {
+static void printElm(gs1_encoder *ctx, const int width, const int color, int *bits, int *ndx, const uint8_t xorMsk) {
 
 	int i;
 	uint8_t *line = ctx->driver_line;
@@ -184,7 +184,7 @@ static void printElm(gs1_encoder *ctx, int width, int color, int *bits, int *ndx
 
 #define WHITE 0
 
-static void printElmnts(gs1_encoder *ctx, struct sPrints *prints) {
+static void printElmnts(gs1_encoder *ctx, const struct sPrints *prints) {
 
 	int i, bits, width, ndx, white;
 	uint8_t xorMsk;
@@ -301,7 +301,7 @@ static void printElmnts(gs1_encoder *ctx, struct sPrints *prints) {
 }
 
 
-bool gs1_doDriverInit(gs1_encoder *ctx, long xdim, long ydim) {
+bool gs1_doDriverInit(gs1_encoder *ctx, const long xdim, const long ydim) {
 
 	FILE* oFile;
 
@@ -343,7 +343,7 @@ bool gs1_doDriverInit(gs1_encoder *ctx, long xdim, long ydim) {
 }
 
 
-bool gs1_doDriverAddRow(gs1_encoder *ctx, struct sPrints *prints) {
+bool gs1_doDriverAddRow(gs1_encoder *ctx, const struct sPrints *prints) {
 
 	struct sPrints *row;
 

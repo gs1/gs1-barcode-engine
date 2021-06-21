@@ -638,9 +638,9 @@ static const struct aiEntry ai_table[] = {
  * an AI matching a prefix of the given data.
  *
  */
-static const struct aiEntry* lookupAIentry(char *p, size_t ailen) {
+static const struct aiEntry* lookupAIentry(const char *p, size_t ailen) {
 
-	int ai_table_len = sizeof(ai_table) / sizeof(ai_table[0]);
+	const int ai_table_len = sizeof(ai_table) / sizeof(ai_table[0]);
 	int i;
 	const struct aiEntry *entry;
 	size_t entrylen;
@@ -669,16 +669,16 @@ static const struct aiEntry* lookupAIentry(char *p, size_t ailen) {
  *  Validate string between start and end pointers according to rules for an AI
  *
  */
-static size_t validate_ai_val(gs1_encoder *ctx, const struct aiEntry *entry, char *start, char *end) {
+static size_t validate_ai_val(gs1_encoder *ctx, const struct aiEntry *entry, const char *start, const char *end) {
 
 	const struct aiComponent *part;
-	int parts_len = sizeof(ai_table[0].parts) / sizeof(ai_table[0].parts[0]);
-	int linters_len = sizeof(ai_table[0].parts[0].linters) / sizeof(ai_table[0].parts[0].linters[0]);
+	const int parts_len = sizeof(ai_table[0].parts) / sizeof(ai_table[0].parts[0]);
+	const int linters_len = sizeof(ai_table[0].parts[0].linters) / sizeof(ai_table[0].parts[0].linters[0]);
 	int i, j;
 	char compval[91];		// Maximum AI value length is 90
 	size_t complen;
 	linter_t linter;
-	char *p, *r;
+	const char *p, *r;
 
 	assert(ctx);
 	assert(entry);
@@ -749,16 +749,19 @@ static size_t validate_ai_val(gs1_encoder *ctx, const struct aiEntry *entry, cha
 } while (0)
 
 
-// Convert GS1 AI syntax data to regular data string with # = FNC1
-bool gs1_parseAIdata(gs1_encoder *ctx, char *aiData, char *dataStr) {
+/*
+ * Convert bracketed AI syntax data to regular AI data string with # = FNC1
+ *
+ */
+bool gs1_parseAIdata(gs1_encoder *ctx, const char *aiData, char *dataStr) {
 
-	char *p;
-	char *r, *outval;
+	const char *p, *r;
+	char *outval;
 	int i;
 	size_t minlen, maxlen;
 	bool fnc1req = true;
 	const struct aiEntry *entry;
-	int parts_len = sizeof(ai_table[0].parts) / sizeof(ai_table[0].parts[0]);
+	const int parts_len = sizeof(ai_table[0].parts) / sizeof(ai_table[0].parts[0]);
 
 	assert(ctx);
 	assert(aiData);
@@ -853,9 +856,9 @@ fail:
 }
 
 
-bool gs1_processAIdata(gs1_encoder *ctx, char *dataStr) {
+bool gs1_processAIdata(gs1_encoder *ctx, const char *dataStr) {
 
-	char *p, *r;
+	const char *p, *r;
 	size_t vallen;
 	const struct aiEntry *entry;
 
@@ -954,7 +957,7 @@ bool gs1_validateParity(uint8_t *str) {
 }
 
 
-bool gs1_allDigits(uint8_t *str) {
+bool gs1_allDigits(const uint8_t *str) {
 
 	assert(str);
 
@@ -1017,7 +1020,7 @@ static void test_parseAIdata(gs1_encoder *ctx, bool should_succeed, char *aiData
 
 
 /*
- *  Convert a human-readable AI string to plain format
+ *  Convert a bracketed AI string to a regular AI string "#..."
  *
  */
 void test_gs1_parseAIdata(void) {

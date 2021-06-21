@@ -28,7 +28,7 @@
 #if PRNT
 
 
-void do_debug_print_cws(char *prefix, uint8_t* cws, uint16_t cwslen) {
+void do_debug_print_cws(const char *prefix, const uint8_t* cws, const uint16_t cwslen) {
 
 	int i;
 
@@ -40,7 +40,7 @@ void do_debug_print_cws(char *prefix, uint8_t* cws, uint16_t cwslen) {
 }
 
 
-void do_debug_print_bits(char *prefix, uint8_t *bits, int numbits) {
+void do_debug_print_bits(const char *prefix, const uint8_t *bits, const int numbits) {
 
 	int i;
 
@@ -53,7 +53,7 @@ void do_debug_print_bits(char *prefix, uint8_t *bits, int numbits) {
 }
 
 
-void do_debug_print_matrix(char* prefix, uint8_t *mtx, int c, int r) {
+void do_debug_print_matrix(const char* prefix, const uint8_t *mtx, const int c, const int r) {
 
 	int x, y;
 	int bw = (c-1)/8+1;
@@ -70,7 +70,7 @@ void do_debug_print_matrix(char* prefix, uint8_t *mtx, int c, int r) {
 }
 
 
-void do_debug_print_pattern_lengths(char* prefix, struct patternLength *pats, int rows) {
+void do_debug_print_pattern_lengths(const char* prefix, const struct patternLength *pats, const int rows) {
 
 	int i, j;
 
@@ -87,7 +87,7 @@ void do_debug_print_pattern_lengths(char* prefix, struct patternLength *pats, in
 }
 
 
-void do_debug_print_pattern(char *prefix, uint8_t* pattern, int elements) {
+void do_debug_print_pattern(const char *prefix, const uint8_t* pattern, const int elements) {
 
 	int i;
 
@@ -100,7 +100,7 @@ void do_debug_print_pattern(char *prefix, uint8_t* pattern, int elements) {
 }
 
 
-void do_debug_print_patterns(char *prefix, uint8_t* patterns, int elements, int rows) {
+void do_debug_print_patterns(const char *prefix, const uint8_t* patterns, const int elements, const int rows) {
 
 	int i, j;
 

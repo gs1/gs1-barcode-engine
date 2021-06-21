@@ -53,22 +53,22 @@ struct aiEntry {
 	char *ai;
 	bool fnc1;
 	struct aiComponent parts[5];
-	char *title;
+	const char *title;
 };
 
 struct aiValue {
 	const struct aiEntry *aiEntry;
-	char *value;
+	const char *value;
 	uint8_t vallen;
 };
 
 
 #include "gs1encoders.h"
 
-bool gs1_parseAIdata(gs1_encoder *ctx, char *aiData, char *dataStr);
-bool gs1_processAIdata(gs1_encoder *ctx, char *dataStr);
+bool gs1_parseAIdata(gs1_encoder *ctx, const char *aiData, char *dataStr);
+bool gs1_processAIdata(gs1_encoder *ctx, const char *dataStr);
 bool gs1_validateParity(uint8_t *str);
-bool gs1_allDigits(uint8_t *str);
+bool gs1_allDigits(const uint8_t *str);
 
 
 #ifdef UNIT_TESTS

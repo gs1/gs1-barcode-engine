@@ -62,12 +62,12 @@ struct patternLength;
 } while (0)
 
 
-void do_debug_print_cws(char *prefix, uint8_t *cws, uint16_t cwslen);
-void do_debug_print_bits(char* prefix, uint8_t *bits, int numbits);
-void do_debug_print_matrix(char* prefix, uint8_t *mtx, int c, int r);
-void do_debug_print_pattern_lengths(char *prefix, struct patternLength *pats, int rows);
-void do_debug_print_pattern(char *prefix, uint8_t* pattern, int elements);
-void do_debug_print_patterns(char *prefix, uint8_t* patterns, int elements, int rows);
+void do_debug_print_cws(const char *prefix, const uint8_t *cws, uint16_t cwslen);
+void do_debug_print_bits(const char *prefix, const uint8_t *bits, int numbits);
+void do_debug_print_matrix(const char *prefix, const uint8_t *mtx, int c, int r);
+void do_debug_print_pattern_lengths(const char *prefix, const struct patternLength *pats, int rows);
+void do_debug_print_pattern(const char *prefix, const uint8_t* pattern, int elements);
+void do_debug_print_patterns(const char *prefix, const uint8_t* patterns, int elements, int rows);
 
 
 #else

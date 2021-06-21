@@ -32,7 +32,7 @@
 #include "enc-private.h"
 #include "gs1encoders.h"
 
-bool gs1_normaliseRSSLim(gs1_encoder *ctx, char *dataStr, char *primaryStr);
+bool gs1_normaliseRSSLim(gs1_encoder *ctx, const char *dataStr, char *primaryStr);
 void gs1_RSSLim(gs1_encoder *ctx);
 
 

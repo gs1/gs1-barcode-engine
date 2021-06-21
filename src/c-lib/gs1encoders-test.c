@@ -58,14 +58,14 @@
 #include "ucc128.h"
 
 
-void test_print_codewords(uint8_t *cws, int numcws) {
+void test_print_codewords(const uint8_t *cws, const int numcws) {
 	int i;
 	for (i=0; i < numcws; i++)
 		printf("%d ", cws[i]);
 	printf("\n");
 }
 
-void test_print_bits(uint8_t *bytes, int numbits) {
+void test_print_bits(const uint8_t *bytes, const int numbits) {
 	int i;
 	for (i=0; i < numbits; i++)
 		printf("%d", bytes[i/8] >> (7-i%8) & 1);
@@ -94,10 +94,10 @@ void test_print_strings(gs1_encoder *ctx) {
 }
 
 
-bool test_encode(gs1_encoder *ctx, bool should_succeed, int sym, char* dataStr, char** expect) {
+bool test_encode(gs1_encoder *ctx, const bool should_succeed, const int sym, const char* dataStr, const char** expect) {
 
 	char **strings;
-	char *tail;
+	const char *tail;
 	int i = 0;
 
 	TEST_CHECK(gs1_encoder_setFormat(ctx, gs1_encoder_dRAW));

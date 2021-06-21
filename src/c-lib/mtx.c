@@ -23,7 +23,7 @@
 #include "mtx.h"
 
 
-void gs1_mtxPutModule(uint8_t *mtx, int cols, int x, int y, uint8_t bit) {
+void gs1_mtxPutModule(uint8_t *mtx, const int cols, const int x, const int y, const uint8_t bit) {
 
 	int p = ((cols-1)/8+1)*y + x/8;
 
@@ -37,7 +37,7 @@ void gs1_mtxPutModule(uint8_t *mtx, int cols, int x, int y, uint8_t bit) {
 }
 
 
-uint8_t gs1_mtxGetModule(uint8_t *mtx, int cols, int x, int y) {
+uint8_t gs1_mtxGetModule(const uint8_t *mtx, const int cols, const int x, const int y) {
 
 	int p = ((cols-1)/8+1)*y + x/8;
 
@@ -47,7 +47,7 @@ uint8_t gs1_mtxGetModule(uint8_t *mtx, int cols, int x, int y) {
 
 
 // Runlength encode the matrix to a set of patterns
-void gs1_mtxToPatterns(uint8_t* mtx, int cols, int rows, struct patternLength *pats) {
+void gs1_mtxToPatterns(const uint8_t* mtx, const int cols, const int rows, struct patternLength *pats) {
 
 	uint8_t r, c, patPos, last;
 

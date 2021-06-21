@@ -23,10 +23,10 @@
 
 #include <stdint.h>
 
-void test_print_codewords(uint8_t *cws, int numcws);
-void test_print_bits(uint8_t *bytes, int numbits);
+void test_print_codewords(const uint8_t *cws, int numcws);
+void test_print_bits(const uint8_t *bytes, int numbits);
 void test_print_strings(gs1_encoder *ctx);
-bool test_encode(gs1_encoder *ctx, bool should_succeed, int sym, char* dataStr, char** expect);
+bool test_encode(gs1_encoder *ctx, bool should_succeed, int sym, const char* dataStr, const char** expect);
 
 
 #endif  /* GS1_ENCODERS_TEST_H */

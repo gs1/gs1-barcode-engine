@@ -30,7 +30,7 @@
  *		Combinations = n! /( n-r! * r!)
  *
  */
-static int combins(int n, int r) {
+static int combins(const int n, const int r) {
 
 	int i, j;
 	int maxDenom, minDenom;
@@ -72,7 +72,7 @@ static int combins(int n, int r) {
 * Return:
 * int widths[] = element widths
 ************************************************************************/
-int *gs1_getRSSwidths(gs1_encoder *ctx, int val, int n, int elements, int maxWidth, int noNarrow)
+int *gs1_getRSSwidths(gs1_encoder *ctx, int val, int n, const int elements, const int maxWidth, const int noNarrow)
 {
 	int *widths = ctx->rss_util_widths;
 	int bar;
@@ -124,7 +124,7 @@ int *gs1_getRSSwidths(gs1_encoder *ctx, int val, int n, int elements, int maxWid
 
 
 // copies pattern for separator adding 9 narrow elements inside each finder
-struct sPrints *gs1_cnvSeparator(gs1_encoder *ctx, struct sPrints *prints)
+struct sPrints *gs1_cnvSeparator(gs1_encoder *ctx, const struct sPrints *prints)
 {
 	int i, j, k;
 	uint8_t *sepPattern = ctx->rssutil_sepPattern;

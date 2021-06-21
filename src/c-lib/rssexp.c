@@ -32,7 +32,7 @@
 #include "rssutil.h"
 
 // gets the next 12 bit sym char from bit string
-static int getVal12(uint8_t bitString[], int symNdx) {
+static int getVal12(const uint8_t bitString[], const int symNdx) {
 	int val, ndx;
 
 	ndx = symNdx*3/2; // index into bitString
@@ -51,7 +51,7 @@ static int getVal12(uint8_t bitString[], int symNdx) {
 
 
 // looks for '^' (symbol separator) in string and returns char index iff found
-static int isSymbolSepatator(uint8_t string[]) {
+static int isSymbolSepatator(const uint8_t string[]) {
 	int i;
 
 	for (i = 0; i < (int)strlen((char*)string); i++) {
@@ -71,8 +71,8 @@ static int isSymbolSepatator(uint8_t string[]) {
 // and a symbol char value. Updates the parity *weight. Will fill in
 // the array forward or reverse order for odd or even characters.
 // Returns the updated parity.
-static int symCharPat(gs1_encoder *ctx, uint8_t bars[], int symValue, int parity, int weight,
-							 int forwardFlag) {
+static int symCharPat(gs1_encoder *ctx, uint8_t bars[], int symValue, int parity, const int weight,
+							 const int forwardFlag) {
 
 	// odd elements N & max, even N & max, odd mul, combos:
 	static const int tbl174[5*6] = {
@@ -142,7 +142,7 @@ static int symCharPat(gs1_encoder *ctx, uint8_t bars[], int symValue, int parity
 #define FINDER_SIZE 6
 
 // convert AI string to bar widths in dbl segments
-static int RSS14Eenc(gs1_encoder *ctx, uint8_t string[], uint8_t bars[RSSEXP_MAX_DBL_SEGS][RSSEXP_ELMNTS], int ccFlag) {
+static int RSS14Eenc(gs1_encoder *ctx, uint8_t string[], uint8_t bars[RSSEXP_MAX_DBL_SEGS][RSSEXP_ELMNTS], const int ccFlag) {
 
 	static const uint8_t finders[FINDER_SIZE][3] = {
 		{ 1,8,4 },
@@ -469,11 +469,11 @@ out:
 
 void test_rssexp_RSSEXP_encode(void) {
 
-	char** expect;
+	const char** expect;
 
 	gs1_encoder* ctx = gs1_encoder_init(NULL);
 
-	expect = (char*[]){
+	expect = (const char*[]){
 " X X   X   XXXX   X XXXXXXXX    X X XXX     XX   X XXX   XX   X  XX X XXXX      XXX  X XXX   XXX XXX XXXX X XXXX   XX   XXXXXX    X X   X  X      XX X ",
 " X X   X   XXXX   X XXXXXXXX    X X XXX     XX   X XXX   XX   X  XX X XXXX      XXX  X XXX   XXX XXX XXXX X XXXX   XX   XXXXXX    X X   X  X      XX X ",
 " X X   X   XXXX   X XXXXXXXX    X X XXX     XX   X XXX   XX   X  XX X XXXX      XXX  X XXX   XXX XXX XXXX X XXXX   XX   XXXXXX    X X   X  X      XX X ",
@@ -513,7 +513,7 @@ NULL
 	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sDataBarExpanded, "#01950123456789033103000123", expect));
 
 	gs1_encoder_setDataBarExpandedSegmentsWidth(ctx, 4);
-	expect = (char*[]){
+	expect = (const char*[]){
 " X X   X   XXXX   X XXXXXXXX    X X XXX     XX   X XXX   XX   X  XX X XXXX      XXX  X XXX   XXX XXX X",
 " X X   X   XXXX   X XXXXXXXX    X X XXX     XX   X XXX   XX   X  XX X XXXX      XXX  X XXX   XXX XXX X",
 " X X   X   XXXX   X XXXXXXXX    X X XXX     XX   X XXX   XX   X  XX X XXXX      XXX  X XXX   XXX XXX X",

@@ -235,41 +235,41 @@ static const uint8_t rsalog[256] = {
 
 
 // Mask functions
-static inline uint8_t mask1(uint8_t i, uint8_t j) {
+static inline uint8_t mask1(const uint8_t i, const uint8_t j) {
 	return (uint8_t)((i+j)%2 == 0);
 }
 
-static inline uint8_t mask2(uint8_t i, uint8_t j) {
+static inline uint8_t mask2(const uint8_t i, const uint8_t j) {
 	(void)i;
 	return (uint8_t)(j%2 == 0);
 }
 
-static inline uint8_t mask3(uint8_t i, uint8_t j) {
+static inline uint8_t mask3(const uint8_t i, const uint8_t j) {
 	(void)j;
 	return (uint8_t)(i%3 == 0);
 }
 
-static inline uint8_t mask4(uint8_t i, uint8_t j) {
+static inline uint8_t mask4(const uint8_t i, const uint8_t j) {
 	return (uint8_t)((i+j)%3 == 0);
 }
 
-static inline uint8_t mask5(uint8_t i, uint8_t j) {
+static inline uint8_t mask5(const uint8_t i, const uint8_t j) {
 	return (uint8_t)((j/2+i/3)%2 == 0);
 }
 
-static inline uint8_t mask6(uint8_t i, uint8_t j) {
+static inline uint8_t mask6(const uint8_t i, const uint8_t j) {
 	return (uint8_t)((i*j)%2+(i*j)%3 == 0);
 }
 
-static inline uint8_t mask7(uint8_t i, uint8_t j) {
+static inline uint8_t mask7(const uint8_t i, const uint8_t j) {
 	return (uint8_t)(((i*j)%2+(i*j)%3)%2 == 0);
 }
 
-static inline uint8_t mask8(uint8_t i, uint8_t j) {
+static inline uint8_t mask8(const uint8_t i, const uint8_t j) {
 	return (uint8_t)(((i*j)%3+(i+j)%2)%2 == 0);
 }
 
-static uint8_t (*const maskfun[8]) (uint8_t x, uint8_t y) = {
+static uint8_t (*const maskfun[8]) (const uint8_t x, const uint8_t y) = {
 	mask1, mask2, mask3, mask4, mask5, mask6, mask7, mask8
 };
 
@@ -299,7 +299,7 @@ static uint8_t (*const maskfun[8]) (uint8_t x, uint8_t y) = {
 
 
 // Place alignment pattern at a coordinate and mark as a fixture module
-static void doPutAlign(uint8_t *mtx, uint8_t *fix, const struct metric *m, int x, int y) {
+static void doPutAlign(uint8_t *mtx, uint8_t *fix, const struct metric *m, const int x, const int y) {
 
 	int i, j;
 
@@ -311,13 +311,13 @@ static void doPutAlign(uint8_t *mtx, uint8_t *fix, const struct metric *m, int x
 
 
 // Reed Solomon product in GF(256)
-static inline uint8_t rsProd(uint8_t a, uint8_t b) {
+static inline uint8_t rsProd(const uint8_t a, const uint8_t b) {
 	return a && b ? rsalog[ (rslog[a] + rslog[b]) % 255 ] : 0;
 }
 
 
 // Generate Reed Solomon coefficients using a generator 2
-static void rsGenerateCoeffs(int size, uint8_t *coeffs) {
+static void rsGenerateCoeffs(const int size, uint8_t *coeffs) {
 
 	int i, j;
 
@@ -333,7 +333,7 @@ static void rsGenerateCoeffs(int size, uint8_t *coeffs) {
 
 
 // Perform Reed Solomon ECC codeword calculation
-static void rsEncode(uint8_t* datcws, int datlen, uint8_t* ecccws, int ecclen, uint8_t* coeffs) {
+static void rsEncode(const uint8_t* datcws, const int datlen, uint8_t* ecccws, const int ecclen, const uint8_t* coeffs) {
 
 	int i, j;
 	uint8_t tmp[MAX_QR_DAT_CWS_PER_BLK + MAX_QR_ECC_CWS_PER_BLK] = { 0 };
@@ -403,8 +403,8 @@ static void plotFixtures(uint8_t *mtx, uint8_t *fix, const struct metric *m) {
 
 
 // Apply a mask function to the non-fixture modules of a matrix
-static void applyMask(uint8_t *dest, uint8_t *src,
-		      uint8_t (*maskfun)(uint8_t x, uint8_t y), uint8_t *fix, const struct metric *m) {
+static void applyMask(uint8_t *dest, const uint8_t *src,
+		      uint8_t (*maskfun)(const uint8_t x, const uint8_t y), const uint8_t *fix, const struct metric *m) {
 
 	int i, j;
 
@@ -427,9 +427,9 @@ static void applyMask(uint8_t *dest, uint8_t *src,
  *  of a row or columns starting with a dark module.
  *
  */
-static int evaln1n3(uint8_t *rle) {
+static int evaln1n3(const uint8_t *rle) {
 
-	uint8_t *s = rle;
+	const uint8_t *s = rle;
 	int n1 = 0, n3 = 0;
 	int i, len;
 
@@ -457,7 +457,7 @@ static int evaln1n3(uint8_t *rle) {
 
 
 // Evaluate a mask returning its total score
-static uint32_t evalMask(uint8_t *mtx, const struct metric *m) {
+static uint32_t evalMask(const uint8_t *mtx, const struct metric *m) {
 
 	int i, j, k, p;
 	uint8_t size = m->size;
@@ -532,7 +532,7 @@ static uint32_t evalMask(uint8_t *mtx, const struct metric *m) {
 
 
 // Append bits to a byte-encoded sequence
-static void addBits(uint8_t bitField[], uint16_t* bitPos, int length, uint16_t bits, int max_length, bool truncate) {
+static void addBits(uint8_t bitField[], uint16_t* bitPos, int length, uint16_t bits, const int max_length, const bool truncate) {
 	int i;
 
 	if (length == 0 || *bitPos == UINT16_MAX)
@@ -566,11 +566,11 @@ static void addBits(uint8_t bitField[], uint16_t* bitPos, int length, uint16_t b
 
 
 // Generate the bitstream that represents the data message as a sequence of 8-bit codewords and length
-static void createCodewords(gs1_encoder *ctx, uint8_t *str, uint8_t cws_v[3][MAX_QR_CWS], uint16_t bits_v[3]) {
+static void createCodewords(gs1_encoder *ctx, const uint8_t *str, uint8_t cws_v[3][MAX_QR_CWS], uint16_t bits_v[3]) {
 
 	int i;
 	bool gs1Mode = false;
-	uint8_t *p;
+	const uint8_t *p;
 
 	(void) ctx;		// Silence compiler
 
@@ -622,7 +622,7 @@ static void createCodewords(gs1_encoder *ctx, uint8_t *str, uint8_t cws_v[3][MAX
 
 
 // Select a symbol version that is sufficent to hold the encoded bitstream
-static const struct metric* selectVersion(gs1_encoder *ctx, uint16_t bits_v[3]) {
+static const struct metric* selectVersion(gs1_encoder *ctx, const uint16_t bits_v[3]) {
 
 	const struct metric *m = NULL;
 	int vers, ncws, ecws, dcws, dmod;
@@ -722,7 +722,7 @@ static void finaliseCodewords(gs1_encoder *ctx, uint8_t *cws, uint16_t *bits, co
 
 
 // Create a symbol that holds the given bitstream
-static void createMatrix(gs1_encoder *ctx, uint8_t *mtx, uint8_t *cws, const struct metric *m) {
+static void createMatrix(gs1_encoder *ctx, uint8_t *mtx, const uint8_t *cws, const struct metric *m) {
 
 	uint8_t fix[MAX_QR_BYTES] = { 0 };	// Matrix in which 1 indicates fixed pattern
 	uint8_t msk[MAX_QR_BYTES];		// Matrix used for mask evaluation
@@ -807,7 +807,7 @@ static void createMatrix(gs1_encoder *ctx, uint8_t *mtx, uint8_t *cws, const str
 }
 
 
-static int QRenc(gs1_encoder *ctx, uint8_t string[], struct patternLength *pats) {
+static int QRenc(gs1_encoder *ctx, const uint8_t string[], struct patternLength *pats) {
 
 	uint8_t mtx[MAX_QR_BYTES] = { 0 };
 	uint8_t cws_v[3][MAX_QR_CWS] = { 0 };	// vergrp specific encodings
@@ -980,11 +980,11 @@ void test_qr_QR_versions(void) {
 
 void test_qr_QR_encode(void) {
 
-	char** expect;
+	const char** expect;
 
 	gs1_encoder* ctx = gs1_encoder_init(NULL);
 
-	expect = (char*[]){
+	expect = (const char*[]){
 "                             ",
 "                             ",
 "                             ",
@@ -1018,7 +1018,7 @@ NULL
 	};
 	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sQR, "ABC123", expect));
 
-	expect = (char*[]){
+	expect = (const char*[]){
 "                                     ",
 "                                     ",
 "                                     ",

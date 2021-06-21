@@ -58,7 +58,7 @@ int gs1_CC3enc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][C
 int gs1_CC4enc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][CCB4_ELMNTS]);
 bool gs1_CCCenc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[]);
 
-int gs1_check2DData(uint8_t dataStr[]);
+int gs1_check2DData(const uint8_t dataStr[]);
 int gs1_pack(gs1_encoder *ctx, uint8_t str[], uint8_t bitField[]);
 void gs1_putBits(gs1_encoder *ctx, uint8_t bitField[], int bitPos, int length, uint16_t bits);
 

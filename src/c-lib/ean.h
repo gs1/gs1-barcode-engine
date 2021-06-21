@@ -25,9 +25,9 @@
 
 #include "gs1encoders.h"
 
-bool gs1_normaliseEAN13(gs1_encoder *ctx, char *dataStr, char *primaryStr);
-bool gs1_normaliseEAN8(gs1_encoder *ctx, char *dataStr, char *primaryStr);
-bool gs1_normaliseUPCE(gs1_encoder *ctx, char *dataStr, char *primaryStr);
+bool gs1_normaliseEAN13(gs1_encoder *ctx, const char *dataStr, char *primaryStr);
+bool gs1_normaliseEAN8(gs1_encoder *ctx, const char *dataStr, char *primaryStr);
+bool gs1_normaliseUPCE(gs1_encoder *ctx, const char *dataStr, char *primaryStr);
 void gs1_EAN13(gs1_encoder *ctx);
 void gs1_EAN8(gs1_encoder *ctx);
 void gs1_UPCE(gs1_encoder *ctx);

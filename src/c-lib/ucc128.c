@@ -45,7 +45,7 @@
  * return:    none
  *
  */
-static void tbl128(int symchr[], uint8_t bars[])
+static void tbl128(const int symchr[], uint8_t bars[])
 {
 
 	/* octal of 1st 5 elements in symbol char */
@@ -122,9 +122,9 @@ static void tbl128(int symchr[], uint8_t bars[])
  * code    *int     starting code: A,B,C = 0,1,2
  *
  */
-static void cda128(uint8_t data[], int *di, int symchr[], int *si, int *code)
+static void cda128(const uint8_t data[], int *di, int symchr[], int *si, int *code)
 {
-	int   c, i;
+	int c, i;
 
 	c = data[*di];
 
@@ -170,9 +170,9 @@ static void cda128(uint8_t data[], int *di, int symchr[], int *si, int *code)
  * code    *int     starting code: A,B,C = 0,1,2
  *
  */
-static void cdb128(uint8_t data[], int *di, int symchr[], int *si, int *code)
+static void cdb128(const uint8_t data[], int *di, int symchr[], int *si, int *code)
 {
-	int   c, i;
+	int c, i;
 
 	c = data[*di];
 
@@ -216,7 +216,7 @@ static void cdb128(uint8_t data[], int *di, int symchr[], int *si, int *code)
  * code    *int     starting code: A,B,C = 0,1,2
  *
  */
-static void cdc128(uint8_t data[], int *di, int symchr[], int *si, int *code)
+static void cdc128(const uint8_t data[], int *di, int symchr[], int *si, int *code)
 {
 	int c, i;
 
@@ -274,7 +274,7 @@ static void cdc128(uint8_t data[], int *di, int symchr[], int *si, int *code)
  * Function Return:    number of symbol characters
  *
  */
-static int enc128(uint8_t data[], uint8_t bars[], int link)
+static int enc128(uint8_t data[], uint8_t bars[], const int link)
 {
 	/* convert ASCII data[] into symchr[] values */
 
@@ -514,7 +514,7 @@ void gs1_U128C(gs1_encoder *ctx) {
 		return;
 	}
 
-	primaryStr[0] = '\0';	
+	primaryStr[0] = '\0';
 	strcat(primaryStr, ctx->dataStr);
 
 	if ((symChars = enc128((uint8_t*)primaryStr, linPattern, (ccFlag) ? 2 : 0)) <= 0) goto out;
@@ -607,11 +607,11 @@ out:
 
 void test_ucc_UCC128A_encode(void) {
 
-	char** expect;
+	const char** expect;
 
 	gs1_encoder* ctx = gs1_encoder_init(NULL);
 
-	expect = (char*[]){
+	expect = (const char*[]){
 "                                          XX XX XXX XXX  XX XXX XXXX X   X X     X    X  XXX X  XX  XX    XX  XX XXXX  XXXX  X X  XX XX   X X                                              ",
 "                                          XX XX XXX XXX  XX XXX XXXX X   X X     X    X  XXX X  XX  XX    XX  XX XXXX  XXXX  X X  XX XX   X X                                              ",
 "                                          XX XX XX  XXXX XX  XX   X  XXX X XXXX   XXX X  XX  X  X XXXXX  X   XXX XXXXX X   XX XXX XX  X   X X                                              ",
@@ -655,11 +655,11 @@ NULL
 
 void test_ucc_UCC128C_encode(void) {
 
-	char** expect;
+	const char** expect;
 
 	gs1_encoder* ctx = gs1_encoder_init(NULL);
 
-	expect = (char*[]){
+	expect = (const char*[]){
 "   XXXXXXXX X X X   XXXX X X XXXX    XX X XXX XXXX    XXX XXXXX XXX X  X     X    X   X XXXX X XX  XXXXX XXX X  X   XXX   X   X   XX    XX XXXXX X X  XXXXX XXXXXXX X   X X  X             ",
 "   XXXXXXXX X X X   XXXX X X XXXX    XX X XXX XXXX    XXX XXXXX XXX X  X     X    X   X XXXX X XX  XXXXX XXX X  X   XXX   X   X   XX    XX XXXXX X X  XXXXX XXXXXXX X   X X  X             ",
 "   XXXXXXXX X X X   XXXX X X XXXX    XX X XXX XXXX    XXX XXXXX XXX X  X     X    X   X XXXX X XX  XXXXX XXX X  X   XXX   X   X   XX    XX XXXXX X X  XXXXX XXXXXXX X   X X  X             ",

@@ -37,7 +37,7 @@
 #include "enc-private.h"
 #include "gs1encoders.h"
 
-bool gs1_normaliseRSS14(gs1_encoder *ctx, char *dataStr, char *primaryStr);
+bool gs1_normaliseRSS14(gs1_encoder *ctx, const char *dataStr, char *primaryStr);
 void gs1_RSS14(gs1_encoder *ctx);
 void gs1_RSS14S(gs1_encoder *ctx);
 void gs1_RSS14SO(gs1_encoder *ctx);

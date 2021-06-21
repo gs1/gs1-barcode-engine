@@ -924,7 +924,7 @@ GS1_ENCODERS_API char* gs1_encoder_getDataStr(gs1_encoder *ctx);
  * @param [in] dataStr containing the raw barcode data
  * @return true on success, otherwise false and an error message is set that can be read using gs1_encoder_getErrMsg()
  */
-GS1_ENCODERS_API bool gs1_encoder_setDataStr(gs1_encoder *ctx, char* dataStr);
+GS1_ENCODERS_API bool gs1_encoder_setDataStr(gs1_encoder *ctx, const char *dataStr);
 
 
 /**
@@ -977,7 +977,7 @@ GS1_ENCODERS_API bool gs1_encoder_setDataStr(gs1_encoder *ctx, char* dataStr);
  * @param [in] dataStr the barcode input data in GS1 Application Identifier syntax
  * @return true on success, otherwise false and an error message is set
  */
-GS1_ENCODERS_API bool gs1_encoder_setAIdataStr(gs1_encoder *ctx, char* dataStr);
+GS1_ENCODERS_API bool gs1_encoder_setAIdataStr(gs1_encoder *ctx, const char *dataStr);
 
 
 /**
@@ -1063,7 +1063,7 @@ GS1_ENCODERS_API char* gs1_encoder_getAIdataStr(gs1_encoder *ctx);
  * @param [in] scanData the scan data input as read by a reader with AIM symbology identifiers enabled
  * @return true on success, otherwise false and an error message is set
  */
-GS1_ENCODERS_API bool gs1_encoder_setScanData(gs1_encoder* ctx, char *scanData);
+GS1_ENCODERS_API bool gs1_encoder_setScanData(gs1_encoder* ctx, const char *scanData);
 
 
 /**
@@ -1157,7 +1157,7 @@ GS1_ENCODERS_API char* gs1_encoder_getScanData(gs1_encoder* ctx);
  * @param [out] hri Pointer to an array of HRI strings
  * @return the number of HRI strings
  */
-GS1_ENCODERS_API int gs1_encoder_getHRI(gs1_encoder* ctx, char*** hri);
+GS1_ENCODERS_API int gs1_encoder_getHRI(gs1_encoder* ctx, char ***hri);
 
 /**
  * @brief Gets the filename for a file containing the barcode data when file
@@ -1192,7 +1192,7 @@ GS1_ENCODERS_API char* gs1_encoder_getDataFile(gs1_encoder *ctx);
  * @param [in] dataFile the data input filename
  * @return true on success, otherwise false and an error message is set
  */
-GS1_ENCODERS_API bool gs1_encoder_setDataFile(gs1_encoder *ctx, char* dataFile);
+GS1_ENCODERS_API bool gs1_encoder_setDataFile(gs1_encoder *ctx, const char *dataFile);
 
 
 /**
@@ -1264,7 +1264,7 @@ GS1_ENCODERS_API char* gs1_encoder_getOutFile(gs1_encoder *ctx);
  * @param [in] outFile the output filename, or "" for buffer output
  * @return true on success, otherwise false and an error message is set
  */
-GS1_ENCODERS_API bool gs1_encoder_setOutFile(gs1_encoder *ctx, char* outFile);
+GS1_ENCODERS_API bool gs1_encoder_setOutFile(gs1_encoder *ctx, const char *outFile);
 
 
 /**
@@ -1305,7 +1305,7 @@ GS1_ENCODERS_API bool gs1_encoder_encode(gs1_encoder *ctx);
  * @param [out] buffer a pointer to the buffer
  * @return length of the buffer
  */
-GS1_ENCODERS_API size_t gs1_encoder_getBuffer(gs1_encoder *ctx, void** buffer);
+GS1_ENCODERS_API size_t gs1_encoder_getBuffer(gs1_encoder *ctx, void **buffer);
 
 
 /**
@@ -1381,7 +1381,7 @@ GS1_ENCODERS_API int gs1_encoder_getBufferHeight(gs1_encoder *ctx);
  * @param [out] strings the value of the given pointer is rewritten to point to an array of strings
  * @return the number of rows in the returned array of strings
  */
-GS1_ENCODERS_API size_t gs1_encoder_getBufferStrings(gs1_encoder *ctx, char*** strings);
+GS1_ENCODERS_API size_t gs1_encoder_getBufferStrings(gs1_encoder *ctx, char ***strings);
 
 
 /**

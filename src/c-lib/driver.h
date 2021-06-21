@@ -49,7 +49,7 @@ struct sPrints;
 } while(0)
 
 bool gs1_doDriverInit(gs1_encoder *ctx, long xdim, long ydim);
-bool gs1_doDriverAddRow(gs1_encoder *ctx, struct sPrints *prints);
+bool gs1_doDriverAddRow(gs1_encoder *ctx, const struct sPrints *prints);
 bool gs1_doDriverFinalise(gs1_encoder *ctx);
 
 #endif /* UTIL_H */

@@ -522,12 +522,12 @@ static const int gfPwr[928] = { 1,3,9,27,81,243,729,329,58,174,522,637,53,159,47
 #define max(X,Y) (((X) > (Y)) ? (X) : (Y))
 
 
-static int gfMul(int a,int b) {
+static int gfMul(const int a, const int b) {
 	if ((a == 0) || (b == 0)) return(0);
 	return(gfPwr[(gfLog[a] + gfLog[b]) % 928]);
 }
 
-static void genPoly(gs1_encoder *ctx, int eccSize) {
+static void genPoly(gs1_encoder *ctx, const int eccSize) {
 	int i, j;
 	int *gpa = ctx->cc_gpa;
 
@@ -544,7 +544,7 @@ static void genPoly(gs1_encoder *ctx, int eccSize) {
 	}
 }
 
-static void genECC(gs1_encoder *ctx, int dsize, int csize, uint16_t sym[]) {
+static void genECC(gs1_encoder *ctx, const int dsize, const int csize, uint16_t sym[]) {
 	int i, n, t;
 	int *gpa = ctx->cc_gpa;
 
@@ -569,7 +569,7 @@ static void genECC(gs1_encoder *ctx, int dsize, int csize, uint16_t sym[]) {
 }
 
 
-void gs1_putBits(gs1_encoder *ctx, uint8_t bitField[], int bitPos, int length, uint16_t bits) {
+void gs1_putBits(gs1_encoder *ctx, uint8_t bitField[], const int bitPos, const int length, uint16_t bits) {
 	int i, maxBytes;
 
 	if (ctx->linFlag == -1) {
@@ -597,7 +597,7 @@ void gs1_putBits(gs1_encoder *ctx, uint8_t bitField[], int bitPos, int length, u
 
 
 /* gets bit in bitString at bitPos */
-static int getBit(uint8_t bitStr[], int bitPos) {
+static int getBit(const uint8_t bitStr[], const int bitPos) {
 	return(((bitStr[bitPos/8] & (0x80>>(bitPos%8))) == 0) ?	0 : 1);
 }
 
@@ -628,7 +628,7 @@ static const uint8_t iswhat[256] = { /* byte look up table with IS_XXX bits */
 };
 
 
-int gs1_check2DData(uint8_t dataStr[]) {
+int gs1_check2DData(const uint8_t dataStr[]) {
 	int i;
 
 	for (i = 0; iswhat[dataStr[i]] != 0x80; i++) {

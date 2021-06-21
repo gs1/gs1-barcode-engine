@@ -249,14 +249,15 @@ fail:
 }
 
 
-bool gs1_processScanData(gs1_encoder* ctx, char* scanData) {
+bool gs1_processScanData(gs1_encoder* ctx, const char* scanData) {
 
 	size_t i;
 	bool aiMode;
 	enum gs1_encoder_symbologies sym;
 	const struct symIdEntry *entry;
-	size_t symIdTable_len = sizeof(symIdTable) / sizeof(symIdTable[0]);
-	char *p, *q, *cc = NULL;
+	const size_t symIdTable_len = sizeof(symIdTable) / sizeof(symIdTable[0]);
+	char *p;
+	const char *q, *cc = NULL;
 	size_t primaryLen;
 
 	assert(ctx);
@@ -383,16 +384,14 @@ fail:
 	do_test_testGenerateScanData(ctx, #n, gs1_encoder_s##n, d, e);			\
 } while (0)
 
-static void do_test_testGenerateScanData(gs1_encoder* ctx, char* name, int sym, char* dataStr, char* expect) {
+static void do_test_testGenerateScanData(gs1_encoder* ctx, const char* name, const int sym, const char* dataStr, const char* expect) {
 
-	char in[256];
 	char *out;
 	char casename[256];
 
 	sprintf(casename, "%s: %s", name, dataStr);
 	TEST_CASE(casename);
 
-	strcpy(in, dataStr);
 	TEST_ASSERT(gs1_encoder_setSym(ctx, sym));
 	TEST_ASSERT(gs1_encoder_setDataStr(ctx, dataStr));
 	TEST_ASSERT((out = gs1_encoder_getScanData(ctx)) != NULL);
@@ -489,7 +488,8 @@ void test_scandata_generateScanData(void) {
 	do_test_testProcessScanData(ctx, ss, sd, #s, gs1_encoder_s##s, d);	\
 } while (0)
 
-static void do_test_testProcessScanData(gs1_encoder *ctx, bool should_succeed, char *scanData, char *expectSymName, enum gs1_encoder_symbologies expectSym, char *expectDataStr) {
+static void do_test_testProcessScanData(gs1_encoder *ctx, const bool should_succeed, const char *scanData,
+		const char *expectSymName, const enum gs1_encoder_symbologies expectSym, const char *expectDataStr) {
 
 	char casename[256];
 

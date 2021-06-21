@@ -35,8 +35,8 @@ struct patternLength {
 };
 
 void gs1_mtxPutModule(uint8_t *mtx, int cols, int x, int y, uint8_t bit);
-uint8_t gs1_mtxGetModule(uint8_t *mtx, int cols, int x, int y);
-void gs1_mtxToPatterns(uint8_t* mtx, int w, int h, struct patternLength *pats);
+uint8_t gs1_mtxGetModule(const uint8_t *mtx, int cols, int x, int y);
+void gs1_mtxToPatterns(const uint8_t *mtx, int w, int h, struct patternLength *pats);
 
 
 #endif  /* MTX_H */

@@ -151,7 +151,7 @@ GS1_ENCODERS_API int gs1_encoder_getSym(gs1_encoder *ctx) {
 	reset_error(ctx);
 	return ctx->sym;
 }
-GS1_ENCODERS_API bool gs1_encoder_setSym(gs1_encoder *ctx, int sym) {
+GS1_ENCODERS_API bool gs1_encoder_setSym(gs1_encoder *ctx, const int sym) {
 	assert(ctx);
 	reset_error(ctx);
 	if (sym < gs1_encoder_sNONE || sym >= gs1_encoder_sNUMSYMS) {
@@ -169,7 +169,7 @@ GS1_ENCODERS_API bool gs1_encoder_getFileInputFlag(gs1_encoder *ctx) {
 	reset_error(ctx);
 	return ctx->fileInputFlag;
 }
-GS1_ENCODERS_API bool gs1_encoder_setFileInputFlag(gs1_encoder *ctx, bool fileInputFlag) {
+GS1_ENCODERS_API bool gs1_encoder_setFileInputFlag(gs1_encoder *ctx, const bool fileInputFlag) {
 	assert(ctx);
 	reset_error(ctx);
 	ctx->fileInputFlag = fileInputFlag;
@@ -182,7 +182,7 @@ GS1_ENCODERS_API int gs1_encoder_getPixMult(gs1_encoder *ctx) {
 	reset_error(ctx);
 	return ctx->pixMult;
 }
-GS1_ENCODERS_API bool gs1_encoder_setPixMult(gs1_encoder *ctx, int pixMult) {
+GS1_ENCODERS_API bool gs1_encoder_setPixMult(gs1_encoder *ctx, const int pixMult) {
 	assert(ctx);
 	reset_error(ctx);
 	if (pixMult < 1 || pixMult > MAX_PIXMULT) {
@@ -206,7 +206,7 @@ GS1_ENCODERS_API int gs1_encoder_getXundercut(gs1_encoder *ctx) {
 	reset_error(ctx);
 	return ctx->Xundercut;
 }
-GS1_ENCODERS_API bool gs1_encoder_setXundercut(gs1_encoder *ctx, int Xundercut) {
+GS1_ENCODERS_API bool gs1_encoder_setXundercut(gs1_encoder *ctx, const int Xundercut) {
 	assert(ctx);
 	reset_error(ctx);
 	if (Xundercut != 0 && ctx->pixMult == 1) {
@@ -229,7 +229,7 @@ GS1_ENCODERS_API int gs1_encoder_getYundercut(gs1_encoder *ctx) {
 	reset_error(ctx);
 	return ctx->Yundercut;
 }
-GS1_ENCODERS_API bool gs1_encoder_setYundercut(gs1_encoder *ctx, int Yundercut) {
+GS1_ENCODERS_API bool gs1_encoder_setYundercut(gs1_encoder *ctx, const int Yundercut) {
 	assert(ctx);
 	reset_error(ctx);
 	if (Yundercut !=0 && ctx->pixMult == 1) {
@@ -252,7 +252,7 @@ GS1_ENCODERS_API int gs1_encoder_getSepHt(gs1_encoder *ctx) {
 	reset_error(ctx);
 	return ctx->sepHt;
 }
-GS1_ENCODERS_API bool gs1_encoder_setSepHt(gs1_encoder *ctx, int sepHt) {
+GS1_ENCODERS_API bool gs1_encoder_setSepHt(gs1_encoder *ctx, const int sepHt) {
 	assert(ctx);
 	reset_error(ctx);
 	if (sepHt < ctx->pixMult || sepHt > 2 * ctx->pixMult) {
@@ -270,7 +270,7 @@ GS1_ENCODERS_API int gs1_encoder_getDataBarExpandedSegmentsWidth(gs1_encoder *ct
 	reset_error(ctx);
 	return ctx->dataBarExpandedSegmentsWidth;
 }
-GS1_ENCODERS_API bool gs1_encoder_setDataBarExpandedSegmentsWidth(gs1_encoder *ctx, int dataBarExpandedSegmentsWidth) {
+GS1_ENCODERS_API bool gs1_encoder_setDataBarExpandedSegmentsWidth(gs1_encoder *ctx, const int dataBarExpandedSegmentsWidth) {
 	assert(ctx);
 	reset_error(ctx);
 	if (dataBarExpandedSegmentsWidth < 2 || dataBarExpandedSegmentsWidth > 22) {
@@ -293,7 +293,7 @@ GS1_ENCODERS_API int gs1_encoder_getDmRows(gs1_encoder *ctx) {
 	reset_error(ctx);
 	return ctx->dmRows;
 }
-GS1_ENCODERS_API bool gs1_encoder_setDmRows(gs1_encoder *ctx, int rows) {
+GS1_ENCODERS_API bool gs1_encoder_setDmRows(gs1_encoder *ctx, const int rows) {
 	assert(ctx);
 	reset_error(ctx);
 	switch (rows) {
@@ -339,7 +339,7 @@ GS1_ENCODERS_API int gs1_encoder_getDmColumns(gs1_encoder *ctx) {
 	reset_error(ctx);
 	return ctx->dmCols;
 }
-GS1_ENCODERS_API bool gs1_encoder_setDmColumns(gs1_encoder *ctx, int columns) {
+GS1_ENCODERS_API bool gs1_encoder_setDmColumns(gs1_encoder *ctx, const int columns) {
 	assert(ctx);
 	reset_error(ctx);
 	switch (columns) {
@@ -384,7 +384,7 @@ GS1_ENCODERS_API int gs1_encoder_getQrVersion(gs1_encoder *ctx) {
 	reset_error(ctx);
 	return ctx->qrVersion;
 }
-GS1_ENCODERS_API bool gs1_encoder_setQrVersion(gs1_encoder *ctx, int version) {
+GS1_ENCODERS_API bool gs1_encoder_setQrVersion(gs1_encoder *ctx, const int version) {
 	assert(ctx);
 	reset_error(ctx);
 	switch (version) {
@@ -445,7 +445,7 @@ GS1_ENCODERS_API int gs1_encoder_getQrEClevel(gs1_encoder *ctx) {
 	reset_error(ctx);
 	return ctx->qrEClevel;
 }
-GS1_ENCODERS_API bool gs1_encoder_setQrEClevel(gs1_encoder *ctx, int ecLevel) {
+GS1_ENCODERS_API bool gs1_encoder_setQrEClevel(gs1_encoder *ctx, const int ecLevel) {
 	assert(ctx);
 	reset_error(ctx);
 	switch (ecLevel) {
@@ -473,7 +473,7 @@ GS1_ENCODERS_API bool gs1_encoder_getAddCheckDigit(gs1_encoder *ctx) {
 	reset_error(ctx);
 	return ctx->addCheckDigit;
 }
-GS1_ENCODERS_API bool gs1_encoder_setAddCheckDigit(gs1_encoder *ctx, bool addCheckDigit) {
+GS1_ENCODERS_API bool gs1_encoder_setAddCheckDigit(gs1_encoder *ctx, const bool addCheckDigit) {
 	assert(ctx);
 	reset_error(ctx);
 	ctx->addCheckDigit = addCheckDigit;
@@ -486,7 +486,7 @@ GS1_ENCODERS_API int gs1_encoder_getFormat(gs1_encoder *ctx) {
 	reset_error(ctx);
 	return ctx->format;
 }
-GS1_ENCODERS_API bool gs1_encoder_setFormat(gs1_encoder *ctx, int format) {
+GS1_ENCODERS_API bool gs1_encoder_setFormat(gs1_encoder *ctx, const int format) {
 	assert(ctx);
 	reset_error(ctx);
 	if (ctx->format == format) return true;
@@ -515,7 +515,7 @@ GS1_ENCODERS_API int gs1_encoder_getGS1_128LinearHeight(gs1_encoder *ctx) {
 	reset_error(ctx);
 	return ctx->gs1_128LinearHeight;
 }
-GS1_ENCODERS_API bool gs1_encoder_setGS1_128LinearHeight(gs1_encoder *ctx, int gs1_128LinearHeight) {
+GS1_ENCODERS_API bool gs1_encoder_setGS1_128LinearHeight(gs1_encoder *ctx, const int gs1_128LinearHeight) {
 	assert(ctx);
 	reset_error(ctx);
 	if (gs1_128LinearHeight < 1 || gs1_128LinearHeight > UCC128_MAX_LINHT) {
@@ -533,7 +533,7 @@ GS1_ENCODERS_API char* gs1_encoder_getOutFile(gs1_encoder *ctx) {
 	reset_error(ctx);
 	return ctx->outFile;
 }
-GS1_ENCODERS_API bool gs1_encoder_setOutFile(gs1_encoder *ctx, char* outFile) {
+GS1_ENCODERS_API bool gs1_encoder_setOutFile(gs1_encoder *ctx, const char* outFile) {
 	assert(ctx);
 	assert(outFile);
 	reset_error(ctx);
@@ -552,7 +552,7 @@ GS1_ENCODERS_API char* gs1_encoder_getDataStr(gs1_encoder *ctx) {
 	reset_error(ctx);
 	return ctx->dataStr;
 }
-GS1_ENCODERS_API bool gs1_encoder_setDataStr(gs1_encoder *ctx, char* dataStr) {
+GS1_ENCODERS_API bool gs1_encoder_setDataStr(gs1_encoder *ctx, const char* dataStr) {
 
 	char *cc;
 
@@ -596,7 +596,7 @@ fail:
 }
 
 
-GS1_ENCODERS_API bool gs1_encoder_setAIdataStr(gs1_encoder *ctx, char* gs1data) {
+GS1_ENCODERS_API bool gs1_encoder_setAIdataStr(gs1_encoder *ctx, const char* gs1data) {
 
 	char *cc;
 
@@ -682,7 +682,7 @@ GS1_ENCODERS_API char* gs1_encoder_getScanData(gs1_encoder* ctx) {
 }
 
 
-GS1_ENCODERS_API bool gs1_encoder_setScanData(gs1_encoder* ctx, char *scanData) {
+GS1_ENCODERS_API bool gs1_encoder_setScanData(gs1_encoder* ctx, const char *scanData) {
 	assert(ctx);
 	assert(scanData);
 	return gs1_processScanData(ctx);
@@ -721,7 +721,7 @@ GS1_ENCODERS_API char* gs1_encoder_getDataFile(gs1_encoder *ctx) {
 	reset_error(ctx);
 	return ctx->dataFile;
 }
-GS1_ENCODERS_API bool gs1_encoder_setDataFile(gs1_encoder *ctx, char* dataFile) {
+GS1_ENCODERS_API bool gs1_encoder_setDataFile(gs1_encoder *ctx, const char* dataFile) {
 	assert(ctx);
 	reset_error(ctx);
 	if (strlen(dataFile) < 1 || strlen(dataFile) > MAX_FNAME) {

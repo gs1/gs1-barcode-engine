@@ -32,7 +32,7 @@
 #include "rsslim.h"
 #include "rssutil.h"
 
-static struct sPrints *separatorLim(gs1_encoder *ctx, struct sPrints *prints) {
+static struct sPrints *separatorLim(gs1_encoder *ctx, const struct sPrints *prints) {
 
 	int i, j, k;
 	uint8_t *sepPattern = ctx->rsslim_sepPattern;
@@ -88,7 +88,7 @@ static struct sPrints *separatorLim(gs1_encoder *ctx, struct sPrints *prints) {
 #define LEFT_MUL 2013571.
 
 // call with str = 13-digit primary, no check digit
-static bool RSSLimEnc(gs1_encoder *ctx, uint8_t string[], uint8_t bars[], int ccFlag) {
+static bool RSSLimEnc(gs1_encoder *ctx, uint8_t string[], uint8_t bars[], const int ccFlag) {
 
 	// stores odd element N & max, even N & max, odd mul, combos
 	static const long oddEvenTbl[1*7*6] = { /* 26,7 */
@@ -295,7 +295,7 @@ static bool RSSLimEnc(gs1_encoder *ctx, uint8_t string[], uint8_t bars[], int cc
 	return(true);
 }
 
-bool gs1_normaliseRSSLim(gs1_encoder *ctx, char *dataStr, char *primaryStr) {
+bool gs1_normaliseRSSLim(gs1_encoder *ctx, const char *dataStr, char *primaryStr) {
 
 	if (strlen(dataStr) >= 3 && strncmp(dataStr, "#01", 3) == 0)
 	dataStr += 3;
@@ -487,11 +487,11 @@ out:
 
 void test_rsslim_RSSLIM_encode(void) {
 
-	char** expect;
+	const char** expect;
 
 	gs1_encoder* ctx = gs1_encoder_init(NULL);
 
-	expect = (char*[]){
+	expect = (const char*[]){
 " X   XX  XX   XX XX X X  XXX X  X X XX X  XX X  X  X XX   XX XXX  XX  XX X",
 " X   XX  XX   XX XX X X  XXX X  X X XX X  XX X  X  X XX   XX XXX  XX  XX X",
 " X   XX  XX   XX XX X X  XXX X  X X XX X  XX X  X  X XX   XX XXX  XX  XX X",

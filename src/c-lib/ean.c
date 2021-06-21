@@ -41,7 +41,7 @@
 
 
 // call with str = 13-digit primary
-static bool EAN13enc(uint8_t *str, uint8_t pattern[] ) {
+static bool EAN13enc(const uint8_t *str, uint8_t pattern[] ) {
 
 	static const uint16_t upcTblA[10] = {	0x3211, 0x2221, 0x2122, 0x1411, 0x1132,
 					0x1231, 0x1114, 0x1312, 0x1213, 0x3112 };
@@ -55,8 +55,6 @@ static bool EAN13enc(uint8_t *str, uint8_t pattern[] ) {
 	int i, j, abMask, bars, sNdx, pNdx, abBits;
 
 	assert(str && strlen((char*)str) == 13);
-	assert(gs1_allDigits(str));
-	assert(gs1_validateParity(str));
 
 	sNdx = 1;
 	pNdx = 0;
@@ -90,7 +88,7 @@ static bool EAN13enc(uint8_t *str, uint8_t pattern[] ) {
 	return(true);
 }
 
-bool gs1_normaliseEAN13(gs1_encoder *ctx, char *dataStr, char *primaryStr) {
+bool gs1_normaliseEAN13(gs1_encoder *ctx, const char *dataStr, char *primaryStr) {
 
 	unsigned int digits = ctx->sym == gs1_encoder_sEAN13 ? 13 : 12;
 
@@ -117,7 +115,7 @@ bool gs1_normaliseEAN13(gs1_encoder *ctx, char *dataStr, char *primaryStr) {
 	if (!gs1_allDigits((uint8_t*)dataStr)) {
 		strcpy(ctx->errMsg, "primary data must be all digits");
 		ctx->errFlag = true;
-			*primaryStr = '\0';
+		*primaryStr = '\0';
 		return false;
 	}
 
@@ -131,7 +129,7 @@ bool gs1_normaliseEAN13(gs1_encoder *ctx, char *dataStr, char *primaryStr) {
 	if (!gs1_validateParity((uint8_t*)primaryStr) && !ctx->addCheckDigit) {
 		strcpy(ctx->errMsg, "primary data check digit is incorrect");
 		ctx->errFlag = true;
-			*primaryStr = '\0';
+		*primaryStr = '\0';
 		return false;
 	}
 
@@ -261,7 +259,7 @@ out:
 #define EAN8_L_PADB	8	// EAN-8 left pad for ccb
 
 // call with str = 8-digit primary with check digit = 0
-static bool EAN8enc(uint8_t str[], uint8_t pattern[] ) {
+static bool EAN8enc(const uint8_t str[], uint8_t pattern[] ) {
 
 	static const uint16_t upcTblA[10] = {	0x3211, 0x2221, 0x2122, 0x1411, 0x1132,
 					0x1231, 0x1114, 0x1312, 0x1213, 0x3112 };
@@ -272,8 +270,6 @@ static bool EAN8enc(uint8_t str[], uint8_t pattern[] ) {
 	int i, j, bars, sNdx, pNdx;
 
 	assert(str && strlen((char*)str) == 8);
-	assert(gs1_allDigits(str));
-	assert(gs1_validateParity(str));
 
 	sNdx = 0;
 	pNdx = 0;
@@ -301,7 +297,7 @@ static bool EAN8enc(uint8_t str[], uint8_t pattern[] ) {
 	return(true);
 }
 
-bool gs1_normaliseEAN8(gs1_encoder *ctx, char* dataStr, char* primaryStr) {
+bool gs1_normaliseEAN8(gs1_encoder *ctx, const char* dataStr, char* primaryStr) {
 
 	if (strlen(dataStr) >= 9 && strncmp(dataStr, "#01000000", 9) == 0)
 		dataStr += 9;
@@ -478,7 +474,7 @@ out:
 #define UPCE_R_PAD	5	// UPCE_W - MAX_WIDTH - UPCE_L_PAD
 
 // call with str = 7-digit primary
-static bool UPCEenc(uint8_t str[], uint8_t pattern[] ) {
+static bool UPCEenc(const uint8_t str[], uint8_t pattern[] ) {
 
 	static const uint16_t upcTblA[10] = {	0x3211, 0x2221, 0x2122, 0x1411, 0x1132,
 					0x1231, 0x1114, 0x1312, 0x1213, 0x3112 };
@@ -491,7 +487,6 @@ static bool UPCEenc(uint8_t str[], uint8_t pattern[] ) {
 	int i, j, abMask, bars, sNdx, pNdx, abBits;
 
 	assert(str && strlen((char*)str) == 7);
-	assert(gs1_allDigits(str));
 
 	sNdx = 0;
 	pNdx = 0;
@@ -526,7 +521,7 @@ static bool UPCEenc(uint8_t str[], uint8_t pattern[] ) {
  *  abcdeNX <=> 0abcde0000NX  :  5<N<9
  *
  */
-static bool zeroCompress(char *primaryStr, char *data7) {
+static bool zeroCompress(const char *primaryStr, char *data7) {
 
 	int i;
 
@@ -575,7 +570,7 @@ static bool zeroCompress(char *primaryStr, char *data7) {
 
 }
 
-bool gs1_normaliseUPCE(gs1_encoder *ctx, char *dataStr, char *primaryStr) {
+bool gs1_normaliseUPCE(gs1_encoder *ctx, const char *dataStr, char *primaryStr) {
 
 	if (strlen(dataStr) >= 5 && strncmp(dataStr, "#0100", 5) == 0)
 		dataStr += 5;
@@ -751,11 +746,11 @@ out:
 
 void test_ean_EAN13_encode_ean13(void) {
 
-	char** expect;
+	const char** expect;
 
 	gs1_encoder* ctx = gs1_encoder_init(NULL);
 
-	expect = (char*[]){
+	expect = (const char*[]){
 "       X X  XX  X  XX  X  XX XX X    X X   XX XXX  X X X X X    X   X  X  X   XXX X  XXX  X XXX  X X X       ",
 "       X X  XX  X  XX  X  XX XX X    X X   XX XXX  X X X X X    X   X  X  X   XXX X  XXX  X XXX  X X X       ",
 "       X X  XX  X  XX  X  XX XX X    X X   XX XXX  X X X X X    X   X  X  X   XXX X  XXX  X XXX  X X X       ",
@@ -844,11 +839,11 @@ NULL
 
 void test_ean_EAN13_encode_upca(void) {
 
-	char** expect;
+	const char** expect;
 
 	gs1_encoder* ctx = gs1_encoder_init(NULL);
 
-	expect = (char*[]){
+	expect = (const char*[]){
 "       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
 "       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
 "       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
@@ -937,11 +932,11 @@ NULL
 
 void test_ean_EAN8_encode(void) {
 
-	char** expect;
+	const char** expect;
 
 	gs1_encoder* ctx = gs1_encoder_init(NULL);
 
-	expect = (char*[]){
+	expect = (const char*[]){
 "       X X   XX X  X  XX XXXX X X   XX X X X  XXX X X    X   X  X    X X X       ",
 "       X X   XX X  X  XX XXXX X X   XX X X X  XXX X X    X   X  X    X X X       ",
 "       X X   XX X  X  XX XXXX X X   XX X X X  XXX X X    X   X  X    X X X       ",
@@ -1016,11 +1011,11 @@ NULL
 
 void test_ean_UPCA_encode(void) {
 
-	char** expect;
+	const char** expect;
 
 	gs1_encoder* ctx = gs1_encoder_init(NULL);
 
-	expect = (char*[]){
+	expect = (const char*[]){
 "       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
 "       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
 "       X X X   XX  XX  X X XXXX   XX X   XX X   XX X X X X    X X    X X X    XX  XX XXX  X X  X   X X       ",
@@ -1107,7 +1102,7 @@ NULL
 }
 
 
-static void test_zeroCompress(char* wide, char* narrow, bool valid) {
+static void test_zeroCompress(const char *wide, const char *narrow, const bool valid) {
 
 	char data7[8];
 	char casename[25];
@@ -1176,11 +1171,11 @@ void test_ean_zeroCompress(void) {
 
 void test_ean_UPCE_encode(void) {
 
-	char** expect;
+	const char** expect;
 
 	gs1_encoder* ctx = gs1_encoder_init(NULL);
 
-	expect = (char*[]){
+	expect = (const char*[]){
 "       X X X  XXX  XX  X  XX XX XXXX X  XXX X XX   X X X X       ",
 "       X X X  XXX  XX  X  XX XX XXXX X  XXX X XX   X X X X       ",
 "       X X X  XXX  XX  X  XX XX XXXX X  XXX X XX   X X X X       ",

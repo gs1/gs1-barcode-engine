@@ -138,13 +138,13 @@ static const uint8_t rsalog[256] = {
 
 
 // Reed Solomon product in GF(256)
-static inline uint8_t rsProd(uint8_t a, uint8_t b) {
+static inline uint8_t rsProd(const uint8_t a, const uint8_t b) {
 	return a && b ? rsalog[ (rslog[a] + rslog[b]) % 255 ] : 0;
 }
 
 
 // Generate Reed Solomon coefficients using a generator 2
-static void rsGenerateCoeffs(int size, uint8_t *coeffs) {
+static void rsGenerateCoeffs(const int size, uint8_t *coeffs) {
 
 	int i, j;
 
@@ -162,7 +162,7 @@ static void rsGenerateCoeffs(int size, uint8_t *coeffs) {
 
 
 // Perform Reed Solomon ECC codeword calculation
-static void rsEncode(uint8_t* datcws, int datlen, uint8_t* ecccws, int ecclen, uint8_t* coeffs) {
+static void rsEncode(const uint8_t* datcws, const int datlen, uint8_t* ecccws, const int ecclen, const uint8_t* coeffs) {
 
 	int i, j;
 	uint8_t tmp[MAX_DM_DAT_CWS_PER_BLK + MAX_DM_ECC_CWS_PER_BLK] = { 0 };
@@ -182,9 +182,10 @@ static void rsEncode(uint8_t* datcws, int datlen, uint8_t* ecccws, int ecclen, u
 
 
 // Generate the codeword sequence that represents the data message
-static void createCodewords(gs1_encoder *ctx, uint8_t *string, uint8_t cws[MAX_DM_CWS], uint16_t* cwslen) {
+static void createCodewords(gs1_encoder *ctx, const uint8_t *string, uint8_t cws[MAX_DM_CWS], uint16_t* cwslen) {
 
 	uint8_t *p;
+	const uint8_t *q;
 	bool gs1Mode = false;
 
 	(void)ctx;
@@ -193,10 +194,10 @@ static void createCodewords(gs1_encoder *ctx, uint8_t *string, uint8_t cws[MAX_D
 		gs1Mode = true;
 	} else {
 		// Unescape leading sequence "\\...#" -> "\...#"
-		p = string;
-		while (*p == '\\')
-			p++;
-		if (*p == '#')
+		q = string;
+		while (*q == '\\')
+			q++;
+		if (*q == '#')
 			string++;
 	}
 
@@ -227,7 +228,7 @@ static void createCodewords(gs1_encoder *ctx, uint8_t *string, uint8_t cws[MAX_D
 
 
 // Select a symbol version that is sufficent to hold the encoded bitstream
-static const struct metric* selectVersion(gs1_encoder *ctx, uint16_t cwslen) {
+static const struct metric* selectVersion(gs1_encoder *ctx, const uint16_t cwslen) {
 
 	const struct metric *m = NULL;
 	bool okay;
@@ -252,7 +253,7 @@ static const struct metric* selectVersion(gs1_encoder *ctx, uint16_t cwslen) {
 
 // Add pseudo-random padding codewords to the bitstream then perform Reed
 // Solomon Error Correction
-static void finaliseCodewords(gs1_encoder *ctx, uint8_t *cws, uint16_t *cwslen, const struct metric *m) {
+static void finaliseCodewords(gs1_encoder *ctx, uint8_t *cws, const uint16_t *cwslen, const struct metric *m) {
 
 	uint8_t tmpcws[MAX_DM_DAT_CWS_PER_BLK+MAX_DM_ECC_CWS_PER_BLK];
 	uint8_t coeffs[MAX_DM_ECC_CWS_PER_BLK+1];
@@ -352,7 +353,7 @@ static void finaliseCodewords(gs1_encoder *ctx, uint8_t *cws, uint16_t *cwslen, 
 
 
 // Create a symbol that holds the given bitstream
-static void createMatrix(gs1_encoder *ctx, uint8_t *mtx, uint8_t *cws, const struct metric *m) {
+static void createMatrix(gs1_encoder *ctx, uint8_t *mtx, const uint8_t *cws, const struct metric *m) {
 
 	uint8_t occ[MAX_DM_BYTES] = { 0 };  // Matrix to indicate occupied positions
 	int i, j;
@@ -464,7 +465,7 @@ static void createMatrix(gs1_encoder *ctx, uint8_t *mtx, uint8_t *cws, const str
 }
 
 
-static int DMenc(gs1_encoder *ctx, uint8_t string[], struct patternLength *pats) {
+static int DMenc(gs1_encoder *ctx, const uint8_t string[], struct patternLength *pats) {
 
 	uint8_t mtx[MAX_DM_BYTES] = { 0 };
 	uint8_t cws[MAX_DM_CWS] = { 0 };
@@ -597,11 +598,11 @@ void test_dm_DM_dataLength(void) {
 
 void test_dm_DM_encode(void) {
 
-	char** expect;
+	const char** expect;
 
 	gs1_encoder* ctx = gs1_encoder_init(NULL);
 
-	expect = (char*[]){
+	expect = (const char*[]){
 "                ",
 " X X X X X X X  ",
 " XX   XX X    X ",
@@ -622,7 +623,7 @@ NULL
 	};
 	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sDM, "1501234567890", expect));
 
-	expect = (char*[]){
+	expect = (const char*[]){
 "                      ",
 " X X X X X X X X X X  ",
 " XX XX X   XXX XX XXX ",
