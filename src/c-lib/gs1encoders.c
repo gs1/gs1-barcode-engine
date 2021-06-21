@@ -858,10 +858,11 @@ GS1_ENCODERS_API size_t gs1_encoder_getBuffer(gs1_encoder *ctx, void** out) {
 
 
 GS1_ENCODERS_API size_t gs1_encoder_getBufferStrings(gs1_encoder *ctx, char*** out) {
-	assert(ctx);
 
 	uint8_t *buf;
 	int w, h, bw, x, y;
+
+	assert(ctx);
 
 	if (!ctx->buffer) {
 		*out = NULL;

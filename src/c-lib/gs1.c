@@ -668,10 +668,10 @@ static size_t validate_ai_val(gs1_encoder *ctx, const struct aiEntry *entry, cha
 	int parts_len = sizeof(ai_table[0].parts) / sizeof(ai_table[0].parts[0]);
 	int linters_len = sizeof(ai_table[0].parts[0].linters) / sizeof(ai_table[0].parts[0].linters[0]);
 	int i, j;
-	char compval[91];
+	char compval[91];		// Maximum AI value length is 90
 	size_t complen;
 	linter_t linter;
-	char *p = start, *r = end;
+	char *p, *r;
 
 	assert(ctx);
 	assert(entry);
@@ -681,6 +681,8 @@ static size_t validate_ai_val(gs1_encoder *ctx, const struct aiEntry *entry, cha
 
 	DEBUG_PRINT("  Considering AI (%s): %s (first %d characters)\n", entry->ai, start, (int)(end-start));
 
+	p = start;
+	r = end;
 	if (p == r) {
 		sprintf(ctx->errMsg, "AI (%s) data is empty", entry->ai);
 		ctx->errFlag = true;
@@ -743,10 +745,7 @@ static size_t validate_ai_val(gs1_encoder *ctx, const struct aiEntry *entry, cha
 // Convert GS1 AI syntax data to regular data string with # = FNC1
 bool gs1_parseAIdata(gs1_encoder *ctx, char *aiData, char *dataStr) {
 
-	assert(ctx);
-	assert(aiData);
-
-	char *p = aiData;
+	char *p;
 	char *r, *outval;
 	int i;
 	size_t minlen, maxlen;
@@ -754,12 +753,16 @@ bool gs1_parseAIdata(gs1_encoder *ctx, char *aiData, char *dataStr) {
 	const struct aiEntry *entry;
 	int parts_len = sizeof(ai_table[0].parts) / sizeof(ai_table[0].parts[0]);
 
+	assert(ctx);
+	assert(aiData);
+
 	*dataStr = '\0';
 	*ctx->errMsg = '\0';
 	ctx->errFlag = false;
 
 	DEBUG_PRINT("\nParsing AI data: %s\n", aiData);
 
+	p = aiData;
 	while (*p) {
 
 		if (*p++ != '(') goto fail; 			// Expect start of AI
@@ -847,14 +850,17 @@ fail:
 
 bool gs1_processAIdata(gs1_encoder *ctx, char *dataStr) {
 
-	char *p = dataStr, *r;
+	char *p, *r;
 	size_t vallen;
 	const struct aiEntry *entry;
 
 	assert(ctx);
+	assert(dataStr);
 
 	*ctx->errMsg = '\0';
 	ctx->errFlag = false;
+
+	p = dataStr;
 
 	// Ensure FNC1 in first
 	if (!*p || *p++ != '#') {

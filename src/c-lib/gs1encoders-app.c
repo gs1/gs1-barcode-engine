@@ -405,13 +405,15 @@ static bool userInt(gs1_encoder *ctx) {
 
 int main(int argc, char *argv[]) {
 
+	gs1_encoder* ctx;
+
 	inpStr = malloc((size_t)(gs1_encoder_getMaxDataStrLength()+1));
 	if (inpStr == NULL) {
 		printf("Failed to allocate the input buffer!\n");
 		return 1;
 	}
 
-	gs1_encoder* ctx = gs1_encoder_init(NULL);
+	ctx = gs1_encoder_init(NULL);
 	if (ctx == NULL) {
 		printf("Failed to initialise GS1 Encoders library!\n");
 		return 1;

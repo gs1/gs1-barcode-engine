@@ -184,10 +184,10 @@ static void rsEncode(uint8_t* datcws, int datlen, uint8_t* ecccws, int ecclen, u
 // Generate the codeword sequence that represents the data message
 static void createCodewords(gs1_encoder *ctx, uint8_t *string, uint8_t cws[MAX_DM_CWS], uint16_t* cwslen) {
 
-	(void)ctx;
-
 	uint8_t *p;
 	bool gs1Mode = false;
+
+	(void)ctx;
 
 	if (*string == '#') {		// "#..." => GS1 mode
 		gs1Mode = true;
@@ -256,7 +256,7 @@ static void finaliseCodewords(gs1_encoder *ctx, uint8_t *cws, uint16_t *cwslen, 
 
 	uint8_t tmpcws[MAX_DM_DAT_CWS_PER_BLK+MAX_DM_ECC_CWS_PER_BLK];
 	uint8_t coeffs[MAX_DM_ECC_CWS_PER_BLK+1];
-	int i, j, pad;
+	int i, j, pad, offset;
 	uint8_t *p;
 
 	(void)ctx;
@@ -287,7 +287,7 @@ static void finaliseCodewords(gs1_encoder *ctx, uint8_t *cws, uint16_t *cwslen, 
 
 		rsEncode(tmpcws, (int)(p-tmpcws), p, m->rscw/m->rsbl, coeffs);
 
-		int offset = m->rscw == 620 ? (i<8 ? 2:-8) : 0;
+		offset = m->rscw == 620 ? (i<8 ? 2:-8) : 0;
 		for (j = i; j < m->rscw; j += m->rsbl)
 			cws[m->ncws + j + offset] = *p++;
 

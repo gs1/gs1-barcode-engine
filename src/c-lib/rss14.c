@@ -141,10 +141,6 @@ static struct sPrints *separator14S(gs1_encoder *ctx, struct sPrints *prints) {
 // call with str = 14-digit primary
 static bool RSS14enc(gs1_encoder *ctx, uint8_t string[], uint8_t bars[], int ccFlag) {
 
-	assert(string && strlen((char*)string) == 14);
-	assert(gs1_allDigits(string));
-	assert(gs1_validateParity(string));
-
 	// stores even elements N & max, odd N & max, even mul, combos
 	static const int tbl154[4*6] = {
 		/* 15,4 */	10,7,	5,2,	4,	336,
@@ -184,6 +180,10 @@ static bool RSS14enc(gs1_encoder *ctx, uint8_t string[], uint8_t bars[], int ccF
 	long chrValue, chrValSave, semiValue, semiValSave, longNum;
 	int iIndex;
 	int *widths;
+
+	assert(string && strlen((char*)string) == 14);
+	assert(gs1_allDigits(string));
+	assert(gs1_validateParity(string));
 
 	string[13] = '\0';
 	data = atof((char*)string);

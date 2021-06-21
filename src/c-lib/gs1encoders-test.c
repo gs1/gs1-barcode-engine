@@ -23,10 +23,12 @@
 #pragma clang diagnostic ignored "-Wgnu-folding-constant"
 #pragma clang diagnostic ignored "-Wimplicit-int-float-conversion"
 #pragma clang diagnostic ignored "-Wsign-conversion"
+#pragma clang diagnostic ignored "-Wdeclaration-after-statement"
 #elif defined(__GNUC__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wconversion"
 #pragma GCC diagnostic ignored "-Wsign-conversion"
+#pragma GCC diagnostic ignored "-Wdeclaration-after-statement"
 #endif
 #include "acutest.h"
 #if defined(__clang__)
@@ -74,6 +76,7 @@ void test_print_bits(uint8_t *bytes, int numbits) {
 void test_print_strings(gs1_encoder *ctx) {
 
 	char **strings;
+	int i;
 
 	gs1_encoder_getBufferStrings(ctx, &strings);
 
@@ -81,7 +84,7 @@ void test_print_strings(gs1_encoder *ctx) {
 
 	printf("\n\n");
 
-	int i = 0;
+	i = 0;
 	while (strings[i]) {
 		printf("%s\n", strings[i++]);
 	}
