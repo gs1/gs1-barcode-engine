@@ -24,7 +24,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#define MAX_AIS	64
+#define MAX_AIS		64
+#define MAX_AI_LEN	90
 
 
 typedef enum {

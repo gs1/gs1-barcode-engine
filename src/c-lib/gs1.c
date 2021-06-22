@@ -31,6 +31,13 @@
 
 
 // AI prefixes that are defined as not requiring termination by an FNC1 character
+#define SIZEOF_ARRAY(x) (sizeof(x) / sizeof(x[0]))
+
+
+/*
+ *  AI prefixes that are defined as not requiring termination by an FNC1 character
+ *
+ */
 static const char* fixedAIprefixes[22] = {
 	"00", "01", "02",
 	"03", "04",
@@ -640,15 +647,14 @@ static const struct aiEntry ai_table[] = {
  */
 static const struct aiEntry* lookupAIentry(const char *p, size_t ailen) {
 
-	const int ai_table_len = sizeof(ai_table) / sizeof(ai_table[0]);
-	int i;
+	size_t i;
 	const struct aiEntry *entry;
 	size_t entrylen;
 
 	assert(ailen <= strlen(p));
 
 	// Walk the AI table to find a match, or a prefix match when ailen == 0
-	for (i = 0; i < ai_table_len; i++) {
+	for (i = 0; i < SIZEOF_ARRAY(ai_table); i++) {
 		entry = &ai_table[i];
 		entrylen = strlen(entry->ai);
 		if (ailen != 0 && ailen != entrylen)
@@ -657,7 +663,7 @@ static const struct aiEntry* lookupAIentry(const char *p, size_t ailen) {
 			break;
 	}
 
-	if (i == ai_table_len)		// Not found
+	if (i == SIZEOF_ARRAY(ai_table))		// Not found
 		return NULL;
 
 	return entry;
@@ -672,10 +678,8 @@ static const struct aiEntry* lookupAIentry(const char *p, size_t ailen) {
 static size_t validate_ai_val(gs1_encoder *ctx, const struct aiEntry *entry, const char *start, const char *end) {
 
 	const struct aiComponent *part;
-	const int parts_len = sizeof(ai_table[0].parts) / sizeof(ai_table[0].parts[0]);
-	const int linters_len = sizeof(ai_table[0].parts[0].linters) / sizeof(ai_table[0].parts[0].linters[0]);
-	int i, j;
-	char compval[91];		// Maximum AI value length is 90
+	size_t i, j;
+	char compval[MAX_AI_LEN+1];
 	size_t complen;
 	linter_t linter;
 	const char *p, *r;
@@ -696,7 +700,7 @@ static size_t validate_ai_val(gs1_encoder *ctx, const struct aiEntry *entry, con
 		return 0;
 	}
 
-	for (i = 0; i < parts_len; i++) {
+	for (i = 0; i < SIZEOF_ARRAY(ai_table[0].parts); i++) {
 		part = &entry->parts[i];
 		if (part->cset == cset_none)
 			break;
@@ -722,7 +726,7 @@ static size_t validate_ai_val(gs1_encoder *ctx, const struct aiEntry *entry, con
 			return 0;
 
 		// Run each additional linter on the component
-		for (j = 0; j < linters_len; j++) {
+		for (j = 0; j < SIZEOF_ARRAY(ai_table[0].parts[0].linters); j++) {
 			if (!part->linters[j])
 				break;
 			if (!part->linters[j](ctx, entry, compval))
@@ -757,11 +761,10 @@ bool gs1_parseAIdata(gs1_encoder *ctx, const char *aiData, char *dataStr) {
 
 	const char *p, *r;
 	char *outval;
-	int i;
 	size_t minlen, maxlen;
+	size_t i;
 	bool fnc1req = true;
 	const struct aiEntry *entry;
-	const int parts_len = sizeof(ai_table[0].parts) / sizeof(ai_table[0].parts[0]);
 
 	assert(ctx);
 	assert(aiData);
@@ -789,7 +792,7 @@ bool gs1_parseAIdata(gs1_encoder *ctx, const char *aiData, char *dataStr) {
 		writeDataStr(entry->ai);			// Write AI
 
 		fnc1req = true;					// Determine whether FNC1 required before next AI
-		for (i = 0; i < (int)(sizeof(fixedAIprefixes) / sizeof(fixedAIprefixes[0])); i++)
+		for (i = 0; i < SIZEOF_ARRAY(fixedAIprefixes); i++)
 			if (strncmp(fixedAIprefixes[i], entry->ai, 2) == 0)
 				fnc1req = false;
 
@@ -856,6 +859,10 @@ fail:
 }
 
 
+/*
+ *  Validate regular AI data ("#...") and extract AIs
+ *
+ */
 bool gs1_processAIdata(gs1_encoder *ctx, const char *dataStr) {
 
 	const char *p, *r;
