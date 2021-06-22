@@ -754,6 +754,44 @@ static size_t validate_ai_val(gs1_encoder *ctx, const struct aiEntry *entry, con
 
 
 /*
+ * AI length and content check (no "#") used by parsers prior to performing
+ * component-based validation since reporting issues such as checksum failure
+ * isn't helpful when the AI is too long
+ *
+ */
+static bool aiValLengthContentCheck(gs1_encoder *ctx, const struct aiEntry *entry, const char *aiVal, size_t vallen) {
+
+	size_t i, minlen = 0, maxlen = 0;
+
+	assert(ctx);
+	assert(entry);
+	assert(aiVal);
+
+	for (i = 0; i < SIZEOF_ARRAY(ai_table[0].parts); i++) {
+		minlen += entry->parts[i].min;
+		maxlen += entry->parts[i].max;
+	}
+	if (vallen < minlen) {
+		sprintf(ctx->errMsg, "AI (%s) value is too short", entry->ai);
+		return false;
+	}
+	if (vallen > maxlen) {
+		sprintf(ctx->errMsg, "AI (%s) value is too long", entry->ai);
+		return false;
+	}
+
+	// Also forbid data "#" characters at this stage so we don't conflate with FNC1
+	if (memchr(aiVal, '#', vallen) != NULL) {
+		sprintf(ctx->errMsg, "AI (%s) contains illegal # character", entry->ai);
+		return false;
+	}
+
+	return true;
+
+}
+
+
+/*
  * Convert bracketed AI syntax data to regular AI data string with # = FNC1
  *
  */
@@ -761,7 +799,6 @@ bool gs1_parseAIdata(gs1_encoder *ctx, const char *aiData, char *dataStr) {
 
 	const char *p, *r;
 	char *outval;
-	size_t minlen, maxlen;
 	size_t i;
 	bool fnc1req = true;
 	const struct aiEntry *entry;
@@ -814,29 +851,10 @@ again:
 
 		nwriteDataStr(r, (size_t)(p-r));		// Write the remainder of the value
 
-		// Do an overall AI length check prior to performing
-		// component-based validation since reporting issues such as
-		// checksum failure isn't helpful when the AI is too long
-		minlen = 0;
-		maxlen = 0;
-		for (i = 0; i < parts_len; i++) {
-			minlen += entry->parts[i].min;
-			maxlen += entry->parts[i].max;
-		}
-		if (strlen(outval) < minlen) {
-			sprintf(ctx->errMsg, "AI (%s) value is too short", entry->ai);
+		// Perform certain checks at parse time, before processing the
+		// components with the linters
+		if (!aiValLengthContentCheck(ctx, entry, outval, strlen(outval)))
 			goto fail;
-		}
-		if (strlen(outval) > maxlen) {
-			sprintf(ctx->errMsg, "AI (%s) value is too long", entry->ai);
-			goto fail;
-		}
-
-		// Also forbid data "#" characters at this stage so we don't conflate with FNC1
-		if (strchr(outval, '#') != NULL) {
-			sprintf(ctx->errMsg, "AI (%s) contains illegal # character", entry->ai);
-			goto fail;
-		}
 
 	}
 
