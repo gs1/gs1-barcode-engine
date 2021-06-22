@@ -81,15 +81,15 @@ TEST_SRC = gs1encoders-test.c
 TEST_OBJ = $(BUILD_DIR)/$(TEST_SRC:.c=.o)
 
 FUZZER_ENCODERS_SRC = gs1encoders-fuzzer-encoders.c
-FUZZER_SRCS = $(FUZZER_ENCODERS_SRC) gs1encoders-fuzzer-ais.c gs1encoders-fuzzer-scandata.c
+FUZZER_SRCS = $(FUZZER_ENCODERS_SRC) gs1encoders-fuzzer-ais.c gs1encoders-fuzzer-scandata.c gs1encoders-fuzzer-dl.c
 
 FUZZER_SYM = QR DM EAN13 EAN8 UPCA UPCE DataBarOmni DataBarTruncated DataBarStacked DataBarStackedOmni DataBarLimited DataBarExpanded GS1_128_CCA GS1_128_CCC
 FUZZER_PREFIX = $(NAME)-fuzzer-
-FUZZER_BINS = $(addprefix $(BUILD_DIR)/$(FUZZER_PREFIX),$(FUZZER_SYM)) $(BUILD_DIR)/$(FUZZER_PREFIX)ais $(BUILD_DIR)/$(FUZZER_PREFIX)scandata
+FUZZER_BINS = $(addprefix $(BUILD_DIR)/$(FUZZER_PREFIX),$(FUZZER_SYM)) $(BUILD_DIR)/$(FUZZER_PREFIX)ais $(BUILD_DIR)/$(FUZZER_PREFIX)scandata $(BUILD_DIR)/$(FUZZER_PREFIX)dl
 FUZZER_OBJS = $(addsuffix .o, $(FUZZER_BINS))
 
 FUZZER_CORPUS_PREFIX = corpus-
-FUZZER_CORPUSES = $(addsuffix /, $(addprefix $(FUZZER_CORPUS_PREFIX),$(FUZZER_SYM))) $(FUZZER_CORPUS_PREFIX)ais/ $(FUZZER_CORPUS_PREFIX)scandata/
+FUZZER_CORPUSES = $(addsuffix /, $(addprefix $(FUZZER_CORPUS_PREFIX),$(FUZZER_SYM))) $(FUZZER_CORPUS_PREFIX)ais/ $(FUZZER_CORPUS_PREFIX)scandata/ $(FUZZER_CORPUS_PREFIX)dl/
 
 ALL_SRCS = $(wildcard *.c)
 SRCS = $(filter-out $(APP_SRC) $(TEST_SRC) $(FUZZER_SRCS), $(ALL_SRCS))
@@ -187,6 +187,12 @@ $(FUZZER_CORPUS_PREFIX)scandata/:
 $(BUILD_DIR)/$(FUZZER_PREFIX)scandata: $(OBJS) $(BUILD_DIR)/$(FUZZER_PREFIX)scandata.o
 	$(CC) $(CFLAGS) $(OBJS) $(BUILD_DIR)/$(FUZZER_PREFIX)scandata.o -o $(BUILD_DIR)/$(FUZZER_PREFIX)scandata
 
+
+$(FUZZER_CORPUS_PREFIX)dl/:
+	mkdir -p $@
+
+$(BUILD_DIR)/$(FUZZER_PREFIX)dl: $(OBJS) $(BUILD_DIR)/$(FUZZER_PREFIX)dl.o
+	$(CC) $(CFLAGS) $(OBJS) $(BUILD_DIR)/$(FUZZER_PREFIX)dl.o -o $(BUILD_DIR)/$(FUZZER_PREFIX)dl
 
 
 #
