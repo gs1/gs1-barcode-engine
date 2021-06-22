@@ -387,6 +387,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a30d5e311f56f119fbfe6c2d9e1405731"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#a30d5e311f56f119fbfe6c2d9e1405731">gs1_encoder_getAIdataStr</a> (<a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx)</td></tr>
 <tr class="memdesc:a30d5e311f56f119fbfe6c2d9e1405731"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the barcode input data buffer in human-friendly AI syntax.  <a href="gs1encoders_8h.html#a30d5e311f56f119fbfe6c2d9e1405731">More...</a><br /></td></tr>
 <tr class="separator:a30d5e311f56f119fbfe6c2d9e1405731"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3a16f8f621abe211b225c28a8008c41a"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#a3a16f8f621abe211b225c28a8008c41a">gs1_encoder_setDLuriStr</a> (<a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx, const char *dlURI)</td></tr>
+<tr class="memdesc:a3a16f8f621abe211b225c28a8008c41a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the data in the buffer that is used when buffer input is selected by parsing input provided as a GS1 Digital Link URI.  <a href="gs1encoders_8h.html#a3a16f8f621abe211b225c28a8008c41a">More...</a><br /></td></tr>
+<tr class="separator:a3a16f8f621abe211b225c28a8008c41a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac137de565a438241f6e8b80598cef464"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#ac137de565a438241f6e8b80598cef464">gs1_encoder_setScanData</a> (<a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx, const char *scanData)</td></tr>
 <tr class="memdesc:ac137de565a438241f6e8b80598cef464"><td class="mdescLeft">&#160;</td><td class="mdescRight">Process scan data received from a barcode reader with reporting of AIM symbology identifiers enabled to extract the message data and perform syntax checks in the case of AI data.  <a href="gs1encoders_8h.html#ac137de565a438241f6e8b80598cef464">More...</a><br /></td></tr>
 <tr class="separator:ac137de565a438241f6e8b80598cef464"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -904,7 +907,7 @@ The library is thread-safe provided that each thread operates on its own instanc
 <p>Return the barcode input data buffer in human-friendly AI syntax. </p>
 <p>For example, if the input data buffer were to contain: </p><pre class="fragment">#011231231231233310ABC123|#99XYZ(TM) CORP
 </pre><p>Then this function would return: </p><pre class="fragment">(01)12312312312333(10)ABC123|(99)XYZ\(TM) CORP
-</pre><dl class="section note"><dt>Note</dt><dd>The return data does not need to be free()ed and the content should be copied if it must persist in user code after subsequent calls to library functions that modify the input data buffer such as <a class="el" href="gs1encoders_8h.html#a6325f0f12c0a2110939b876aefbdd1d1" title="Sets the raw data in the buffer that is used when buffer input is selected.">gs1_encoder_setDataStr()</a>, <a class="el" href="gs1encoders_8h.html#abdce5a9347ff7cbbd153b1a13e3273dd" title="Sets the data in the buffer that is used when buffer input is selected by parsing input provided in G...">gs1_encoder_setAIdataStr()</a> and <a class="el" href="gs1encoders_8h.html#ac137de565a438241f6e8b80598cef464" title="Process scan data received from a barcode reader with reporting of AIM symbology identifiers enabled ...">gs1_encoder_setScanData()</a>.</dd>
+</pre><dl class="section note"><dt>Note</dt><dd>The return data does not need to be free()ed and the content should be copied if it must persist in user code after subsequent calls to library functions that modify the input data buffer such as <a class="el" href="gs1encoders_8h.html#a6325f0f12c0a2110939b876aefbdd1d1" title="Sets the raw data in the buffer that is used when buffer input is selected.">gs1_encoder_setDataStr()</a>, <a class="el" href="gs1encoders_8h.html#abdce5a9347ff7cbbd153b1a13e3273dd" title="Sets the data in the buffer that is used when buffer input is selected by parsing input provided in G...">gs1_encoder_setAIdataStr()</a>, <a class="el" href="gs1encoders_8h.html#ac137de565a438241f6e8b80598cef464" title="Process scan data received from a barcode reader with reporting of AIM symbology identifiers enabled ...">gs1_encoder_setScanData()</a> and <a class="el" href="gs1encoders_8h.html#a3a16f8f621abe211b225c28a8008c41a" title="Sets the data in the buffer that is used when buffer input is selected by parsing input provided as a...">gs1_encoder_setDLuriStr()</a>.</dd>
 <dd>
 The returned pointer should be checked for NULL which indicates non-AI input data.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#a6ab16e68827bb7adc811e8e5ec6cc369" title="Reads the raw barcode data input buffer.">gs1_encoder_getDataStr()</a></dd></dl>
@@ -1166,7 +1169,7 @@ The returned pointer should be checked for NULL which indicates non-AI input dat
 </div><div class="memdoc">
 
 <p>Reads the raw barcode data input buffer. </p>
-<dl class="section note"><dt>Note</dt><dd>The return data does not need to be free()ed and the content should be copied if it must persist in user code after subsequent calls to library function that modify the input data buffer such as <a class="el" href="gs1encoders_8h.html#a6325f0f12c0a2110939b876aefbdd1d1" title="Sets the raw data in the buffer that is used when buffer input is selected.">gs1_encoder_setDataStr()</a>, <a class="el" href="gs1encoders_8h.html#abdce5a9347ff7cbbd153b1a13e3273dd" title="Sets the data in the buffer that is used when buffer input is selected by parsing input provided in G...">gs1_encoder_setAIdataStr()</a> and <a class="el" href="gs1encoders_8h.html#ac137de565a438241f6e8b80598cef464" title="Process scan data received from a barcode reader with reporting of AIM symbology identifiers enabled ...">gs1_encoder_setScanData()</a>.</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>The return data does not need to be free()ed and the content should be copied if it must persist in user code after subsequent calls to library function that modify the input data buffer such as <a class="el" href="gs1encoders_8h.html#a6325f0f12c0a2110939b876aefbdd1d1" title="Sets the raw data in the buffer that is used when buffer input is selected.">gs1_encoder_setDataStr()</a>, <a class="el" href="gs1encoders_8h.html#abdce5a9347ff7cbbd153b1a13e3273dd" title="Sets the data in the buffer that is used when buffer input is selected by parsing input provided in G...">gs1_encoder_setAIdataStr()</a>, <a class="el" href="gs1encoders_8h.html#ac137de565a438241f6e8b80598cef464" title="Process scan data received from a barcode reader with reporting of AIM symbology identifiers enabled ...">gs1_encoder_setScanData()</a> and <a class="el" href="gs1encoders_8h.html#a3a16f8f621abe211b225c28a8008c41a" title="Sets the data in the buffer that is used when buffer input is selected by parsing input provided as a...">gs1_encoder_setDLuriStr()</a>.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#a6ab16e68827bb7adc811e8e5ec6cc369" title="Reads the raw barcode data input buffer.">gs1_encoder_getDataStr()</a> </dd>
 <dd>
 <a class="el" href="gs1encoders_8h.html#a114c44586db6c7c481edcacccde763ff" title="Selects between a file and buffer for barcode data input. symbols.">gs1_encoder_setFileInputFlag()</a></dd></dl>
@@ -1381,7 +1384,7 @@ The returned pointer should be checked for NULL which indicates non-AI input dat
 "(10) ABC123"
 "--"
 "(99) XYZ(TM) CORP"
-</pre><dl class="section note"><dt>Note</dt><dd>The return data does not need to be free()ed and the content should be copied if it must persist in user code after subsequent calls to functions that modify the input data buffer such as <a class="el" href="gs1encoders_8h.html#a6325f0f12c0a2110939b876aefbdd1d1" title="Sets the raw data in the buffer that is used when buffer input is selected.">gs1_encoder_setDataStr()</a>, <a class="el" href="gs1encoders_8h.html#abdce5a9347ff7cbbd153b1a13e3273dd" title="Sets the data in the buffer that is used when buffer input is selected by parsing input provided in G...">gs1_encoder_setAIdataStr()</a> or <a class="el" href="gs1encoders_8h.html#ac137de565a438241f6e8b80598cef464" title="Process scan data received from a barcode reader with reporting of AIM symbology identifiers enabled ...">gs1_encoder_setScanData()</a>.</dd></dl>
+</pre><dl class="section note"><dt>Note</dt><dd>The return data does not need to be free()ed and the content should be copied if it must persist in user code after subsequent calls to functions that modify the input data buffer such as <a class="el" href="gs1encoders_8h.html#a6325f0f12c0a2110939b876aefbdd1d1" title="Sets the raw data in the buffer that is used when buffer input is selected.">gs1_encoder_setDataStr()</a>, <a class="el" href="gs1encoders_8h.html#abdce5a9347ff7cbbd153b1a13e3273dd" title="Sets the data in the buffer that is used when buffer input is selected by parsing input provided in G...">gs1_encoder_setAIdataStr()</a>, <a class="el" href="gs1encoders_8h.html#ac137de565a438241f6e8b80598cef464" title="Process scan data received from a barcode reader with reporting of AIM symbology identifiers enabled ...">gs1_encoder_setScanData()</a> and <a class="el" href="gs1encoders_8h.html#a3a16f8f621abe211b225c28a8008c41a" title="Sets the data in the buffer that is used when buffer input is selected by parsing input provided as a...">gs1_encoder_setDLuriStr()</a>.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#a6ab16e68827bb7adc811e8e5ec6cc369" title="Reads the raw barcode data input buffer.">gs1_encoder_getDataStr()</a> </dd>
 <dd>
 <a class="el" href="gs1encoders_8h.html#a114c44586db6c7c481edcacccde763ff" title="Selects between a file and buffer for barcode data input. symbols.">gs1_encoder_setFileInputFlag()</a></dd></dl>
@@ -1660,7 +1663,7 @@ The returned pointer should be checked for NULL which indicates non-AI input dat
 <div class="line">       <span class="stringliteral">&quot;(01)12345678901231(10)ABC123(11)210630&quot;</span>);</div>
 <div class="line">printf(<span class="stringliteral">&quot;Scan data: %s\n&quot;</span>, <a class="code" href="gs1encoders_8h.html#a9fbea46b1179c7e866ad4a2ebede9ab4">gs1_encoder_getScanData</a>(ctx)); <span class="comment">// Print the scan data that a reader should return</span></div>
 <div class="line"><a class="code" href="gs1encoders_8h.html#a0078a51318ba3551052c309fe48110ae">gs1_encoder_free</a>(ctx);                                   <span class="comment">// Release the instance of the library</span></div>
-</div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>The return data does not need to be free()ed and the content should be copied if it must persist in user code after subsequent calls to library functions that modify the input data buffer such as <a class="el" href="gs1encoders_8h.html#a6325f0f12c0a2110939b876aefbdd1d1" title="Sets the raw data in the buffer that is used when buffer input is selected.">gs1_encoder_setDataStr()</a>, <a class="el" href="gs1encoders_8h.html#abdce5a9347ff7cbbd153b1a13e3273dd" title="Sets the data in the buffer that is used when buffer input is selected by parsing input provided in G...">gs1_encoder_setAIdataStr()</a> and <a class="el" href="gs1encoders_8h.html#ac137de565a438241f6e8b80598cef464" title="Process scan data received from a barcode reader with reporting of AIM symbology identifiers enabled ...">gs1_encoder_setScanData()</a>.</dd></dl>
+</div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>The return data does not need to be free()ed and the content should be copied if it must persist in user code after subsequent calls to library functions that modify the input data buffer such as <a class="el" href="gs1encoders_8h.html#a6325f0f12c0a2110939b876aefbdd1d1" title="Sets the raw data in the buffer that is used when buffer input is selected.">gs1_encoder_setDataStr()</a>, <a class="el" href="gs1encoders_8h.html#abdce5a9347ff7cbbd153b1a13e3273dd" title="Sets the data in the buffer that is used when buffer input is selected by parsing input provided in G...">gs1_encoder_setAIdataStr()</a>, <a class="el" href="gs1encoders_8h.html#ac137de565a438241f6e8b80598cef464" title="Process scan data received from a barcode reader with reporting of AIM symbology identifiers enabled ...">gs1_encoder_setScanData()</a> and <a class="el" href="gs1encoders_8h.html#a3a16f8f621abe211b225c28a8008c41a" title="Sets the data in the buffer that is used when buffer input is selected by parsing input provided as a...">gs1_encoder_setDLuriStr()</a>.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#ac137de565a438241f6e8b80598cef464" title="Process scan data received from a barcode reader with reporting of AIM symbology identifiers enabled ...">gs1_encoder_setScanData()</a> </dd>
 <dd>
 <a class="el" href="gs1encoders_8h.html#a6325f0f12c0a2110939b876aefbdd1d1" title="Sets the raw data in the buffer that is used when buffer input is selected.">gs1_encoder_setDataStr()</a> </dd>
@@ -2138,6 +2141,60 @@ The length of the data must be less that the value returned by <a class="el" hre
 
 </div>
 </div>
+<a id="a3a16f8f621abe211b225c28a8008c41a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3a16f8f621abe211b225c28a8008c41a">&#9670;&nbsp;</a></span>gs1_encoder_setDLuriStr()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">GS1_ENCODERS_API bool gs1_encoder_setDLuriStr </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *&#160;</td>
+          <td class="paramname"><em>ctx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>dlURI</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Sets the data in the buffer that is used when buffer input is selected by parsing input provided as a GS1 Digital Link URI. </p>
+<p>The input is provided in human-friendly format <b>without</b> FNC1 characters which are inserted automatically, for example:</p>
+<div class="fragment"><div class="line">https:<span class="comment">//example.org/01/12345678901231/22/ABC%2d123?99=TEST</span></div>
+</div><!-- fragment --><p>The input is immediately parsed and validated against the basic syntax for a Digital Link URI and certain rules for GS1 AIs, after which the user-provided URI is available via <a class="el" href="gs1encoders_8h.html#a6ab16e68827bb7adc811e8e5ec6cc369" title="Reads the raw barcode data input buffer.">gs1_encoder_getDataStr()</a>. If the input is invalid then this function will return false and an error message will be set that can be read using <a class="el" href="gs1encoders_8h.html#aee9e7c8b49fe2a8fa7bd0b21c1e7510b" title="Read an error message generated by the library.">gs1_encoder_getErrMsg()</a>.</p>
+<p>If the input is successfully parsed then the extracted AI string is available via <a class="el" href="gs1encoders_8h.html#a30d5e311f56f119fbfe6c2d9e1405731" title="Return the barcode input data buffer in human-friendly AI syntax.">gs1_encoder_getAIdataStr()</a> and <a class="el" href="gs1encoders_8h.html#a3fe65a09fa62afe033b6697970778e25" title="Update a given pointer towards an array of strings containing Human-Readable Interpretation (&quot;HRI&quot;) t...">gs1_encoder_getHRI()</a>.</p>
+<dl class="section note"><dt>Note</dt><dd>The length of the input data must be less that the value returned by <a class="el" href="gs1encoders_8h.html#aa24d43ed449f07eae209f974686b195c" title="Get the maximum size of the input data buffer for barcode message content.">gs1_encoder_getMaxDataStrLength()</a>.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#a6325f0f12c0a2110939b876aefbdd1d1" title="Sets the raw data in the buffer that is used when buffer input is selected.">gs1_encoder_setDataStr()</a> </dd>
+<dd>
+<a class="el" href="gs1encoders_8h.html#aa24d43ed449f07eae209f974686b195c" title="Get the maximum size of the input data buffer for barcode message content.">gs1_encoder_getMaxDataStrLength()</a> </dd>
+<dd>
+<a class="el" href="gs1encoders_8h.html#a6ab16e68827bb7adc811e8e5ec6cc369" title="Reads the raw barcode data input buffer.">gs1_encoder_getDataStr()</a> </dd>
+<dd>
+<a class="el" href="gs1encoders_8h.html#a30d5e311f56f119fbfe6c2d9e1405731" title="Return the barcode input data buffer in human-friendly AI syntax.">gs1_encoder_getAIdataStr()</a> </dd>
+<dd>
+<a class="el" href="gs1encoders_8h.html#a3fe65a09fa62afe033b6697970778e25" title="Update a given pointer towards an array of strings containing Human-Readable Interpretation (&quot;HRI&quot;) t...">gs1_encoder_getHRI()</a> </dd>
+<dd>
+<a class="el" href="gs1encoders_8h.html#a114c44586db6c7c481edcacccde763ff" title="Selects between a file and buffer for barcode data input. symbols.">gs1_encoder_setFileInputFlag()</a></dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">ctx</td><td><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34" title="A gs1_encoder context.">gs1_encoder</a> context </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">dlURI</td><td>the barcode input data in the form of a Digital Link URI </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true on success, otherwise false and an error message is set </dd></dl>
+
+</div>
+</div>
 <a id="ac0058e7f2ba0c14bbb1b60dc31d039d2"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac0058e7f2ba0c14bbb1b60dc31d039d2">&#9670;&nbsp;</a></span>gs1_encoder_setDmColumns()</h2>
 
@@ -2570,7 +2627,7 @@ The length of the data must be less that the value returned by <a class="el" hre
 <div class="line">    exit 1;                                                 <span class="comment">// Handle failure if bad AI data is received</span></div>
 <div class="line">printf(<span class="stringliteral">&quot;AI data: %s\n&quot;</span>, gs1_encoder_setGS1DataStr(ctx));    <span class="comment">// Print the AI scan data in human-friendly format</span></div>
 <div class="line"><a class="code" href="gs1encoders_8h.html#a0078a51318ba3551052c309fe48110ae">gs1_encoder_free</a>(ctx);                                      <span class="comment">// Release the instance of the library</span></div>
-</div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>The return data does not need to be free()ed and the content should be copied if it must persist in user code after subsequent calls to library functions that modify the input data buffer such as <a class="el" href="gs1encoders_8h.html#a6325f0f12c0a2110939b876aefbdd1d1" title="Sets the raw data in the buffer that is used when buffer input is selected.">gs1_encoder_setDataStr()</a>, <a class="el" href="gs1encoders_8h.html#abdce5a9347ff7cbbd153b1a13e3273dd" title="Sets the data in the buffer that is used when buffer input is selected by parsing input provided in G...">gs1_encoder_setAIdataStr()</a> and <a class="el" href="gs1encoders_8h.html#ac137de565a438241f6e8b80598cef464" title="Process scan data received from a barcode reader with reporting of AIM symbology identifiers enabled ...">gs1_encoder_setScanData()</a>.</dd></dl>
+</div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>The return data does not need to be free()ed and the content should be copied if it must persist in user code after subsequent calls to library functions that modify the input data buffer such as <a class="el" href="gs1encoders_8h.html#a6325f0f12c0a2110939b876aefbdd1d1" title="Sets the raw data in the buffer that is used when buffer input is selected.">gs1_encoder_setDataStr()</a>, <a class="el" href="gs1encoders_8h.html#abdce5a9347ff7cbbd153b1a13e3273dd" title="Sets the data in the buffer that is used when buffer input is selected by parsing input provided in G...">gs1_encoder_setAIdataStr()</a>, <a class="el" href="gs1encoders_8h.html#ac137de565a438241f6e8b80598cef464" title="Process scan data received from a barcode reader with reporting of AIM symbology identifiers enabled ...">gs1_encoder_setScanData()</a> and <a class="el" href="gs1encoders_8h.html#a3a16f8f621abe211b225c28a8008c41a" title="Sets the data in the buffer that is used when buffer input is selected by parsing input provided as a...">gs1_encoder_setDLuriStr()</a>.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#ac137de565a438241f6e8b80598cef464" title="Process scan data received from a barcode reader with reporting of AIM symbology identifiers enabled ...">gs1_encoder_setScanData()</a> </dd>
 <dd>
 <a class="el" href="gs1encoders_8h.html#a6ab16e68827bb7adc811e8e5ec6cc369" title="Reads the raw barcode data input buffer.">gs1_encoder_getDataStr()</a> </dd>
