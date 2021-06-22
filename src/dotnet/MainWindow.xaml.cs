@@ -33,20 +33,16 @@ namespace gs1encoders_dotnet
             symbologyComboBox.SelectedIndex = App.gs1Encoder.Sym;
 
             infoLabel.Content = "";
-            if (App.gs1Encoder.DataStr.Length > 0 && App.gs1Encoder.DataStr[0] == '#' && dataStrTextBox.Text.Length > 0)  // AI data
+            if (App.gs1Encoder.DataStr.Length > 0 && App.gs1Encoder.DataStr[0] == '#')  // AI data
             {
-                switch (dataStrTextBox.Text[0])
-                {
-                    case '#':
-                        infoLabel.Content = "AI data:   " + App.gs1Encoder.GS1dataStr;
-                        break;
-                    case '(':
-                        infoLabel.Content = "Encoded data (FNC1 = \"#\"):   " + App.gs1Encoder.DataStr;
-                        break;
-                    default:
-                        break;
-                }
+                if (dataStrTextBox.Text.StartsWith("#"))            
+                        infoLabel.Content = "AI data:   " + App.gs1Encoder.AIdataStr;
+                else if (dataStrTextBox.Text.StartsWith("("))                   
+                        infoLabel.Content = "Encoded data (FNC1 = \"#\"):   " + App.gs1Encoder.DataStr;                
             }
+
+            if (App.gs1Encoder.DataStr.StartsWith("http://") || App.gs1Encoder.DataStr.StartsWith("https://"))
+                infoLabel.Content = "Extracted AI data:   " + App.gs1Encoder.AIdataStr;
 
             pixMultTextBox.Text = App.gs1Encoder.PixMult.ToString(CultureInfo.InvariantCulture);
             XundercutTextBox.Text = App.gs1Encoder.Xundercut.ToString(CultureInfo.InvariantCulture);
@@ -73,11 +69,11 @@ namespace gs1encoders_dotnet
                 App.gs1Encoder.Sym = symbologyComboBox.SelectedIndex;
                 if (dataStrTextBox.Text.Length > 0 && dataStrTextBox.Text[0] == '(')
                 {
-                    App.gs1Encoder.GS1dataStr = dataStrTextBox.Text;
+                    App.gs1Encoder.AIdataStr = dataStrTextBox.Text;
                 }
-                else
+                else if (dataStrTextBox.Text.StartsWith("http://") || dataStrTextBox.Text.StartsWith("https://"))
                 {
-                    App.gs1Encoder.DataStr = dataStrTextBox.Text;
+                    App.gs1Encoder.SetDLuriStr(dataStrTextBox.Text);
                 }
                 if (Int32.TryParse(pixMultTextBox.Text, out v)) App.gs1Encoder.PixMult = v;
                 if (Int32.TryParse(XundercutTextBox.Text, out v)) App.gs1Encoder.Xundercut = v;

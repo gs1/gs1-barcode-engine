@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:gs1encoders_dotnet"
         mc:Ignorable="d"
-        Title="MainWindow" Height="580" Width="800" MinWidth="800" MinHeight="580">
+        Title="MainWindow" Height="650" Width="1000" MinWidth="800" MinHeight="580">
     <Grid Margin="0,0,0,-31">
         <Grid.RowDefinitions>
             <RowDefinition Height="233*"/>
@@ -45,7 +45,6 @@
         <Label x:Name="label_Copy3" Content="DataBar Exp segments" HorizontalAlignment="Left" Margin="20,264,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Width="163" Height="30"/>
         <TextBox x:Name="linHeightTextBox" HorizontalAlignment="Left" Height="23" Margin="180,302,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="66" Grid.Column="1"/>
         <Label x:Name="label_Copy4" Content="GS1-128 linear height" HorizontalAlignment="Left" Margin="20,299,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Width="163" Height="30"/>
-        <Label x:Name="errorMessageLabel" Content="" HorizontalAlignment="Center" Margin="30,90,29,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Height="28" Width="733" FontWeight="Bold"/>
         <Label x:Name="label_Copy5" Content="QR Code version" HorizontalAlignment="Left" Margin="20,334,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Width="163" Height="30"/>
         <Label x:Name="label_Copy6" Content="QR Code EC level" HorizontalAlignment="Left" Margin="20,369,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Width="163" Height="30"/>
         <Label x:Name="label_Copy7" Content="DataMatrix rows" HorizontalAlignment="Left" Margin="20,404,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Width="163" Height="30"/>
@@ -141,6 +140,7 @@
             <ComboBoxItem Content="144" Tag="144" HorizontalAlignment="Left" Width="66"/>
         </ComboBox>
         <Label x:Name="infoLabel" Content="" HorizontalAlignment="Left" Margin="29,57,30,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Height="28" Width="733"/>
+        <Label x:Name="errorMessageLabel" Content="" HorizontalAlignment="Left" Margin="29,90,23,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Height="28" Width="733" FontWeight="Bold"/>
         <TextBox x:Name="hriTextBox"  FontFamily="Consolas" IsReadOnly="True" VerticalAlignment="Bottom" HorizontalAlignment="Left" FontSize="14" Grid.ColumnSpan="2" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Height="98" Width="226" Margin="20,0,0,10" Grid.RowSpan="2" VerticalContentAlignment="Bottom"/>
     </Grid>
 </Window>

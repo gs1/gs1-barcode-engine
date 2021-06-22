@@ -56,7 +56,7 @@ namespace gs1encoders_dotnet
 
             gs1Encoder.Sym = (int)GS1Encoder.Symbology.DM;
             mw.dataStrTextBox.Text = "(01)02112345678900";
-            gs1Encoder.GS1dataStr = mw.dataStrTextBox.Text;
+            gs1Encoder.AIdataStr = mw.dataStrTextBox.Text;
             
             mw.LoadControls();
 
