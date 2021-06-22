@@ -78,6 +78,7 @@ struct gs1_encoder {
 	int format;		// BMP, TIF or RAW
 	bool fileInputFlag;	// true is dataFile else dataStr
 	char dataStr[MAX_DATA+1];
+	char dlAIbuffer[MAX_DATA+1];	// Populated with unbracketed AI string extracted from DL input
 	char dataFile[MAX_FNAME+1];
 	char outFile[MAX_FNAME+1];
 	uint8_t *buffer;	// We may allocate an output buffer

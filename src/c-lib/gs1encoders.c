@@ -643,6 +643,28 @@ GS1_ENCODERS_API bool gs1_encoder_setAIdataStr(gs1_encoder *ctx, const char* gs1
 }
 
 
+GS1_ENCODERS_API bool gs1_encoder_setDLuriStr(gs1_encoder *ctx, const char* dlData) {
+
+	assert(ctx);
+	assert(dlData);
+	reset_error(ctx);
+
+	// Validate DL data
+	ctx->numAIs = 0;
+	strcpy(ctx->dataStr, dlData);		// User input goes here for encoding
+
+	// We encode into dlAIbuffer as storage for HRI text
+	if (!gs1_parseDLuri(ctx, ctx->dataStr, ctx->dlAIbuffer)) {
+		*ctx->dataStr = '\0';
+		ctx->numAIs = 0;
+		return false;
+	}
+
+	return true;
+
+}
+
+
 GS1_ENCODERS_API char* gs1_encoder_getAIdataStr(gs1_encoder *ctx) {
 
 	int i, j;
@@ -1523,6 +1545,7 @@ void test_api_getHRI(void) {
 
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
 
+	// HRI from AI data
 	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "#011231231231233310ABC123|#99COMPOSITE"));
 	TEST_ASSERT((numAIs = gs1_encoder_getHRI(ctx, &hri)) == 4);
 	TEST_ASSERT(hri != NULL);
@@ -1530,6 +1553,15 @@ void test_api_getHRI(void) {
 	TEST_CHECK(strcmp(hri[1], "(10) ABC123") == 0);
 	TEST_CHECK(strcmp(hri[2], "--") == 0);
 	TEST_CHECK(strcmp(hri[3], "(99) COMPOSITE") == 0);
+
+	// HRI from DL data
+	TEST_ASSERT(gs1_encoder_setDLuriStr(ctx, "https://a/01/12312312312333/22/TESTING?99=ABC%2d123&98=XYZ"));
+	TEST_ASSERT((numAIs = gs1_encoder_getHRI(ctx, &hri)) == 4);
+	TEST_ASSERT(hri != NULL);
+	TEST_CHECK(strcmp(hri[0], "(01) 12312312312333") == 0);
+	TEST_CHECK(strcmp(hri[1], "(22) TESTING") == 0);
+	TEST_CHECK(strcmp(hri[2], "(99) ABC-123") == 0);
+	TEST_CHECK(strcmp(hri[3], "(98) XYZ") == 0);
 
 	gs1_encoder_free(ctx);
 

@@ -186,6 +186,7 @@ TEST_LIST = {
      */
     { "gs1_lookupAIentry", test_gs1_lookupAIentry },
     { "gs1_gs1_parseAIdata", test_gs1_parseAIdata },
+    { "gs1_gs1_parseDLuri", test_gs1_parseDLuri },
     { "gs1_gs1_processAIdata", test_gs1_processAIdata },
     { "gs1_validateParity", test_gs1_validateParity },
     { "gs1_URIunescape", test_gs1_URIunescape },

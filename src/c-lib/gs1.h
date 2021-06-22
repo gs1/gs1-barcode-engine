@@ -67,6 +67,7 @@ struct aiValue {
 #include "gs1encoders.h"
 
 bool gs1_parseAIdata(gs1_encoder *ctx, const char *aiData, char *dataStr);
+bool gs1_parseDLuri(gs1_encoder *ctx, char *dlData, char *dataStr);
 bool gs1_processAIdata(gs1_encoder *ctx, const char *dataStr);
 bool gs1_validateParity(uint8_t *str);
 bool gs1_allDigits(const uint8_t *str);
@@ -76,6 +77,7 @@ bool gs1_allDigits(const uint8_t *str);
 
 void test_gs1_lookupAIentry(void);
 void test_gs1_parseAIdata(void);
+void test_gs1_parseDLuri(void);
 void test_gs1_processAIdata(void);
 void test_gs1_validateParity(void);
 void test_gs1_URIunescape(void);

@@ -32,6 +32,36 @@
 #include "gs1.h"
 
 
+/*
+ *  This library stores a compact representation of AI data (FNC1 in first) in
+ *  unbracketed format where "#" represents FNC1, i.e. "#..."
+ *
+ *  Where applicable, ingested data is validated and processed into the
+ *  aforementioned form, then a table of extracted AIs is maintained consisting
+ *  of a pointer to an AI table entry, a pointer to the data start of the AI
+ *  value, and the value's length:
+ *
+ *    aiEntry -> aiTable entry
+ *    value   -> Start of value in the AI data string
+ *    vallen  : Length of value
+ *
+ *  This ensures that we only store a single instance of the input that has
+ *  been provided by the provided by the user, whether they have provided
+ *  bracketed AI data or scan data.
+ *
+ *  Digital Link inputs are an exception since they must be stored as given,
+ *  ready to be encoded directly into a barcode symbol. Unlike conversion
+ *  between bracketed/unbracketed AI data and scan data, by specification the
+ *  conversion between Digital Link URIs and AI syntax is not bijective: the
+ *  URI stem is lost, element order may not be preserved and AI values may be
+ *  normalised into canonical form.
+
+ *  The extracted AI element string is stored in dlAIbuffer which is used as
+ *  the storage for HRI text and construction bracketed AI strings.
+ *
+ */
+
+
 #define SIZEOF_ARRAY(x) (sizeof(x) / sizeof(x[0]))
 
 
@@ -673,6 +703,40 @@ static const struct aiEntry* lookupAIentry(const char *p, size_t ailen) {
 
 
 /*
+ * List of DL pkeys
+ *
+ * These are only used for find the beginning of the DL pathinfo.
+ *
+ */
+static const char* dl_pkeys[] = {
+	"00",		// SSCC
+	"01",		// GTIN; qualifiers 22,10,21 or 235
+	"253",		// GDTI
+	"255",		// GCN
+	"401",		// GINC
+	"402",		// GSIN
+	"414",		// LOC NO.; qualifiers=254 or 7040
+	"417",		// PARTY; qualifiers=7040
+	"8003",		// GRAI
+	"8004",		// GIAI; qualifiers=7040
+	"8006",		// ITIP; qualifiers=22,10,21
+	"8010",		// CPID; qualifiers=8011
+	"8013",		// GMN
+	"8017",		// GSRN - PROVIDER; qualifiers=8019
+	"8018",		// GSRN - RECIPIENT; qualifiers=8019
+};
+
+static bool isDLpkey(char* p) {
+	size_t i;
+	assert(p);
+	for (i = 0; i < SIZEOF_ARRAY(dl_pkeys); i++)
+		if (strcmp(p, dl_pkeys[i]) == 0)
+			return true;
+	return false;
+}
+
+
+/*
  *  Validate string between start and end pointers according to rules for an AI
  *
  */
@@ -905,6 +969,238 @@ static size_t URIunescape(char *out, size_t maxlen, const char *in, const size_t
 
 
 /*
+ * Convert DL data to regular AI data string with # = FNC1
+ *
+ * This performs a lightweight parse, sufficient for extracting the AIs for
+ * validation and HRI purposes.
+ *
+ * It does not validate the structure of the DL URI nor the data relationships
+ * between the extracted AIs.
+ *
+ * Extraction using convenience strings for GS1 keys are not supported.
+ *
+ */
+bool gs1_parseDLuri(gs1_encoder *ctx, char *dlData, char *dataStr) {
+
+	char *p, *r, *e;
+	char *pi = NULL;	// Path info
+	char *qp = NULL;	// Query params
+	char *fr = NULL;	// Fragment
+	char *dp = NULL;	// DL path info
+	bool ret;
+	size_t i;
+	size_t vallen;
+	bool fnc1req = true;
+	const struct aiEntry *entry;
+	char aival[MAX_AI_LEN+1];	// Unescaped AI value
+
+	assert(ctx);
+	assert(dlData);
+
+	*dataStr = '\0';
+	*ctx->errMsg = '\0';
+	ctx->errFlag = false;
+
+	DEBUG_PRINT("\nParsing DL data: %s\n", dlData);
+
+	p = dlData;
+
+	if (strlen(p) >= 8 && strncmp(p, "https://", 8) == 0)
+		p += 8;
+	else if (strlen(p) >= 7 && strncmp(p, "http://", 7) == 0)
+		p += 7;
+	else {
+		strcpy(ctx->errMsg, "Scheme must be http:// or https://");
+		goto fail;
+	}
+
+	DEBUG_PRINT("  Schema: %.*s\n", p-dlData, dlData);
+
+	if (((r = strchr(p, '/')) == NULL) || r-p < 1) {
+		strcpy(ctx->errMsg, "URI must contain a domain and path info");
+		goto fail;
+	}
+
+	DEBUG_PRINT("  Domain: %.*s\n", r-p, p);
+
+	pi = p = r;					// Skip the domain name
+
+	// Query parameter marker delimits end of path info
+	if ((qp = strchr(pi, '?')) != NULL)
+		*qp++ = '\0';
+
+	DEBUG_PRINT("  Path info: %s\n", pi);
+
+	// Search backwards from the end of the path info looking for an
+	// "/AI/value" pair where AI is a DL primary key
+	while ((r = strrchr(pi, '/')) != NULL) {
+
+		*p = '/';				// Restore original pair separator
+							// Clobbers first character of path
+							// info on first iteration
+
+		// Find start of AI
+		*r = '\0';				// Chop off value
+		p = strrchr(pi, '/'); 			// Beginning of AI
+		*r = '/';				// Restore original AI/value separator
+		if (!p)					// At beginning of path
+			break;
+
+		DEBUG_PRINT("      %s\n", p);
+
+		entry = lookupAIentry(p+1, (size_t)(r-p-1));
+		if (!entry)
+			break;
+
+		if (isDLpkey(entry->ai)) {		// Found root of DL path info
+			dp = p;
+			break;
+		}
+
+		*p = '\0';
+
+	}
+
+	if (!dp) {
+		strcpy(ctx->errMsg, "No GS1 DL keys found in path info");
+		goto fail;
+	}
+
+	DEBUG_PRINT("  Stem: %.*s\n", dp-dlData, dlData);
+
+	DEBUG_PRINT("  DL path info: %s\n", dp);
+
+	// Process each AI value pair in the DL path info
+	p = dp;
+	while (*p) {
+		assert(*p == '/');
+		p++;
+		r = strchr(p, '/');
+		assert(r);
+		entry = lookupAIentry(p, (size_t)(r-p));	// Known to exist
+		assert(entry);
+
+		if ((p = strchr(++r, '/')) == NULL)
+			p = r + strlen(r);
+
+;		// Reverse percent encoding
+		if ((vallen = URIunescape(aival, MAX_AI_LEN, r, (size_t)(p-r))) == 0) {
+			sprintf(ctx->errMsg, "Decoded AI (%s) from DL path info too long", entry->ai);
+			goto fail;
+		}
+
+		// Special handling of AI (01) to pad up to a GTIN-14
+		if (strcmp(entry->ai, "01") == 0 &&
+		    (vallen == 13 || vallen == 12 || vallen == 8)) {
+			for (i = 0; i <= 13; i++)
+				aival[13-i] = vallen >= i+1 ? aival[vallen-i-1] : '0';
+			aival[14] = '\0';
+			vallen = 14;
+		}
+
+		DEBUG_PRINT("    Extracted: (%s) %.*s\n", entry->ai, vallen, aival);
+
+		if (fnc1req)
+			writeDataStr("#");			// Write FNC1, if required
+		writeDataStr(entry->ai);			// Write AI
+
+		fnc1req = true;					// Determine whether FNC1 required before next AI
+		for (i = 0; i < SIZEOF_ARRAY(fixedAIprefixes); i++)
+			if (strncmp(fixedAIprefixes[i], entry->ai, 2) == 0)
+				fnc1req = false;
+
+		nwriteDataStr(aival, vallen);			// Write value
+
+		// Perform certain checks at parse time, before processing the
+		// components with the linters
+		if (!aiValLengthContentCheck(ctx, entry, aival, vallen))
+			goto fail;
+
+	}
+
+	// Fragment character delimits end of the query parameters
+	if (qp && ((fr = strchr(qp, '#')) != NULL))
+		*fr++ = '\0';
+
+	if (qp)
+		DEBUG_PRINT("  Query params: %s\n", qp);
+
+	p = qp;
+	while (p && *p) {
+
+		while (*p == '&')				// Jump any & separators
+			p++;
+		if ((r = strchr(p, '&')) == NULL)
+			r = p + strlen(p);			// Value-pair finishes at end of data
+
+		// Discard parameters with no value and unknown AIs
+		if ((e = strchr(p, '=')) == NULL ||
+		    (entry = lookupAIentry(p, (size_t)(e-p))) == NULL) {
+			DEBUG_PRINT("    Skipped:   %.*s\n", r-p, p);
+			p = r;
+			continue;
+		}
+		e++;
+
+		// Reverse percent encoding
+		if ((vallen = URIunescape(aival, MAX_AI_LEN, e, (size_t)(r-e))) == 0) {
+			sprintf(ctx->errMsg, "Decoded AI (%s) from DL query params too long", entry->ai);
+			goto fail;
+		}
+
+		DEBUG_PRINT("    Extracted: (%s) %.*s\n", entry->ai, vallen, aival);
+
+		if (fnc1req)
+			writeDataStr("#");			// Write FNC1, if required
+		writeDataStr(entry->ai);			// Write AI
+
+		fnc1req = true;					// Determine whether FNC1 required before next AI
+		for (i = 0; i < SIZEOF_ARRAY(fixedAIprefixes); i++)
+			if (strncmp(fixedAIprefixes[i], entry->ai, 2) == 0)
+				fnc1req = false;
+
+		nwriteDataStr(aival, vallen);			// Write value
+
+		// Perform certain checks at parse time, before processing the
+		// components with the linters
+		if (!aiValLengthContentCheck(ctx, entry, aival, vallen))
+			goto fail;
+
+		p = r;
+
+	}
+
+	DEBUG_PRINT("Parsing DL data successful: %s\n", dataStr);
+
+	// Now validate the data that we have written
+	ret = gs1_processAIdata(ctx, dataStr);
+
+out:
+
+	if (qp)			// Restore original query parameter delimeter
+		*(qp-1) = '?';
+
+	if (fr)			// Restore original fragment delimieter
+		*(fr-1) = '#';
+
+	return ret;
+
+fail:
+
+	if (*ctx->errMsg == '\0')
+		strcpy(ctx->errMsg, "Failed to parse DL data");
+	ctx->errFlag = true;
+
+	DEBUG_PRINT("Parsing DL data failed: %s\n", ctx->errMsg);
+
+	*dataStr = '\0';
+	ret = false;
+	goto out;
+
+}
+
+
+/*
  *  Validate regular AI data ("#...") and extract AIs
  *
  */
@@ -1055,7 +1351,7 @@ void test_gs1_lookupAIentry(void) {
 }
 
 
-static void test_parseAIdata(gs1_encoder *ctx, bool should_succeed, char *aiData, char* expect) {
+static void test_parseAIdata(gs1_encoder *ctx, const bool should_succeed, const char *aiData, const char* expect) {
 
 	char out[256];
 	char casename[256];
@@ -1108,7 +1404,150 @@ void test_gs1_parseAIdata(void) {
 }
 
 
-static void test_processAIdata(gs1_encoder *ctx, bool should_succeed, char *dataStr) {
+static void test_parseDLuri(gs1_encoder *ctx, bool should_succeed, const char *dlData, const char* expect) {
+
+	char in[256];
+	char out[256];
+	char casename[256];
+
+	sprintf(casename, "%s => %s", dlData, expect);
+	TEST_CASE(casename);
+
+	strcpy(in, dlData);
+	TEST_CHECK(gs1_parseDLuri(ctx, in, out) ^ !should_succeed);
+	if (should_succeed)
+		TEST_CHECK(strcmp(out, expect) == 0);
+	TEST_MSG("Given: %s; Got: %s; Expected: %s; Err: %s", dlData, out, expect, ctx->errMsg);
+
+}
+
+
+/*
+ *  Convert a DL URI to a regular AI string "#..."
+ *
+ */
+void test_gs1_parseDLuri(void) {
+
+	gs1_encoder* ctx = gs1_encoder_init(NULL);
+
+	test_parseDLuri(ctx, false,  "", "");
+	test_parseDLuri(ctx, false,  "ftp://", "");
+	test_parseDLuri(ctx, false,  "http://", "");
+	test_parseDLuri(ctx, false,  "http:///", "");			// No domain
+	test_parseDLuri(ctx, false,  "http://a", "");			// No path info
+	test_parseDLuri(ctx, false,  "http://a/", "");			// Pathelogical minimal domain but no AI info
+
+	test_parseDLuri(ctx, true,					// http
+		"http://a/00/006141411234567890",
+		"#00006141411234567890");
+
+	test_parseDLuri(ctx, true,					// https
+		"https://a/00/006141411234567890",
+		"#00006141411234567890");
+
+	test_parseDLuri(ctx, false,					// No domain
+		"https://00/006141411234567890",
+		"");
+
+	test_parseDLuri(ctx, true,
+		"https://a/stem/00/006141411234567890",
+		"#00006141411234567890");
+
+	test_parseDLuri(ctx, true,
+		"https://a/more/stem/00/006141411234567890",
+		"#00006141411234567890");
+
+	test_parseDLuri(ctx, true,					// Fake AI in stem, stop at rightmost key
+		"https://a/00/faux/00/006141411234567890",
+		"#00006141411234567890");
+
+	test_parseDLuri(ctx, true,
+		"https://a/01/12312312312333",
+		"#0112312312312333");
+
+	test_parseDLuri(ctx, true,					// GTIN-13 -> GTIN-14
+		"https://a/01/2112345678900",
+		"#0102112345678900");
+
+	test_parseDLuri(ctx, true,					// GTIN-12 -> GTIN-14
+		"https://a/01/416000336108",
+		"#0100416000336108");
+
+	test_parseDLuri(ctx, true,					// GTIN-8 -> GTIN-14
+		"https://a/01/02345673",
+		"#0100000002345673");
+
+	test_parseDLuri(ctx, true,
+		"https://a/01/12312312312333/22/TEST/10/ABC/21/XYZ",
+		"#011231231231233322TEST#10ABC#21XYZ");
+
+	test_parseDLuri(ctx, true,
+		"https://a/01/12312312312333/235/TEST",
+		"#0112312312312333235TEST");
+
+	test_parseDLuri(ctx, true,
+		"https://a/253/1231231231232",
+		"#2531231231231232");
+
+	test_parseDLuri(ctx, true,
+		"https://a/253/1231231231232TEST5678901234567",
+		"#2531231231231232TEST5678901234567");
+
+	test_parseDLuri(ctx, false,
+		"https://a/253/1231231231232TEST56789012345678", "");	// Too long N13 X0..17
+
+	test_parseDLuri(ctx, true,
+		"https://a/8018/123456789012345675/8019/123",
+		"#8018123456789012345675#8019123");
+
+	test_parseDLuri(ctx, false,
+		"https://a/stem/00/006141411234567890/", ""); 		// Can't end in slash
+
+	test_parseDLuri(ctx, true,
+		"https://a/stem/00/006141411234567890?99=ABC",		// Query params; no FNC1 req after pathinfo
+		 "#0000614141123456789099ABC");
+
+	test_parseDLuri(ctx, true,
+		"https://a/stem/401/12345678?99=ABC",			// Query params; FNC1 req after pathinfo
+		 "#40112345678#99ABC");
+
+	test_parseDLuri(ctx, true,
+		"https://a/01/12312312312333?99=ABC&98=XYZ",
+		"#011231231231233399ABC#98XYZ");
+
+	test_parseDLuri(ctx, true,
+		"https://a/01/12312312312333?&&&99=ABC&&&&&&98=XYZ&&&",	// Extraneous query param separators
+		"#011231231231233399ABC#98XYZ");
+
+	test_parseDLuri(ctx, true,
+		"https://a/01/12312312312333?99=ABC&unknown=666&98=XYZ",
+		"#011231231231233399ABC#98XYZ");
+
+	test_parseDLuri(ctx, true,
+		"https://a/01/12312312312333?99=ABC&singleton&98=XYZ",
+		"#011231231231233399ABC#98XYZ");
+
+	test_parseDLuri(ctx, true,
+		"https://a/01/12312312312333?singleton&99=ABC&98=XYZ",
+		"#011231231231233399ABC#98XYZ");
+
+	test_parseDLuri(ctx, true,
+		"https://a/01/12312312312333?99=ABC&98=XYZ&singleton",
+		"#011231231231233399ABC#98XYZ");
+
+	test_parseDLuri(ctx, true,
+		"https://a/01/12312312312333/22/ABC%2d123?99=ABC&98=XYZ%2f987",	// Percent escaped values
+		"#011231231231233322ABC-123#99ABC#98XYZ/987");
+
+
+//	test_parseDLuri(ctx, true,  "https://id.gs1.org/01/9506000134352",  "#0109506000134352");	// Normalise GTIN
+
+	gs1_encoder_free(ctx);
+
+}
+
+
+static void test_processAIdata(gs1_encoder *ctx, const bool should_succeed, const char *dataStr) {
 
 	char casename[256];
 
