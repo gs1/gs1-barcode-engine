@@ -1539,9 +1539,6 @@ void test_gs1_parseDLuri(void) {
 		"https://a/01/12312312312333/22/ABC%2d123?99=ABC&98=XYZ%2f987",	// Percent escaped values
 		"#011231231231233322ABC-123#99ABC#98XYZ/987");
 
-
-//	test_parseDLuri(ctx, true,  "https://id.gs1.org/01/9506000134352",  "#0109506000134352");	// Normalise GTIN
-
 	gs1_encoder_free(ctx);
 
 }
