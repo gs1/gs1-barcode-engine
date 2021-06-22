@@ -21,8 +21,10 @@
 #include <assert.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "gs1encoders.h"
 #include "enc-private.h"
@@ -30,7 +32,6 @@
 #include "gs1.h"
 
 
-// AI prefixes that are defined as not requiring termination by an FNC1 character
 #define SIZEOF_ARRAY(x) (sizeof(x) / sizeof(x[0]))
 
 
@@ -877,6 +878,32 @@ fail:
 }
 
 
+static size_t URIunescape(char *out, size_t maxlen, const char *in, const size_t inlen) {
+
+	size_t i, j;
+	char hex[3] = { 0 };
+
+	assert(in);
+	assert(out);
+
+	for (i = 0, j = 0; i < inlen && j < maxlen; i++, j++) {
+		if (i < inlen - 2 && in[i] == '%' && isxdigit(in[i+1]) && isxdigit(in[i+2])) {
+			hex[0] = in[i+1];
+			hex[1] = in[i+2];
+			out[j] = (char)strtoul(hex, NULL, 16);
+			i += 2;
+		}
+		else {
+			out[j] = in[i];
+		}
+	}
+	out[j] = '\0';
+
+	return j;
+
+}
+
+
 /*
  *  Validate regular AI data ("#...") and extract AIs
  *
@@ -1188,6 +1215,57 @@ void test_gs1_validateParity(void) {
 	TEST_CHECK(gs1_validateParity((uint8_t*)good_gtin8));
 	TEST_CHECK(!gs1_validateParity((uint8_t*)bad_gtin8));
 	TEST_CHECK(bad_gtin8[7] == '0');		// Recomputed
+
+}
+
+
+static void test_gs1_doURIunescape(const char *in, const char *expect) {
+
+	char out[MAX_AI_LEN+1];
+
+	TEST_CHECK(URIunescape(out, MAX_AI_LEN, in, strlen(in)) == strlen(expect));
+	TEST_CHECK(strcmp(out, expect) == 0);
+	TEST_MSG("Given: %s; Got: %s; Expected: %s", in, out, expect);
+
+}
+
+
+void test_gs1_URIunescape(void) {
+
+	char out[MAX_AI_LEN+1];
+
+	test_gs1_doURIunescape("", "");
+	test_gs1_doURIunescape("test", "test");
+	test_gs1_doURIunescape("%20", " ");
+	test_gs1_doURIunescape("%20AB", " AB");
+	test_gs1_doURIunescape("A%20B", "A B");
+	test_gs1_doURIunescape("AB%20", "AB ");
+	test_gs1_doURIunescape("ABC%2", "ABC%2");		// Off end
+	test_gs1_doURIunescape("ABCD%", "ABCD%");
+	test_gs1_doURIunescape("A%20%20B", "A  B");		// Run together
+	test_gs1_doURIunescape("A%01B", "A" "\x01" "B");	// "Minima", we check \0 below
+	test_gs1_doURIunescape("A%ffB", "A" "\xFF" "B");	// Maxima
+	test_gs1_doURIunescape("A%FfB", "A" "\xFF" "B");	// Case mixing
+	test_gs1_doURIunescape("A%fFB", "A" "\xFF" "B");	// Case mixing
+	test_gs1_doURIunescape("A%FFB", "A" "\xFF" "B");	// Case mixing
+	test_gs1_doURIunescape("A%4FB", "AOB");
+	test_gs1_doURIunescape("A%4fB", "AOB");
+	test_gs1_doURIunescape("A%4gB", "A%4gB");		// Non hex digit
+	test_gs1_doURIunescape("A%4GB", "A%4GB");		// Non hex digit
+	test_gs1_doURIunescape("A%g4B", "A%g4B");		// Non hex digit
+	test_gs1_doURIunescape("A%G4B", "A%G4B");		// Non hex digit
+
+	// Check that \0 is sane, although we are only working with strings
+	TEST_CHECK(URIunescape(out, MAX_AI_LEN, "A%00B", 5) == 3);
+	TEST_CHECK(memcmp(out, "A" "\x00" "B", 4) == 0);
+
+	// Truncated input
+	TEST_CHECK(URIunescape(out, MAX_AI_LEN, "ABCD", 2) == 2);
+	TEST_CHECK(memcmp(out, "AB", 3) == 0);			// Includes \0
+
+	// Truncated output
+	TEST_CHECK(URIunescape(out, 2, "ABCD", 4) == 2);
+	TEST_CHECK(memcmp(out, "AB", 3) == 0);			// Includes \0
 
 }
 
