@@ -1388,6 +1388,7 @@ static void test_parseAIdata(gs1_encoder *ctx, const bool should_succeed, const 
 	sprintf(casename, "%s => %s", aiData, expect);
 	TEST_CASE(casename);
 
+	ctx->numAIs = 0;
 	TEST_CHECK(gs1_parseAIdata(ctx, aiData, out) ^ !should_succeed);
 	if (should_succeed)
 		TEST_CHECK(strcmp(out, expect) == 0);
@@ -1442,8 +1443,10 @@ static void test_parseDLuri(gs1_encoder *ctx, bool should_succeed, const char *d
 	sprintf(casename, "%s => %s", dlData, expect);
 	TEST_CASE(casename);
 
+	ctx->numAIs = 0;
 	strcpy(in, dlData);
 	TEST_CHECK(gs1_parseDLuri(ctx, in, out) ^ !should_succeed);
+	TEST_MSG("Err: %s", ctx->errMsg);
 	if (should_succeed)
 		TEST_CHECK(strcmp(out, expect) == 0);
 	TEST_MSG("Given: %s; Got: %s; Expected: %s; Err: %s", dlData, out, expect, ctx->errMsg);
