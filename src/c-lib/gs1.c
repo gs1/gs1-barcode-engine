@@ -1026,7 +1026,7 @@ bool gs1_parseDLuri(gs1_encoder *ctx, char *dlData, char *dataStr) {
 		goto fail;
 	}
 
-	DEBUG_PRINT("  Schema: %.*s\n", p-dlData, dlData);
+	DEBUG_PRINT("  Scheme %.*s\n", p-dlData-3, dlData);
 
 	if (((r = strchr(p, '/')) == NULL) || r-p < 1) {
 		strcpy(ctx->errMsg, "URI must contain a domain and path info");
