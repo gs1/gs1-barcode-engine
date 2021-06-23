@@ -1146,17 +1146,30 @@ bool gs1_parseDLuri(gs1_encoder *ctx, char *dlData, char *dataStr) {
 			r = p + strlen(p);			// Value-pair finishes at end of data
 
 		// Discard parameters with no value and unknown AIs
-		if ((e = strchr(p, '=')) == NULL ||
-		    (entry = lookupAIentry(p, (size_t)(e-p))) == NULL) {
+		if ((e = memchr(p, '=', (size_t)(r-p))) == NULL) {
+			DEBUG_PRINT("    Skipped singleton:   %.*s\n", r-p, p);
+			p = r;
+			continue;
+		}
+
+		// Numeric-only query parameters not matching an AI aren't allowed
+		entry = NULL;
+		if (gs1_allDigits((uint8_t*)p, (size_t)(e-p)) && (entry = lookupAIentry(p, (size_t)(e-p))) == NULL) {
+			sprintf(ctx->errMsg, "Unknown AI (%.*s) in query parameters", (int)(e-p), p);
+			goto fail;
+		}
+
+		// Skip non-numeric query parameters
+		if (!entry) {
 			DEBUG_PRINT("    Skipped:   %.*s\n", r-p, p);
 			p = r;
 			continue;
 		}
-		e++;
 
 		// Reverse percent encoding
+		e++;
 		if ((vallen = URIunescape(aival, MAX_AI_LEN, e, (size_t)(r-e))) == 0) {
-			sprintf(ctx->errMsg, "Decoded AI (%s) from DL query params too long", entry->ai);
+			sprintf(ctx->errMsg, "Decoded AI (%s) value from DL query params too long", entry->ai);
 			goto fail;
 		}
 
@@ -1530,6 +1543,9 @@ void test_gs1_parseDLuri(void) {
 	test_parseDLuri(ctx, true,
 		"https://a/01/12312312312333?99=ABC&98=XYZ",
 		"#011231231231233399ABC#98XYZ");
+
+	test_parseDLuri(ctx, false,
+		"https://a/01/12312312312333?99=ABC&999=faux", "");	// Non-AI, numeric-only query param
 
 	test_parseDLuri(ctx, true,
 		"https://a/01/12312312312333?&&&99=ABC&&&&&&98=XYZ&&&",	// Extraneous query param separators
