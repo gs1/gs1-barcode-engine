@@ -1583,6 +1583,82 @@ void test_gs1_parseDLuri(void) {
 		"https://a/01/12312312312333/22/ABC%2d123?99=ABC&98=XYZ%2f987",	// Percent escaped values
 		"#011231231231233322ABC-123#99ABC#98XYZ/987");
 
+
+	/*
+	 * Examples for DL specification
+	 *
+	 */
+
+	test_parseDLuri(ctx, true,
+		"https://id.gs1.org/01/09520123456788",
+		"#0109520123456788");
+
+	test_parseDLuri(ctx, true,
+		"https://brand.example.com/01/9520123456788",
+		"#0109520123456788");
+
+	test_parseDLuri(ctx, true,
+		"https://brand.example.com/some-extra/pathinfo/01/9520123456788",
+		"#0109520123456788");
+
+	test_parseDLuri(ctx, true,
+		"https://id.gs1.org/01/09520123456788/22/2A",
+		"#0109520123456788222A");
+
+	test_parseDLuri(ctx, true,
+		"https://id.gs1.org/01/09520123456788/10/ABC123",
+		"#010952012345678810ABC123");
+
+	test_parseDLuri(ctx, true,
+		"https://id.gs1.org/01/09520123456788/21/12345",
+		"#01095201234567882112345");
+
+	test_parseDLuri(ctx, true,
+		"https://id.gs1.org/01/09520123456788/10/ABC1/21/12345?17=180426",
+		"#010952012345678810ABC1#2112345#17180426");
+	// Specification sorts (17) before (10) and (21):
+	//   "#01095201234567881718042610ABC1#2112345"
+
+	test_parseDLuri(ctx, true,
+		"https://id.gs1.org/01/09520123456788?3103=000195",
+		"#01095201234567883103000195");
+
+	test_parseDLuri(ctx, true,
+		"https://example.com/01/9520123456788?3103=000195&3922=0299&17=201225",
+		"#0109520123456788310300019539220299#17201225");
+
+	test_parseDLuri(ctx, true,
+		"https://example.com/01/9520123456788?3103=000195&3922=0299&17=201225",
+		"#0109520123456788310300019539220299#17201225");
+
+	test_parseDLuri(ctx, true,
+		"https://id.gs1.org/01/9520123456788?3103=000195&3922=0299&17=201225",
+		"#0109520123456788310300019539220299#17201225");
+
+	test_parseDLuri(ctx, true,
+		"https://id.gs1.org/01/9520123456788?17=201225&3103=000195&3922=0299",
+		"#010952012345678817201225310300019539220299");
+
+	test_parseDLuri(ctx, true,
+		"https://id.gs1.org/00/952012345678912345",
+		"#00952012345678912345");
+
+	test_parseDLuri(ctx, true,
+		"https://id.gs1.org/00/952012345678912345?02=09520123456788&37=25&10=ABC123",
+		"#0095201234567891234502095201234567883725#10ABC123");
+
+	test_parseDLuri(ctx, true,
+		"https://id.gs1.org/414/9520123456788",
+		"#4149520123456788");
+
+	test_parseDLuri(ctx, true,
+		"https://id.gs1.org/414/9520123456788/254/32a%2Fb",
+		"#414952012345678825432a/b");
+
+	test_parseDLuri(ctx, true,
+		"https://example.com/8004/9520614141234567?01=9520123456788",
+		"#80049520614141234567#0109520123456788");
+
 	gs1_encoder_free(ctx);
 
 }
