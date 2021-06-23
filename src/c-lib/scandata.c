@@ -309,7 +309,7 @@ bool gs1_processScanData(gs1_encoder* ctx, const char* scanData) {
 		*p = '\0';
 		strncat(p, scanData, primaryLen);
 
-		if (!gs1_allDigits((uint8_t*)p)) {
+		if (!gs1_allDigits((uint8_t*)p, 0)) {
 			strcpy(ctx->errMsg, "Primary message number only contain digits");
 			goto fail;
 		}

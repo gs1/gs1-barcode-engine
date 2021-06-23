@@ -205,7 +205,7 @@ static bool RSSLimEnc(gs1_encoder *ctx, uint8_t string[], uint8_t bars[], const 
 	int *widths;
 
 	assert(string && strlen((char*)string) == 14);
-	assert(gs1_allDigits(string));
+	assert(gs1_allDigits(string, 0));
 	assert(gs1_validateParity(string));
 
 	string[13]='\0';
@@ -317,7 +317,7 @@ bool gs1_normaliseRSSLim(gs1_encoder *ctx, const char *dataStr, char *primaryStr
 		}
 	}
 
-	if (!gs1_allDigits((uint8_t*)dataStr)) {
+	if (!gs1_allDigits((uint8_t*)dataStr, 0)) {
 		strcpy(ctx->errMsg, "primary data must be all digits");
 		ctx->errFlag = true;
 		*primaryStr = '\0';

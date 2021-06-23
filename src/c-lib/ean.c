@@ -112,7 +112,7 @@ bool gs1_normaliseEAN13(gs1_encoder *ctx, const char *dataStr, char *primaryStr)
 		}
 	}
 
-	if (!gs1_allDigits((uint8_t*)dataStr)) {
+	if (!gs1_allDigits((uint8_t*)dataStr, 0)) {
 		strcpy(ctx->errMsg, "primary data must be all digits");
 		ctx->errFlag = true;
 		*primaryStr = '\0';
@@ -319,7 +319,7 @@ bool gs1_normaliseEAN8(gs1_encoder *ctx, const char* dataStr, char* primaryStr) 
 		}
 	}
 
-	if (!gs1_allDigits((uint8_t*)dataStr)) {
+	if (!gs1_allDigits((uint8_t*)dataStr, 0)) {
 		strcpy(ctx->errMsg, "primary data must be all digits");
 		ctx->errFlag = true;
 		*primaryStr = '\0';
@@ -592,7 +592,7 @@ bool gs1_normaliseUPCE(gs1_encoder *ctx, const char *dataStr, char *primaryStr) 
 		}
 	}
 
-	if (!gs1_allDigits((uint8_t*)dataStr)) {
+	if (!gs1_allDigits((uint8_t*)dataStr, 0)) {
 		strcpy(ctx->errMsg, "primary data must be all digits");
 		ctx->errFlag = true;
 		*primaryStr = '\0';

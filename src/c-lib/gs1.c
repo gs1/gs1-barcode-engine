@@ -107,7 +107,7 @@ static bool lint_cset82(gs1_encoder *ctx, const struct aiEntry *entry, char *val
 
 static bool lint_csetNumeric(gs1_encoder *ctx, const struct aiEntry *entry, char *val) {
 	DEBUG_PRINT("      csetNumeric...");
-	if (!gs1_allDigits((uint8_t*)val)) {
+	if (!gs1_allDigits((uint8_t*)val, 0)) {
 		sprintf(ctx->errMsg, "AI (%s): Illegal non-digit character", entry->ai);
 		ctx->errFlag = true;
 		return false;
@@ -1305,14 +1305,18 @@ bool gs1_validateParity(uint8_t *str) {
 }
 
 
-bool gs1_allDigits(const uint8_t *str) {
+bool gs1_allDigits(const uint8_t *str, size_t len) {
+
+	size_t i;
 
 	assert(str);
 
-	while (*str) {
-		if (*str < '0' || *str >'9')
+	if (!len)
+		len = strlen((char *)str);
+
+	for (i = 0; i < len; i++) {
+		if (str[i] < '0' || str[i] >'9')
 			return false;
-		str++;
 	}
 	return true;
 
