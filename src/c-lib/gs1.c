@@ -69,7 +69,7 @@
  *  AI prefixes that are defined as not requiring termination by an FNC1 character
  *
  */
-static const char* fixedAIprefixes[22] = {
+static const char *fixedAIprefixes[22] = {
 	"00", "01", "02",
 	"03", "04",
 	"11", "12", "13", "14", "15", "16", "17", "18", "19",
@@ -81,10 +81,17 @@ static const char* fixedAIprefixes[22] = {
 
 
 /*
+ *  Set of characters that are permissible in URIs, including percent
+ *
+ */
+static const char *uriCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~:/?#[]@!$&'()*+,;=%";
+
+
+/*
  *  Set of 82 characters valid within type "X" AIs
  *
  */
-static const char* cset82 = "!\"%&'()*+,-./0123456789:;<=>?ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz";
+static const char *cset82 = "!\"%&'()*+,-./0123456789:;<=>?ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz";
 
 
 /* "Linter" functions
@@ -1004,6 +1011,11 @@ bool gs1_parseDLuri(gs1_encoder *ctx, char *dlData, char *dataStr) {
 	DEBUG_PRINT("\nParsing DL data: %s\n", dlData);
 
 	p = dlData;
+
+	if (strspn(p, uriCharacters) != strlen(p)) {
+		strcpy(ctx->errMsg, "URI contains illegal characters");
+		goto fail;
+	}
 
 	if (strlen(p) >= 8 && strncmp(p, "https://", 8) == 0)
 		p += 8;
