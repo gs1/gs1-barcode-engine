@@ -1173,6 +1173,15 @@ bool gs1_parseDLuri(gs1_encoder *ctx, char *dlData, char *dataStr) {
 			goto fail;
 		}
 
+		// Special handling of AI (01) to pad up to a GTIN-14
+		if (strcmp(entry->ai, "01") == 0 &&
+		    (vallen == 13 || vallen == 12 || vallen == 8)) {
+			for (i = 0; i <= 13; i++)
+				aival[13-i] = vallen >= i+1 ? aival[vallen-i-1] : '0';
+			aival[14] = '\0';
+			vallen = 14;
+		}
+
 		DEBUG_PRINT("    Extracted: (%s) %.*s\n", entry->ai, vallen, aival);
 
 		if (fnc1req)
