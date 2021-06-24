@@ -28,7 +28,7 @@
 #include "cc.h"
 #include "debug.h"
 #include "driver.h"
-#include "gs1.h"
+#include "ai.h"
 #include "rsslim.h"
 #include "rssutil.h"
 

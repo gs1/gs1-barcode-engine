@@ -29,7 +29,7 @@
 #include "debug.h"
 #include "driver.h"
 #include "ean.h"
-#include "gs1.h"
+#include "ai.h"
 
 
 #define EAN13_ELMNTS	61	// includes qz's

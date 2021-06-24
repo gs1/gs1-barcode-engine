@@ -49,7 +49,8 @@
 #include "cc.h"
 #include "dm.h"
 #include "ean.h"
-#include "gs1.h"
+#include "ai.h"
+#include "dl.h"
 #include "qr.h"
 #include "rss14.h"
 #include "rssexp.h"
@@ -181,15 +182,21 @@ TEST_LIST = {
 
 
     /*
-     * gs1.c
+     * ai.c
      *
      */
-    { "gs1_lookupAIentry", test_gs1_lookupAIentry },
-    { "gs1_gs1_parseAIdata", test_gs1_parseAIdata },
-    { "gs1_gs1_parseDLuri", test_gs1_parseDLuri },
-    { "gs1_gs1_processAIdata", test_gs1_processAIdata },
-    { "gs1_validateParity", test_gs1_validateParity },
-    { "gs1_URIunescape", test_gs1_URIunescape },
+    { "ai_lookupAIentry", test_ai_lookupAIentry },
+    { "ai_gs1_parseAIdata", test_ai_parseAIdata },
+    { "ai_gs1_processAIdata", test_ai_processAIdata },
+    { "ai_validateParity", test_ai_validateParity },
+
+
+    /*
+     * dl.c
+     *
+     */
+    { "dl_gs1_parseDLuri", test_dl_parseDLuri },
+    { "dl_URIunescape", test_dl_URIunescape },
 
 
     /*

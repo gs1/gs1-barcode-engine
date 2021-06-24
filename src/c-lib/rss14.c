@@ -27,7 +27,7 @@
 #include "enc-private.h"
 #include "debug.h"
 #include "driver.h"
-#include "gs1.h"
+#include "ai.h"
 #include "rss14.h"
 #include "rssutil.h"
 #include "cc.h"

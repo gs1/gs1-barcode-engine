@@ -46,11 +46,14 @@ struct sPrints {
 };
 
 
+#define SIZEOF_ARRAY(x) (sizeof(x) / sizeof(x[0]))
+
+
 #include "cc.h"
 #include "dm.h"
 #include "driver.h"
 #include "ean.h"
-#include "gs1.h"
+#include "ai.h"
 #include "mtx.h"
 #include "qr.h"
 #include "rss14.h"

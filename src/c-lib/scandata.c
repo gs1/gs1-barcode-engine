@@ -20,13 +20,14 @@
 
 #include <assert.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 
 #include "enc-private.h"
 #include "gs1encoders.h"
 #include "ean.h"
-#include "gs1.h"
+#include "ai.h"
 #include "rss14.h"
 #include "rsslim.h"
 

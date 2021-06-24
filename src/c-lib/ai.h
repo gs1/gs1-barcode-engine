@@ -18,11 +18,13 @@
  *
  */
 
-#ifndef GS1_H
-#define GS1_H
+#ifndef AI_H
+#define AI_H
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <string.h>
+
 
 #define MAX_AIS		64
 #define MAX_AI_LEN	90
@@ -64,10 +66,26 @@ struct aiValue {
 };
 
 
+// Write to unbracketed AI dataStr checking for overflow
+#define writeDataStr(v) do {						\
+	if (strlen(dataStr) + strlen(v) > MAX_DATA)			\
+		goto fail;						\
+	strcat(dataStr, v);						\
+} while (0)
+
+#define nwriteDataStr(v,l) do {						\
+	if (strlen(dataStr) + l > MAX_DATA)				\
+		goto fail;						\
+	strncat(dataStr, v, l);						\
+} while (0)
+
+
 #include "gs1encoders.h"
 
+const struct aiEntry* gs1_lookupAIentry(const char *p, size_t ailen);
+bool gs1_isFNC1required(const char *ai);
+bool gs1_aiValLengthContentCheck(gs1_encoder *ctx, const struct aiEntry *entry, const char *aiVal, size_t vallen);
 bool gs1_parseAIdata(gs1_encoder *ctx, const char *aiData, char *dataStr);
-bool gs1_parseDLuri(gs1_encoder *ctx, char *dlData, char *dataStr);
 bool gs1_processAIdata(gs1_encoder *ctx, const char *dataStr);
 bool gs1_validateParity(uint8_t *str);
 bool gs1_allDigits(const uint8_t *str, size_t len);
@@ -75,14 +93,12 @@ bool gs1_allDigits(const uint8_t *str, size_t len);
 
 #ifdef UNIT_TESTS
 
-void test_gs1_lookupAIentry(void);
-void test_gs1_parseAIdata(void);
-void test_gs1_parseDLuri(void);
-void test_gs1_processAIdata(void);
-void test_gs1_validateParity(void);
-void test_gs1_URIunescape(void);
+void test_ai_lookupAIentry(void);
+void test_ai_parseAIdata(void);
+void test_ai_processAIdata(void);
+void test_ai_validateParity(void);
 
 #endif
 
 
-#endif  /* GS1_H */
+#endif  /* AI_H */
