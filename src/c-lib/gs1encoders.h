@@ -28,8 +28,9 @@
  * --------
  *
  * The GS1 Barcode Encoder Library provides routines to generate GS1 barcode
- * symbols, process GS1 AI syntax data provided in raw or human-friendly
- * formats, and process the scan data received from barcode readers.
+ * symbols, process GS1 Digital Link and GS1 AI syntax data provided in raw or
+ * human-friendly formats, and process the scan data received from barcode
+ * readers.
  *
  * The supported symbologies are:
  *
@@ -835,8 +836,7 @@ GS1_ENCODERS_API bool gs1_encoder_setFileInputFlag(gs1_encoder *ctx, bool fileIn
  * The return data does not need to be free()ed and the content should be
  * copied if it must persist in user code after subsequent calls to library
  * function that modify the input data buffer such as gs1_encoder_setDataStr(),
- * gs1_encoder_setAIdataStr(), gs1_encoder_setScanData() and
- * gs1_encoder_setDLuriStr().
+ * gs1_encoder_setAIdataStr() and gs1_encoder_setScanData().
  *
  * @see gs1_encoder_getDataStr()
  * @see gs1_encoder_setFileInputFlag()
@@ -848,8 +848,8 @@ GS1_ENCODERS_API char* gs1_encoder_getDataStr(gs1_encoder *ctx);
 
 
 /**
- * @brief Sets the raw data in the buffer that is used when buffer input is
- * selected.
+ * @brief Sets the raw data in the buffer that is to be directly encoded within
+ * a barcode symbol when buffer input is selected.
  *
  * Each encoder accepts input in a format that is specific to the requirements
  * of the symbology, as described below. Some accept "plain" data
@@ -874,7 +874,11 @@ GS1_ENCODERS_API char* gs1_encoder_getDataStr(gs1_encoder *ctx);
  * automatically, including insertion of FNC1 characters where required. This
  * can be used for all symbologies that accept GS1 AI syntax data.
  *
- * The acceptable raw data input varies between symbologies:
+ * Inputs beginning with "http://" or "https://" will be parsed as a Digital
+ * Link URI during which the corresponding AI element string is extracted and
+ * validated.
+ *
+ * The acceptable data input varies between symbologies:
  *
  *   * **EAN-13**:: 13 digits including check digit
  *   * **EAN-8**:: 8 digits including check digit
@@ -908,9 +912,9 @@ GS1_ENCODERS_API char* gs1_encoder_getDataStr(gs1_encoder *ctx);
  * in human-friendly GS1 AI syntax using gs1_encoder_setAIdataStr().**
  *
  * \note
- * Plain data and AI data that is syntactically valid but unsuitable for the
- * intended symbology will be accepted by this function and this fail when
- * gs1_encoder_encode() is called.
+ * Plain data inputs (including Digital Link URIs) and AI data inputs that are
+ * syntactically valid but unsuitable for the intended symbology will be
+ * accepted by this function and this fail when gs1_encoder_encode() is called.
  *
  * \note
  * The length of the data must be less that the value returned by
@@ -996,8 +1000,8 @@ GS1_ENCODERS_API bool gs1_encoder_setAIdataStr(gs1_encoder *ctx, const char *dat
  * The return data does not need to be free()ed and the content should be
  * copied if it must persist in user code after subsequent calls to library
  * functions that modify the input data buffer such as
- * gs1_encoder_setDataStr(), gs1_encoder_setAIdataStr(),
- * gs1_encoder_setScanData() and gs1_encoder_setDLuriStr().
+ * gs1_encoder_setDataStr(), gs1_encoder_setAIdataStr() and
+ * gs1_encoder_setScanData().
  *
  * \note
  * The returned pointer should be checked for NULL which indicates non-AI input data.
@@ -1011,47 +1015,9 @@ GS1_ENCODERS_API char* gs1_encoder_getAIdataStr(gs1_encoder *ctx);
 
 
 /**
- * @brief Sets the data in the buffer that is used when buffer input is
- * selected by parsing input provided as a GS1 Digital Link URI.
- *
- * The input is provided in human-friendly format **without** FNC1 characters
- * which are inserted automatically, for example:
- *
- * \code
- * https://example.org/01/12345678901231/22/ABC%2d123?99=TEST
- * \endcode
- *
- * The input is immediately parsed and validated against the basic syntax for a
- * Digital Link URI and certain rules for GS1 AIs, after which the
- * user-provided URI is available via gs1_encoder_getDataStr(). If the input is
- * invalid then this function will return false and an error message will be
- * set that can be read using gs1_encoder_getErrMsg().
- *
- * If the input is successfully parsed then the extracted AI string is
- * available via gs1_encoder_getAIdataStr() and gs1_encoder_getHRI().
- *
- * \note
- * The length of the input data must be less that the value returned by
- * gs1_encoder_getMaxDataStrLength().
- *
- * @see gs1_encoder_setDataStr()
- * @see gs1_encoder_getMaxDataStrLength()
- * @see gs1_encoder_getDataStr()
- * @see gs1_encoder_getAIdataStr()
- * @see gs1_encoder_getHRI()
- * @see gs1_encoder_setFileInputFlag()
- *
- * @param [in,out] ctx ::gs1_encoder context
- * @param [in] dlURI the barcode input data in the form of a Digital Link URI
- * @return true on success, otherwise false and an error message is set
- */
-GS1_ENCODERS_API bool gs1_encoder_setDLuriStr(gs1_encoder *ctx, const char *dlURI);
-
-
-/**
  * @brief Process scan data received from a barcode reader with reporting of
  * AIM symbology identifiers enabled to extract the message data and perform
- * syntax checks in the case of AI data.
+ * syntax checks in the case of GS1 Digital Link and AI data input.
  *
  * This function will process scan data (such as the output of a barcode
  * reader) and process the received data, setting the data input buffer to the
@@ -1090,8 +1056,8 @@ GS1_ENCODERS_API bool gs1_encoder_setDLuriStr(gs1_encoder *ctx, const char *dlUR
  * The return data does not need to be free()ed and the content should be
  * copied if it must persist in user code after subsequent calls to library
  * functions that modify the input data buffer such as
- * gs1_encoder_setDataStr(), gs1_encoder_setAIdataStr(),
- * gs1_encoder_setScanData() and gs1_encoder_setDLuriStr().
+ * gs1_encoder_setDataStr(), gs1_encoder_setAIdataStr() and
+ * gs1_encoder_setScanData().
  *
  * @see gs1_encoder_setScanData()
  * @see gs1_encoder_getDataStr()
@@ -1154,8 +1120,8 @@ GS1_ENCODERS_API bool gs1_encoder_setScanData(gs1_encoder* ctx, const char *scan
  * The return data does not need to be free()ed and the content should be
  * copied if it must persist in user code after subsequent calls to library
  * functions that modify the input data buffer such as
- * gs1_encoder_setDataStr(), gs1_encoder_setAIdataStr(),
- * gs1_encoder_setScanData() and gs1_encoder_setDLuriStr().
+ * gs1_encoder_setDataStr(), gs1_encoder_setAIdataStr() and
+ * gs1_encoder_setScanData().
  *
  * @see gs1_encoder_setScanData()
  * @see gs1_encoder_setDataStr()
@@ -1187,8 +1153,7 @@ GS1_ENCODERS_API char* gs1_encoder_getScanData(gs1_encoder* ctx);
  * The return data does not need to be free()ed and the content should be
  * copied if it must persist in user code after subsequent calls to functions
  * that modify the input data buffer such as gs1_encoder_setDataStr(),
- * gs1_encoder_setAIdataStr(), gs1_encoder_setScanData() and
- * gs1_encoder_setDLuriStr().
+ * gs1_encoder_setAIdataStr() or gs1_encoder_setScanData().
  *
  * @see gs1_encoder_getDataStr()
  * @see gs1_encoder_setFileInputFlag()

@@ -566,14 +566,19 @@ GS1_ENCODERS_API bool gs1_encoder_setDataStr(gs1_encoder *ctx, const char* dataS
 		ctx->errFlag = true;
 		return false;
 	}
-	if (ctx->dataStr != dataStr)				// For file input we are given ctx->dataStr
+	if (ctx->dataStr != dataStr)					// File input is via ctx->dataStr
 		strcpy(ctx->dataStr, dataStr);
 
 	// Validate and process data, including extraction of HRI
 	ctx->numAIs = 0;
-	if ((cc = strchr(ctx->dataStr, '|')) != NULL)		// Composite symbol
-	{
-		*cc = '\0';					// Delimit end of linear component
+	if ((strlen(ctx->dataStr) >= 8 && strncmp(ctx->dataStr, "https://", 8) == 0) ||	// Digital Link URI
+	    (strlen(ctx->dataStr) >= 7 && strncmp(ctx->dataStr, "http://",  7) == 0)) {
+		// We extract AIs with the element string stored in dlAIbuffer
+		if (!gs1_parseDLuri(ctx, ctx->dataStr, ctx->dlAIbuffer))
+			goto fail;
+	}
+	else if ((cc = strchr(ctx->dataStr, '|')) != NULL) {		// Composite symbol
+		*cc = '\0';						// Delimit end of linear component
 		if (*ctx->dataStr == '#' && !gs1_processAIdata(ctx, ctx->dataStr))
 			goto fail;
 		if (ctx->numAIs >= MAX_AIS) {
@@ -581,12 +586,12 @@ GS1_ENCODERS_API bool gs1_encoder_setDataStr(gs1_encoder *ctx, const char* dataS
 			ctx->errFlag = true;
 			goto fail;
 		}
-		ctx->aiData[ctx->numAIs++].aiEntry = NULL;	// Indicate separator in HRI
+		ctx->aiData[ctx->numAIs++].aiEntry = NULL;		// Indicate separator in HRI
 		if (!gs1_processAIdata(ctx, cc + 1))
 			goto fail;
-		*cc = '|';					// Restore orginal "|"
+		*cc = '|';						// Restore orginal "|"
 	}
-	else {							// Linear-only symbol
+	else {								// Linear-only symbol
 		if (*ctx->dataStr == '#' && !gs1_processAIdata(ctx, ctx->dataStr))
 			goto fail;
 	}
@@ -642,28 +647,6 @@ GS1_ENCODERS_API bool gs1_encoder_setAIdataStr(gs1_encoder *ctx, const char* gs1
 			ctx->numAIs = 0;
 			return false;
 		}
-	}
-
-	return true;
-
-}
-
-
-GS1_ENCODERS_API bool gs1_encoder_setDLuriStr(gs1_encoder *ctx, const char* dlData) {
-
-	assert(ctx);
-	assert(dlData);
-	reset_error(ctx);
-
-	// Validate DL data
-	ctx->numAIs = 0;
-	strcpy(ctx->dataStr, dlData);		// User input goes here for encoding
-
-	// We encode into dlAIbuffer as storage for HRI text
-	if (!gs1_parseDLuri(ctx, ctx->dataStr, ctx->dlAIbuffer)) {
-		*ctx->dataStr = '\0';
-		ctx->numAIs = 0;
-		return false;
 	}
 
 	return true;
@@ -1560,8 +1543,8 @@ void test_api_getHRI(void) {
 	TEST_CHECK(strcmp(hri[2], "--") == 0);
 	TEST_CHECK(strcmp(hri[3], "(99) COMPOSITE") == 0);
 
-	// HRI from DL data
-	TEST_ASSERT(gs1_encoder_setDLuriStr(ctx, "https://a/01/12312312312333/22/TESTING?99=ABC%2d123&98=XYZ"));
+	// HRI from Digital Link URI
+	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "https://a/01/12312312312333/22/TESTING?99=ABC%2d123&98=XYZ"));
 	TEST_ASSERT((numAIs = gs1_encoder_getHRI(ctx, &hri)) == 4);
 	TEST_ASSERT(hri != NULL);
 	TEST_CHECK(strcmp(hri[0], "(01) 12312312312333") == 0);

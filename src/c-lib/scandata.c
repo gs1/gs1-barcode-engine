@@ -28,6 +28,7 @@
 #include "gs1encoders.h"
 #include "ean.h"
 #include "ai.h"
+#include "dl.h"
 #include "rss14.h"
 #include "rsslim.h"
 
@@ -264,6 +265,10 @@ bool gs1_processScanData(gs1_encoder* ctx, const char* scanData) {
 	assert(ctx);
 	assert(scanData);
 
+	ctx->sym = gs1_encoder_sNONE;
+	*ctx->dataStr = '\0';
+	ctx->numAIs = 0;
+
 	*ctx->errMsg = '\0';
 	ctx->errFlag = false;
 
@@ -351,14 +356,26 @@ bool gs1_processScanData(gs1_encoder* ctx, const char* scanData) {
 		if (!gs1_processAIdata(ctx, q))		// Validate AI data
 			goto fail;
 
-	} else {
-		// Disambiguate from GS1 data: "#" -> "\#" ; "\#" -> "\\#", etc
-		q = scanData;
-		while (*q == '\\')
-			q++;
-		if (*q == '#')
-			*p++ = '\\';
-		strcpy(p, scanData);
+		return true;
+
+	}
+
+	// From here plain data
+
+	// Disambiguate from GS1 data: "#" -> "\#" ; "\#" -> "\\#", etc
+	q = scanData;
+	while (*q == '\\')
+		q++;
+	if (*q == '#')
+		*p++ = '\\';
+	strcpy(p, scanData);
+
+	// If a Digital Link URI is given then process it immediately
+	if ((strlen(ctx->dataStr) >= 8 && strncmp(ctx->dataStr, "https://", 8) == 0) || // Digital Link URI
+	    (strlen(ctx->dataStr) >= 7 && strncmp(ctx->dataStr, "http://",  7) == 0)) {
+		// We extract AIs with the element string stored in dlAIbuffer
+		if (!gs1_parseDLuri(ctx, ctx->dataStr, ctx->dlAIbuffer))
+			goto fail;
 	}
 
 	return true;
@@ -530,6 +547,11 @@ void test_scandata_processScanData(void) {
 	test_testProcessScanData(true, "]Q3011231231231233310ABC123" "\x1D" "99TESTING",
 		QR, "#011231231231233310ABC123#99TESTING");
 
+	// Digital Link URI
+	test_testProcessScanData(true, "]Q1https://id.gs1.org/01/12312312312333?99=TEST",
+		QR, "https://id.gs1.org/01/12312312312333?99=TEST");
+	TEST_CHECK(strcmp(ctx->dlAIbuffer, "#011231231231233399TEST") == 0);	// Check AI extraction
+
 	/* DM */
 	test_testProcessScanData(true, "]d1", DM, "");
 	test_testProcessScanData(true, "]d1TESTING", DM, "TESTING");
@@ -538,6 +560,11 @@ void test_scandata_processScanData(void) {
 	test_testProcessScanData(false, "]d2", NONE, "");		// Empty GS1 data
 	test_testProcessScanData(true, "]d2011231231231233310ABC123" "\x1D" "99TESTING",
 		DM, "#011231231231233310ABC123#99TESTING");
+
+	// Digital Link URI
+	test_testProcessScanData(true, "]d1https://id.gs1.org/01/12312312312333?99=TEST",
+		DM, "https://id.gs1.org/01/12312312312333?99=TEST");
+	TEST_CHECK(strcmp(ctx->dlAIbuffer, "#011231231231233399TEST") == 0);	// Check AI extraction
 
 	/* DataBar Expanded, shared with all DataBar family and UCC-128 Composite */
 	test_testProcessScanData(false, "]e0", NONE, "");		// Empty GS1 data
