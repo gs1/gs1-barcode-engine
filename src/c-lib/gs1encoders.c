@@ -576,6 +576,11 @@ GS1_ENCODERS_API bool gs1_encoder_setDataStr(gs1_encoder *ctx, const char* dataS
 		*cc = '\0';					// Delimit end of linear component
 		if (*ctx->dataStr == '#' && !gs1_processAIdata(ctx, ctx->dataStr))
 			goto fail;
+		if (ctx->numAIs >= MAX_AIS) {
+			strcpy(ctx->errMsg, "Too many AIs");
+			ctx->errFlag = true;
+			goto fail;
+		}
 		ctx->aiData[ctx->numAIs++].aiEntry = NULL;	// Indicate separator in HRI
 		if (!gs1_processAIdata(ctx, cc + 1))
 			goto fail;
