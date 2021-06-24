@@ -54,10 +54,13 @@
     <ClCompile Include="debug.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="gs1.c">
+    <ClCompile Include="scandata.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="scandata.c">
+    <ClCompile Include="ai.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dl.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -104,10 +107,13 @@
     <ClInclude Include="debug.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="gs1.h">
+    <ClInclude Include="scandata.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="scandata.h">
+    <ClInclude Include="ai.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
