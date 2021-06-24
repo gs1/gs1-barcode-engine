@@ -154,14 +154,14 @@ bool gs1_parseDLuri(gs1_encoder *ctx, char *dlData, char *dataStr) {
 		goto fail;
 	}
 
-	DEBUG_PRINT("  Scheme %.*s\n", p-dlData-3, dlData);
+	DEBUG_PRINT("  Scheme %.*s\n", (int)(p-dlData-3), dlData);
 
 	if (((r = strchr(p, '/')) == NULL) || r-p < 1) {
 		strcpy(ctx->errMsg, "URI must contain a domain and path info");
 		goto fail;
 	}
 
-	DEBUG_PRINT("  Domain: %.*s\n", r-p, p);
+	DEBUG_PRINT("  Domain: %.*s\n", (int)(r-p), p);
 
 	pi = p = r;					// Skip the domain name
 
@@ -206,7 +206,7 @@ bool gs1_parseDLuri(gs1_encoder *ctx, char *dlData, char *dataStr) {
 		goto fail;
 	}
 
-	DEBUG_PRINT("  Stem: %.*s\n", dp-dlData, dlData);
+	DEBUG_PRINT("  Stem: %.*s\n", (int)(dp-dlData), dlData);
 
 	DEBUG_PRINT("  DL path info: %s\n", dp);
 
@@ -238,7 +238,7 @@ bool gs1_parseDLuri(gs1_encoder *ctx, char *dlData, char *dataStr) {
 			vallen = 14;
 		}
 
-		DEBUG_PRINT("    Extracted: (%s) %.*s\n", entry->ai, vallen, aival);
+		DEBUG_PRINT("    Extracted: (%s) %.*s\n", entry->ai, (int)vallen, aival);
 
 		if (fnc1req)
 			writeDataStr("#");			// Write FNC1, if required
@@ -271,7 +271,7 @@ bool gs1_parseDLuri(gs1_encoder *ctx, char *dlData, char *dataStr) {
 
 		// Discard parameters with no value and unknown AIs
 		if ((e = memchr(p, '=', (size_t)(r-p))) == NULL) {
-			DEBUG_PRINT("    Skipped singleton:   %.*s\n", r-p, p);
+			DEBUG_PRINT("    Skipped singleton:   %.*s\n", (int)(r-p), p);
 			p = r;
 			continue;
 		}
@@ -285,7 +285,7 @@ bool gs1_parseDLuri(gs1_encoder *ctx, char *dlData, char *dataStr) {
 
 		// Skip non-numeric query parameters
 		if (!entry) {
-			DEBUG_PRINT("    Skipped:   %.*s\n", r-p, p);
+			DEBUG_PRINT("    Skipped:   %.*s\n", (int)(r-p), p);
 			p = r;
 			continue;
 		}
@@ -306,7 +306,7 @@ bool gs1_parseDLuri(gs1_encoder *ctx, char *dlData, char *dataStr) {
 			vallen = 14;
 		}
 
-		DEBUG_PRINT("    Extracted: (%s) %.*s\n", entry->ai, vallen, aival);
+		DEBUG_PRINT("    Extracted: (%s) %.*s\n", entry->ai, (int)vallen, aival);
 
 		if (fnc1req)
 			writeDataStr("#");			// Write FNC1, if required
