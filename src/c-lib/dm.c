@@ -483,6 +483,15 @@ static int DMenc(gs1_encoder *ctx, const uint8_t string[], struct patternLength 
 		return 0;
 	}
 
+	// For GS1 purposes we restrict to AI or DL only
+	if (!(*string == '#' ||
+	     (strlen((char*)string) >= 8 && strncmp((char*)string, "https://", 8) == 0) ||
+	     (strlen((char*)string) >= 7 && strncmp((char*)string, "http://",  7) == 0)) ) {
+		strcpy(ctx->errMsg, "Data Matrix input must be either an AI element string or a Digital Link URI");
+		ctx->errFlag = true;
+		return 0;
+	}
+
 	createCodewords(ctx, string, cws, &cwslen);
 	if (cwslen == UINT16_MAX) {
 		strcpy(ctx->errMsg, "Data exceeds the capacity of any Data Matrix symbol");
@@ -572,30 +581,6 @@ out:
 #include "gs1encoders-test.h"
 
 
-void test_dm_DM_dataLength(void) {
-
-	int i;
-	char string[MAX_DM_DAT_CWS+1] = { 0 };
-	char casename[5];
-
-	gs1_encoder* ctx = gs1_encoder_init(NULL);
-
-	gs1_encoder_setFormat(ctx, gs1_encoder_dRAW);
-	gs1_encoder_setSym(ctx, gs1_encoder_sDM);
-
-	for (i = 1; i <= MAX_DM_DAT_CWS; i++) {
-		string[i-1] = 'A';
-		gs1_encoder_setDataStr(ctx, string);
-		sprintf(casename, "%d", i);
-		TEST_CASE(casename);
-		TEST_CHECK(gs1_encoder_encode(ctx));
-	}
-
-	gs1_encoder_free(ctx);
-
-}
-
-
 void test_dm_DM_encode(void) {
 
 	const char** expect;
@@ -603,25 +588,33 @@ void test_dm_DM_encode(void) {
 	gs1_encoder* ctx = gs1_encoder_init(NULL);
 
 	expect = (const char*[]){
-"                ",
-" X X X X X X X  ",
-" XX   XX X    X ",
-" X   XXXXX XX   ",
-" X XX   X   X X ",
-" X XXX XXX X X  ",
-" XX XX     XX X ",
-" X  XX   X   X  ",
-" XX X    X XX X ",
-" X XX     XX X  ",
-" X  XX    X   X ",
-" X XXX X XXX    ",
-" XXXXXXXX XX XX ",
-" XX  X   XXX    ",
-" XXXXXXXXXXXXXX ",
-"                ",
+"                        ",
+" X X X X X X X X X X X  ",
+" X XX XXX  X X X X X  X ",
+" XXX  X  XXX  XXXX      ",
+" XX XXX  XX  XX X XXX X ",
+" XX  X  X X X   X X XX  ",
+" XXXXX     XX   X   XXX ",
+" X  XXX X X XXX X XX    ",
+" XX  XXXXX XX  XXXXX XX ",
+" X  X              XX   ",
+" X XX XXX X   X X X   X ",
+" XX XX    X   XXX XXX   ",
+" X X    X  XX  X XXX XX ",
+" X    XX XXX XX  X X    ",
+" X XX X   XX   XX     X ",
+" X    X    X X  X X     ",
+" X XX   X XXXX   XXX  X ",
+" XX   XXXXX X XX XX XX  ",
+" XX XX X XX XXX       X ",
+" X XXXX    X X  X X  X  ",
+" X  X  X X XXXXX  X X X ",
+" XX X   XX  XXXXXX   X  ",
+" XXXXXXXXXXXXXXXXXXXXXX ",
+"                        ",
 NULL
 	};
-	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sDM, "1501234567890", expect));
+	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sDM, "https://id.gs1.org/01/12312312312333", expect));
 
 	expect = (const char*[]){
 "                      ",

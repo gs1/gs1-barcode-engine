@@ -825,6 +825,15 @@ static int QRenc(gs1_encoder *ctx, const uint8_t string[], struct patternLength 
 		return 0;
 	}
 
+	// For GS1 purposes we restrict to AI or DL only
+	if (!(*string == '#' ||
+	     (strlen((char*)string) >= 8 && strncmp((char*)string, "https://", 8) == 0) ||
+	     (strlen((char*)string) >= 7 && strncmp((char*)string, "http://",  7) == 0)) ) {
+		strcpy(ctx->errMsg, "QR Code input must be either an AI element string or a Digital Link URI");
+		ctx->errFlag = true;
+		return 0;
+	}
+
 	createCodewords(ctx, string, cws_v, bits_v);
 	if (bits_v[0] == UINT16_MAX && bits_v[1] == UINT16_MAX && bits_v[2] == UINT16_MAX) {
 		strcpy(ctx->errMsg, "Data exceeds the capacity of any QR Code symbol");
@@ -962,7 +971,7 @@ void test_qr_QR_versions(void) {
 
 	gs1_encoder_setFormat(ctx, gs1_encoder_dRAW);
 	gs1_encoder_setSym(ctx, gs1_encoder_sQR);
-	gs1_encoder_setDataStr(ctx, "ABC123");
+	gs1_encoder_setDataStr(ctx, "#99A");
 
 	for (v = 1; v <= 40; v++) {
 		for (ec = gs1_encoder_qrEClevelL; ec <= gs1_encoder_qrEClevelH; ec++) {
@@ -985,38 +994,46 @@ void test_qr_QR_encode(void) {
 	gs1_encoder* ctx = gs1_encoder_init(NULL);
 
 	expect = (const char*[]){
-"                             ",
-"                             ",
-"                             ",
-"                             ",
-"    XXXXXXX  X XX XXXXXXX    ",
-"    X     X  X  X X     X    ",
-"    X XXX X XXX X X XXX X    ",
-"    X XXX X X     X XXX X    ",
-"    X XXX X XXXXX X XXX X    ",
-"    X     X XX  X X     X    ",
-"    XXXXXXX X X X XXXXXXX    ",
-"            X XXX            ",
-"    X XXXXX  XX X XXXXX      ",
-"      XX X X X  X  X  X      ",
-"    XXXX XXX  XX X  X  X     ",
-"     XXX   X X     XXXXX     ",
-"      X   XX  XX X  X X      ",
-"            X XXXXXX  X      ",
-"    XXXXXXX   X X XX X X     ",
-"    X     X X  XXXX X X X    ",
-"    X XXX X X X X  X X X     ",
-"    X XXX X XXX X   X X      ",
-"    X XXX X XXXX X X XX      ",
-"    X     X  XX    XX X      ",
-"    XXXXXXX XX X X X X X     ",
-"                             ",
-"                             ",
-"                             ",
-"                             ",
+"                                     ",
+"                                     ",
+"                                     ",
+"                                     ",
+"    XXXXXXX X  XXX X   X  XXXXXXX    ",
+"    X     X X X XX  XX    X     X    ",
+"    X XXX X        XX X X X XXX X    ",
+"    X XXX X X X   XXXXXX  X XXX X    ",
+"    X XXX X   XXX XX XXXX X XXX X    ",
+"    X     X   X  X   X XX X     X    ",
+"    XXXXXXX X X X X X X X XXXXXXX    ",
+"            X   X  X X  X            ",
+"    X XX XXX  X  X   X XX X  X XX    ",
+"    X   XX  X XXXXX    X  XXX   X    ",
+"        X X   XX X  X   X   X XX     ",
+"     X X    XXXXX  XX XX X X    X    ",
+"         XX    X  XXXXX XX   XX      ",
+"    XX  XX XX X X XX XXXXXX   XXX    ",
+"    X XXXXXX    XX  X  XX X X XXX    ",
+"     X XXX XX X   X    XX  X   X     ",
+"    X     XX XXXX X X  XX  XXX X     ",
+"      XXXX XXX XX XXX X      XXX     ",
+"    X X  XXX     XXXXXX X X X X      ",
+"       X    XX   XX  X X  X   X      ",
+"     X XX XXX X  XX  X XXXXXXXX      ",
+"            XX XX       X   XXXXX    ",
+"    XXXXXXX XXX   X X  XX X XX X     ",
+"    X     X X  X XXXX X X   XX  X    ",
+"    X XXX X   XXX  XXXX XXXXX X      ",
+"    X XXX X XX  X  X XX  X XXX  X    ",
+"    X XXX X X XX X  X  X   X  X X    ",
+"    X     X  X XX X    XX XXXX X     ",
+"    XXXXXXX XXXX X  X  XXXXXX  X     ",
+"                                     ",
+"                                     ",
+"                                     ",
+"                                     ",
 NULL
 	};
-	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sQR, "ABC123", expect));
+	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sQR, "https://id.gs1.org/01/12312312312333", expect));
 
 	expect = (const char*[]){
 "                                     ",
