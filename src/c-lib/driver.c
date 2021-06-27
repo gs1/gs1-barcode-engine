@@ -18,6 +18,9 @@
  *
  */
 
+#include <assert.h>
+#include <float.h>
+#include <math.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdint.h>
@@ -402,5 +405,101 @@ bool gs1_doDriverFinalise(gs1_encoder *ctx) {
 	}
 
 	return true;
+
+}
+
+
+// Find pixMult that produces X dimension closest to target, within optional constraints
+static int findPixMultForConstraints(gs1_encoder *ctx) {
+
+	double diff, best = DBL_MAX;
+	int i, pixMult = 0;
+
+	assert(ctx);
+	assert(ctx->deviceRes > 0);
+	assert(ctx->minX == 0 || ctx->maxX == 0 || ctx->minX <= ctx->maxX);
+	assert(ctx->minX == 0 || ctx->targetX >= ctx->minX);
+	assert(ctx->maxX == 0 || ctx->targetX <= ctx->maxX);
+
+	for (i = 1; i <= MAX_PIXMULT; i++) {
+		if (ctx->minX != 0 && ((double)i)/ctx->deviceRes < ctx->minX)
+			continue;
+		if (ctx->maxX != 0 && ((double)i)/ctx->deviceRes > ctx->maxX)
+			continue;
+		diff = fabs(((double)i)/ctx->deviceRes - ctx->targetX);
+		if (diff < best - 0.00001) {		// Handle roundoff
+			best = diff;
+			pixMult = i;
+		}
+	}
+
+	if (!pixMult) {
+		sprintf(ctx->errMsg, "Impossible to plot X-dimension of %f within %f - %f at %f resolution", ctx->targetX, ctx->minX, ctx->maxX, ctx->deviceRes);
+		ctx->errFlag = true;
+		return 0;
+	}
+
+	return pixMult;
+
+}
+
+
+bool gs1_setXdimension(gs1_encoder *ctx, const double minX, const double targetX, const double maxX) {
+
+	int pixMult;
+
+	if (ctx->deviceRes == 0) {
+		strcpy(ctx->errMsg, "Must set device resolution before specifying X-dimension constraints");
+		ctx->errFlag = true;
+		goto fail;
+	}
+	if (minX < 0) {
+		strcpy(ctx->errMsg, "Minimum X-dimension cannot be negative");
+		ctx->errFlag = true;
+		goto fail;
+	}
+	if (targetX < 0) {
+		strcpy(ctx->errMsg, "Target X-dimension must be positive");
+		ctx->errFlag = true;
+		goto fail;
+	}
+	if (maxX < 0) {
+		strcpy(ctx->errMsg, "Maximum X-dimension cannot be negative");
+		ctx->errFlag = true;
+		goto fail;
+	}
+	if (minX != 0 && maxX != 0 && maxX < minX) {
+		strcpy(ctx->errMsg, "Minimum X-dimension cannot be greater than maximum X-dimension");
+		ctx->errFlag = true;
+		goto fail;
+	}
+	if ((minX != 0 && targetX < minX) ||
+	    (maxX != 0 && targetX > maxX)) {
+		strcpy(ctx->errMsg, "Target X-dimension must not be outside the specified minimum and maximum");
+		ctx->errFlag = true;
+		goto fail;
+	}
+
+	ctx->minX = minX;
+	ctx->targetX = targetX;
+	ctx->maxX = maxX;
+
+	if ((pixMult = findPixMultForConstraints(ctx)) == 0)
+		goto fail;	// Error already set
+
+	ctx->pixMult = pixMult;
+	if (pixMult <= ctx->Xundercut)
+		ctx->Xundercut = 0;
+	if (pixMult <= ctx->Yundercut)
+		ctx->Yundercut = 0;
+	if (pixMult * 2 < ctx->sepHt || pixMult > ctx->sepHt)
+		ctx->sepHt = pixMult;
+
+	return true;
+
+fail:
+
+	ctx->pixMult = 0;	// Disable rendering until resolved by user
+	return false;
 
 }

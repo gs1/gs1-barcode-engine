@@ -104,6 +104,9 @@ GS1_ENCODERS_API gs1_encoder* gs1_encoder_init(void *mem) {
 
 	// Set default parameters
 	ctx->sym = gs1_encoder_sNONE;
+	ctx->deviceRes = 0;
+	ctx->minX = 0;
+	ctx->maxX = 0;
 	ctx->pixMult = 1;
 	ctx->Xundercut = 0;
 	ctx->Yundercut = 0;
@@ -191,6 +194,9 @@ GS1_ENCODERS_API bool gs1_encoder_setPixMult(gs1_encoder *ctx, const int pixMult
 		ctx->errFlag = true;
 		return false;
 	}
+	ctx->minX = 0;
+	ctx->targetX = 0;
+	ctx->maxX = 0;
 	ctx->pixMult = pixMult;
 	if (pixMult <= ctx->Xundercut)
 		ctx->Xundercut = 0;
@@ -202,6 +208,59 @@ GS1_ENCODERS_API bool gs1_encoder_setPixMult(gs1_encoder *ctx, const int pixMult
 }
 
 
+GS1_ENCODERS_API double gs1_encoder_getDeviceResolution(gs1_encoder *ctx) {
+	assert(ctx);
+	reset_error(ctx);
+	return ctx->deviceRes;
+}
+GS1_ENCODERS_API bool gs1_encoder_setDeviceResolution(gs1_encoder *ctx, double res) {
+	assert(ctx);
+	reset_error(ctx);
+
+	if (res < 0) {
+		strcpy(ctx->errMsg, "Device resolution cannot be negative");
+		ctx->errFlag = true;
+		return false;
+	}
+
+	ctx->deviceRes = res;
+
+	ctx->pixMult = 0;
+	ctx->minX = 0;
+	ctx->targetX = 0;
+	ctx->maxX = 0;
+
+	return true;
+}
+
+
+GS1_ENCODERS_API bool gs1_encoder_setXdimension(gs1_encoder *ctx, const double minX, const double targetX, const double maxX) {
+	assert(ctx);
+	reset_error(ctx);
+	return gs1_setXdimension(ctx, minX, targetX, maxX);
+}
+GS1_ENCODERS_API double gs1_encoder_getMinXdimension(gs1_encoder *ctx) {
+	assert(ctx);
+	reset_error(ctx);
+	return ctx->minX;
+}
+GS1_ENCODERS_API double gs1_encoder_getMaxXdimension(gs1_encoder *ctx) {
+	assert(ctx);
+	reset_error(ctx);
+	return ctx->maxX;
+}
+GS1_ENCODERS_API double gs1_encoder_getTargetXdimension(gs1_encoder *ctx) {
+	assert(ctx);
+	reset_error(ctx);
+	return ctx->targetX;
+}
+GS1_ENCODERS_API double gs1_encoder_getActualXdimension(gs1_encoder *ctx) {
+	assert(ctx);
+	reset_error(ctx);
+	return ctx->deviceRes != 0 ? (double)ctx->pixMult / ctx->deviceRes : 0;
+}
+
+
 GS1_ENCODERS_API int gs1_encoder_getXundercut(gs1_encoder *ctx) {
 	assert(ctx);
 	reset_error(ctx);
@@ -210,8 +269,8 @@ GS1_ENCODERS_API int gs1_encoder_getXundercut(gs1_encoder *ctx) {
 GS1_ENCODERS_API bool gs1_encoder_setXundercut(gs1_encoder *ctx, const int Xundercut) {
 	assert(ctx);
 	reset_error(ctx);
-	if (Xundercut != 0 && ctx->pixMult == 1) {
-		strcpy(ctx->errMsg, "No X undercut available when 1 pixel per X");
+	if (Xundercut != 0 && ctx->pixMult <= 1) {
+		strcpy(ctx->errMsg, "No X undercut available unless at least 2 pixel per X");
 		ctx->errFlag = true;
 		return false;
 	}
@@ -233,8 +292,8 @@ GS1_ENCODERS_API int gs1_encoder_getYundercut(gs1_encoder *ctx) {
 GS1_ENCODERS_API bool gs1_encoder_setYundercut(gs1_encoder *ctx, const int Yundercut) {
 	assert(ctx);
 	reset_error(ctx);
-	if (Yundercut !=0 && ctx->pixMult == 1) {
-		strcpy(ctx->errMsg, "No Y undercut available when 1 pixel per X");
+	if (Yundercut !=0 && ctx->pixMult <= 1) {
+		strcpy(ctx->errMsg, "No Y undercut available unless at least 2 pixel per X");
 		ctx->errFlag = true;
 		return false;
 	}
@@ -256,6 +315,11 @@ GS1_ENCODERS_API int gs1_encoder_getSepHt(gs1_encoder *ctx) {
 GS1_ENCODERS_API bool gs1_encoder_setSepHt(gs1_encoder *ctx, const int sepHt) {
 	assert(ctx);
 	reset_error(ctx);
+	if (ctx->pixMult == 0) {
+		strcpy(ctx->errMsg, "X-dimension must be set before separator height is available");
+		ctx->errFlag = true;
+		return false;
+	}
 	if (sepHt < ctx->pixMult || sepHt > 2 * ctx->pixMult) {
 		sprintf(ctx->errMsg, "Valid separator height range is %d to %d", ctx->pixMult, 2 * ctx->pixMult);
 		ctx->errFlag = true;
@@ -767,6 +831,12 @@ GS1_ENCODERS_API bool gs1_encoder_encode(gs1_encoder *ctx) {
 	ctx->bufferWidth = 0;
 	ctx->bufferHeight = 0;
 
+	if (ctx->pixMult == 0) {
+		strcpy(ctx->errMsg, "X-dimension must be set before encoding a symbol");
+		ctx->errFlag = true;
+		return false;
+	}
+
 	if (ctx->fileInputFlag) {
 		size_t i;
 		if ((iFile = fopen(ctx->dataFile, "r")) == NULL) {
@@ -1128,6 +1198,313 @@ void test_api_pixMult(void) {
 
 }
 
+static void test_achievableX(gs1_encoder *ctx,
+				const double minX, const double targetX, const double maxX,
+				const double res, const double expectedX, const int expectedPixMult) {
+
+	double achievedX;
+	int achievedPixMult;
+
+	TEST_CHECK(gs1_encoder_setDeviceResolution(ctx, res));
+	TEST_CHECK(gs1_encoder_setXdimension(ctx, minX, targetX, maxX) ^ (expectedX == 0));
+	TEST_CHECK((achievedX = gs1_encoder_getActualXdimension(ctx)) == expectedX);
+	TEST_MSG("Achieved X: %f; Expected X: %f", achievedX, expectedX);
+	TEST_CHECK((achievedPixMult = gs1_encoder_getPixMult(ctx)) == expectedPixMult);
+	TEST_MSG("Achieved PixMult: %d; Expected PixMult: %d", achievedPixMult, expectedPixMult);
+
+}
+
+
+void test_api_Xdimension(void) {
+
+	gs1_encoder* ctx;
+
+	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+
+
+	// Check defaults
+	TEST_CHECK(gs1_encoder_getDeviceResolution(ctx) == 0.0);
+	TEST_CHECK(gs1_encoder_getMinXdimension(ctx) == 0.0);
+	TEST_CHECK(gs1_encoder_getMaxXdimension(ctx) == 0.0);
+
+	// Reset X-dimension and device dots when device resolution changes
+	TEST_CHECK(gs1_encoder_setDeviceResolution(ctx, 1));
+	TEST_CHECK(gs1_encoder_setXdimension(ctx, 2, 3, 4));
+	TEST_CHECK(gs1_encoder_getMinXdimension(ctx) == 2);
+	TEST_CHECK(gs1_encoder_getTargetXdimension(ctx) == 3);
+	TEST_CHECK(gs1_encoder_getMaxXdimension(ctx) == 4);
+	TEST_CHECK(gs1_encoder_getPixMult(ctx) == 3);
+	TEST_CHECK(gs1_encoder_setDeviceResolution(ctx, 2));
+	TEST_CHECK(gs1_encoder_getMinXdimension(ctx) == 0);
+	TEST_CHECK(gs1_encoder_getTargetXdimension(ctx) == 0);
+	TEST_CHECK(gs1_encoder_getMaxXdimension(ctx) == 0);
+	TEST_CHECK(gs1_encoder_getPixMult(ctx) == 0);
+
+	// Reset X-dimension when device dots changes
+	TEST_CHECK(gs1_encoder_setPixMult(ctx,1));
+	TEST_CHECK(gs1_encoder_getPixMult(ctx) == 1);
+	TEST_CHECK(gs1_encoder_setDeviceResolution(ctx, 1));
+	TEST_CHECK(gs1_encoder_setXdimension(ctx, 2, 3, 4));
+	TEST_CHECK(gs1_encoder_getMinXdimension(ctx) == 2);
+	TEST_CHECK(gs1_encoder_getTargetXdimension(ctx) == 3);
+	TEST_CHECK(gs1_encoder_getMaxXdimension(ctx) == 4);
+	TEST_CHECK(gs1_encoder_setPixMult(ctx,2));
+	TEST_CHECK(gs1_encoder_getPixMult(ctx) == 2);
+	TEST_CHECK(gs1_encoder_getMinXdimension(ctx) == 0);
+	TEST_CHECK(gs1_encoder_getTargetXdimension(ctx) == 0);
+	TEST_CHECK(gs1_encoder_getMaxXdimension(ctx) == 0);
+
+	TEST_CHECK(!gs1_encoder_setDeviceResolution(ctx, -1));		// Not negative device resolution
+
+	TEST_CHECK(gs1_encoder_setDeviceResolution(ctx, 0));		// 0 means undefined
+	TEST_CHECK(!gs1_encoder_setXdimension(ctx, 0, 42, 0));		// Device resolution not set !
+	TEST_CHECK(gs1_encoder_getActualXdimension(ctx) == 0);
+	TEST_CHECK(gs1_encoder_getPixMult(ctx) == 0);
+
+	TEST_CHECK(gs1_encoder_setDeviceResolution(ctx, 1));
+	TEST_CHECK(!gs1_encoder_setXdimension(ctx, -1.0, 0, 0));	// Negative min X-dimension !
+	TEST_CHECK(gs1_encoder_getActualXdimension(ctx) == 0);
+	TEST_CHECK(gs1_encoder_getPixMult(ctx) == 0);
+
+	TEST_CHECK(gs1_encoder_setDeviceResolution(ctx, 1));
+	TEST_CHECK(!gs1_encoder_setXdimension(ctx, 0, -1.0, 0));	// Negative target X-dimension !
+	TEST_CHECK(gs1_encoder_getActualXdimension(ctx) == 0);
+	TEST_CHECK(gs1_encoder_getPixMult(ctx) == 0);
+
+	TEST_CHECK(gs1_encoder_setDeviceResolution(ctx, 1));
+	TEST_CHECK(!gs1_encoder_setXdimension(ctx, 0, 0, -1.0));	// Negative max X-dimension !
+	TEST_CHECK(gs1_encoder_getActualXdimension(ctx) == 0);
+	TEST_CHECK(gs1_encoder_getPixMult(ctx) == 0);
+
+	TEST_CHECK(gs1_encoder_setDeviceResolution(ctx, 1));
+	TEST_CHECK(gs1_encoder_setXdimension(ctx, 0, 0, 0));		// No constraints
+	TEST_CHECK(gs1_encoder_setXdimension(ctx, 0, 2, 0));		// Just target
+	TEST_CHECK(gs1_encoder_setXdimension(ctx, 2, 2, 0));		// target with min
+	TEST_CHECK(gs1_encoder_setXdimension(ctx, 0, 2, 2));		// target with max
+	TEST_CHECK(gs1_encoder_setXdimension(ctx, 2, 2, 2));		// max == target == min
+	TEST_CHECK(gs1_encoder_setXdimension(ctx, 1, 2, 3));		// min < target < max
+	TEST_CHECK(gs1_encoder_setXdimension(ctx, 1, 2, 2));		// min < target == max
+	TEST_CHECK(gs1_encoder_setXdimension(ctx, 1, 1, 2));		// min == target < max
+
+	TEST_CHECK(!gs1_encoder_setXdimension(ctx, 3, 2, 1));		// max < min !
+	TEST_CHECK(gs1_encoder_getActualXdimension(ctx) == 0);
+	TEST_CHECK(gs1_encoder_getPixMult(ctx) == 0);
+
+	// Check min <= target <= max
+	TEST_CHECK(gs1_encoder_setDeviceResolution(ctx, 1));
+	TEST_CHECK(!gs1_encoder_setXdimension(ctx, 49, 48, 51));	// target < min !
+	TEST_CHECK(gs1_encoder_getActualXdimension(ctx) == 0);
+	TEST_CHECK(gs1_encoder_getPixMult(ctx) == 0);
+	TEST_CHECK(gs1_encoder_setXdimension(ctx, 49, 49, 51));		// target == min
+	TEST_CHECK(gs1_encoder_getActualXdimension(ctx) == 49);
+	TEST_CHECK(gs1_encoder_getPixMult(ctx) == 49);
+	TEST_CHECK(gs1_encoder_setXdimension(ctx, 49, 50, 51));		// min < target < max
+	TEST_CHECK(gs1_encoder_getActualXdimension(ctx) == 50);
+	TEST_CHECK(gs1_encoder_getPixMult(ctx) == 50);
+	TEST_CHECK(gs1_encoder_setXdimension(ctx, 49, 51, 51));		// target == max
+	TEST_CHECK(gs1_encoder_getActualXdimension(ctx) == 51);
+	TEST_CHECK(gs1_encoder_getPixMult(ctx) == 51);
+	TEST_CHECK(!gs1_encoder_setXdimension(ctx, 49, 52, 51));	// target > max !
+	TEST_CHECK(gs1_encoder_getActualXdimension(ctx) == 0);
+	TEST_CHECK(gs1_encoder_getPixMult(ctx) == 0);
+	TEST_CHECK(gs1_encoder_setDeviceResolution(ctx, 1));
+	TEST_CHECK(!gs1_encoder_setXdimension(ctx, 50, 49, 50));	// target < min == max !
+	TEST_CHECK(gs1_encoder_getActualXdimension(ctx) == 0);
+	TEST_CHECK(gs1_encoder_getPixMult(ctx) == 0);
+	TEST_CHECK(gs1_encoder_setXdimension(ctx, 50, 50, 50));		// target == min == max
+	TEST_CHECK(gs1_encoder_getActualXdimension(ctx) == 50);
+	TEST_CHECK(gs1_encoder_getPixMult(ctx) == 50);
+	TEST_CHECK(!gs1_encoder_setXdimension(ctx, 50, 51, 50));	// target > max == min !
+	TEST_CHECK(gs1_encoder_getActualXdimension(ctx) == 0);
+	TEST_CHECK(gs1_encoder_getPixMult(ctx) == 0);
+
+	// Basic check that N dots at N dots per unit equals unity
+	TEST_CHECK(gs1_encoder_setDeviceResolution(ctx, 72.0));
+	TEST_CHECK(gs1_encoder_setXdimension(ctx, 0, 1.0, 0));
+	TEST_CHECK(gs1_encoder_getActualXdimension(ctx) == 1.0);
+	TEST_CHECK(gs1_encoder_getPixMult(ctx) == 72);
+
+	// Smallest X dimension possible (pixMult = 1), i.e. that 1 dot at N dots per unit is 1/Nth of a unit
+	TEST_CHECK(gs1_encoder_setDeviceResolution(ctx, 72.0));
+	TEST_CHECK(gs1_encoder_setXdimension(ctx, 0, 1.0/72.0, 0));
+	TEST_CHECK(gs1_encoder_getActualXdimension(ctx) == 1.0/72.0);
+	TEST_CHECK(gs1_encoder_getPixMult(ctx) == 1);
+
+	// Twice the size (pixMult = 2), i.e. that 2 dots at N dots per unit is 2/Nth of a unit
+	TEST_CHECK(gs1_encoder_setDeviceResolution(ctx, 72.0));
+	TEST_CHECK(gs1_encoder_setXdimension(ctx, 0, 1.0/36.0, 0));
+	TEST_CHECK(gs1_encoder_getActualXdimension(ctx) == 2.0/72.0);
+	TEST_CHECK(gs1_encoder_getPixMult(ctx) == 2);
+
+	// Edge case for rounding up to 2 dots per module
+	TEST_CHECK(gs1_encoder_setDeviceResolution(ctx, 72.0));
+	TEST_CHECK(gs1_encoder_setXdimension(ctx, 0, 1.0/47.9, 0));
+	TEST_CHECK(gs1_encoder_getActualXdimension(ctx) == 2.0/72.0);
+	TEST_CHECK(gs1_encoder_getPixMult(ctx) == 2);
+
+	// Edge case for rounding down to 1 dot per module
+	TEST_CHECK(gs1_encoder_setDeviceResolution(ctx, 72.0));
+	TEST_CHECK(gs1_encoder_setXdimension(ctx, 0, 1.0/48, 0));
+	TEST_CHECK(gs1_encoder_getActualXdimension(ctx) == 1.0/72.0);
+	TEST_CHECK(gs1_encoder_getPixMult(ctx) == 1);
+
+	/*
+	 * Common target X-dimensions, using 100 DPI
+	 *
+	 */
+	TEST_CHECK(gs1_encoder_setDeviceResolution(ctx, 100.0));
+	TEST_CHECK(gs1_encoder_setXdimension(ctx, 0, 0.330, 0));
+	TEST_CHECK(gs1_encoder_getActualXdimension(ctx) == 0.33);
+	TEST_CHECK(gs1_encoder_getPixMult(ctx) == 33);
+
+	// +e skew of target to check rounding
+	TEST_CHECK(gs1_encoder_setDeviceResolution(ctx, 100.0));
+	TEST_CHECK(gs1_encoder_setXdimension(ctx, 0, 0.331, 0));
+	TEST_CHECK(gs1_encoder_getActualXdimension(ctx) == 0.33);
+	TEST_CHECK(gs1_encoder_getPixMult(ctx) == 33);
+
+	// -e
+	TEST_CHECK(gs1_encoder_setDeviceResolution(ctx, 100.0));
+	TEST_CHECK(gs1_encoder_setXdimension(ctx, 0, 0.329, 0));
+	TEST_CHECK(gs1_encoder_getActualXdimension(ctx) == 0.33);
+	TEST_CHECK(gs1_encoder_getPixMult(ctx) == 33);
+
+
+	// Aim for 0.264 (minimum for linear at PoS) without constraints and undershoot
+	TEST_CHECK(gs1_encoder_setDeviceResolution(ctx, 100.0));
+	TEST_CHECK(gs1_encoder_setXdimension(ctx, 0, 0.264, 0));
+	TEST_CHECK(gs1_encoder_getActualXdimension(ctx) == 0.26);
+	TEST_CHECK(gs1_encoder_getPixMult(ctx) == 26);
+
+	// Add lower bound to ensure that we shift up
+	TEST_CHECK(gs1_encoder_setDeviceResolution(ctx, 100.0));
+	TEST_CHECK(gs1_encoder_setXdimension(ctx, 0.264, 0.264, 0));
+	TEST_CHECK(gs1_encoder_getActualXdimension(ctx) == 0.27);
+	TEST_CHECK(gs1_encoder_getPixMult(ctx) == 27);
+
+	// Aim for 0.743 (maximum for 2D at PoS) without constraints
+	TEST_CHECK(gs1_encoder_setDeviceResolution(ctx, 100.0));
+	TEST_CHECK(gs1_encoder_setXdimension(ctx, 0, 0.743, 0));
+	TEST_CHECK(gs1_encoder_getActualXdimension(ctx) == 0.74);
+	TEST_CHECK(gs1_encoder_getPixMult(ctx) == 74);
+
+	// Add upper bound to ensure no change
+	TEST_CHECK(gs1_encoder_setDeviceResolution(ctx, 100.0));
+	TEST_CHECK(gs1_encoder_setXdimension(ctx, 0, 0.743, 0.743));
+	TEST_CHECK(gs1_encoder_getActualXdimension(ctx) == 0.74);
+	TEST_CHECK(gs1_encoder_getPixMult(ctx) == 74);
+
+
+	// Aim for 0.616 (maximum for 2D with DPM) without constraints
+	TEST_CHECK(gs1_encoder_setDeviceResolution(ctx, 92.0));
+	TEST_CHECK(gs1_encoder_setXdimension(ctx, 0, 0.616, 0));
+	TEST_CHECK(gs1_encoder_getActualXdimension(ctx) == 57.0/92.0);	// 0.619
+	TEST_CHECK(gs1_encoder_getPixMult(ctx) == 57);
+
+	// Add upper bound to ensure that we shift down
+	TEST_CHECK(gs1_encoder_setDeviceResolution(ctx, 92.0));
+	TEST_CHECK(gs1_encoder_setXdimension(ctx, 0, 0.616, 0.616));
+	TEST_CHECK(gs1_encoder_getActualXdimension(ctx) == 56.0/92.0);	// 0.609
+	TEST_CHECK(gs1_encoder_getPixMult(ctx) == 56);
+
+
+	/*
+	 * Linear symbol at P.o.S.: minX = 0.264mm; targetX = 0.330mm; maxX = 0.660mm
+	 *
+	 */
+	//                     minX   tgtX   maxX  res  actualX  dots per module
+	test_achievableX(ctx, 0.264, 0.330, 0.660,   8,   0.375,   3);	// 8 dots/mm => X = 0.375 (114%) @ 3 dots per module
+	test_achievableX(ctx, 0.264, 0.330, 0.660,   7, 2.0/7.0,   2);	// 7 dots/mm => X = 0.286 (87%)  @ 2 dots per module
+	test_achievableX(ctx, 0.264, 0.330, 0.660,   6, 2.0/6.0,   2);	// 6 dots/mm => X = 0.333 (101%) @ 2 dots per module
+	test_achievableX(ctx, 0.264, 0.330, 0.660,   5,   0.400,   2);	// 5 dots/mm => X = 0.400 (121%) @ 2 dots per module
+	test_achievableX(ctx, 0.264, 0.330, 0.660,   4,   0.500,   2);	// 4 dots/mm => X = 0.500 (152%) @ 2 dots per module
+	test_achievableX(ctx, 0.264, 0.330, 0.660,   3, 1.0/3.0,   1);	// 3 dots/mm => X = 0.333 (101%) @ 1 dot per module
+	test_achievableX(ctx, 0.264, 0.330, 0.660,   2,   0.500,   1);	// 2 dots/mm => X = 0.500 (152%) @ 1 dot per module
+	test_achievableX(ctx, 0.264, 0.330, 0.660,   1,       0,   0);	// 1 dots/mm => Impossible; 1 dot => 1.000mm
+
+
+	/*
+	 * 2D symbol at P.o.S.: minX = 0.375mm; targetX = 0.625mm; maxX = 0.990mm
+	 *
+	 */
+	//                     minX   tgtX   maxX  res  actualX  dots per module
+	test_achievableX(ctx, 0.375, 0.625, 0.990,   8,   0.625,   5);	// 8 dots/mm => X = 0.625 (100%) @ 5 dots per module
+	test_achievableX(ctx, 0.375, 0.625, 0.990,   7, 4.0/7.0,   4);	// 7 dots/mm => X = 0.571 (91%)  @ 4 dots per module
+	test_achievableX(ctx, 0.375, 0.625, 0.990,   6, 4.0/6.0,   4);	// 6 dots/mm => X = 0.667 (107%) @ 4 dots per module
+	test_achievableX(ctx, 0.375, 0.625, 0.990,   5,   0.600,   3);	// 5 dots/mm => X = 0.600 (96%)  @ 3 dots per module
+	test_achievableX(ctx, 0.375, 0.625, 0.990,   4,   0.500,   2);	// 4 dots/mm => X = 0.500 (80%)  @ 2 dots per module
+	test_achievableX(ctx, 0.375, 0.625, 0.990,   3, 2.0/3.0,   2);	// 3 dots/mm => X = 0.667 (107%) @ 2 dots per module
+	test_achievableX(ctx, 0.375, 0.625, 0.990,   2,   0.500,   1);	// 2 dots/mm => X = 0.500 (80%)  @ 1 dot per module
+	test_achievableX(ctx, 0.375, 0.625, 0.990,   1,       0,   0);	// 1 dots/mm => Impossible; 1 dot => 1.000mm
+
+
+	/*
+	 * 2D symbol for Digital Link; minX = 0.396mm; targetX = 0.495mm; maxX = 0.743mm
+	 *
+	 */
+	//                     minX   tgtX   maxX  res  actualX  dots per module
+	test_achievableX(ctx, 0.396, 0.495, 0.743,   8,   0.500,   4);	// 8 dots/mm => X = 0.500 (101%) @ 4 dots per module
+	test_achievableX(ctx, 0.396, 0.495, 0.743,   7, 3.0/7.0,   3);	// 7 dots/mm => X = 0.429 (87%)  @ 3 dots per module
+	test_achievableX(ctx, 0.396, 0.495, 0.743,   6,   0.500,   3);	// 6 dots/mm => X = 0.500 (101%) @ 3 dots per module
+	test_achievableX(ctx, 0.396, 0.495, 0.743,   5,   0.400,   2);	// 5 dots/mm => X = 0.400 (81%)  @ 2 dots per module
+	test_achievableX(ctx, 0.396, 0.495, 0.743,   4,   0.500,   2);	// 4 dots/mm => X = 0.500 (101%) @ 2 dots per module
+	test_achievableX(ctx, 0.396, 0.495, 0.743,   3, 2.0/3.0,   2);	// 3 dots/mm => X = 0.667 (135%) @ 2 dots per module
+	test_achievableX(ctx, 0.396, 0.495, 0.743,   2,   0.500,   1);	// 2 dots/mm => X = 0.500 (101%) @ 1 dot per module
+	test_achievableX(ctx, 0.396, 0.495, 0.743,   1,       0,   0);	// 1 dots/mm => Impossible; 1 dot => 1.000mm
+
+
+	/*
+	 * Linear symbol in general distribution: minX = 0.495mm; targetX = 0.660mm; maxX = 0.660mm
+	 *
+	 */
+	//                     minX   tgtX   maxX  res  actualX  dots per module
+	test_achievableX(ctx, 0.495, 0.660, 0.660,   8,   0.625,   5);	// 8 dots/mm => X = 0.625 (95%) @ 5 dots per module
+	test_achievableX(ctx, 0.495, 0.660, 0.660,   7, 4.0/7.0,   4);	// 7 dots/mm => X = 0.571 (87%) @ 4 dots per module
+	test_achievableX(ctx, 0.495, 0.660, 0.660,   6,   0.500,   3);	// 6 dots/mm => X = 0.500 (75%) @ 3 dots per module
+	test_achievableX(ctx, 0.495, 0.660, 0.660,   5,   0.600,   3);	// 5 dots/mm => X = 0.600 (90%) @ 3 dots per module
+	test_achievableX(ctx, 0.495, 0.660, 0.660,   4,   0.500,   2);	// 4 dots/mm => X = 0.500 (75%) @ 2 dots per module
+	test_achievableX(ctx, 0.495, 0.660, 0.660,   3,       0,   0);	// 3 dots/mm => Impossible; 1 dot => 0.333mm; 2 dots => 0.667mm
+	test_achievableX(ctx, 0.495, 0.660, 0.660,   2,   0.500,   1);	// 2 dots/mm => X = 0.500 (75%) @ 1 dots per module
+	test_achievableX(ctx, 0.495, 0.660, 0.660,   1,       0,   0);	// 1 dots/mm => Impossible; 1 dot => 1.000mm
+
+
+	/*
+	 * 2D symbol in general distribution; minX = 0.743mm; targetX = 0.743mm; maxX = 1.500mm
+	 *
+	 */
+	//                     minX   tgtX   maxX  res  actualX  dots per module
+	test_achievableX(ctx, 0.743, 0.743, 1.500,   8,   0.750,   6);	// 8 dots/mm => X = 0.750 (101%) @ 6 dots per module
+	test_achievableX(ctx, 0.743, 0.743, 1.500,   7, 6.0/7.0,   6);	// 7 dots/mm => X = 0.857 (115%) @ 6 dots per module
+	test_achievableX(ctx, 0.743, 0.743, 1.500,   6, 5.0/6.0,   5);	// 6 dots/mm => X = 0.833 (112%) @ 5 dots per module
+	test_achievableX(ctx, 0.743, 0.743, 1.500,   5,   0.800,   4);	// 5 dots/mm => X = 0.800 (108%) @ 4 dots per module
+	test_achievableX(ctx, 0.743, 0.743, 1.500,   4,   0.750,   3);	// 4 dots/mm => X = 0.750 (101%) @ 3 dots per module
+	test_achievableX(ctx, 0.743, 0.743, 1.500,   3,   1.000,   3);	// 3 dots/mm => X = 1.000 (135%) @ 2 dots per module
+	test_achievableX(ctx, 0.743, 0.743, 1.500,   2,   1.000,   2);	// 2 dots/mm => X = 1.000 (135%) @ 2 dots per module
+	test_achievableX(ctx, 0.743, 0.743, 1.500,   1,   1.000,   1);	// 1 dot/mm  => X = 1.000 (135%) @ 1 dot per module
+
+
+	/*
+	 * 2D symbols for GDTI, GRAI, GIAI and GLN; minX = 0.380mm; targetX = 0.380mm; maxX = 0.495mm
+	 *
+	 */
+	//                     minX   tgtX   maxX  res   actualX  dots per module
+	test_achievableX(ctx, 0.380, 0.380, 0.495,  12, 5.0/12.0,   5);	// 12 dots/mm => X = 0.417 (110%) @ 5 dots per module
+	test_achievableX(ctx, 0.380, 0.380, 0.495,  11, 5.0/11.0,   5);	// 11 dots/mm => X = 0.455 (120%) @ 5 dots per module
+	test_achievableX(ctx, 0.380, 0.380, 0.495,  10,    0.400,   4);	// 10 dots/mm => X = 0.400 (105%) @ 4 dots per module
+	test_achievableX(ctx, 0.380, 0.380, 0.495,   9,  4.0/9.0,   4);	//  9 dots/mm => X = 0.444 (117%) @ 4 dots per module
+	test_achievableX(ctx, 0.380, 0.380, 0.495,   8,        0,   0);	//  8 dots/mm => Impossible; 3 dots => 0.375mm; 4 dots => 0.500mm
+	test_achievableX(ctx, 0.380, 0.380, 0.495,   7,  3.0/7.0,   3);	//  7 dots/mm => X = 0.428 (86%) @ 3 dots per module
+	test_achievableX(ctx, 0.380, 0.380, 0.495,   6,        0,   0);	//  6 dots/mm => Impossible; 2 dots => 0.333mm; 3 dots => 0.500mm
+	test_achievableX(ctx, 0.380, 0.380, 0.495,   5,    0.400,   2);	//  5 dots/mm => X = 0.400 (105%) @ 2 dots per module
+	test_achievableX(ctx, 0.380, 0.380, 0.495,   4,        0,   0);	//  4 dots/mm => Impossible; 1 dot => 0.250mm; 2 dots => 0.500mm
+	test_achievableX(ctx, 0.380, 0.380, 0.495,   3,        0,   0);	//  3 dots/mm => Impossible; 1 dot => 0.333mm; 2 dots => 0.666mm
+	test_achievableX(ctx, 0.380, 0.380, 0.495,   2,        0,   0);	//  2 dots/mm => Impossible; 1 dot => 0.500mm
+
+
+	gs1_encoder_free(ctx);
+
+}
+
 
 void test_api_XYundercut(void) {
 
@@ -1140,6 +1517,11 @@ void test_api_XYundercut(void) {
 	TEST_CHECK(gs1_encoder_setXundercut(ctx, 0));
 	TEST_CHECK(gs1_encoder_setYundercut(ctx, 0));
 
+	// X-dimension must be set before XYundercut
+	ctx->pixMult = 0;
+	TEST_CHECK(!gs1_encoder_setXundercut(ctx, 0));
+	TEST_CHECK(!gs1_encoder_setYundercut(ctx, 0));
+
 	// Minima
 	gs1_encoder_setPixMult(ctx, 2);
 	TEST_CHECK(gs1_encoder_setXundercut(ctx, 1));
@@ -1150,7 +1532,7 @@ void test_api_XYundercut(void) {
 	TEST_CHECK(gs1_encoder_setXundercut(ctx, MAX_PIXMULT - 1));
 	TEST_CHECK(gs1_encoder_setYundercut(ctx, MAX_PIXMULT - 1));
 
-	// Must be less than X dimension
+	// Must be less than X-dimension
 	gs1_encoder_setPixMult(ctx, 2);
 	TEST_CHECK(!gs1_encoder_setXundercut(ctx, 2));
 	TEST_CHECK(!gs1_encoder_setYundercut(ctx, 2));
@@ -1174,14 +1556,18 @@ void test_api_sepHt(void) {
 	TEST_CHECK(gs1_encoder_setSepHt(ctx, 5));
 	TEST_CHECK(gs1_encoder_getSepHt(ctx) == 5);
 
-	// Range with smallest X dimension
+	// X-dimension must be set before sepHt
+	ctx->pixMult = 0;
+	TEST_CHECK(!gs1_encoder_setSepHt(ctx, 0));
+
+	// Range with smallest X-dimension
 	gs1_encoder_setPixMult(ctx, 1);
 	TEST_CHECK(gs1_encoder_setSepHt(ctx, 1));
 	TEST_CHECK(!gs1_encoder_setSepHt(ctx, 0));
 	TEST_CHECK(gs1_encoder_setSepHt(ctx, 2));
 	TEST_CHECK(!gs1_encoder_setSepHt(ctx, 3));
 
-	// Range with largest X dimension
+	// Range with largest X-dimension
 	gs1_encoder_setPixMult(ctx, MAX_PIXMULT);
 	TEST_CHECK(gs1_encoder_setSepHt(ctx, MAX_PIXMULT));
 	TEST_CHECK(!gs1_encoder_setSepHt(ctx, MAX_PIXMULT - 1));

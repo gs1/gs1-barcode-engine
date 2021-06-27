@@ -52,5 +52,6 @@ struct sPrints;
 bool gs1_doDriverInit(gs1_encoder *ctx, long xdim, long ydim);
 bool gs1_doDriverAddRow(gs1_encoder *ctx, const struct sPrints *prints);
 bool gs1_doDriverFinalise(gs1_encoder *ctx);
+bool gs1_setXdimension(gs1_encoder *ctx, double minX, double targetX, double maxX);
 
 #endif /* UTIL_H */

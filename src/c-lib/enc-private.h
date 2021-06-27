@@ -31,7 +31,7 @@
 // Implementation limits that can be changed
 #define MAX_FNAME	120	// Maximum filename
 #define MAX_DATA	8191	// Maximum input buffer size
-#define MAX_PIXMULT	12	// Largest X dimension
+#define MAX_PIXMULT	100	// Largest X dimension
 
 
 struct sPrints {
@@ -66,46 +66,50 @@ struct sPrints {
 struct gs1_encoder {
 
 	// members with accessors
-	int sym;		// symbology type
-	int pixMult;		// pixels per X
-	int Xundercut;		// X pixels to undercut
-	int Yundercut;		// Y pixels to undercut
-	int addCheckDigit;	// for EAN/UPC and RSS-14/Lim, calculated if true, otherwise validated
-	int sepHt;		// separator row height
+	int sym;				// Symbology type
+	double deviceRes;			// Device resolution
+	double minX;				// Minimum user X dimension
+	double maxX;				// Maximum user X dimension
+	double targetX;				// Target user X dimension
+	int pixMult;				// Pixels per X
+	int Xundercut;				// X pixels to undercut
+	int Yundercut;				// Y pixels to undercut
+	int addCheckDigit;			// For EAN/UPC and RSS-14/Lim, calculated if true, otherwise validated
+	int sepHt;				// Separator row height
 	int dataBarExpandedSegmentsWidth;	// Number of segments for RSS Expdanded (Stacked)
-	int gs1_128LinearHeight;		// height of UCC/EAN-128 in X
-	int dmRows;		// Data Matrix fixed number of rows
-	int dmCols;		// Data Matrix fixed number of columns
-	int qrVersion;		// QR Code fixed symbol version
-	int qrEClevel;		// QR Code error correction level
-	int format;		// BMP, TIF or RAW
-	bool fileInputFlag;	// true is dataFile else dataStr
-	char dataStr[MAX_DATA+1];
-	char dlAIbuffer[MAX_DATA+1];	// Populated with unbracketed AI string extracted from DL input
+	int gs1_128LinearHeight;		// Height of UCC/EAN-128 in X
+	int dmRows;				// Data Matrix fixed number of rows
+	int dmCols;				// Data Matrix fixed number of columns
+	int qrVersion;				// QR Code fixed symbol version
+	int qrEClevel;				// QR Code error correction level
+	int format;				// BMP, TIF or RAW
+	bool fileInputFlag;			// True is dataFile else dataStr
+	char dataStr[MAX_DATA+1];		// Input data buffer passed to the encoders
+	char dlAIbuffer[MAX_DATA+1];		// Populated with unbracketed AI string extracted from DL input
 	char dataFile[MAX_FNAME+1];
 	char outFile[MAX_FNAME+1];
-	uint8_t *buffer;	// We may allocate an output buffer
-	int bufferWidth;	// Width of a raw format buffer
-	int bufferHeight;	// Height of a raw format buffer
-	char **bufferStrings;	// We may allocate output as a set of strings
-	char outStr[2*MAX_DATA+1];	// Buffer to return formatted HRI data
-	char *outHRI[MAX_AIS];		// Array of AI element string for HRI printing
+	uint8_t *buffer;			// We may allocate an output buffer
+	int bufferWidth;			// Width of a raw format buffer
+	int bufferHeight;			// Height of a raw format buffer
+	char **bufferStrings;			// We may allocate output as a set of strings
+	char outStr[2*MAX_DATA+1];		// Buffer to return formatted HRI data
+	char *outHRI[MAX_AIS];			// Array of AI element string for HRI printing
 	char VERSION[16];
 
 	// per-instance globals
-	bool localAlloc;	// True if we malloc()ed this struct
+	bool localAlloc;			// True if we malloc()ed this struct
 	FILE *outfp;
-	struct aiValue aiData[MAX_AIS];	// List of AI components
+	struct aiValue aiData[MAX_AIS];		// List of AI components
 	int numAIs;
 	size_t bufferCap;
 	size_t bufferSize;
 	int errFlag;
 	char errMsg[512];
 	int line1;
-	int linFlag;		// tells pack whether linear or cc is being encoded
-	int colCnt;		// after set, may be decreased by getUnusedBitCnt
-	int rowCnt;		// determined by getUnusedBitCnt
-	int eccCnt;		// determined by getUnusedBitCnt
+	int linFlag;				// Tells pack whether linear or cc is being encoded
+	int colCnt;				// After set, may be decreased by getUnusedBitCnt
+	int rowCnt;				// Determined by getUnusedBitCnt
+	int eccCnt;				// Determined by getUnusedBitCnt
 	uint8_t ccPattern[MAX_CCB4_ROWS][CCB4_ELMNTS];
 	const int *cc_CCSizes;	// will point to CCxSize
 	int cc_gpa[512];
@@ -145,6 +149,7 @@ void test_api_defaults(void);
 void test_api_sym(void);
 void test_api_fileInputFlag(void);
 void test_api_pixMult(void);
+void test_api_Xdimension(void);
 void test_api_XYundercut(void);
 void test_api_sepHt(void);
 void test_api_segWidth(void);

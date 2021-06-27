@@ -162,6 +162,7 @@ TEST_LIST = {
     { "api_sym", test_api_sym },
     { "api_fileInputFlag", test_api_fileInputFlag },
     { "api_pixMult", test_api_pixMult },
+    { "api_Xdimension", test_api_Xdimension },
     { "api_XYundercut", test_api_XYundercut },
     { "api_sepHt", test_api_sepHt },
     { "api_segWidth", test_api_segWidth },

@@ -304,11 +304,32 @@ Functions</h2></td></tr>
 <tr class="memdesc:a4c6e9e761ef9d0be70222b5b15767d7f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the symbology type.  <a href="gs1encoders_8h.html#a4c6e9e761ef9d0be70222b5b15767d7f">More...</a><br /></td></tr>
 <tr class="separator:a4c6e9e761ef9d0be70222b5b15767d7f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af29e8e582397559cc4474d33ddc4c549"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#af29e8e582397559cc4474d33ddc4c549">gs1_encoder_getPixMult</a> (<a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx)</td></tr>
-<tr class="memdesc:af29e8e582397559cc4474d33ddc4c549"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current pixels per module ("X-dimension")  <a href="gs1encoders_8h.html#af29e8e582397559cc4474d33ddc4c549">More...</a><br /></td></tr>
+<tr class="memdesc:af29e8e582397559cc4474d33ddc4c549"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current device dots per module.  <a href="gs1encoders_8h.html#af29e8e582397559cc4474d33ddc4c549">More...</a><br /></td></tr>
 <tr class="separator:af29e8e582397559cc4474d33ddc4c549"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7ce840da1e7271a887c5477a18d3bd63"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#a7ce840da1e7271a887c5477a18d3bd63">gs1_encoder_setPixMult</a> (<a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx, int pixMult)</td></tr>
-<tr class="memdesc:a7ce840da1e7271a887c5477a18d3bd63"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the pixels per module ("X-dimension").  <a href="gs1encoders_8h.html#a7ce840da1e7271a887c5477a18d3bd63">More...</a><br /></td></tr>
+<tr class="memdesc:a7ce840da1e7271a887c5477a18d3bd63"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the device dots per module.  <a href="gs1encoders_8h.html#a7ce840da1e7271a887c5477a18d3bd63">More...</a><br /></td></tr>
 <tr class="separator:a7ce840da1e7271a887c5477a18d3bd63"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0d6e22388bf34bc68444a4353d52ffa2"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#a0d6e22388bf34bc68444a4353d52ffa2">gs1_encoder_getDeviceResolution</a> (<a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx)</td></tr>
+<tr class="memdesc:a0d6e22388bf34bc68444a4353d52ffa2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the specified device resolution.  <a href="gs1encoders_8h.html#a0d6e22388bf34bc68444a4353d52ffa2">More...</a><br /></td></tr>
+<tr class="separator:a0d6e22388bf34bc68444a4353d52ffa2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a92625d85d68e393c283bfc672615d588"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#a92625d85d68e393c283bfc672615d588">gs1_encoder_setDeviceResolution</a> (<a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx, double resolution)</td></tr>
+<tr class="memdesc:a92625d85d68e393c283bfc672615d588"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the device resolution.  <a href="gs1encoders_8h.html#a92625d85d68e393c283bfc672615d588">More...</a><br /></td></tr>
+<tr class="separator:a92625d85d68e393c283bfc672615d588"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae42bc7ced7a33a85d5404a52218f92d9"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#ae42bc7ced7a33a85d5404a52218f92d9">gs1_encoder_setXdimension</a> (<a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx, double min, double target, double max)</td></tr>
+<tr class="memdesc:ae42bc7ced7a33a85d5404a52218f92d9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the constraints for the X-dimension width.  <a href="gs1encoders_8h.html#ae42bc7ced7a33a85d5404a52218f92d9">More...</a><br /></td></tr>
+<tr class="separator:ae42bc7ced7a33a85d5404a52218f92d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af885ee8f32f8802a32afb29a3571697c"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#af885ee8f32f8802a32afb29a3571697c">gs1_encoder_getMinXdimension</a> (<a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx)</td></tr>
+<tr class="memdesc:af885ee8f32f8802a32afb29a3571697c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current minimum permissible X-dimension.  <a href="gs1encoders_8h.html#af885ee8f32f8802a32afb29a3571697c">More...</a><br /></td></tr>
+<tr class="separator:af885ee8f32f8802a32afb29a3571697c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a61a14fe486ff3f640673e94521602f1b"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#a61a14fe486ff3f640673e94521602f1b">gs1_encoder_getMaxXdimension</a> (<a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx)</td></tr>
+<tr class="memdesc:a61a14fe486ff3f640673e94521602f1b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current maximum permissible X-dimension.  <a href="gs1encoders_8h.html#a61a14fe486ff3f640673e94521602f1b">More...</a><br /></td></tr>
+<tr class="separator:a61a14fe486ff3f640673e94521602f1b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad43cabc580becbd2e1bb95f7c1816e00"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#ad43cabc580becbd2e1bb95f7c1816e00">gs1_encoder_getTargetXdimension</a> (<a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx)</td></tr>
+<tr class="memdesc:ad43cabc580becbd2e1bb95f7c1816e00"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current target X-dimension specified by the user.  <a href="gs1encoders_8h.html#ad43cabc580becbd2e1bb95f7c1816e00">More...</a><br /></td></tr>
+<tr class="separator:ad43cabc580becbd2e1bb95f7c1816e00"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a49cd9d8a28207bd4a09dd6e6280449d7"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#a49cd9d8a28207bd4a09dd6e6280449d7">gs1_encoder_getActualXdimension</a> (<a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx)</td></tr>
+<tr class="memdesc:a49cd9d8a28207bd4a09dd6e6280449d7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the actual X-dimension that can be achieved on the device.  <a href="gs1encoders_8h.html#a49cd9d8a28207bd4a09dd6e6280449d7">More...</a><br /></td></tr>
+<tr class="separator:a49cd9d8a28207bd4a09dd6e6280449d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae7157576172abcc30d788a61f984ed4d"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#ae7157576172abcc30d788a61f984ed4d">gs1_encoder_getXundercut</a> (<a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx)</td></tr>
 <tr class="memdesc:ae7157576172abcc30d788a61f984ed4d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current X undercut.  <a href="gs1encoders_8h.html#ae7157576172abcc30d788a61f984ed4d">More...</a><br /></td></tr>
 <tr class="separator:ae7157576172abcc30d788a61f984ed4d"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -857,6 +878,39 @@ The library is thread-safe provided that each thread operates on its own instanc
 
 </div>
 </div>
+<a id="a49cd9d8a28207bd4a09dd6e6280449d7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a49cd9d8a28207bd4a09dd6e6280449d7">&#9670;&nbsp;</a></span>gs1_encoder_getActualXdimension()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">GS1_ENCODERS_API double gs1_encoder_getActualXdimension </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *&#160;</td>
+          <td class="paramname"><em>ctx</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the actual X-dimension that can be achieved on the device. </p>
+<p>This returns the actual X-dimension that can be achieved based on the device resolution specified by <a class="el" href="gs1encoders_8h.html#a92625d85d68e393c283bfc672615d588" title="Set the device resolution.">gs1_encoder_setDeviceResolution()</a> and the current number of pixels per module.</p>
+<p>It likely differs from the target X-dimension but is guaranteed not to exceed any minimum and maximum X-dimension specified using <a class="el" href="gs1encoders_8h.html#ae42bc7ced7a33a85d5404a52218f92d9" title="Set the constraints for the X-dimension width.">gs1_encoder_setXdimension()</a>.</p>
+<dl class="section note"><dt>Note</dt><dd>The units for this parameter are those implicitly considered when specifying the device resolution using <a class="el" href="gs1encoders_8h.html#a92625d85d68e393c283bfc672615d588" title="Set the device resolution.">gs1_encoder_setDeviceResolution()</a>.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#ae42bc7ced7a33a85d5404a52218f92d9" title="Set the constraints for the X-dimension width.">gs1_encoder_setXdimension()</a> </dd>
+<dd>
+<a class="el" href="gs1encoders_8h.html#a92625d85d68e393c283bfc672615d588" title="Set the device resolution.">gs1_encoder_setDeviceResolution()</a></dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">ctx</td><td><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34" title="A gs1_encoder context.">gs1_encoder</a> context </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>achieved X-dimension, or 0 if undefined </dd></dl>
+
+</div>
+</div>
 <a id="aef6ebfc63b8088b22bb3cc0926430ac6"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aef6ebfc63b8088b22bb3cc0926430ac6">&#9670;&nbsp;</a></span>gs1_encoder_getAddCheckDigit()</h2>
 
@@ -1180,6 +1234,35 @@ The returned pointer should be checked for NULL which indicates non-AI input dat
 
 </div>
 </div>
+<a id="a0d6e22388bf34bc68444a4353d52ffa2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0d6e22388bf34bc68444a4353d52ffa2">&#9670;&nbsp;</a></span>gs1_encoder_getDeviceResolution()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">GS1_ENCODERS_API double gs1_encoder_getDeviceResolution </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *&#160;</td>
+          <td class="paramname"><em>ctx</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the specified device resolution. </p>
+<p>This is the value specified by the user using <a class="el" href="gs1encoders_8h.html#a92625d85d68e393c283bfc672615d588" title="Set the device resolution.">gs1_encoder_setDeviceResolution()</a>.</p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#a92625d85d68e393c283bfc672615d588" title="Set the device resolution.">gs1_encoder_setDeviceResolution()</a></dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">ctx</td><td><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34" title="A gs1_encoder context.">gs1_encoder</a> context </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>device resolution, or 0 if undefined </dd></dl>
+
+</div>
+</div>
 <a id="a2114d7368ec999101a58365354c9a6db"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a2114d7368ec999101a58365354c9a6db">&#9670;&nbsp;</a></span>gs1_encoder_getDmColumns()</h2>
 
@@ -1483,10 +1566,74 @@ The returned pointer should be checked for NULL which indicates non-AI input dat
 
 <p>Get the maximum X-dimension in pixels. </p>
 <p>This is an implementation limit that may be lowered for systems with limited memory by rebuilding the library.</p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#a7ce840da1e7271a887c5477a18d3bd63" title="Set the pixels per module (&quot;X-dimension&quot;).">gs1_encoder_setPixMult()</a> </dd>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#a7ce840da1e7271a887c5477a18d3bd63" title="Set the device dots per module.">gs1_encoder_setPixMult()</a> </dd>
 <dd>
-<a class="el" href="gs1encoders_8h.html#af29e8e582397559cc4474d33ddc4c549" title="Get the current pixels per module (&quot;X-dimension&quot;)">gs1_encoder_getPixMult()</a></dd></dl>
+<a class="el" href="gs1encoders_8h.html#af29e8e582397559cc4474d33ddc4c549" title="Get the current device dots per module.">gs1_encoder_getPixMult()</a></dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>maximum number pixel per module </dd></dl>
+
+</div>
+</div>
+<a id="a61a14fe486ff3f640673e94521602f1b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a61a14fe486ff3f640673e94521602f1b">&#9670;&nbsp;</a></span>gs1_encoder_getMaxXdimension()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">GS1_ENCODERS_API double gs1_encoder_getMaxXdimension </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *&#160;</td>
+          <td class="paramname"><em>ctx</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the current maximum permissible X-dimension. </p>
+<p>This is the value specified by the user using <a class="el" href="gs1encoders_8h.html#ae42bc7ced7a33a85d5404a52218f92d9" title="Set the constraints for the X-dimension width.">gs1_encoder_setXdimension()</a>.</p>
+<dl class="section note"><dt>Note</dt><dd>The units for this parameter are those implicitly considered when specifying the device resolution using <a class="el" href="gs1encoders_8h.html#a92625d85d68e393c283bfc672615d588" title="Set the device resolution.">gs1_encoder_setDeviceResolution()</a>.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#ae42bc7ced7a33a85d5404a52218f92d9" title="Set the constraints for the X-dimension width.">gs1_encoder_setXdimension()</a> </dd>
+<dd>
+<a class="el" href="gs1encoders_8h.html#a92625d85d68e393c283bfc672615d588" title="Set the device resolution.">gs1_encoder_setDeviceResolution()</a></dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">ctx</td><td><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34" title="A gs1_encoder context.">gs1_encoder</a> context </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>minimum X-dimension, or 0 if undefined </dd></dl>
+
+</div>
+</div>
+<a id="af885ee8f32f8802a32afb29a3571697c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af885ee8f32f8802a32afb29a3571697c">&#9670;&nbsp;</a></span>gs1_encoder_getMinXdimension()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">GS1_ENCODERS_API double gs1_encoder_getMinXdimension </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *&#160;</td>
+          <td class="paramname"><em>ctx</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the current minimum permissible X-dimension. </p>
+<p>This is the value specified by the user using <a class="el" href="gs1encoders_8h.html#ae42bc7ced7a33a85d5404a52218f92d9" title="Set the constraints for the X-dimension width.">gs1_encoder_setXdimension()</a>.</p>
+<dl class="section note"><dt>Note</dt><dd>The units for this parameter are those implicitly considered when specifying the device resolution using <a class="el" href="gs1encoders_8h.html#a92625d85d68e393c283bfc672615d588" title="Set the device resolution.">gs1_encoder_setDeviceResolution()</a>.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#ae42bc7ced7a33a85d5404a52218f92d9" title="Set the constraints for the X-dimension width.">gs1_encoder_setXdimension()</a> </dd>
+<dd>
+<a class="el" href="gs1encoders_8h.html#a92625d85d68e393c283bfc672615d588" title="Set the device resolution.">gs1_encoder_setDeviceResolution()</a></dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">ctx</td><td><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34" title="A gs1_encoder context.">gs1_encoder</a> context </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>minimum X-dimension, or 0 if undefined </dd></dl>
 
 </div>
 </div>
@@ -1535,8 +1682,8 @@ The returned pointer should be checked for NULL which indicates non-AI input dat
       </table>
 </div><div class="memdoc">
 
-<p>Get the current pixels per module ("X-dimension") </p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#a7ce840da1e7271a887c5477a18d3bd63" title="Set the pixels per module (&quot;X-dimension&quot;).">gs1_encoder_setPixMult()</a> </dd>
+<p>Get the current device dots per module. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#a7ce840da1e7271a887c5477a18d3bd63" title="Set the device dots per module.">gs1_encoder_setPixMult()</a> </dd>
 <dd>
 <a class="el" href="gs1encoders_8h.html#a5bfa45afeb7501157a72604ba4611279" title="Get the maximum X-dimension in pixels.">gs1_encoder_getMaxPixMult()</a></dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -1545,7 +1692,7 @@ The returned pointer should be checked for NULL which indicates non-AI input dat
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>pixels per module </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>device dots per module </dd></dl>
 
 </div>
 </div>
@@ -1729,6 +1876,38 @@ The returned pointer should be checked for NULL which indicates non-AI input dat
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>symbology type, one of <a class="el" href="gs1encoders_8h.html#a7dab341c6821917b8eddfd1d17de4053" title="All of the major GS1 barcode formats (&quot;symbologies&quot;) are supported by this library.">gs1_encoder_symbologies</a> </dd></dl>
+
+</div>
+</div>
+<a id="ad43cabc580becbd2e1bb95f7c1816e00"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad43cabc580becbd2e1bb95f7c1816e00">&#9670;&nbsp;</a></span>gs1_encoder_getTargetXdimension()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">GS1_ENCODERS_API double gs1_encoder_getTargetXdimension </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *&#160;</td>
+          <td class="paramname"><em>ctx</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the current target X-dimension specified by the user. </p>
+<p>This is the value specified by the user using <a class="el" href="gs1encoders_8h.html#ae42bc7ced7a33a85d5404a52218f92d9" title="Set the constraints for the X-dimension width.">gs1_encoder_setXdimension()</a>. It may differ from the actual X-dimension that has been achieved (based on the device resolution) which can be retrieved using <a class="el" href="gs1encoders_8h.html#a49cd9d8a28207bd4a09dd6e6280449d7" title="Get the actual X-dimension that can be achieved on the device.">gs1_encoder_getActualXdimension()</a>.</p>
+<dl class="section note"><dt>Note</dt><dd>The units for this parameter are those implicitly considered when specifying the device resolution using <a class="el" href="gs1encoders_8h.html#a92625d85d68e393c283bfc672615d588" title="Set the device resolution.">gs1_encoder_setDeviceResolution()</a>.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#ae42bc7ced7a33a85d5404a52218f92d9" title="Set the constraints for the X-dimension width.">gs1_encoder_setXdimension()</a> </dd>
+<dd>
+<a class="el" href="gs1encoders_8h.html#a92625d85d68e393c283bfc672615d588" title="Set the device resolution.">gs1_encoder_setDeviceResolution()</a></dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">ctx</td><td><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34" title="A gs1_encoder context.">gs1_encoder</a> context </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>target X-dimension, or 0 if undefined </dd></dl>
 
 </div>
 </div>
@@ -2139,6 +2318,51 @@ The length of the data must be less that the value returned by <a class="el" hre
 
 </div>
 </div>
+<a id="a92625d85d68e393c283bfc672615d588"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a92625d85d68e393c283bfc672615d588">&#9670;&nbsp;</a></span>gs1_encoder_setDeviceResolution()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">GS1_ENCODERS_API bool gs1_encoder_setDeviceResolution </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *&#160;</td>
+          <td class="paramname"><em>ctx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>resolution</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set the device resolution. </p>
+<p>Specifies the resolution (device dots per unit) of the output device on which the barcode is to be rendered.</p>
+<p>This function is expected to be used along with <a class="el" href="gs1encoders_8h.html#ae42bc7ced7a33a85d5404a52218f92d9" title="Set the constraints for the X-dimension width.">gs1_encoder_setXdimension()</a> to automatically set the device dots per module that would produce an image that most-closely matches the specified real-world dimensions when rendered on the device.</p>
+<p>Calling this function will clear any existing X-dimension constraints, and therefore must be called before <a class="el" href="gs1encoders_8h.html#ae42bc7ced7a33a85d5404a52218f92d9" title="Set the constraints for the X-dimension width.">gs1_encoder_setXdimension()</a>.</p>
+<dl class="section note"><dt>Note</dt><dd>A real-world unit is not specified, however the unit for the value specified here becomes the basis for the values provided to <a class="el" href="gs1encoders_8h.html#ae42bc7ced7a33a85d5404a52218f92d9" title="Set the constraints for the X-dimension width.">gs1_encoder_setXdimension()</a>. For example, if the device resolution is specified in dots per mm (d/mm) then the X-dimension constraints must also be provided in mm. If dots per inch (DPI) is provided here then the X-dimension must also be specified in inches.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#a0d6e22388bf34bc68444a4353d52ffa2" title="Get the specified device resolution.">gs1_encoder_getDeviceResolution()</a> </dd>
+<dd>
+<a class="el" href="gs1encoders_8h.html#ae42bc7ced7a33a85d5404a52218f92d9" title="Set the constraints for the X-dimension width.">gs1_encoder_setXdimension()</a></dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">ctx</td><td><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34" title="A gs1_encoder context.">gs1_encoder</a> context </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">resolution</td><td>device dots per unit </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true on success, otherwise false and an error message is set that can be read using <a class="el" href="gs1encoders_8h.html#aee9e7c8b49fe2a8fa7bd0b21c1e7510b" title="Read an error message generated by the library.">gs1_encoder_getErrMsg()</a> </dd></dl>
+
+</div>
+</div>
 <a id="ac0058e7f2ba0c14bbb1b60dc31d039d2"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac0058e7f2ba0c14bbb1b60dc31d039d2">&#9670;&nbsp;</a></span>gs1_encoder_setDmColumns()</h2>
 
@@ -2428,16 +2652,24 @@ The length of the data must be less that the value returned by <a class="el" hre
       </table>
 </div><div class="memdoc">
 
-<p>Set the pixels per module ("X-dimension"). </p>
+<p>Set the device dots per module. </p>
+<p>Directly specifies the number of device pixels that shall compose a module within a barcode symbol. A module is defined to be the most narrow element: The shortest width bar for a linear symbology or the smallest square for a 2D symbology.</p>
 <p>Valid options range from 1 up to the limit returned by <a class="el" href="gs1encoders_8h.html#a5bfa45afeb7501157a72604ba4611279" title="Get the maximum X-dimension in pixels.">gs1_encoder_getMaxPixMult()</a>.</p>
-<dl class="section note"><dt>Note</dt><dd>The X and Y undercut will be reset if the new X dimension is insufficient. The separator height will be updated to match the new X dimension as necessary.</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#af29e8e582397559cc4474d33ddc4c549" title="Get the current pixels per module (&quot;X-dimension&quot;)">gs1_encoder_getPixMult()</a> </dd>
+<p>Calling this function will clear any X-dimension constraints set by <a class="el" href="gs1encoders_8h.html#ae42bc7ced7a33a85d5404a52218f92d9" title="Set the constraints for the X-dimension width.">gs1_encoder_setXdimension()</a>.</p>
+<dl class="section note"><dt>Note</dt><dd>This option is most useful when creating a bitmap for rendering on a digital display where the image size does not directly relate to any real-world dimensions. To specify the intended output size in terms of real-world dimensions use <a class="el" href="gs1encoders_8h.html#a92625d85d68e393c283bfc672615d588" title="Set the device resolution.">gs1_encoder_setDeviceResolution()</a> and <a class="el" href="gs1encoders_8h.html#ae42bc7ced7a33a85d5404a52218f92d9" title="Set the constraints for the X-dimension width.">gs1_encoder_setXdimension()</a> instead.</dd>
 <dd>
-<a class="el" href="gs1encoders_8h.html#a5bfa45afeb7501157a72604ba4611279" title="Get the maximum X-dimension in pixels.">gs1_encoder_getMaxPixMult()</a></dd></dl>
+The X and Y undercut will be reset if the new X dimension is insufficient. The separator height will be updated to match the new X dimension as necessary.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#af29e8e582397559cc4474d33ddc4c549" title="Get the current device dots per module.">gs1_encoder_getPixMult()</a> </dd>
+<dd>
+<a class="el" href="gs1encoders_8h.html#a5bfa45afeb7501157a72604ba4611279" title="Get the maximum X-dimension in pixels.">gs1_encoder_getMaxPixMult()</a> </dd>
+<dd>
+<a class="el" href="gs1encoders_8h.html#a92625d85d68e393c283bfc672615d588" title="Set the device resolution.">gs1_encoder_setDeviceResolution()</a> </dd>
+<dd>
+<a class="el" href="gs1encoders_8h.html#ae42bc7ced7a33a85d5404a52218f92d9" title="Set the constraints for the X-dimension width.">gs1_encoder_setXdimension()</a></dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in,out]</td><td class="paramname">ctx</td><td><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34" title="A gs1_encoder context.">gs1_encoder</a> context </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">pixMult</td><td>pixels per module </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">pixMult</td><td>device dots per module </td></tr>
   </table>
   </dd>
 </dl>
@@ -2620,7 +2852,7 @@ The length of the data must be less that the value returned by <a class="el" hre
 <dl class="section note"><dt>Note</dt><dd>Valid values are 1 to 2 times the X dimension.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#a1a20f915fbe83e690a9506f3d8901b67" title="Get the current separator height between linear and 2D components.">gs1_encoder_getSepHt()</a> </dd>
 <dd>
-<a class="el" href="gs1encoders_8h.html#af29e8e582397559cc4474d33ddc4c549" title="Get the current pixels per module (&quot;X-dimension&quot;)">gs1_encoder_getPixMult()</a></dd></dl>
+<a class="el" href="gs1encoders_8h.html#af29e8e582397559cc4474d33ddc4c549" title="Get the current device dots per module.">gs1_encoder_getPixMult()</a></dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in,out]</td><td class="paramname">ctx</td><td><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34" title="A gs1_encoder context.">gs1_encoder</a> context </td></tr>
@@ -2674,6 +2906,81 @@ The length of the data must be less that the value returned by <a class="el" hre
 
 </div>
 </div>
+<a id="ae42bc7ced7a33a85d5404a52218f92d9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae42bc7ced7a33a85d5404a52218f92d9">&#9670;&nbsp;</a></span>gs1_encoder_setXdimension()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">GS1_ENCODERS_API bool gs1_encoder_setXdimension </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *&#160;</td>
+          <td class="paramname"><em>ctx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>min</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>target</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>max</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set the constraints for the X-dimension width. </p>
+<p>This function will automatically set the number of device dots per module that is required to produce symbols whose X-dimension most-closely meets the provided target X-dimension on a device whose resolution has been previously specified with <a class="el" href="gs1encoders_8h.html#a92625d85d68e393c283bfc672615d588" title="Set the device resolution.">gs1_encoder_setDeviceResolution()</a>, without exceeding the optional constraints.</p>
+<p>The following real-world dimensions are accepted:</p>
+<ul>
+<li>Target X-dimension (mandatory):: The ideal X-dimension for the application.</li>
+<li>Minimum X-dimension (optional):: The minimum X-dimension permitted by the application.</li>
+<li>Maximum X-dimension (optional):: The maximum X-dimension permitted by the application.</li>
+</ul>
+<p>When the minimum and/or maximum X-dimension is specified the chosen device dots per module is guaranteed to not exceed these constraints. With low-resolution devices and tight X-dimension tollerances it may not be possible to achieve an X-dimension that falls within the given constraints since modules must be composed of some whole number of device dots. Put another way, barcode images must be scaled in quantums of device dots to prevent unstable module widths due to pixel-grazing.</p>
+<p>For example, it is not possible to generate linear symbols intended for general distribution, where the permissible X-dimension is restricted to 0.495 - 0.660mm, on a device whose resolution is 3 dots/mm since 1 device dot is 0.333mm and 2 device dots is 0.667mm. (Note that it is however possible to achieve an acceptable X-dimension on an even lower resolution, 2 dots/mm device since 1 device dot is 0.500mm, which demonstrates that care should exercised when selecting devices for a particular application.)</p>
+<p>If the required X-dimension constraints can be achieved then the selected device dots per module can be obtained with <a class="el" href="gs1encoders_8h.html#af29e8e582397559cc4474d33ddc4c549" title="Get the current device dots per module.">gs1_encoder_getPixMult()</a> and the actual X-dimension achieved can be obtained with <a class="el" href="gs1encoders_8h.html#a49cd9d8a28207bd4a09dd6e6280449d7" title="Get the actual X-dimension that can be achieved on the device.">gs1_encoder_getActualXdimension()</a>.</p>
+<p>If it is not possible to achieve the given X-dimension then the function will produce an error and the device dots per module will be set to undefined (0).</p>
+<dl class="section note"><dt>Note</dt><dd>This function is expected to be used along with <a class="el" href="gs1encoders_8h.html#a92625d85d68e393c283bfc672615d588" title="Set the device resolution.">gs1_encoder_setDeviceResolution()</a> to automatically set the device dots per module that would produce an image that most-closely matches the specified real-world dimensions when rendered on the device. If the output is intended for rendition on digital displays where the symbol size does not relate to a real-world dimension then the device dots per module should be directly specified using <a class="el" href="gs1encoders_8h.html#a7ce840da1e7271a887c5477a18d3bd63" title="Set the device dots per module.">gs1_encoder_setPixMult()</a> instead.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#a92625d85d68e393c283bfc672615d588" title="Set the device resolution.">gs1_encoder_setDeviceResolution()</a> </dd>
+<dd>
+<a class="el" href="gs1encoders_8h.html#af885ee8f32f8802a32afb29a3571697c" title="Get the current minimum permissible X-dimension.">gs1_encoder_getMinXdimension()</a> </dd>
+<dd>
+<a class="el" href="gs1encoders_8h.html#ad43cabc580becbd2e1bb95f7c1816e00" title="Get the current target X-dimension specified by the user.">gs1_encoder_getTargetXdimension()</a> </dd>
+<dd>
+<a class="el" href="gs1encoders_8h.html#a61a14fe486ff3f640673e94521602f1b" title="Get the current maximum permissible X-dimension.">gs1_encoder_getMaxXdimension()</a> </dd>
+<dd>
+<a class="el" href="gs1encoders_8h.html#af29e8e582397559cc4474d33ddc4c549" title="Get the current device dots per module.">gs1_encoder_getPixMult()</a> </dd>
+<dd>
+<a class="el" href="gs1encoders_8h.html#a49cd9d8a28207bd4a09dd6e6280449d7" title="Get the actual X-dimension that can be achieved on the device.">gs1_encoder_getActualXdimension()</a></dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">ctx</td><td><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34" title="A gs1_encoder context.">gs1_encoder</a> context </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">min</td><td>minimum permissible X-dimension, or 0 for undefined </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">target</td><td>target X-dimension </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">max</td><td>maximum permissible X-dimension, or 0 for undefined </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true on success, otherwise false and an error message is set that can be read using <a class="el" href="gs1encoders_8h.html#aee9e7c8b49fe2a8fa7bd0b21c1e7510b" title="Read an error message generated by the library.">gs1_encoder_getErrMsg()</a> </dd></dl>
+
+</div>
+</div>
 <a id="a290b68be80ac8199ae624af65ecec689"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a290b68be80ac8199ae624af65ecec689">&#9670;&nbsp;</a></span>gs1_encoder_setXundercut()</h2>
 
@@ -2705,7 +3012,7 @@ The length of the data must be less that the value returned by <a class="el" hre
 <dl class="section note"><dt>Note</dt><dd>Must be less than half the X-dimension.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#ae7157576172abcc30d788a61f984ed4d" title="Get the current X undercut.">gs1_encoder_getXundercut()</a> </dd>
 <dd>
-<a class="el" href="gs1encoders_8h.html#af29e8e582397559cc4474d33ddc4c549" title="Get the current pixels per module (&quot;X-dimension&quot;)">gs1_encoder_getPixMult()</a></dd></dl>
+<a class="el" href="gs1encoders_8h.html#af29e8e582397559cc4474d33ddc4c549" title="Get the current device dots per module.">gs1_encoder_getPixMult()</a></dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in,out]</td><td class="paramname">ctx</td><td><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34" title="A gs1_encoder context.">gs1_encoder</a> context </td></tr>
@@ -2748,7 +3055,7 @@ The length of the data must be less that the value returned by <a class="el" hre
 <dl class="section note"><dt>Note</dt><dd>Must be less than half the X-dimension.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#a713b4f73c53df35035e4b166e9a04626" title="Get the current Y undercut.">gs1_encoder_getYundercut()</a> </dd>
 <dd>
-<a class="el" href="gs1encoders_8h.html#af29e8e582397559cc4474d33ddc4c549" title="Get the current pixels per module (&quot;X-dimension&quot;)">gs1_encoder_getPixMult()</a></dd></dl>
+<a class="el" href="gs1encoders_8h.html#af29e8e582397559cc4474d33ddc4c549" title="Get the current device dots per module.">gs1_encoder_getPixMult()</a></dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in,out]</td><td class="paramname">ctx</td><td><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34" title="A gs1_encoder context.">gs1_encoder</a> context </td></tr>

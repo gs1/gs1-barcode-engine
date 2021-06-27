@@ -476,21 +476,36 @@ GS1_ENCODERS_API bool gs1_encoder_setSym(gs1_encoder *ctx, int sym);
 
 
 /**
- * @brief Get the current pixels per module ("X-dimension")
+ * @brief Get the current device dots per module
  *
  * @see gs1_encoder_setPixMult()
  * @see gs1_encoder_getMaxPixMult()
  *
  * @param [in,out] ctx ::gs1_encoder context
- * @return pixels per module
+ * @return device dots per module
  */
 GS1_ENCODERS_API int gs1_encoder_getPixMult(gs1_encoder *ctx);
 
 
 /**
- * @brief Set the pixels per module ("X-dimension").
+ * @brief Set the device dots per module
+ *
+ * Directly specifies the number of device pixels that shall compose a module
+ * within a barcode symbol. A module is defined to be the most narrow element:
+ * The shortest width bar for a linear symbology or the smallest square for a
+ * 2D symbology.
  *
  * Valid options range from 1 up to the limit returned by gs1_encoder_getMaxPixMult().
+ *
+ * Calling this function will clear any X-dimension constraints set by
+ * gs1_encoder_setXdimension().
+ *
+ * \note
+ * This option is most useful when creating a bitmap for rendering on a digital
+ * display where the image size does not directly relate to any real-world
+ * dimensions. To specify the intended output size in terms of real-world
+ * dimensions use gs1_encoder_setDeviceResolution() and
+ * gs1_encoder_setXdimension() instead.
  *
  * \note
  * The X and Y undercut will be reset if the new X dimension is insufficient.
@@ -498,12 +513,205 @@ GS1_ENCODERS_API int gs1_encoder_getPixMult(gs1_encoder *ctx);
  *
  * @see gs1_encoder_getPixMult()
  * @see gs1_encoder_getMaxPixMult()
+ * @see gs1_encoder_setDeviceResolution()
+ * @see gs1_encoder_setXdimension()
  *
  * @param [in,out] ctx ::gs1_encoder context
- * @param [in] pixMult pixels per module
+ * @param [in] pixMult device dots per module
  * @return true on success, otherwise false and an error message is set that can be read using gs1_encoder_getErrMsg()
  */
 GS1_ENCODERS_API bool gs1_encoder_setPixMult(gs1_encoder *ctx, int pixMult);
+
+
+/**
+ * @brief Get the specified device resolution
+ *
+ * This is the value specified by the user using gs1_encoder_setDeviceResolution().
+ *
+ * @see gs1_encoder_setDeviceResolution()
+ *
+ * @param [in,out] ctx ::gs1_encoder context
+ * @return device resolution, or 0 if undefined
+ */
+GS1_ENCODERS_API double gs1_encoder_getDeviceResolution(gs1_encoder *ctx);
+
+
+/**
+ * @brief Set the device resolution
+ *
+ * Specifies the resolution (device dots per unit) of the output device on
+ * which the barcode is to be rendered.
+ *
+ * This function is expected to be used along with gs1_encoder_setXdimension()
+ * to automatically set the device dots per module that would produce an image that
+ * most-closely matches the specified real-world dimensions when rendered on
+ * the device.
+ *
+ * Calling this function will clear any existing X-dimension constraints, and
+ * therefore must be called before gs1_encoder_setXdimension().
+ *
+ * \note
+ * A real-world unit is not specified, however the unit for the value specified
+ * here becomes the basis for the values provided to
+ * gs1_encoder_setXdimension().  For example, if the device resolution is
+ * specified in dots per mm (d/mm) then the X-dimension constraints must also
+ * be provided in mm. If dots per inch (DPI) is provided here then the
+ * X-dimension must also be specified in inches.
+ *
+ * @see gs1_encoder_getDeviceResolution()
+ * @see gs1_encoder_setXdimension()
+ *
+ * @param [in,out] ctx ::gs1_encoder context
+ * @param [in] resolution device dots per unit
+ * @return true on success, otherwise false and an error message is set that can be read using gs1_encoder_getErrMsg()
+ */
+GS1_ENCODERS_API bool gs1_encoder_setDeviceResolution(gs1_encoder *ctx, double resolution);
+
+
+/**
+ * @brief Set the constraints for the X-dimension width
+ *
+ * This function will automatically set the number of device dots per module
+ * that is required to produce symbols whose X-dimension most-closely meets the
+ * provided target X-dimension on a device whose resolution has been previously
+ * specified with gs1_encoder_setDeviceResolution(), without exceeding the
+ * optional constraints.
+ *
+ * The following real-world dimensions are accepted:
+ *
+ *   * Target X-dimension (mandatory):: The ideal X-dimension for the application.
+ *   * Minimum X-dimension (optional):: The minimum X-dimension permitted by the application.
+ *   * Maximum X-dimension (optional):: The maximum X-dimension permitted by the application.
+ *
+ * When the minimum and/or maximum X-dimension is specified the chosen device
+ * dots per module is guaranteed to not exceed these constraints. With
+ * low-resolution devices and tight X-dimension tollerances it may not be
+ * possible to achieve an X-dimension that falls within the given constraints
+ * since modules must be composed of some whole number of device dots. Put
+ * another way, barcode images must be scaled in quantums of device dots to
+ * prevent unstable module widths due to pixel-grazing.
+ *
+ * For example, it is not possible to generate linear symbols intended for
+ * general distribution, where the permissible X-dimension is restricted to 0.495 -
+ * 0.660mm, on a device whose resolution is 3 dots/mm since 1 device dot is
+ * 0.333mm and 2 device dots is 0.667mm. (Note that it is however possible to
+ * achieve an acceptable X-dimension on an even lower resolution, 2 dots/mm
+ * device since 1 device dot is 0.500mm, which demonstrates that care should
+ * exercised when selecting devices for a particular application.)
+ *
+ * If the required X-dimension constraints can be achieved then the selected
+ * device dots per module can be obtained with gs1_encoder_getPixMult() and
+ * the actual X-dimension achieved can be obtained with
+ * gs1_encoder_getActualXdimension().
+ *
+ * If it is not possible to achieve the given X-dimension then the function
+ * will produce an error and the device dots per module will be set to
+ * undefined (0).
+ *
+ * \note
+ * This function is expected to be used along with
+ * gs1_encoder_setDeviceResolution() to automatically set the device dots per
+ * module that would produce an image that most-closely matches the specified
+ * real-world dimensions when rendered on the device. If the output is intended
+ * for rendition on digital displays where the symbol size does not relate to a
+ * real-world dimension then the device dots per module should be directly specified
+ * using gs1_encoder_setPixMult() instead.
+ *
+ * @see gs1_encoder_setDeviceResolution()
+ * @see gs1_encoder_getMinXdimension()
+ * @see gs1_encoder_getTargetXdimension()
+ * @see gs1_encoder_getMaxXdimension()
+ * @see gs1_encoder_getPixMult()
+ * @see gs1_encoder_getActualXdimension()
+ *
+ * @param [in,out] ctx ::gs1_encoder context
+ * @param [in] min minimum permissible X-dimension, or 0 for undefined
+ * @param [in] target target X-dimension
+ * @param [in] max maximum permissible X-dimension, or 0 for undefined
+ * @return true on success, otherwise false and an error message is set that can be read using gs1_encoder_getErrMsg()
+ */
+GS1_ENCODERS_API bool gs1_encoder_setXdimension(gs1_encoder *ctx, double min, double target, double max);
+
+
+/**
+ * @brief Get the current minimum permissible X-dimension
+ *
+ * This is the value specified by the user using gs1_encoder_setXdimension().
+ *
+ * \note
+ * The units for this parameter are those implicitly considered when specifying
+ * the device resolution using gs1_encoder_setDeviceResolution().
+ *
+ * @see gs1_encoder_setXdimension()
+ * @see gs1_encoder_setDeviceResolution()
+ *
+ * @param [in,out] ctx ::gs1_encoder context
+ * @return minimum X-dimension, or 0 if undefined
+ */
+GS1_ENCODERS_API double gs1_encoder_getMinXdimension(gs1_encoder *ctx);
+
+
+/**
+ * @brief Get the current maximum permissible X-dimension
+ *
+ * This is the value specified by the user using gs1_encoder_setXdimension().
+ *
+ * \note
+ * The units for this parameter are those implicitly considered when specifying
+ * the device resolution using gs1_encoder_setDeviceResolution().
+ *
+ * @see gs1_encoder_setXdimension()
+ * @see gs1_encoder_setDeviceResolution()
+ *
+ * @param [in,out] ctx ::gs1_encoder context
+ * @return minimum X-dimension, or 0 if undefined
+ */
+GS1_ENCODERS_API double gs1_encoder_getMaxXdimension(gs1_encoder *ctx);
+
+
+/**
+ * @brief Get the current target X-dimension specified by the user
+ *
+ * This is the value specified by the user using gs1_encoder_setXdimension(). It
+ * may differ from the actual X-dimension that has been achieved (based on the
+ * device resolution) which can be retrieved using
+ * gs1_encoder_getActualXdimension().
+ *
+ * \note
+ * The units for this parameter are those implicitly considered when specifying
+ * the device resolution using gs1_encoder_setDeviceResolution().
+ *
+ * @see gs1_encoder_setXdimension()
+ * @see gs1_encoder_setDeviceResolution()
+ *
+ * @param [in,out] ctx ::gs1_encoder context
+ * @return target X-dimension, or 0 if undefined
+ */
+GS1_ENCODERS_API double gs1_encoder_getTargetXdimension(gs1_encoder *ctx);
+
+
+/**
+ * @brief Get the actual X-dimension that can be achieved on the device
+ *
+ * This returns the actual X-dimension that can be achieved based on the device
+ * resolution specified by gs1_encoder_setDeviceResolution() and the current
+ * number of pixels per module.
+ *
+ * It likely differs from the target X-dimension but is guaranteed not to
+ * exceed any minimum and maximum X-dimension specified using
+ * gs1_encoder_setXdimension().
+ *
+ * \note
+ * The units for this parameter are those implicitly considered when specifying
+ * the device resolution using gs1_encoder_setDeviceResolution().
+ *
+ * @see gs1_encoder_setXdimension()
+ * @see gs1_encoder_setDeviceResolution()
+ *
+ * @param [in,out] ctx ::gs1_encoder context
+ * @return achieved X-dimension, or 0 if undefined
+ */
+GS1_ENCODERS_API double gs1_encoder_getActualXdimension(gs1_encoder *ctx);
 
 
 /**
