@@ -23,12 +23,13 @@
 
 #include <stdbool.h>
 
-#define MAX_LINE 6032 // 10 inches wide at 600 dpi
-#define DEFAULT_BMP_FILE "out.bmp"
-#define DEFAULT_TIF_FILE "out.tif"
-
+#include "qr.h"
 #include "enc-private.h"
 #include "gs1encoders.h"
+
+#define MAX_LINE (MAX_QR_SIZE * MAX_PIXMULT)
+#define DEFAULT_BMP_FILE "out.bmp"
+#define DEFAULT_TIF_FILE "out.tif"
 
 struct sPrints;
 
