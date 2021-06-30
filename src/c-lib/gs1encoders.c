@@ -766,7 +766,7 @@ GS1_ENCODERS_API bool gs1_encoder_setScanData(gs1_encoder* ctx, const char *scan
 
 GS1_ENCODERS_API int gs1_encoder_getHRI(gs1_encoder *ctx, char*** out) {
 
-	int i;
+	int i, j;
 	struct aiValue ai;
 	char *p = ctx->outStr;
 
@@ -775,18 +775,18 @@ GS1_ENCODERS_API int gs1_encoder_getHRI(gs1_encoder *ctx, char*** out) {
 	reset_error(ctx);
 
 	*p = '\0';
-	for (i = 0; i < ctx->numAIs; i++) {
-		ctx->outHRI[i] = p;
+	for (i = 0, j = 0; i < ctx->numAIs; i++) {
 		ai = ctx->aiData[i];
-		if (ai.aiEntry)
-			p += sprintf(p, "(%s) %.*s", ai.aiEntry->ai, ai.vallen, ai.value);
-		else
-			p += sprintf(p, "--");
+		if (!ai.aiEntry)
+			continue;
+		ctx->outHRI[j] = p;
+		p += sprintf(p, "(%s) %.*s", ai.aiEntry->ai, ai.vallen, ai.value);
 		*p++ = '\0';
+		j++;
 	}
 
 	*out = ctx->outHRI;
-	return ctx->numAIs;
+	return j;
 
 }
 
@@ -1922,12 +1922,11 @@ void test_api_getHRI(void) {
 
 	// HRI from AI data
 	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "#011231231231233310ABC123|#99COMPOSITE"));
-	TEST_ASSERT((numAIs = gs1_encoder_getHRI(ctx, &hri)) == 4);
+	TEST_ASSERT((numAIs = gs1_encoder_getHRI(ctx, &hri)) == 3);
 	TEST_ASSERT(hri != NULL);
 	TEST_CHECK(strcmp(hri[0], "(01) 12312312312333") == 0);
 	TEST_CHECK(strcmp(hri[1], "(10) ABC123") == 0);
-	TEST_CHECK(strcmp(hri[2], "--") == 0);
-	TEST_CHECK(strcmp(hri[3], "(99) COMPOSITE") == 0);
+	TEST_CHECK(strcmp(hri[2], "(99) COMPOSITE") == 0);
 
 	// HRI from Digital Link URI
 	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "https://a/01/12312312312333/22/TESTING?99=ABC%2d123&98=XYZ"));
