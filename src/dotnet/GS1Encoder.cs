@@ -180,6 +180,29 @@ namespace gs1encoders_dotnet
         [return: MarshalAs(UnmanagedType.U1)]
         private static extern bool gs1_encoder_setPixMult(IntPtr ctx, int pixMult);
 
+        [DllImport(gs1_dll, EntryPoint = "gs1_encoder_getDeviceResolution", CallingConvention = CallingConvention.Cdecl)]
+        private static extern double gs1_encoder_getDeviceResolution(IntPtr ctx);
+
+        [DllImport(gs1_dll, EntryPoint = "gs1_encoder_setDeviceResolution", CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.U1)]
+        private static extern bool gs1_encoder_setDeviceResolution(IntPtr ctx, double resolution);
+
+        [DllImport(gs1_dll, EntryPoint = "gs1_encoder_setXdimension", CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.U1)]
+        private static extern bool gs1_encoder_setXdimension(IntPtr ctx, double min, double target, double max);
+
+        [DllImport(gs1_dll, EntryPoint = "gs1_encoder_getTargetXdimension", CallingConvention = CallingConvention.Cdecl)]        
+        private static extern double gs1_encoder_getTargetXdimension(IntPtr ctx);
+
+        [DllImport(gs1_dll, EntryPoint = "gs1_encoder_getMinXdimension", CallingConvention = CallingConvention.Cdecl)]
+        private static extern double gs1_encoder_getMinXdimension(IntPtr ctx);
+
+        [DllImport(gs1_dll, EntryPoint = "gs1_encoder_getMaxXdimension", CallingConvention = CallingConvention.Cdecl)]
+        private static extern double gs1_encoder_getMaxXdimension(IntPtr ctx);
+
+        [DllImport(gs1_dll, EntryPoint = "gs1_encoder_getActualXdimension", CallingConvention = CallingConvention.Cdecl)]
+        private static extern double gs1_encoder_getActualXdimension(IntPtr ctx);
+
         [DllImport(gs1_dll, EntryPoint = "gs1_encoder_getXundercut", CallingConvention = CallingConvention.Cdecl)]
         private static extern int gs1_encoder_getXundercut(IntPtr ctx);
 
@@ -280,10 +303,6 @@ namespace gs1encoders_dotnet
         [return: MarshalAs(UnmanagedType.U1)]
         private static extern bool gs1_encoder_setScanData(IntPtr ctx, string scanData);
 
-        [DllImport(gs1_dll, EntryPoint = "gs1_encoder_setDLuriStr", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        [return: MarshalAs(UnmanagedType.U1)]
-        private static extern bool gs1_encoder_setDLuriStr(IntPtr ctx, string dlURI);
-
         [DllImport(gs1_dll, EntryPoint = "gs1_encoder_getHRI", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int gs1_encoder_getHRI(IntPtr ctx, ref IntPtr hri);
 
@@ -369,6 +388,49 @@ namespace gs1encoders_dotnet
                 if (!gs1_encoder_setPixMult(ctx, value))
                     throw new GS1EncoderParameterException(ErrMsg);
             }
+        }
+
+        public double DeviceResolution
+        {
+            get
+            {
+                return gs1_encoder_getDeviceResolution(ctx);
+            }
+            set
+            {
+                if (!gs1_encoder_setDeviceResolution(ctx, value))
+                    throw new GS1EncoderParameterException(ErrMsg);
+            }
+        }
+
+        public double TargetXdimension
+        {
+            get
+            {
+                return gs1_encoder_getTargetXdimension(ctx);
+            }
+        }
+
+        public double MinXdimension
+        {
+            get
+            {
+                return gs1_encoder_getMinXdimension(ctx);
+            }
+        }
+
+        public double MaxXdimension
+        {
+            get
+            {
+                return gs1_encoder_getMaxXdimension(ctx);
+            }
+        }
+
+        public void setXdimension(double min, double target, double max)
+        {
+            if (!gs1_encoder_setXdimension(ctx, min, target, max))
+                throw new GS1EncoderParameterException(ErrMsg);
         }
 
         public int Xundercut
@@ -547,12 +609,6 @@ namespace gs1encoders_dotnet
                 if (!gs1_encoder_setScanData(ctx, value))
                     throw new GS1EncoderParameterException(ErrMsg);
             }
-        }
-
-        public void SetDLuriStr(string dlURI)
-        {
-            if (!gs1_encoder_setDLuriStr(ctx, dlURI))
-                throw new GS1EncoderParameterException(ErrMsg);
         }
 
         public string[] HRI

@@ -71,9 +71,9 @@ namespace gs1encoders_dotnet
                 {
                     App.gs1Encoder.AIdataStr = dataStrTextBox.Text;
                 }
-                else if (dataStrTextBox.Text.StartsWith("http://") || dataStrTextBox.Text.StartsWith("https://"))
+                else
                 {
-                    App.gs1Encoder.SetDLuriStr(dataStrTextBox.Text);
+                    App.gs1Encoder.DataStr = dataStrTextBox.Text;
                 }
                 if (Int32.TryParse(pixMultTextBox.Text, out v)) App.gs1Encoder.PixMult = v;
                 if (Int32.TryParse(XundercutTextBox.Text, out v)) App.gs1Encoder.Xundercut = v;

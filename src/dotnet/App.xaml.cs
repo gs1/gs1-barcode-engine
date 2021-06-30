@@ -52,7 +52,7 @@ namespace gs1encoders_dotnet
             gs1Encoder.FileInputFlag = false;
             gs1Encoder.OutFile = "";
             gs1Encoder.Format = (int)GS1Encoder.Formats.BMP;
-            gs1Encoder.PixMult = 2;
+            gs1Encoder.PixMult = 1;
 
             gs1Encoder.Sym = (int)GS1Encoder.Symbology.DM;
             mw.dataStrTextBox.Text = "(01)02112345678900";
