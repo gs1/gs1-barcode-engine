@@ -63,8 +63,7 @@ namespace gs1encoders_dotnet
             infoLabel.Content = "";
             errorMessageLabel.Content = "";
             hriTextBox.Text = "";
-            SaveBMPButton.IsEnabled = false;
-            SavePNGButton.IsEnabled = false;            
+            SaveButton.IsEnabled = false;          
             PrintButton.IsEnabled = false;
 
             try
@@ -132,35 +131,27 @@ namespace gs1encoders_dotnet
                 barcodeImage.Source = img;
             }
 
-            SaveBMPButton.IsEnabled = true;
-            SavePNGButton.IsEnabled = true;
+            SaveButton.IsEnabled = true;
             PrintButton.IsEnabled = true;
 
             LoadControls();
 
         }
-
-        private void SaveBMPButton_Click(object sender, RoutedEventArgs e)
-        {
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.Filter = "Bitmap Image (*.bmp)|*.bmp";
-            if (saveFileDialog.ShowDialog() == true) {
-                BitmapEncoder encoder = new BmpBitmapEncoder();
-                encoder.Frames.Add(BitmapFrame.Create((BitmapSource)barcodeImage.Source));
-                using (var fileStream = new System.IO.FileStream(saveFileDialog.FileName, System.IO.FileMode.Create))
-                {
-                    encoder.Save(fileStream);
-                }
-            }                
-        }
         
-        private void SavePNGButton_Click(object sender, RoutedEventArgs e)
+        private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.Filter = "Portable Network Graphic (*.png)|*.png";
+            saveFileDialog.Filter = "Bitmap Image (*.bmp)|*.bmp|Portable Network Graphic (*.png)|*.png";
             if (saveFileDialog.ShowDialog() == true)
             {
-                BitmapEncoder encoder = new PngBitmapEncoder();
+                BitmapEncoder encoder;
+                if (saveFileDialog.FilterIndex == 0)
+                {
+                    encoder = new BmpBitmapEncoder();                    
+                } else
+                {
+                    encoder = new PngBitmapEncoder();
+                }
                 encoder.Frames.Add(BitmapFrame.Create((BitmapSource)barcodeImage.Source));
                 using (var fileStream = new System.IO.FileStream(saveFileDialog.FileName, System.IO.FileMode.Create))
                 {
@@ -263,6 +254,382 @@ namespace gs1encoders_dotnet
             string content = (string)infoLabel.Content;
             content = Regex.Replace(content,".*:\\s+","");
             Clipboard.SetText(content);
+        }
+
+        private void applicationComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+            double minX = 0;
+            double maxX = 0;
+            double targetX = 0;
+
+            if (applicationComboBox.SelectedValue.ToString().Equals("Custom"))
+            {
+                minXdimensionTextBox.IsEnabled = true;
+                maxXdimensionTextBox.IsEnabled = true;
+                targetXdimensionTextBox.IsEnabled = true;
+            }
+            else
+            {
+                minXdimensionTextBox.IsEnabled = false;
+                maxXdimensionTextBox.IsEnabled = false;
+                targetXdimensionTextBox.IsEnabled = false;
+            }
+
+            DataBarOmni_ComboBoxItem.IsEnabled = false;
+            DataBarTruncated_ComboBoxItem.IsEnabled = false;
+            DataBarStacked_ComboBoxItem.IsEnabled = false;
+            DataBarStackedOmni_ComboBoxItem.IsEnabled = false;
+            DataBarLimited_ComboBoxItem.IsEnabled = false;
+            DataBarExpanded_ComboBoxItem.IsEnabled = false;
+            UPCA_ComboBoxItem.IsEnabled = false;
+            UPCE_ComboBoxItem.IsEnabled = false;
+            EAN13_ComboBoxItem.IsEnabled = false;
+            EAN8_ComboBoxItem.IsEnabled = false;
+            GS1_128_CCA_ComboBoxItem.IsEnabled = false;
+            GS1_128_CCC_ComboBoxItem.IsEnabled = false;
+            QR_ComboBoxItem.IsEnabled = false;
+            DM_ComboBoxItem.IsEnabled = false;
+
+            switch (applicationComboBox.SelectedValue.ToString())
+            {
+                case "Custom":
+                    DataBarOmni_ComboBoxItem.IsEnabled = true;
+                    DataBarTruncated_ComboBoxItem.IsEnabled = true;
+                    DataBarStacked_ComboBoxItem.IsEnabled = true;
+                    DataBarStackedOmni_ComboBoxItem.IsEnabled = true;
+                    DataBarLimited_ComboBoxItem.IsEnabled = true;
+                    DataBarExpanded_ComboBoxItem.IsEnabled = true;
+                    UPCA_ComboBoxItem.IsEnabled = true;
+                    UPCE_ComboBoxItem.IsEnabled = true;
+                    EAN13_ComboBoxItem.IsEnabled = true;
+                    EAN8_ComboBoxItem.IsEnabled = true;
+                    GS1_128_CCA_ComboBoxItem.IsEnabled = true;
+                    GS1_128_CCC_ComboBoxItem.IsEnabled = true;
+                    QR_ComboBoxItem.IsEnabled = true;
+                    DM_ComboBoxItem.IsEnabled = true;
+                    break;
+
+                case "Table 1 EAN/UPC":
+                    UPCA_ComboBoxItem.IsEnabled = true;
+                    UPCE_ComboBoxItem.IsEnabled = true;
+                    EAN13_ComboBoxItem.IsEnabled = true;
+                    EAN8_ComboBoxItem.IsEnabled = true;
+                    minX = 0.264; targetX = 0.330; maxX = 0.660;
+                    break;
+
+                case "Table 1 GS1 DataBar":
+                    DataBarOmni_ComboBoxItem.IsEnabled = true;
+                    DataBarTruncated_ComboBoxItem.IsEnabled = true;
+                    DataBarStackedOmni_ComboBoxItem.IsEnabled = true;
+                    DataBarExpanded_ComboBoxItem.IsEnabled = true;
+                    minX = 0.264; targetX = 0.330; maxX = 0.660;
+                    break;
+
+                case "Table 1 2D":
+                    QR_ComboBoxItem.IsEnabled = true;
+                    DM_ComboBoxItem.IsEnabled = true;
+                    minX = 0.375; targetX = 0.625; maxX = 0.990;
+                    break;
+
+                case "Table 1 AI (8200)":
+                    QR_ComboBoxItem.IsEnabled = true;
+                    DM_ComboBoxItem.IsEnabled = true;
+                    minX = 0.396; targetX = 0.495; maxX = 0.743;
+                    break;
+
+                case "Table 1 Digital Link":
+                    QR_ComboBoxItem.IsEnabled = true;
+                    DM_ComboBoxItem.IsEnabled = true;
+                    minX = 0.396; targetX = 0.495; maxX = 0.743;
+                    break;
+
+                case "Table 2 EAN/UPC":
+                    UPCA_ComboBoxItem.IsEnabled = true;
+                    UPCE_ComboBoxItem.IsEnabled = true;
+                    EAN13_ComboBoxItem.IsEnabled = true;
+                    EAN8_ComboBoxItem.IsEnabled = true;
+                    minX = 0.495; targetX = 0.660; maxX = 0.660;
+                    break;
+
+                case "Table 2 GS1 DataBar":
+                    DataBarOmni_ComboBoxItem.IsEnabled = true;
+                    DataBarTruncated_ComboBoxItem.IsEnabled = true;
+                    DataBarStacked_ComboBoxItem.IsEnabled = true;
+                    DataBarStackedOmni_ComboBoxItem.IsEnabled = true;
+                    DataBarLimited_ComboBoxItem.IsEnabled = true;
+                    DataBarExpanded_ComboBoxItem.IsEnabled = true;
+                    minX = 0.495; targetX = 0.660; maxX = 0.660;
+                    break;
+
+                case "Table 2 GS1-128":
+                    GS1_128_CCA_ComboBoxItem.IsEnabled = true;
+                    GS1_128_CCC_ComboBoxItem.IsEnabled = true;
+                    minX = 0.495; targetX = 0.495; maxX = 1.016;
+                    break;
+
+                case "Table 2 2D":
+                    QR_ComboBoxItem.IsEnabled = true;
+                    DM_ComboBoxItem.IsEnabled = true;
+                    minX = 0.743; targetX = 0.743; maxX = 1.500;
+                    break;
+
+                case "Table 3":
+                    UPCA_ComboBoxItem.IsEnabled = true;
+                    UPCE_ComboBoxItem.IsEnabled = true;
+                    EAN13_ComboBoxItem.IsEnabled = true;
+                    EAN8_ComboBoxItem.IsEnabled = true;
+                    DataBarOmni_ComboBoxItem.IsEnabled = true;
+                    DataBarStackedOmni_ComboBoxItem.IsEnabled = true;
+                    DataBarExpanded_ComboBoxItem.IsEnabled = true;
+                    minX = 0.495; targetX = 0.660; maxX = 0.660;
+                    break;
+
+                case "Table 4 EAN/UPC":
+                    UPCA_ComboBoxItem.IsEnabled = true;
+                    UPCE_ComboBoxItem.IsEnabled = true;
+                    EAN13_ComboBoxItem.IsEnabled = true;
+                    EAN8_ComboBoxItem.IsEnabled = true;
+                    minX = 0.264; targetX = 0.330; maxX = 0.660;
+                    break;
+
+                case "Table 4 GS1 DataBar":
+                    DataBarOmni_ComboBoxItem.IsEnabled = true;
+                    DataBarTruncated_ComboBoxItem.IsEnabled = true;
+                    DataBarStacked_ComboBoxItem.IsEnabled = true;
+                    DataBarStackedOmni_ComboBoxItem.IsEnabled = true;
+                    DataBarLimited_ComboBoxItem.IsEnabled = true;
+                    DataBarExpanded_ComboBoxItem.IsEnabled = true;
+                    minX = 0.264; targetX = 0.330; maxX = 0.660;
+                    break;
+
+                case "Table 4 GS1-128":
+                    GS1_128_CCA_ComboBoxItem.IsEnabled = true;
+                    GS1_128_CCC_ComboBoxItem.IsEnabled = true;
+                    minX = 0.250; targetX = 0.495; maxX = 0.495;
+                    break;
+
+                case "Table 4 2D":
+                    QR_ComboBoxItem.IsEnabled = true;
+                    DM_ComboBoxItem.IsEnabled = true;
+                    minX = 0.380; targetX = 0.380; maxX = 0.495;
+                    break;
+
+                case "Table 5 GS1-128":
+                    GS1_128_CCA_ComboBoxItem.IsEnabled = true;
+                    GS1_128_CCC_ComboBoxItem.IsEnabled = true;
+                    minX = 0.495; targetX = 0.495; maxX = 0.940;
+                    break;
+
+                case "Table 5 2D":
+                    QR_ComboBoxItem.IsEnabled = true;
+                    DM_ComboBoxItem.IsEnabled = true;
+                    minX = 0.743; targetX = 0.743; maxX = 1.500;
+                    break;
+
+                case "Table 6 EAN/UPC":
+                    UPCA_ComboBoxItem.IsEnabled = true;
+                    UPCE_ComboBoxItem.IsEnabled = true;
+                    EAN13_ComboBoxItem.IsEnabled = true;
+                    EAN8_ComboBoxItem.IsEnabled = true;
+                    minX = 0.170; targetX = 0.330; maxX = 0.660;
+                    break;
+
+                case "Table 6 GS1 DataBar":
+                    DataBarOmni_ComboBoxItem.IsEnabled = true;
+                    DataBarTruncated_ComboBoxItem.IsEnabled = true;
+                    DataBarStacked_ComboBoxItem.IsEnabled = true;
+                    DataBarStackedOmni_ComboBoxItem.IsEnabled = true;
+                    DataBarLimited_ComboBoxItem.IsEnabled = true;
+                    DataBarExpanded_ComboBoxItem.IsEnabled = true;
+                    minX = 0.170; targetX = 0.200; maxX = 0.660;
+                    break;
+
+                case "Table 6 GS1-128":
+                    GS1_128_CCA_ComboBoxItem.IsEnabled = true;
+                    GS1_128_CCC_ComboBoxItem.IsEnabled = true;
+                    minX = 0.170; targetX = 0.495; maxX = 0.495;
+                    break;
+
+                case "Table 6 DataMatrix":
+                    DM_ComboBoxItem.IsEnabled = true;
+                    minX = 0.254; targetX = 0.380; maxX = 0.990;
+                    break;
+
+                case "Table 7 DPM":
+                    QR_ComboBoxItem.IsEnabled = true;
+                    DM_ComboBoxItem.IsEnabled = true;
+                    minX = 0.254; targetX = 0.300; maxX = 0.615;
+                    break;
+
+                case "Table 7 DM Ink":
+                    DM_ComboBoxItem.IsEnabled = true;
+                    minX = 0.254; targetX = 0.300; maxX = 0.615;
+                    break;
+
+                case "Table 7 DM DPM-A":
+                    DM_ComboBoxItem.IsEnabled = true;
+                    minX = 0.100; targetX = 0.200; maxX = 0.300;
+                    break;
+
+                case "Table 7 DM DPM-B":
+                    DM_ComboBoxItem.IsEnabled = true;
+                    minX = 0.200; targetX = 0.300; maxX = 0.495;
+                    break;
+
+                case "Table 8 EAN/UPC":
+                    UPCA_ComboBoxItem.IsEnabled = true;
+                    UPCE_ComboBoxItem.IsEnabled = true;
+                    EAN13_ComboBoxItem.IsEnabled = true;
+                    EAN8_ComboBoxItem.IsEnabled = true;
+                    minX = 0.495; targetX = 0.660; maxX = 0.660;
+                    break;
+
+                case "Table 8 GS1 DataBar":
+                    DataBarOmni_ComboBoxItem.IsEnabled = true;
+                    DataBarTruncated_ComboBoxItem.IsEnabled = true;
+                    DataBarStacked_ComboBoxItem.IsEnabled = true;
+                    DataBarStackedOmni_ComboBoxItem.IsEnabled = true;
+                    DataBarLimited_ComboBoxItem.IsEnabled = true;
+                    DataBarExpanded_ComboBoxItem.IsEnabled = true;
+                    minX = 0.495; targetX = 0.660; maxX = 0.660;
+                    break;
+
+                case "Table 8 GS1-128":
+                    GS1_128_CCA_ComboBoxItem.IsEnabled = true;
+                    GS1_128_CCC_ComboBoxItem.IsEnabled = true;
+                    minX = 0.495; targetX = 0.495; maxX = 1.016;
+                    break;
+
+                case "Table 8 DataMatrix":
+                    DM_ComboBoxItem.IsEnabled = true;
+                    minX = 0.750; targetX = 0.750; maxX = 1.520;
+                    break;
+
+                case "Table 9 GS1-128":
+                    GS1_128_CCA_ComboBoxItem.IsEnabled = true;
+                    GS1_128_CCC_ComboBoxItem.IsEnabled = true;
+                    minX = 0.250; targetX = 0.250; maxX = 0.495;
+                    break;
+
+                case "Table 9 2D":
+                    QR_ComboBoxItem.IsEnabled = true;
+                    DM_ComboBoxItem.IsEnabled = true;
+                    minX = 0.380; targetX = 0.380; maxX = 0.495;
+                    break;
+
+                case "Table 10 EAN/UPC":
+                    UPCA_ComboBoxItem.IsEnabled = true;
+                    UPCE_ComboBoxItem.IsEnabled = true;
+                    EAN13_ComboBoxItem.IsEnabled = true;
+                    EAN8_ComboBoxItem.IsEnabled = true;
+                    minX = 0.264; targetX = 0.330; maxX = 0.660;
+                    break;
+
+                case "Table 10 GS1 DataBar":
+                    DataBarOmni_ComboBoxItem.IsEnabled = true;
+                    DataBarTruncated_ComboBoxItem.IsEnabled = true;
+                    DataBarStacked_ComboBoxItem.IsEnabled = true;
+                    DataBarStackedOmni_ComboBoxItem.IsEnabled = true;
+                    DataBarLimited_ComboBoxItem.IsEnabled = true;
+                    DataBarExpanded_ComboBoxItem.IsEnabled = true;
+                    minX = 0.264; targetX = 0.330; maxX = 0.660;
+                    break;
+
+                case "Table 10 GS1-128":
+                    GS1_128_CCA_ComboBoxItem.IsEnabled = true;
+                    GS1_128_CCC_ComboBoxItem.IsEnabled = true;
+                    minX = 0.264; targetX = 0.330; maxX = 0.660;
+                    break;
+
+                case "Table 10 DataMatrix":
+                    DM_ComboBoxItem.IsEnabled = true;
+                    minX = 0.396; targetX = 0.495; maxX = 0.990;
+                    break;
+
+                case "Table 11 GS1 DataBar":
+                    DataBarExpanded_ComboBoxItem.IsEnabled = true;
+                    minX = 0.264; targetX = 0.330; maxX = 0.660;
+                    break;
+
+                case "Table 11 GS1-128":
+                    GS1_128_CCA_ComboBoxItem.IsEnabled = true;
+                    GS1_128_CCC_ComboBoxItem.IsEnabled = true;
+                    minX = 0.170; targetX = 0.250; maxX = 0.495;
+                    break;
+
+                case "Table 11 2D":
+                    QR_ComboBoxItem.IsEnabled = true;
+                    DM_ComboBoxItem.IsEnabled = true;
+                    minX = 0.254; targetX = 0.380; maxX = 0.495;
+                    break;
+
+                case "Table 12 unit pack":
+                    QR_ComboBoxItem.IsEnabled = true;
+                    DM_ComboBoxItem.IsEnabled = true;
+                    minX = 0.380; targetX = 0.380; maxX = 0.990;
+                    break;
+
+                case "Table 12 ag. GS1-128":
+                    GS1_128_CCA_ComboBoxItem.IsEnabled = true;
+                    GS1_128_CCC_ComboBoxItem.IsEnabled = true;
+                    minX = 0.495; targetX = 0.495; maxX = 1.016;
+                    break;
+
+                case "Table 12 ag. 2D":
+                    QR_ComboBoxItem.IsEnabled = true;
+                    DM_ComboBoxItem.IsEnabled = true;
+                    minX = 0.750; targetX = 0.750; maxX = 1.520;
+                    break;
+
+                case "Table 12 log. GS1-128":
+                    GS1_128_CCA_ComboBoxItem.IsEnabled = true;
+                    GS1_128_CCC_ComboBoxItem.IsEnabled = true;
+                    minX = 0.495; targetX = 0.495; maxX = 0.940;
+                    break;
+
+                case "Table 12 log. 2D":
+                    QR_ComboBoxItem.IsEnabled = true;
+                    DM_ComboBoxItem.IsEnabled = true;
+                    minX = 0.750; targetX = 0.750; maxX = 1.520;
+                    break;
+
+                case "Table 13 GS1-128":
+                    GS1_128_CCA_ComboBoxItem.IsEnabled = true;
+                    GS1_128_CCC_ComboBoxItem.IsEnabled = true;
+                    minX = 0.495; targetX = 0.940; maxX = 0.940;
+                    break;
+
+                case "Table 13 2D":
+                    QR_ComboBoxItem.IsEnabled = true;
+                    DM_ComboBoxItem.IsEnabled = true;
+                    minX = 0.495; targetX = 3.500; maxX = 3.500;
+                    break;
+
+            }
+
+            if (minX != 0 )
+                minXdimensionTextBox.Text = String.Format("{0:0.000}", minX);
+            if (targetX != 0)
+                targetXdimensionTextBox.Text = String.Format("{0:0.000}", targetX);
+            if (maxX != 0)
+                maxXdimensionTextBox.Text = String.Format("{0:0.000}", maxX);
+
+            if (App.gs1Encoder.DeviceResolution != 0)
+            {
+                App.gs1Encoder.setXdimension(minX, targetX, maxX);
+                actualXLabel.Content = "Achieved X = 1.124mm (120% target)";
+            }
+            else
+            {
+                if (actualXLabel != null)
+                    actualXLabel.Content = "Device resolution is not set";
+            }
+
+
+
+            LoadControls();
+
         }
     }
 }
