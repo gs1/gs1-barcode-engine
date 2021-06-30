@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Microsoft.Win32;
 using System.IO;
 using System.Globalization;
 using System.Text.RegularExpressions;
@@ -62,6 +63,9 @@ namespace gs1encoders_dotnet
             infoLabel.Content = "";
             errorMessageLabel.Content = "";
             hriTextBox.Text = "";
+            SaveBMPButton.IsEnabled = false;
+            SavePNGButton.IsEnabled = false;            
+            PrintButton.IsEnabled = false;
 
             try
             {
@@ -115,38 +119,150 @@ namespace gs1encoders_dotnet
                 LoadControls();
                 return;
             }
-
-            byte[] imageData = App.gs1Encoder.GetBuffer();
-
-            /*
-            try
+            
+            using (MemoryStream ms = new MemoryStream(App.gs1Encoder.GetBuffer()))
             {
-            */
-                using (MemoryStream ms = new MemoryStream(imageData))
-                {
-
-                    BitmapImage img = new BitmapImage();
-                    img.BeginInit();
-                    img.CacheOption = BitmapCacheOption.OnLoad;
-                    img.StreamSource = ms;
-                    img.EndInit();
-                    if (img.CanFreeze)
-                        img.Freeze();
-                    barcodeImage.Source = img;
-                }
-        /*  
-            }        
-            catch (Exception)
-            {
-                errorMessageLabel.Content = "An error occurred generating the barcode image";
-                LoadControls();
-                return;
+                BitmapImage img = new BitmapImage();
+                img.BeginInit();
+                img.CacheOption = BitmapCacheOption.OnLoad;
+                img.StreamSource = ms;
+                img.EndInit();
+                if (img.CanFreeze)
+                    img.Freeze();
+                barcodeImage.Source = img;
             }
-        */
+
+            SaveBMPButton.IsEnabled = true;
+            SavePNGButton.IsEnabled = true;
+            PrintButton.IsEnabled = true;
 
             LoadControls();
 
         }
 
+        private void SaveBMPButton_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "Bitmap Image (*.bmp)|*.bmp";
+            if (saveFileDialog.ShowDialog() == true) {
+                BitmapEncoder encoder = new BmpBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create((BitmapSource)barcodeImage.Source));
+                using (var fileStream = new System.IO.FileStream(saveFileDialog.FileName, System.IO.FileMode.Create))
+                {
+                    encoder.Save(fileStream);
+                }
+            }                
+        }
+        
+        private void SavePNGButton_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "Portable Network Graphic (*.png)|*.png";
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                BitmapEncoder encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create((BitmapSource)barcodeImage.Source));
+                using (var fileStream = new System.IO.FileStream(saveFileDialog.FileName, System.IO.FileMode.Create))
+                {
+                    encoder.Save(fileStream);
+                }
+            }
+        }
+
+        private void CopyToClipboardButton_Click(object sender, RoutedEventArgs e)
+        {
+            Clipboard.SetImage(barcodeImage.Source as BitmapSource);
+        }
+
+        private void PrintButton_Click(object sender, RoutedEventArgs e)
+        {
+            PrintDialog printDialog = new PrintDialog();
+            if (printDialog.ShowDialog() == true)
+            {
+                DrawingVisual visual = new DrawingVisual();
+                using (DrawingContext dc = visual.RenderOpen())
+                {
+                    Rect rc = new Rect(0, 0, ((BitmapImage)barcodeImage.Source).PixelWidth, ((BitmapImage)barcodeImage.Source).PixelHeight);
+                    dc.DrawImage((BitmapImage)barcodeImage.Source, rc);
+                    
+                }
+                printDialog.PrintVisual(visual, "Barcode");
+            }
+        }
+
+        private void hriTextBox_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            Clipboard.SetText(hriTextBox.Text);
+        }
+
+        private void symbologyComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            linHeightLabel.IsEnabled = false;
+            linHeightTextBox.IsEnabled = false;
+            sepHtLabel.IsEnabled = false;
+            sepHtTextBox.IsEnabled = false;
+            segWidthLabel.IsEnabled = false;
+            segWidthComboBox.IsEnabled = false;
+            qrVersionLabel.IsEnabled = false;
+            qrVersionComboBox.IsEnabled = false;
+            qrEClevelLabel.IsEnabled = false;
+            qrEClevelComboBox.IsEnabled = false;
+            dmRowsLabel.IsEnabled = false;
+            dmRowsComboBox.IsEnabled = false;
+
+            switch ((GS1Encoder.Symbology)symbologyComboBox.SelectedIndex) {
+
+                case GS1Encoder.Symbology.EAN13:
+                case GS1Encoder.Symbology.EAN8:
+                case GS1Encoder.Symbology.UPCA:
+                case GS1Encoder.Symbology.UPCE:
+                    sepHtLabel.IsEnabled = true;
+                    sepHtTextBox.IsEnabled = true;
+                    break;
+
+                case GS1Encoder.Symbology.GS1_128_CCA:
+                case GS1Encoder.Symbology.GS1_128_CCC:
+                    linHeightLabel.IsEnabled = true;
+                    linHeightTextBox.IsEnabled = true;
+                    sepHtLabel.IsEnabled = true;
+                    sepHtTextBox.IsEnabled = true;
+                    break;
+
+                case GS1Encoder.Symbology.DataBarExpanded:
+                    segWidthLabel.IsEnabled = true;
+                    segWidthComboBox.IsEnabled = true;
+                    goto case GS1Encoder.Symbology.DataBarOmni;
+
+                case GS1Encoder.Symbology.DataBarOmni:
+                case GS1Encoder.Symbology.DataBarStacked:
+                case GS1Encoder.Symbology.DataBarStackedOmni:
+                case GS1Encoder.Symbology.DataBarTruncated:
+                case GS1Encoder.Symbology.DataBarLimited:
+                    sepHtLabel.IsEnabled = true;
+                    sepHtTextBox.IsEnabled = true;
+                    break;
+
+                case GS1Encoder.Symbology.DM:
+                    dmRowsLabel.IsEnabled = true;
+                    dmRowsComboBox.IsEnabled = true;
+                    break;
+
+                case GS1Encoder.Symbology.QR:
+                    qrVersionLabel.IsEnabled = true;
+                    qrVersionComboBox.IsEnabled = true;
+                    qrEClevelLabel.IsEnabled = true;
+                    qrEClevelComboBox.IsEnabled = true;
+                    break;
+
+            }            
+
+        }
+
+        private void infoLabel_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            string content = (string)infoLabel.Content;
+            content = Regex.Replace(content,".*:\\s+","");
+            Clipboard.SetText(content);
+        }
     }
 }
