@@ -25,7 +25,7 @@
 #include "enc-private.h"
 
 char* gs1_generateScanData(gs1_encoder *ctx);
-char* gs1_processScanData(gs1_encoder *ctx);
+bool gs1_processScanData(gs1_encoder *ctx);
 
 
 #ifdef UNIT_TESTS
