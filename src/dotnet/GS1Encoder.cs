@@ -427,6 +427,14 @@ namespace gs1encoders_dotnet
             }
         }
 
+        public double ActualXdimension
+        {
+            get
+            {
+                return gs1_encoder_getActualXdimension(ctx);
+            }
+        }
+
         public void setXdimension(double min, double target, double max)
         {
             if (!gs1_encoder_setXdimension(ctx, min, target, max))
