@@ -24,27 +24,18 @@ namespace gs1encoders_dotnet
     /// </summary>
     public partial class MainWindow : Window
     {
+
+        private bool _disableEvents = false;
+
         public MainWindow()
         {
             InitializeComponent();
         }
 
-        public void LoadControls()
+        public void LoadDataValues()
         {
+            _disableEvents = true;
             symbologyComboBox.SelectedIndex = App.gs1Encoder.Sym;
-
-            infoLabel.Content = "";
-            if (App.gs1Encoder.DataStr.Length > 0 && App.gs1Encoder.DataStr[0] == '#')  // AI data
-            {
-                if (dataStrTextBox.Text.StartsWith("#"))            
-                        infoLabel.Content = "AI data:   " + App.gs1Encoder.AIdataStr;
-                else if (dataStrTextBox.Text.StartsWith("("))                   
-                        infoLabel.Content = "Encoded data (FNC1 = \"#\"):   " + App.gs1Encoder.DataStr;                
-            }
-
-            if (App.gs1Encoder.DataStr.StartsWith("http://") || App.gs1Encoder.DataStr.StartsWith("https://"))
-                infoLabel.Content = "Extracted AI data:   " + App.gs1Encoder.AIdataStr;
-
             pixMultTextBox.Text = App.gs1Encoder.PixMult.ToString(CultureInfo.InvariantCulture);
             XundercutTextBox.Text = App.gs1Encoder.Xundercut.ToString(CultureInfo.InvariantCulture);
             YundercutTextBox.Text = App.gs1Encoder.Yundercut.ToString(CultureInfo.InvariantCulture);
@@ -54,21 +45,16 @@ namespace gs1encoders_dotnet
             qrVersionComboBox.SelectedValue = App.gs1Encoder.QrVersion.ToString(CultureInfo.InvariantCulture);
             qrEClevelComboBox.SelectedValue = App.gs1Encoder.QrEClevel.ToString(CultureInfo.InvariantCulture);
             dmRowsComboBox.SelectedValue = App.gs1Encoder.DmRows.ToString(CultureInfo.InvariantCulture);
-
+            _disableEvents = false;
         }
 
         private void generateButton_Click(object sender, RoutedEventArgs e)
         {
-            barcodeImage.Source = null;
-            infoLabel.Content = "";
-            errorMessageLabel.Content = "";
-            hriTextBox.Text = "";
-            SaveButton.IsEnabled = false;          
-            PrintButton.IsEnabled = false;
+
+            clearRender();
 
             try
             {
-                int v;
                 App.gs1Encoder.Sym = symbologyComboBox.SelectedIndex;
                 if (dataStrTextBox.Text.Length > 0 && dataStrTextBox.Text[0] == '(')
                 {
@@ -78,28 +64,29 @@ namespace gs1encoders_dotnet
                 {
                     App.gs1Encoder.DataStr = dataStrTextBox.Text;
                 }
-                if (Int32.TryParse(pixMultTextBox.Text, out v)) App.gs1Encoder.PixMult = v;
-                if (Int32.TryParse(XundercutTextBox.Text, out v)) App.gs1Encoder.Xundercut = v;
-                if (Int32.TryParse(YundercutTextBox.Text, out v)) App.gs1Encoder.Yundercut = v;
-                if (Int32.TryParse(sepHtTextBox.Text, out v)) App.gs1Encoder.SepHt = v;
-                if (Int32.TryParse((string)segWidthComboBox.SelectedValue, out v)) App.gs1Encoder.DataBarExpandedSegmentsWidth = v;
-                if (Int32.TryParse(linHeightTextBox.Text, out v)) App.gs1Encoder.GS1_128LinearHeight = v;
-                if (Int32.TryParse((string)qrVersionComboBox.SelectedValue, out v)) App.gs1Encoder.QrVersion = v;
-                if (Int32.TryParse((string)qrEClevelComboBox.SelectedValue, out v)) App.gs1Encoder.QrEClevel = v;
-                if (Int32.TryParse((string)dmRowsComboBox.SelectedValue, out v)) App.gs1Encoder.DmRows = v;
             }
             catch (GS1EncoderParameterException E)
             {
                 errorMessageLabel.Content = "Error: " + E.Message;
-                LoadControls();
+                LoadDataValues();
                 return;
             }      
 
             try
             { 
-               
-
                 App.gs1Encoder.Encode();
+
+                infoLabel.Content = "";
+                if (App.gs1Encoder.DataStr.Length > 0 && App.gs1Encoder.DataStr[0] == '#')  // AI data
+                {
+                    if (dataStrTextBox.Text.StartsWith("#"))
+                        infoLabel.Content = "AI data:   " + App.gs1Encoder.AIdataStr;
+                    else if (dataStrTextBox.Text.StartsWith("("))
+                        infoLabel.Content = "Encoded data (FNC1 = \"#\"):   " + App.gs1Encoder.DataStr;
+                }
+
+                if (App.gs1Encoder.DataStr.StartsWith("http://") || App.gs1Encoder.DataStr.StartsWith("https://"))
+                    infoLabel.Content = "Extracted AI data:   " + App.gs1Encoder.AIdataStr;
 
                 string scan = App.gs1Encoder.ScanData;
                 scan = Regex.Replace(scan, @"\p{Cc}", a => "{" + string.Format("%{0:X2}", (byte)a.Value[0]) + "}");
@@ -115,7 +102,7 @@ namespace gs1encoders_dotnet
             catch (GS1EncoderEncodeException E)
             {
                 errorMessageLabel.Content = "Error: " + E.Message;
-                LoadControls();
+                LoadDataValues();
                 return;
             }
             
@@ -132,9 +119,8 @@ namespace gs1encoders_dotnet
             }
 
             SaveButton.IsEnabled = true;
-            PrintButton.IsEnabled = true;
 
-            LoadControls();
+            LoadDataValues();
 
         }
         
@@ -245,7 +231,9 @@ namespace gs1encoders_dotnet
                     qrEClevelComboBox.IsEnabled = true;
                     break;
 
-            }            
+            }
+
+            clearRender();
 
         }
 
@@ -259,9 +247,11 @@ namespace gs1encoders_dotnet
         private void applicationComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
 
-            double minX = 0;
-            double maxX = 0;
-            double targetX = 0;
+            double minX = 0, maxX =0, targetX = 0;
+
+            if (_disableEvents) return;
+
+            clearRender();
 
             if (applicationComboBox.SelectedValue.ToString().Equals("Custom"))
             {
@@ -308,6 +298,7 @@ namespace gs1encoders_dotnet
                     GS1_128_CCC_ComboBoxItem.IsEnabled = true;
                     QR_ComboBoxItem.IsEnabled = true;
                     DM_ComboBoxItem.IsEnabled = true;
+                    minX = 0; targetX = 0; maxX = 0;
                     break;
 
                 case "Table 1 EAN/UPC":
@@ -608,28 +599,341 @@ namespace gs1encoders_dotnet
 
             }
 
-            if (minX != 0 )
-                minXdimensionTextBox.Text = String.Format("{0:0.000}", minX);
-            if (targetX != 0)
-                targetXdimensionTextBox.Text = String.Format("{0:0.000}", targetX);
-            if (maxX != 0)
-                maxXdimensionTextBox.Text = String.Format("{0:0.000}", maxX);
-
-            if (App.gs1Encoder.DeviceResolution != 0)
+            _disableEvents = true;
+            if (symbologyComboBox.SelectedItem != null && !((ComboBoxItem)symbologyComboBox.SelectedItem).IsEnabled)
             {
+                symbologyComboBox.SelectedIndex = 0;
+                while (!((ComboBoxItem)symbologyComboBox.SelectedItem).IsEnabled)
+                    symbologyComboBox.SelectedIndex++;
+            }            
+            minXdimensionTextBox.Text = minX != 0 ? String.Format("{0:0.000}", minX) : "";
+            targetXdimensionTextBox.Text = targetX !=0 ? String.Format("{0:0.000}", targetX) : "";            
+            maxXdimensionTextBox.Text = maxX != 0 ? String.Format("{0:0.000}", maxX) : "";
+            _disableEvents = false;
+
+            recalculateXdimension();
+        }
+
+        private void clearRender()
+        {
+            infoLabel.Content = "";
+            errorMessageLabel.Content = "";
+            hriTextBox.Text = "";
+            SaveButton.IsEnabled = false;
+            barcodeImage.Source = null;            
+        }
+
+        private void recalculateXdimension() {
+
+            double res, minX, targetX, maxX;
+
+            // Not initialised yet
+            if (actualXLabel == null)
+                return;
+
+            actualXLabel.Content = "";            
+
+            if (deviceResolutionTextBox.Text == "" &&
+                targetXdimensionTextBox.Text == "" &&
+                minXdimensionTextBox.Text == "" &&
+                maxXdimensionTextBox.Text == "")
+            {
+                pixMultTextBox.IsEnabled = true;
+                generateButton.IsEnabled = true;
+            } else
+            {
+                pixMultTextBox.IsEnabled = false;
+                generateButton.IsEnabled = false;
+            }
+
+            if (!Double.TryParse(deviceResolutionTextBox.Text, out res))
+            {
+                if (deviceResolutionTextBox.Text == "")
+                    res = 0;
+                else
+                {
+                    actualXLabel.Content = "Device resolution is not a number";
+                }
+            }
+
+            if (!Double.TryParse(targetXdimensionTextBox.Text, out targetX))
+            {
+                if (targetXdimensionTextBox.Text == "")
+                    targetX = 0;
+                else
+                {
+                    actualXLabel.Content = "Target X-dimension is not a number";
+                    return;
+                }
+            }
+
+            if (!Double.TryParse(minXdimensionTextBox.Text, out minX))
+            {
+                if (minXdimensionTextBox.Text == "")
+                    minX = 0;
+                else
+                {
+                    actualXLabel.Content = "Minimum X-dimension is not a number";
+                    return;
+                }
+            }
+
+            if (!Double.TryParse(maxXdimensionTextBox.Text, out maxX))
+            {
+                if (maxXdimensionTextBox.Text == "")
+                    maxX = 0;
+                else
+                {
+                    actualXLabel.Content = "Maximum X-dimension is not a number";
+                    return;
+                }
+            }
+
+            // Not using user dimensions
+            if (targetX == 0)
+            {
+                return;
+            }
+            
+            generateButton.IsEnabled = false;
+
+            // User X-dimensions can only be calculated when device resolution is known
+            if (deviceResolutionTextBox.Text == "")
+            {
+                actualXLabel.Content = "Device resolution is not set";
+                return;
+            }
+
+            try
+            {
+                App.gs1Encoder.DeviceResolution = res;
                 App.gs1Encoder.setXdimension(minX, targetX, maxX);
-                actualXLabel.Content = "Achieved X = 1.124mm (120% target)";
+                actualXLabel.Content = String.Format("Achieved X = {0:N3}mm ({1:N0}% target)",
+                    App.gs1Encoder.ActualXdimension,
+                    App.gs1Encoder.ActualXdimension / App.gs1Encoder.TargetXdimension * 100);
+                generateButton.IsEnabled = true;
             }
-            else
+            catch (GS1EncoderParameterException E)
             {
-                if (actualXLabel != null)
-                    actualXLabel.Content = "Device resolution is not set";
+                errorMessageLabel.Content = "Error: " + E.Message;
             }
 
+            _disableEvents = true;
+            pixMultTextBox.Text = App.gs1Encoder.PixMult.ToString();
+            _disableEvents = false;
 
+        }
 
-            LoadControls();
+        private void deviceResolutionTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (_disableEvents) return;
+            clearRender();
+            recalculateXdimension();
+        }
 
+        private void targetXdimensionTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (_disableEvents) return;
+            clearRender();
+            recalculateXdimension();
+        }
+
+        private void minXdimensionTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (_disableEvents) return;
+            clearRender();
+            recalculateXdimension();
+        }
+
+        private void maxXdimensionTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (_disableEvents) return;
+            clearRender();
+            recalculateXdimension();
+        }
+
+        private void dataStrTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (_disableEvents) return;
+            clearRender();
+        }
+
+        private void XundercutTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (_disableEvents) return;
+            clearRender();
+        }
+
+        private void YundercutTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (_disableEvents) return;
+            clearRender();
+        }
+
+        private void linHeightTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (_disableEvents) return;
+            clearRender();
+        }
+
+        private void sepHtTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (_disableEvents) return;
+            clearRender();
+        }
+
+        private void segWidthComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (_disableEvents) return;
+            clearRender();
+            try
+            {
+                int v;
+                if (Int32.TryParse((string)segWidthComboBox.SelectedValue, out v)) App.gs1Encoder.DataBarExpandedSegmentsWidth = v;                
+            }
+            catch (GS1EncoderParameterException E)
+            {
+                errorMessageLabel.Content = "Error: " + E.Message;
+                return;
+            }
+            LoadDataValues();
+        }
+
+        private void qrVersionComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (_disableEvents) return;
+            clearRender();
+            try
+            {
+                int v;
+                if (Int32.TryParse((string)qrVersionComboBox.SelectedValue, out v)) App.gs1Encoder.QrVersion = v;                
+            }
+            catch (GS1EncoderParameterException E)
+            {
+                errorMessageLabel.Content = "Error: " + E.Message;
+                return;
+            }
+            LoadDataValues();
+        }
+
+        private void qrEClevelComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (_disableEvents) return;
+            clearRender();
+            try
+            {
+                int v;
+                if (Int32.TryParse((string)qrEClevelComboBox.SelectedValue, out v)) App.gs1Encoder.QrEClevel = v;
+            }
+            catch (GS1EncoderParameterException E)
+            {
+                errorMessageLabel.Content = "Error: " + E.Message;
+                return;
+            }
+            LoadDataValues();
+        }
+
+        private void dmRowsComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (_disableEvents) return;
+            clearRender();
+            try
+            {
+                int v;                
+                if (Int32.TryParse((string)dmRowsComboBox.SelectedValue, out v)) App.gs1Encoder.DmRows = v;
+            }
+            catch (GS1EncoderParameterException E)
+            {
+                errorMessageLabel.Content = "Error: " + E.Message;
+                return;
+            }
+            LoadDataValues();
+        }
+
+        private void pixMultTextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (_disableEvents) return;
+            try
+            {
+                int v;
+                if (Int32.TryParse(pixMultTextBox.Text, out v)) App.gs1Encoder.PixMult = v;
+            }
+            catch (GS1EncoderParameterException E)
+            {
+                errorMessageLabel.Content = "Error: " + E.Message;
+                return;
+            }
+            LoadDataValues();
+        }
+
+        private void pixMultTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (_disableEvents) return;
+            clearRender();
+        }
+
+        private void XundercutTextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (_disableEvents) return;
+            try
+            {
+                int v;
+                if (Int32.TryParse(XundercutTextBox.Text, out v)) App.gs1Encoder.Xundercut = v;
+            }
+            catch (GS1EncoderParameterException E)
+            {
+                errorMessageLabel.Content = "Error: " + E.Message;
+                return;
+            }
+            LoadDataValues();
+        }
+
+        private void YundercutTextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (_disableEvents) return;
+            try
+            {
+                int v;
+                if (Int32.TryParse(YundercutTextBox.Text, out v)) App.gs1Encoder.Yundercut = v;
+            }
+            catch (GS1EncoderParameterException E)
+            {
+                errorMessageLabel.Content = "Error: " + E.Message;
+                return;
+            }
+            LoadDataValues();
+        }
+
+        private void linHeightTextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (_disableEvents) return;
+            try
+            {
+                int v;
+                if (Int32.TryParse(linHeightTextBox.Text, out v)) App.gs1Encoder.GS1_128LinearHeight = v;
+            }
+            catch (GS1EncoderParameterException E)
+            {
+                errorMessageLabel.Content = "Error: " + E.Message;
+                return;
+            }
+            LoadDataValues();
+        }
+
+        private void sepHtTextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (_disableEvents) return;
+            try
+            {
+                int v;
+                if (Int32.TryParse(sepHtTextBox.Text, out v)) App.gs1Encoder.SepHt = v;
+            }
+            catch (GS1EncoderParameterException E)
+            {
+                errorMessageLabel.Content = "Error: " + E.Message;
+                return;
+            }
+            LoadDataValues();
         }
     }
 }

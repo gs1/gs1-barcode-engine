@@ -58,7 +58,7 @@ namespace gs1encoders_dotnet
             mw.dataStrTextBox.Text = "(01)02112345678900";
             gs1Encoder.AIdataStr = mw.dataStrTextBox.Text;
             
-            mw.LoadControls();
+            mw.LoadDataValues();
 
             mw.generateButton.RaiseEvent(new RoutedEventArgs(System.Windows.Controls.Button.ClickEvent));
 
