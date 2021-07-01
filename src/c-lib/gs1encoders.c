@@ -1519,8 +1519,8 @@ void test_api_XYundercut(void) {
 
 	// X-dimension must be set before XYundercut
 	ctx->pixMult = 0;
-	TEST_CHECK(!gs1_encoder_setXundercut(ctx, 0));
-	TEST_CHECK(!gs1_encoder_setYundercut(ctx, 0));
+	TEST_CHECK(!gs1_encoder_setXundercut(ctx, 1));
+	TEST_CHECK(!gs1_encoder_setYundercut(ctx, 1));
 
 	// Minima
 	gs1_encoder_setPixMult(ctx, 2);
