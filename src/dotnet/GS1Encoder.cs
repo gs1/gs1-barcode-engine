@@ -615,7 +615,7 @@ namespace gs1encoders_dotnet
             set
             {
                 if (!gs1_encoder_setScanData(ctx, value))
-                    throw new GS1EncoderParameterException(ErrMsg);
+                    throw new GS1EncoderScanDataException(ErrMsg);
             }
         }
 
@@ -719,6 +719,14 @@ namespace gs1encoders_dotnet
     public class GS1EncoderEncodeException : Exception
     {
         public GS1EncoderEncodeException(string message)
+           : base(message)
+        {
+        }
+    }
+
+    public class GS1EncoderScanDataException : Exception
+    {
+        public GS1EncoderScanDataException(string message)
            : base(message)
         {
         }

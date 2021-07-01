@@ -25,6 +25,7 @@ namespace gs1encoders_dotnet
     public partial class MainWindow : Window
     {
 
+        // Events do nothing. For use when updating UI data
         private bool _disableEvents = false;
 
         public MainWindow()
@@ -48,10 +49,40 @@ namespace gs1encoders_dotnet
             _disableEvents = false;
         }
 
+        private void processScanData()
+        {
+            try
+            {
+                App.gs1Encoder.ScanData = dataStrTextBox.Text;
+            }
+            catch (GS1EncoderScanDataException E)
+            {
+                errorMessageLabel.Content = "Error: " + E.Message;
+                return;
+            }
+
+            symbologyComboBox.SelectedIndex = App.gs1Encoder.Sym;
+
+            if (App.gs1Encoder.DataStr.StartsWith("#"))
+            {
+                dataStrTextBox.Text = App.gs1Encoder.AIdataStr;
+            } else
+            {
+                dataStrTextBox.Text = App.gs1Encoder.DataStr;
+            }
+            
+            generateButton.RaiseEvent(new RoutedEventArgs(System.Windows.Controls.Button.ClickEvent));
+        }
+
         private void generateButton_Click(object sender, RoutedEventArgs e)
         {
 
             clearRender();
+
+            if ((GS1Encoder.Symbology)symbologyComboBox.SelectedIndex == GS1Encoder.Symbology.NUMSYMS) {
+                processScanData();
+                return;
+            }
 
             try
             {
@@ -186,6 +217,7 @@ namespace gs1encoders_dotnet
             qrEClevelComboBox.IsEnabled = false;
             dmRowsLabel.IsEnabled = false;
             dmRowsComboBox.IsEnabled = false;
+            generateButton.Content = "Generate Barcode";
 
             switch ((GS1Encoder.Symbology)symbologyComboBox.SelectedIndex) {
 
@@ -229,6 +261,11 @@ namespace gs1encoders_dotnet
                     qrVersionComboBox.IsEnabled = true;
                     qrEClevelLabel.IsEnabled = true;
                     qrEClevelComboBox.IsEnabled = true;
+                    break;
+
+                case GS1Encoder.Symbology.NUMSYMS: // Auto-detect from scan data
+                    generateButton.Content = "Process Scan Data";
+                    dataStrTextBox.Text = "";
                     break;
 
             }
@@ -934,6 +971,15 @@ namespace gs1encoders_dotnet
                 return;
             }
             LoadDataValues();
+        }
+
+        private void errorMessageLabel_MouseDown(object sender, MouseButtonEventArgs e)
+        {           
+            string content = (string)errorMessageLabel.Content;
+            if (!content.StartsWith("Scan data:"))
+                return;
+            content = Regex.Replace(content, ".*:\\s+", "");
+            Clipboard.SetText(content);
         }
     }
 }

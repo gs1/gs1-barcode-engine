@@ -36,6 +36,7 @@
             <ComboBoxItem x:Name="GS1_128_CCC_ComboBoxItem" Content="GS1-128 with CC-C" HorizontalAlignment="Left" Width="239"/>
             <ComboBoxItem x:Name="QR_ComboBoxItem" Content="QR Code" HorizontalAlignment="Left" Width="239"/>
             <ComboBoxItem x:Name="DM_ComboBoxItem" Content="DataMatrix" HorizontalAlignment="Left" Width="239"/>
+            <ComboBoxItem x:Name="ScanData_ComboBoxItem" Content="[Auto-detect from scan data]" HorizontalAlignment="Left" Width="239"/>
         </ComboBox>
         <TextBox x:Name="pixMultTextBox" HorizontalAlignment="Left" Height="23" Margin="193,51,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="66" Grid.Column="1" Grid.Row="1" LostFocus="pixMultTextBox_LostFocus" TextChanged="pixMultTextBox_TextChanged"/>
         <Label x:Name="pixMultLabel" Content="Dots per module" HorizontalAlignment="Left" Margin="20,48,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Width="170" Height="30" Grid.Row="1" FontSize="14"/>
@@ -150,7 +151,7 @@
             <ComboBoxItem Content="144" Tag="144" HorizontalAlignment="Left" Width="66"/>
         </ComboBox>
         <Label x:Name="infoLabel" Content="" Margin="20,57,30,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Height="28" Cursor="Hand" ToolTip="Click to copy to clipboard" ToolTipService.ShowDuration="5000" MouseDown="infoLabel_MouseDown"/>
-        <Label x:Name="errorMessageLabel" Content="" Margin="20,90,30,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Height="28" FontWeight="Bold"/>
+        <Label x:Name="errorMessageLabel" Content="" Margin="20,90,30,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Height="28" FontWeight="Bold" MouseDown="errorMessageLabel_MouseDown"/>
         <TextBox x:Name="hriTextBox"  FontFamily="Consolas" IsReadOnly="True" VerticalAlignment="Bottom" HorizontalAlignment="Left" FontSize="14" Grid.ColumnSpan="2" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Height="107" Width="239" Margin="20,0,0,10" Grid.RowSpan="2" VerticalContentAlignment="Bottom" PreviewMouseDown="hriTextBox_PreviewMouseDown" Cursor="Hand"  ToolTip="Click to copy to clipboard" ToolTipService.ShowDuration="5000" Grid.Row="1" />
         <Label x:Name="hriTextLabel" Grid.ColumnSpan="2" Content="HRI text" HorizontalAlignment="Left" Margin="16,0,0,74" Height="29" VerticalAlignment="Bottom" FontWeight="Bold" Grid.Row="1"/>
         <Slider x:Name="ZoomSlider" Ticks="100,200,300,400,500,600,700,800,900,1000,1100,1200,1300,1400,1500,1600,1700,1800,1900,2000" IsSnapToTickEnabled="True" TickPlacement="BottomRight" Grid.ColumnSpan="2" Margin="0,0,26,11" HorizontalAlignment="Right" Width="180" Height="18" VerticalAlignment="Bottom" Minimum="100" Value="300" Grid.Row="2" Maximum="2000"/>
