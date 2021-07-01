@@ -274,7 +274,7 @@ GS1_ENCODERS_API bool gs1_encoder_setXundercut(gs1_encoder *ctx, const int Xunde
 		ctx->errFlag = true;
 		return false;
 	}
-	if (Xundercut < 0 || Xundercut > ctx->pixMult - 1) {
+	if (Xundercut != 0 && (Xundercut < 0 || Xundercut > ctx->pixMult - 1)) {
 		sprintf(ctx->errMsg, "Valid X undercut range is 1 to %d", ctx->pixMult - 1);
 		ctx->errFlag = true;
 		return false;
@@ -297,7 +297,7 @@ GS1_ENCODERS_API bool gs1_encoder_setYundercut(gs1_encoder *ctx, const int Yunde
 		ctx->errFlag = true;
 		return false;
 	}
-	if (Yundercut < 0 || Yundercut > ctx->pixMult - 1) {
+	if (Yundercut != 0 && (Yundercut < 0 || Yundercut > ctx->pixMult - 1)) {
 		sprintf(ctx->errMsg, "Valid Y undercut range is 1 to %d", ctx->pixMult - 1);
 		ctx->errFlag = true;
 		return false;
