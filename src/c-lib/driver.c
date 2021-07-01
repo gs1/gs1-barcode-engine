@@ -434,7 +434,7 @@ static int findPixMultForConstraints(gs1_encoder *ctx) {
 	}
 
 	if (!pixMult) {
-		sprintf(ctx->errMsg, "Impossible to plot X-dimension of %f within %f - %f at %f resolution", ctx->targetX, ctx->minX, ctx->maxX, ctx->deviceRes);
+		sprintf(ctx->errMsg, "Impossible to plot X-dimension of %.3f units within the range %.3f - %.3f units at resolution of %g dots per unit", ctx->targetX, ctx->minX, ctx->maxX, ctx->deviceRes);
 		ctx->errFlag = true;
 		return 0;
 	}
@@ -449,7 +449,7 @@ bool gs1_setXdimension(gs1_encoder *ctx, const double minX, const double targetX
 	int pixMult;
 
 	if (ctx->deviceRes == 0) {
-		strcpy(ctx->errMsg, "Must set device resolution before specifying X-dimension constraints");
+		strcpy(ctx->errMsg, "Must set device resolution when specifying X-dimension constraints");
 		ctx->errFlag = true;
 		goto fail;
 	}
