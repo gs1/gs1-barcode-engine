@@ -434,7 +434,7 @@ static int findPixMultForConstraints(gs1_encoder *ctx) {
 	}
 
 	if (!pixMult) {
-		sprintf(ctx->errMsg, "Impossible to plot X-dimension of %.3f units within the range %.3f - %.3f units at resolution of %g dots per unit", ctx->targetX, ctx->minX, ctx->maxX, ctx->deviceRes);
+		sprintf(ctx->errMsg, "Impossible to plot X-dimension of %.4f units within the range %.4f - %.4f units at resolution of %g dots per unit", ctx->targetX, ctx->minX, ctx->maxX, ctx->deviceRes);
 		ctx->errFlag = true;
 		return 0;
 	}

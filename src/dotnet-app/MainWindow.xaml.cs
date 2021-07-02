@@ -21,6 +21,8 @@ namespace GS1.EncodersApp
         // Events do nothing. For use when updating UI data
         private bool _disableEvents = false;
 
+        public string units = "d/mm";
+
         public MainWindow()
         {
             InitializeComponent();
@@ -123,14 +125,10 @@ namespace GS1.EncodersApp
 
         }
 
-        private void applicationComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void lookupXdimensionForApplication()
         {
-
             double minX = 0, maxX = 0, targetX = 0;
-
-            if (_disableEvents) return;
-
-            clearRender();
+            double minXi = 0, maxXi = 0, targetXi = 0;
 
             if (applicationComboBox.SelectedValue.ToString().Equals("Custom"))
             {
@@ -178,6 +176,7 @@ namespace GS1.EncodersApp
                     QR_ComboBoxItem.IsEnabled = true;
                     DM_ComboBoxItem.IsEnabled = true;
                     minX = 0; targetX = 0; maxX = 0;
+                    minXi = 0; targetXi = 0; maxXi = 0;
                     break;
 
                 case "Table 1 EAN/UPC":
@@ -186,6 +185,7 @@ namespace GS1.EncodersApp
                     EAN13_ComboBoxItem.IsEnabled = true;
                     EAN8_ComboBoxItem.IsEnabled = true;
                     minX = 0.264; targetX = 0.330; maxX = 0.660;
+                    minXi = 0.0104; targetXi = 0.0130; maxXi = 0.0260;
                     break;
 
                 case "Table 1 GS1 DataBar":
@@ -194,24 +194,28 @@ namespace GS1.EncodersApp
                     DataBarStackedOmni_ComboBoxItem.IsEnabled = true;
                     DataBarExpanded_ComboBoxItem.IsEnabled = true;
                     minX = 0.264; targetX = 0.330; maxX = 0.660;
+                    minXi = 0.0104; targetXi = 0.0130; maxXi = 0.0260;
                     break;
 
                 case "Table 1 2D":
                     QR_ComboBoxItem.IsEnabled = true;
                     DM_ComboBoxItem.IsEnabled = true;
                     minX = 0.375; targetX = 0.625; maxX = 0.990;
+                    minXi = 0.0148; targetXi = 0.0246; maxXi = 0.0390;
                     break;
 
                 case "Table 1 AI (8200)":
                     QR_ComboBoxItem.IsEnabled = true;
                     DM_ComboBoxItem.IsEnabled = true;
                     minX = 0.396; targetX = 0.495; maxX = 0.743;
+                    minXi = 0.0150; targetXi = 0.0195; maxXi = 0.0293;
                     break;
 
                 case "Table 1 Digital Link":
                     QR_ComboBoxItem.IsEnabled = true;
                     DM_ComboBoxItem.IsEnabled = true;
                     minX = 0.396; targetX = 0.495; maxX = 0.743;
+                    minXi = 0.0150; targetXi = 0.0195; maxXi = 0.0293;
                     break;
 
                 case "Table 2 EAN/UPC":
@@ -220,6 +224,7 @@ namespace GS1.EncodersApp
                     EAN13_ComboBoxItem.IsEnabled = true;
                     EAN8_ComboBoxItem.IsEnabled = true;
                     minX = 0.495; targetX = 0.660; maxX = 0.660;
+                    minXi = 0.0195; targetXi = 0.0260; maxXi = 0.0260;
                     break;
 
                 case "Table 2 GS1 DataBar":
@@ -230,18 +235,21 @@ namespace GS1.EncodersApp
                     DataBarLimited_ComboBoxItem.IsEnabled = true;
                     DataBarExpanded_ComboBoxItem.IsEnabled = true;
                     minX = 0.495; targetX = 0.660; maxX = 0.660;
+                    minXi = 0.0195; targetXi = 0.0260; maxXi = 0.0260;
                     break;
 
                 case "Table 2 GS1-128":
                     GS1_128_CCA_ComboBoxItem.IsEnabled = true;
                     GS1_128_CCC_ComboBoxItem.IsEnabled = true;
                     minX = 0.495; targetX = 0.495; maxX = 1.016;
+                    minXi = 0.0195; targetXi = 0.0195; maxXi = 0.0400;
                     break;
 
                 case "Table 2 2D":
                     QR_ComboBoxItem.IsEnabled = true;
                     DM_ComboBoxItem.IsEnabled = true;
                     minX = 0.743; targetX = 0.743; maxX = 1.500;
+                    minXi = 0.0292; targetXi = 0.0292; maxXi = 0.0591;
                     break;
 
                 case "Table 3":
@@ -253,6 +261,7 @@ namespace GS1.EncodersApp
                     DataBarStackedOmni_ComboBoxItem.IsEnabled = true;
                     DataBarExpanded_ComboBoxItem.IsEnabled = true;
                     minX = 0.495; targetX = 0.660; maxX = 0.660;
+                    minXi = 0.0195; targetXi = 0.0260; maxXi = 0.0260;
                     break;
 
                 case "Table 4 EAN/UPC":
@@ -261,6 +270,7 @@ namespace GS1.EncodersApp
                     EAN13_ComboBoxItem.IsEnabled = true;
                     EAN8_ComboBoxItem.IsEnabled = true;
                     minX = 0.264; targetX = 0.330; maxX = 0.660;
+                    minXi = 0.0104; targetXi = 0.0130; maxXi = 0.0260;
                     break;
 
                 case "Table 4 GS1 DataBar":
@@ -271,30 +281,35 @@ namespace GS1.EncodersApp
                     DataBarLimited_ComboBoxItem.IsEnabled = true;
                     DataBarExpanded_ComboBoxItem.IsEnabled = true;
                     minX = 0.264; targetX = 0.330; maxX = 0.660;
+                    minXi = 0.0104; targetXi = 0.0130; maxXi = 0.0260;
                     break;
 
                 case "Table 4 GS1-128":
                     GS1_128_CCA_ComboBoxItem.IsEnabled = true;
                     GS1_128_CCC_ComboBoxItem.IsEnabled = true;
                     minX = 0.250; targetX = 0.495; maxX = 0.495;
+                    minXi = 0.00984; targetXi = 0.0195; maxXi = 0.0195;
                     break;
 
                 case "Table 4 2D":
                     QR_ComboBoxItem.IsEnabled = true;
                     DM_ComboBoxItem.IsEnabled = true;
                     minX = 0.380; targetX = 0.380; maxX = 0.495;
+                    minXi = 0.0150; targetXi = 0.0150; maxXi = 0.0195;
                     break;
 
                 case "Table 5 GS1-128":
                     GS1_128_CCA_ComboBoxItem.IsEnabled = true;
                     GS1_128_CCC_ComboBoxItem.IsEnabled = true;
                     minX = 0.495; targetX = 0.495; maxX = 0.940;
+                    minXi = 0.0195; targetXi = 0.0195; maxXi = 0.0370;
                     break;
 
                 case "Table 5 2D":
                     QR_ComboBoxItem.IsEnabled = true;
                     DM_ComboBoxItem.IsEnabled = true;
                     minX = 0.743; targetX = 0.743; maxX = 1.500;
+                    minXi = 0.0292; targetXi = 0.0292; maxXi = 0.0591;
                     break;
 
                 case "Table 6 EAN/UPC":
@@ -303,6 +318,7 @@ namespace GS1.EncodersApp
                     EAN13_ComboBoxItem.IsEnabled = true;
                     EAN8_ComboBoxItem.IsEnabled = true;
                     minX = 0.170; targetX = 0.330; maxX = 0.660;
+                    minXi = 0.0067; targetXi = 0.0130; maxXi = 0.0260;
                     break;
 
                 case "Table 6 GS1 DataBar":
@@ -313,38 +329,45 @@ namespace GS1.EncodersApp
                     DataBarLimited_ComboBoxItem.IsEnabled = true;
                     DataBarExpanded_ComboBoxItem.IsEnabled = true;
                     minX = 0.170; targetX = 0.200; maxX = 0.660;
+                    minXi = 0.0067; targetXi = 0.0080; maxXi = 0.0260;
                     break;
 
                 case "Table 6 GS1-128":
                     GS1_128_CCA_ComboBoxItem.IsEnabled = true;
                     GS1_128_CCC_ComboBoxItem.IsEnabled = true;
                     minX = 0.170; targetX = 0.495; maxX = 0.495;
+                    minXi = 0.0067; targetXi = 0.0195; maxXi = 0.0195;
                     break;
 
                 case "Table 6 DataMatrix":
                     DM_ComboBoxItem.IsEnabled = true;
                     minX = 0.254; targetX = 0.380; maxX = 0.990;
+                    minXi = 0.0100; targetXi = 0.0150; maxXi = 0.0390;
                     break;
 
                 case "Table 7 DPM":
                     QR_ComboBoxItem.IsEnabled = true;
                     DM_ComboBoxItem.IsEnabled = true;
                     minX = 0.254; targetX = 0.300; maxX = 0.615;
+                    minXi = 0.0100; targetXi = 0.0118; maxXi = 0.0242;
                     break;
 
                 case "Table 7 DM Ink":
                     DM_ComboBoxItem.IsEnabled = true;
                     minX = 0.254; targetX = 0.300; maxX = 0.615;
+                    minXi = 0.0100; targetXi = 0.0118; maxXi = 0.0242;
                     break;
 
                 case "Table 7 DM DPM-A":
                     DM_ComboBoxItem.IsEnabled = true;
                     minX = 0.100; targetX = 0.200; maxX = 0.300;
+                    minXi = 0.0039; targetXi = 0.0079; maxXi = 0.0118;
                     break;
 
                 case "Table 7 DM DPM-B":
                     DM_ComboBoxItem.IsEnabled = true;
                     minX = 0.200; targetX = 0.300; maxX = 0.495;
+                    minXi = 0.0079; targetXi = 0.0118; maxXi = 0.0195;
                     break;
 
                 case "Table 8 EAN/UPC":
@@ -353,6 +376,7 @@ namespace GS1.EncodersApp
                     EAN13_ComboBoxItem.IsEnabled = true;
                     EAN8_ComboBoxItem.IsEnabled = true;
                     minX = 0.495; targetX = 0.660; maxX = 0.660;
+                    minXi = 0.0195; targetXi = 0.0260; maxXi = 0.0260;
                     break;
 
                 case "Table 8 GS1 DataBar":
@@ -363,29 +387,34 @@ namespace GS1.EncodersApp
                     DataBarLimited_ComboBoxItem.IsEnabled = true;
                     DataBarExpanded_ComboBoxItem.IsEnabled = true;
                     minX = 0.495; targetX = 0.660; maxX = 0.660;
+                    minXi = 0.0195; targetXi = 0.0260; maxXi = 0.0260;
                     break;
 
                 case "Table 8 GS1-128":
                     GS1_128_CCA_ComboBoxItem.IsEnabled = true;
                     GS1_128_CCC_ComboBoxItem.IsEnabled = true;
                     minX = 0.495; targetX = 0.495; maxX = 1.016;
+                    minXi = 0.0195; targetXi = 0.0195; maxXi = 0.0400;
                     break;
 
                 case "Table 8 DataMatrix":
                     DM_ComboBoxItem.IsEnabled = true;
                     minX = 0.750; targetX = 0.750; maxX = 1.520;
+                    minXi = 0.0300; targetXi = 0.0300; maxXi = 0.0600;
                     break;
 
                 case "Table 9 GS1-128":
                     GS1_128_CCA_ComboBoxItem.IsEnabled = true;
                     GS1_128_CCC_ComboBoxItem.IsEnabled = true;
                     minX = 0.250; targetX = 0.250; maxX = 0.495;
+                    minXi = 0.0098; targetXi = 0.0098; maxXi = 0.0195;
                     break;
 
                 case "Table 9 2D":
                     QR_ComboBoxItem.IsEnabled = true;
                     DM_ComboBoxItem.IsEnabled = true;
                     minX = 0.380; targetX = 0.380; maxX = 0.495;
+                    minXi = 0.0150; targetXi = 0.0150; maxXi = 0.0195;
                     break;
 
                 case "Table 10 EAN/UPC":
@@ -394,6 +423,7 @@ namespace GS1.EncodersApp
                     EAN13_ComboBoxItem.IsEnabled = true;
                     EAN8_ComboBoxItem.IsEnabled = true;
                     minX = 0.264; targetX = 0.330; maxX = 0.660;
+                    minXi = 0.0104; targetXi = 0.0130; maxXi = 0.0260;
                     break;
 
                 case "Table 10 GS1 DataBar":
@@ -404,76 +434,89 @@ namespace GS1.EncodersApp
                     DataBarLimited_ComboBoxItem.IsEnabled = true;
                     DataBarExpanded_ComboBoxItem.IsEnabled = true;
                     minX = 0.264; targetX = 0.330; maxX = 0.660;
+                    minXi = 0.0104; targetXi = 0.0130; maxXi = 0.0260;
                     break;
 
                 case "Table 10 GS1-128":
                     GS1_128_CCA_ComboBoxItem.IsEnabled = true;
                     GS1_128_CCC_ComboBoxItem.IsEnabled = true;
                     minX = 0.264; targetX = 0.330; maxX = 0.660;
+                    minXi = 0.0104; targetXi = 0.0130; maxXi = 0.0260;
                     break;
 
                 case "Table 10 DataMatrix":
                     DM_ComboBoxItem.IsEnabled = true;
                     minX = 0.396; targetX = 0.495; maxX = 0.990;
+                    minXi = 0.0156; targetXi = 0.0195; maxXi = 0.0390;
                     break;
 
                 case "Table 11 GS1 DataBar":
                     DataBarExpanded_ComboBoxItem.IsEnabled = true;
                     minX = 0.264; targetX = 0.330; maxX = 0.660;
+                    minXi = 0.0104; targetXi = 0.0130; maxXi = 0.0260;
                     break;
 
                 case "Table 11 GS1-128":
                     GS1_128_CCA_ComboBoxItem.IsEnabled = true;
                     GS1_128_CCC_ComboBoxItem.IsEnabled = true;
                     minX = 0.170; targetX = 0.250; maxX = 0.495;
+                    minXi = 0.0067; targetXi = 0.0098; maxXi = 0.0195;
                     break;
 
                 case "Table 11 2D":
                     QR_ComboBoxItem.IsEnabled = true;
                     DM_ComboBoxItem.IsEnabled = true;
                     minX = 0.254; targetX = 0.380; maxX = 0.495;
+                    minXi = 0.0100; targetXi = 0.0150; maxXi = 0.0195;
                     break;
 
                 case "Table 12 unit pack":
                     QR_ComboBoxItem.IsEnabled = true;
                     DM_ComboBoxItem.IsEnabled = true;
                     minX = 0.380; targetX = 0.380; maxX = 0.990;
+                    minXi = 0.0150; targetXi = 0.0150; maxXi = 0.0390;
                     break;
 
                 case "Table 12 ag. GS1-128":
                     GS1_128_CCA_ComboBoxItem.IsEnabled = true;
                     GS1_128_CCC_ComboBoxItem.IsEnabled = true;
                     minX = 0.495; targetX = 0.495; maxX = 1.016;
+                    minXi = 0.0195; targetXi = 0.0195; maxXi = 0.400;
                     break;
 
                 case "Table 12 ag. 2D":
                     QR_ComboBoxItem.IsEnabled = true;
                     DM_ComboBoxItem.IsEnabled = true;
                     minX = 0.750; targetX = 0.750; maxX = 1.520;
+                    minXi = 0.0295; targetXi = 0.0295; maxXi = 0.0600;
                     break;
 
                 case "Table 12 log. GS1-128":
                     GS1_128_CCA_ComboBoxItem.IsEnabled = true;
                     GS1_128_CCC_ComboBoxItem.IsEnabled = true;
                     minX = 0.495; targetX = 0.495; maxX = 0.940;
+                    minXi = 0.0195; targetXi = 0.0195; maxXi = 0.0370;
                     break;
 
                 case "Table 12 log. 2D":
                     QR_ComboBoxItem.IsEnabled = true;
                     DM_ComboBoxItem.IsEnabled = true;
                     minX = 0.750; targetX = 0.750; maxX = 1.520;
+                    minXi = 0.0295; targetXi = 0.0295; maxXi = 0.0600;
                     break;
 
                 case "Table 13 GS1-128":
                     GS1_128_CCA_ComboBoxItem.IsEnabled = true;
                     GS1_128_CCC_ComboBoxItem.IsEnabled = true;
                     minX = 0.495; targetX = 0.940; maxX = 0.940;
+                    minXi = 0.0195; targetXi = 0.0195; maxXi = 0.0370;
                     break;
 
                 case "Table 13 2D":
                     QR_ComboBoxItem.IsEnabled = true;
                     DM_ComboBoxItem.IsEnabled = true;
                     minX = 0.495; targetX = 3.500; maxX = 3.500;
+                    minXi = 0.0195; targetXi = 0.1378; maxXi = 0.1378;
                     break;
 
             }
@@ -485,12 +528,30 @@ namespace GS1.EncodersApp
                 while (!((ComboBoxItem)symbologyComboBox.SelectedItem).IsEnabled)
                     symbologyComboBox.SelectedIndex++;
             }
-            minXdimensionTextBox.Text = minX != 0 ? String.Format("{0:0.000}", minX) : "";
-            targetXdimensionTextBox.Text = targetX != 0 ? String.Format("{0:0.000}", targetX) : "";
-            maxXdimensionTextBox.Text = maxX != 0 ? String.Format("{0:0.000}", maxX) : "";
+
+            if (units == "d/mm")
+            {
+                minXdimensionTextBox.Text = minX != 0 ? String.Format("{0:0.000}", minX) : "";
+                targetXdimensionTextBox.Text = targetX != 0 ? String.Format("{0:0.000}", targetX) : "";
+                maxXdimensionTextBox.Text = maxX != 0 ? String.Format("{0:0.000}", maxX) : "";
+            }
+            else  // DPI
+            {
+                minXdimensionTextBox.Text = minXi != 0 ? String.Format("{0:0.0000}", minXi) : "";
+                targetXdimensionTextBox.Text = targetXi != 0 ? String.Format("{0:0.0000}", targetXi) : "";
+                maxXdimensionTextBox.Text = maxXi != 0 ? String.Format("{0:0.0000}", maxXi) : "";
+            }
+
             _disableEvents = false;
 
             recalculateXdimension();
+        }
+
+        private void applicationComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (_disableEvents) return;
+            clearRender();
+            lookupXdimensionForApplication();
         }
 
         private void processScanData()
@@ -739,14 +800,25 @@ namespace GS1.EncodersApp
             {
                 App.gs1Encoder.DeviceResolution = res;
                 App.gs1Encoder.setXdimension(minX, targetX, maxX);
-                actualXLabel.Content = String.Format("Achieved X = {0:N3}mm ({1:N0}% target)",
-                    App.gs1Encoder.ActualXdimension,
-                    App.gs1Encoder.ActualXdimension / App.gs1Encoder.TargetXdimension * 100);
+                if (units == "d/mm") {
+                    actualXLabel.Content = String.Format("Achieved X = {0:N3}mm ({1:N0}% target)",
+                        App.gs1Encoder.ActualXdimension,
+                        App.gs1Encoder.ActualXdimension / App.gs1Encoder.TargetXdimension * 100);
+                }
+                else  // DPI
+                {
+                    actualXLabel.Content = String.Format("Achieved X = {0:N4}in ({1:N0}% target)",
+                        App.gs1Encoder.ActualXdimension,
+                        App.gs1Encoder.ActualXdimension / App.gs1Encoder.TargetXdimension * 100);
+                }
                 generateButton.IsEnabled = true;
             }
             catch (GS1EncoderParameterException E)
             {
-                errorMessageLabel.Content = "Error: " + E.Message;
+                string message = E.Message;
+                message = Regex.Replace(message, " units", units == "d/mm" ? "mm" : "in");
+                message = Regex.Replace(message, "unit", units == "d/mm" ? "mm" : "inch");
+                errorMessageLabel.Content = "Error: " + message;
             }
 
             _disableEvents = true;
@@ -823,5 +895,12 @@ namespace GS1.EncodersApp
             Clipboard.SetText(content);
         }
 
+        private void unitsButton_Click(object sender, RoutedEventArgs e)
+        {
+            units = units == "DPI" ? "d/mm" : "DPI";
+            unitsButton.Content = units;
+            deviceResolutionTextBox.Text = "";
+            lookupXdimensionForApplication();
+        }
     }
 }

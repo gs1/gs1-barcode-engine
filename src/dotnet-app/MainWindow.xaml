@@ -30,8 +30,8 @@
             <ComboBoxItem x:Name="EAN8_ComboBoxItem" Content="EAN-8" HorizontalAlignment="Left" Width="239"/>
             <ComboBoxItem x:Name="GS1_128_CCA_ComboBoxItem" Content="GS1-128 with CC-A or CC-B" HorizontalAlignment="Left" Width="239"/>
             <ComboBoxItem x:Name="GS1_128_CCC_ComboBoxItem" Content="GS1-128 with CC-C" HorizontalAlignment="Left" Width="239"/>
-            <ComboBoxItem x:Name="QR_ComboBoxItem" Content="QR Code" HorizontalAlignment="Left" Width="239"/>
-            <ComboBoxItem x:Name="DM_ComboBoxItem" Content="DataMatrix" HorizontalAlignment="Left" Width="239"/>
+            <ComboBoxItem x:Name="QR_ComboBoxItem" Content="GS1 QR Code / QR Code" HorizontalAlignment="Left" Width="239"/>
+            <ComboBoxItem x:Name="DM_ComboBoxItem" Content="GS1 DataMatrix / Data Matrix" HorizontalAlignment="Left" Width="239"/>
             <ComboBoxItem x:Name="ScanData_ComboBoxItem" Content="[Auto-detect from scan data]" HorizontalAlignment="Left" Width="239"/>
         </ComboBox>
         <TextBox x:Name="pixMultTextBox" HorizontalAlignment="Left" Height="23" Margin="193,330,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="66" Grid.Column="1" LostFocus="genericTextBox_LostFocus" TextChanged="genericTextBox_TextChanged"/>
@@ -152,8 +152,8 @@
         <Label x:Name="hriTextLabel" Content="HRI text" HorizontalAlignment="Left" Margin="18,0,0,149" Height="29" VerticalAlignment="Bottom" FontWeight="Bold" Width="68"/>
         <Slider x:Name="ZoomSlider" Ticks="100,200,300,400,500,600,700,800,900,1000,1100,1200,1300,1400,1500,1600,1700,1800,1900,2000" IsSnapToTickEnabled="True" TickPlacement="BottomRight" Margin="0,0,26,48" HorizontalAlignment="Right" Width="180" Minimum="100" Value="300" Maximum="2000" Height="25" VerticalAlignment="Bottom"/>
         <TextBlock x:Name="zoomTextBlock" Margin="0,0,196,48" TextWrapping="Wrap" Text="{Binding Value, ElementName=ZoomSlider, Mode=OneWay, StringFormat=Screen zoom: \{0:N0\}%}" HorizontalAlignment="Right" Width="160" Height="26" VerticalAlignment="Bottom"/>
-        <TextBox x:Name="deviceResolutionTextBox" HorizontalAlignment="Left" Height="23" Margin="193,126,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="66" TextChanged="XdimensionTextBox_TextChanged"/>
-        <Label x:Name="deviceResolutionLabel" Content="Device resolution (d/mm)" HorizontalAlignment="Left" Margin="18,123,0,0" VerticalAlignment="Top" Width="170" Height="30" FontSize="14"/>
+        <TextBox x:Name="deviceResolutionTextBox" HorizontalAlignment="Left" Height="23" Margin="143,126,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="51" TextChanged="XdimensionTextBox_TextChanged" RenderTransformOrigin="0.904,0.348"/>
+        <Label x:Name="deviceResolutionLabel" Content="Device resolution" HorizontalAlignment="Left" Margin="18,123,0,0" VerticalAlignment="Top" Width="124" Height="30" FontSize="14"/>
         <TextBox x:Name="targetXdimensionTextBox" HorizontalAlignment="Left" Height="23" Margin="193,196,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="66" TextChanged="XdimensionTextBox_TextChanged"/>
         <Label x:Name="targetXdimensionLabel" Content="Target X-dimension (mm)" HorizontalAlignment="Left" Margin="18,193,0,0" VerticalAlignment="Top" Width="170" Height="30" FontSize="14"/>
         <TextBox x:Name="minXdimensionTextBox" HorizontalAlignment="Left" Height="23" Margin="193,231,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="66" TextChanged="XdimensionTextBox_TextChanged"/>
@@ -210,6 +210,7 @@
             <ComboBoxItem Content="Table 13 2D" HorizontalAlignment="Left" Width="147"/>
         </ComboBox>
         <Label x:Name="actualXLabel" Content="" HorizontalAlignment="Left" Margin="14,291,0,0" VerticalAlignment="Top" Width="252" FontSize="12" FontWeight="Bold" HorizontalContentAlignment="Center" Height="26"/>
+        <Button x:Name="unitsButton" Content="d/mm" HorizontalAlignment="Left" Margin="203,126,0,0" VerticalAlignment="Top" Width="56" Height="23" Click="unitsButton_Click"/>
 
     </Grid>
 </Window>

@@ -16,5 +16,7 @@ src/c-lib/crash-*
 src/c-lib/fuzz-*
 src/c-lib/out.tif
 src/c-lib/out.bmp
-src/dotnet/bin/
-src/dotnet/obj/
+src/dotnet-lib/bin/
+src/dotnet-lib/obj/
+src/dotnet-app/bin/
+src/dotnet-app/obj/
