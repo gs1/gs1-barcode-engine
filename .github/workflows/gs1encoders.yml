@@ -60,7 +60,7 @@ jobs:
         msbuild /p:Configuration=release /p:Platform="x64" gs1encoders.sln
         c-lib\build\test\x64\Release\gs1encoders-test.exe
         c-lib\build\console-app\x64\Release\gs1encoders-app.exe --version
-        dotnet\bin\Release\gs1encoders-dotnet.exe --version
+        dotnet-app\bin\Release\gs1encoders-dotnet.exe --version
 
   ci-scan-build:
 
@@ -117,7 +117,7 @@ jobs:
     - name: Exercise applications
       run: |
         src\c-lib\build\console-app\x64\Release\gs1encoders-app.exe --version
-        src\dotnet\bin\Release\gs1encoders-dotnet.exe --version
+        src\dotnet-app\bin\Release\gs1encoders-dotnet.exe --version
 
     - name: ZIP development libs
       working-directory: src/c-lib/build/library/x64/Release

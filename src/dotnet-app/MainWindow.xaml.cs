@@ -1,23 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Microsoft.Win32;
 using System.IO;
 using System.Globalization;
 using System.Text.RegularExpressions;
+using GS1.Encoders;
 
-namespace gs1encoders_dotnet
+namespace GS1.EncodersApp
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -31,6 +24,15 @@ namespace gs1encoders_dotnet
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        private void clearRender()
+        {
+            infoLabel.Content = "";
+            errorMessageLabel.Content = "";
+            hriTextBox.Text = "";
+            SaveButton.IsEnabled = false;
+            barcodeImage.Source = null;
         }
 
         public void LoadDataValues()
@@ -49,160 +51,6 @@ namespace gs1encoders_dotnet
             _disableEvents = false;
         }
 
-        private void processScanData()
-        {
-            try
-            {
-                App.gs1Encoder.ScanData = dataStrTextBox.Text;
-            }
-            catch (GS1EncoderScanDataException E)
-            {
-                errorMessageLabel.Content = "Error: " + E.Message;
-                return;
-            }
-
-            symbologyComboBox.SelectedIndex = App.gs1Encoder.Sym;
-
-            if (App.gs1Encoder.DataStr.StartsWith("#"))
-            {
-                dataStrTextBox.Text = App.gs1Encoder.AIdataStr;
-            } else
-            {
-                dataStrTextBox.Text = App.gs1Encoder.DataStr;
-            }
-            
-            generateButton.RaiseEvent(new RoutedEventArgs(System.Windows.Controls.Button.ClickEvent));
-        }
-
-        private void generateButton_Click(object sender, RoutedEventArgs e)
-        {
-
-            clearRender();
-
-            if ((GS1Encoder.Symbology)symbologyComboBox.SelectedIndex == GS1Encoder.Symbology.NUMSYMS) {
-                processScanData();
-                return;
-            }
-
-            try
-            {
-                App.gs1Encoder.Sym = symbologyComboBox.SelectedIndex;
-                if (dataStrTextBox.Text.Length > 0 && dataStrTextBox.Text[0] == '(')
-                {
-                    App.gs1Encoder.AIdataStr = dataStrTextBox.Text;
-                }
-                else
-                {
-                    App.gs1Encoder.DataStr = dataStrTextBox.Text;
-                }
-            }
-            catch (GS1EncoderParameterException E)
-            {
-                errorMessageLabel.Content = "Error: " + E.Message;
-                LoadDataValues();
-                return;
-            }      
-
-            try
-            { 
-                App.gs1Encoder.Encode();
-
-                infoLabel.Content = "";
-                if (App.gs1Encoder.DataStr.Length > 0 && App.gs1Encoder.DataStr[0] == '#')  // AI data
-                {
-                    if (dataStrTextBox.Text.StartsWith("#"))
-                        infoLabel.Content = "AI data:   " + App.gs1Encoder.AIdataStr;
-                    else if (dataStrTextBox.Text.StartsWith("("))
-                        infoLabel.Content = "Encoded data (FNC1 = \"#\"):   " + App.gs1Encoder.DataStr;
-                }
-
-                if (App.gs1Encoder.DataStr.StartsWith("http://") || App.gs1Encoder.DataStr.StartsWith("https://"))
-                    infoLabel.Content = "Extracted AI data:   " + App.gs1Encoder.AIdataStr;
-
-                string scan = App.gs1Encoder.ScanData;
-                scan = Regex.Replace(scan, @"\p{Cc}", a => "{" + string.Format("%{0:X2}", (byte)a.Value[0]) + "}");
-                errorMessageLabel.Content = "Scan data: " + scan;
-
-                string[] hri = App.gs1Encoder.HRI;
-                hriTextBox.Text = "";
-                foreach (string ai in hri)
-                {
-                    hriTextBox.Text += ai + "\n";
-                }
-            }
-            catch (GS1EncoderEncodeException E)
-            {
-                errorMessageLabel.Content = "Error: " + E.Message;
-                LoadDataValues();
-                return;
-            }
-            
-            using (MemoryStream ms = new MemoryStream(App.gs1Encoder.GetBuffer()))
-            {
-                BitmapImage img = new BitmapImage();
-                img.BeginInit();
-                img.CacheOption = BitmapCacheOption.OnLoad;
-                img.StreamSource = ms;
-                img.EndInit();
-                if (img.CanFreeze)
-                    img.Freeze();
-                barcodeImage.Source = img;
-            }
-
-            SaveButton.IsEnabled = true;
-
-            LoadDataValues();
-
-        }
-        
-        private void SaveButton_Click(object sender, RoutedEventArgs e)
-        {
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.Filter = "Bitmap Image (*.bmp)|*.bmp|Portable Network Graphic (*.png)|*.png";
-            if (saveFileDialog.ShowDialog() == true)
-            {
-                BitmapEncoder encoder;
-                if (saveFileDialog.FilterIndex == 0)
-                {
-                    encoder = new BmpBitmapEncoder();                    
-                } else
-                {
-                    encoder = new PngBitmapEncoder();
-                }
-                encoder.Frames.Add(BitmapFrame.Create((BitmapSource)barcodeImage.Source));
-                using (var fileStream = new System.IO.FileStream(saveFileDialog.FileName, System.IO.FileMode.Create))
-                {
-                    encoder.Save(fileStream);
-                }
-            }
-        }
-
-        private void CopyToClipboardButton_Click(object sender, RoutedEventArgs e)
-        {
-            Clipboard.SetImage(barcodeImage.Source as BitmapSource);
-        }
-
-        private void PrintButton_Click(object sender, RoutedEventArgs e)
-        {
-            PrintDialog printDialog = new PrintDialog();
-            if (printDialog.ShowDialog() == true)
-            {
-                DrawingVisual visual = new DrawingVisual();
-                using (DrawingContext dc = visual.RenderOpen())
-                {
-                    Rect rc = new Rect(0, 0, ((BitmapImage)barcodeImage.Source).PixelWidth, ((BitmapImage)barcodeImage.Source).PixelHeight);
-                    dc.DrawImage((BitmapImage)barcodeImage.Source, rc);
-                    
-                }
-                printDialog.PrintVisual(visual, "Barcode");
-            }
-        }
-
-        private void hriTextBox_PreviewMouseDown(object sender, MouseButtonEventArgs e)
-        {
-            Clipboard.SetText(hriTextBox.Text);
-        }
-
         private void symbologyComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             linHeightLabel.IsEnabled = false;
@@ -219,7 +67,8 @@ namespace gs1encoders_dotnet
             dmRowsComboBox.IsEnabled = false;
             generateButton.Content = "Generate Barcode";
 
-            switch ((GS1Encoder.Symbology)symbologyComboBox.SelectedIndex) {
+            switch ((GS1Encoder.Symbology)symbologyComboBox.SelectedIndex)
+            {
 
                 case GS1Encoder.Symbology.EAN13:
                 case GS1Encoder.Symbology.EAN8:
@@ -274,17 +123,10 @@ namespace gs1encoders_dotnet
 
         }
 
-        private void infoLabel_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            string content = (string)infoLabel.Content;
-            content = Regex.Replace(content,".*:\\s+","");
-            Clipboard.SetText(content);
-        }
-
         private void applicationComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
 
-            double minX = 0, maxX =0, targetX = 0;
+            double minX = 0, maxX = 0, targetX = 0;
 
             if (_disableEvents) return;
 
@@ -642,22 +484,174 @@ namespace gs1encoders_dotnet
                 symbologyComboBox.SelectedIndex = 0;
                 while (!((ComboBoxItem)symbologyComboBox.SelectedItem).IsEnabled)
                     symbologyComboBox.SelectedIndex++;
-            }            
+            }
             minXdimensionTextBox.Text = minX != 0 ? String.Format("{0:0.000}", minX) : "";
-            targetXdimensionTextBox.Text = targetX !=0 ? String.Format("{0:0.000}", targetX) : "";            
+            targetXdimensionTextBox.Text = targetX != 0 ? String.Format("{0:0.000}", targetX) : "";
             maxXdimensionTextBox.Text = maxX != 0 ? String.Format("{0:0.000}", maxX) : "";
             _disableEvents = false;
 
             recalculateXdimension();
         }
 
-        private void clearRender()
+        private void processScanData()
         {
-            infoLabel.Content = "";
-            errorMessageLabel.Content = "";
-            hriTextBox.Text = "";
-            SaveButton.IsEnabled = false;
-            barcodeImage.Source = null;            
+            try
+            {
+                App.gs1Encoder.ScanData = dataStrTextBox.Text;
+            }
+            catch (GS1EncoderScanDataException E)
+            {
+                errorMessageLabel.Content = "Error: " + E.Message;
+                return;
+            }
+
+            symbologyComboBox.SelectedIndex = App.gs1Encoder.Sym;
+
+            if (App.gs1Encoder.DataStr.StartsWith("#"))
+            {
+                dataStrTextBox.Text = App.gs1Encoder.AIdataStr;
+            } else
+            {
+                dataStrTextBox.Text = App.gs1Encoder.DataStr;
+            }
+            
+            generateButton.RaiseEvent(new RoutedEventArgs(System.Windows.Controls.Button.ClickEvent));
+        }
+
+        private void generateButton_Click(object sender, RoutedEventArgs e)
+        {
+
+            clearRender();
+
+            if ((GS1Encoder.Symbology)symbologyComboBox.SelectedIndex == GS1Encoder.Symbology.NUMSYMS) {
+                processScanData();
+                return;
+            }
+
+            try
+            {
+                App.gs1Encoder.Sym = symbologyComboBox.SelectedIndex;
+                if (dataStrTextBox.Text.Length > 0 && dataStrTextBox.Text[0] == '(')
+                {
+                    App.gs1Encoder.AIdataStr = dataStrTextBox.Text;
+                }
+                else
+                {
+                    App.gs1Encoder.DataStr = dataStrTextBox.Text;
+                }
+            }
+            catch (GS1EncoderParameterException E)
+            {
+                errorMessageLabel.Content = "Error: " + E.Message;
+                LoadDataValues();
+                return;
+            }      
+
+            try
+            { 
+                App.gs1Encoder.Encode();
+
+                infoLabel.Content = "";
+                if (App.gs1Encoder.DataStr.Length > 0 && App.gs1Encoder.DataStr[0] == '#')  // AI data
+                {
+                    if (dataStrTextBox.Text.StartsWith("#"))
+                        infoLabel.Content = "AI data:   " + App.gs1Encoder.AIdataStr;
+                    else if (dataStrTextBox.Text.StartsWith("("))
+                        infoLabel.Content = "Encoded data (FNC1 = \"#\"):   " + App.gs1Encoder.DataStr;
+                }
+
+                if (App.gs1Encoder.DataStr.StartsWith("http://") || App.gs1Encoder.DataStr.StartsWith("https://"))
+                    infoLabel.Content = "Extracted AI data:   " + App.gs1Encoder.AIdataStr;
+
+                string scan = App.gs1Encoder.ScanData;
+                scan = Regex.Replace(scan, @"\p{Cc}", a => "{" + string.Format("%{0:X2}", (byte)a.Value[0]) + "}");
+                errorMessageLabel.Content = "Scan data: " + scan;
+
+                string[] hri = App.gs1Encoder.HRI;
+                hriTextBox.Text = "";
+                foreach (string ai in hri)
+                {
+                    hriTextBox.Text += ai + "\n";
+                }
+            }
+            catch (GS1EncoderEncodeException E)
+            {
+                errorMessageLabel.Content = "Error: " + E.Message;
+                LoadDataValues();
+                return;
+            }
+            
+            using (MemoryStream ms = new MemoryStream(App.gs1Encoder.GetBuffer()))
+            {
+                BitmapImage img = new BitmapImage();
+                img.BeginInit();
+                img.CacheOption = BitmapCacheOption.OnLoad;
+                img.StreamSource = ms;
+                img.EndInit();
+                if (img.CanFreeze)
+                    img.Freeze();
+                barcodeImage.Source = img;
+            }
+
+            SaveButton.IsEnabled = true;
+
+            LoadDataValues();
+
+        }
+        
+        private void SaveButton_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "Bitmap Image (*.bmp)|*.bmp|Portable Network Graphic (*.png)|*.png";
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                BitmapEncoder encoder;
+                if (saveFileDialog.FilterIndex == 0)
+                {
+                    encoder = new BmpBitmapEncoder();                    
+                } else
+                {
+                    encoder = new PngBitmapEncoder();
+                }
+                encoder.Frames.Add(BitmapFrame.Create((BitmapSource)barcodeImage.Source));
+                using (var fileStream = new System.IO.FileStream(saveFileDialog.FileName, System.IO.FileMode.Create))
+                {
+                    encoder.Save(fileStream);
+                }
+            }
+        }
+
+        private void CopyToClipboardButton_Click(object sender, RoutedEventArgs e)
+        {
+            Clipboard.SetImage(barcodeImage.Source as BitmapSource);
+        }
+
+        private void hriTextBox_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            Clipboard.SetText(hriTextBox.Text);
+        }
+
+        private void infoLabel_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            string content = (string)infoLabel.Content;
+            content = Regex.Replace(content, ".*:\\s+", "");
+            Clipboard.SetText(content);
+        }
+
+        private void PrintButton_Click(object sender, RoutedEventArgs e)
+        {
+            PrintDialog printDialog = new PrintDialog();
+            if (printDialog.ShowDialog() == true)
+            {
+                DrawingVisual visual = new DrawingVisual();
+                using (DrawingContext dc = visual.RenderOpen())
+                {
+                    Rect rc = new Rect(0, 0, ((BitmapImage)barcodeImage.Source).PixelWidth, ((BitmapImage)barcodeImage.Source).PixelHeight);
+                    dc.DrawImage((BitmapImage)barcodeImage.Source, rc);
+                    
+                }
+                printDialog.PrintVisual(visual, "Barcode");
+            }
         }
 
         private void recalculateXdimension() {
@@ -761,72 +755,32 @@ namespace gs1encoders_dotnet
 
         }
 
-        private void deviceResolutionTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        private void genericTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (_disableEvents) return;
             clearRender();
+        }
+
+        private void XdimensionTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            genericTextBox_TextChanged(sender, e);
             recalculateXdimension();
         }
 
-        private void targetXdimensionTextBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            if (_disableEvents) return;
-            clearRender();
-            recalculateXdimension();
-        }
-
-        private void minXdimensionTextBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            if (_disableEvents) return;
-            clearRender();
-            recalculateXdimension();
-        }
-
-        private void maxXdimensionTextBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            if (_disableEvents) return;
-            clearRender();
-            recalculateXdimension();
-        }
-
-        private void dataStrTextBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            if (_disableEvents) return;
-            clearRender();
-        }
-
-        private void XundercutTextBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            if (_disableEvents) return;
-            clearRender();
-        }
-
-        private void YundercutTextBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            if (_disableEvents) return;
-            clearRender();
-        }
-
-        private void linHeightTextBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            if (_disableEvents) return;
-            clearRender();
-        }
-
-        private void sepHtTextBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            if (_disableEvents) return;
-            clearRender();
-        }
-
-        private void segWidthComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void genericComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (_disableEvents) return;
             clearRender();
             try
             {
                 int v;
-                if (Int32.TryParse((string)segWidthComboBox.SelectedValue, out v)) App.gs1Encoder.DataBarExpandedSegmentsWidth = v;                
+                if (Int32.TryParse((string)((ComboBox)sender).SelectedValue, out v))
+                {
+                    if (sender == segWidthComboBox) App.gs1Encoder.DataBarExpandedSegmentsWidth = v;
+                    if (sender == qrVersionComboBox) App.gs1Encoder.QrVersion = v;
+                    if (sender == qrEClevelComboBox) App.gs1Encoder.QrEClevel = v;
+                    if (sender == dmRowsComboBox) App.gs1Encoder.DmRows = v;
+                }
             }
             catch (GS1EncoderParameterException E)
             {
@@ -836,134 +790,21 @@ namespace gs1encoders_dotnet
             LoadDataValues();
         }
 
-        private void qrVersionComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void genericTextBox_LostFocus(object sender, RoutedEventArgs e)
         {
             if (_disableEvents) return;
             clearRender();
             try
             {
                 int v;
-                if (Int32.TryParse((string)qrVersionComboBox.SelectedValue, out v)) App.gs1Encoder.QrVersion = v;                
-            }
-            catch (GS1EncoderParameterException E)
-            {
-                errorMessageLabel.Content = "Error: " + E.Message;
-                return;
-            }
-            LoadDataValues();
-        }
-
-        private void qrEClevelComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (_disableEvents) return;
-            clearRender();
-            try
-            {
-                int v;
-                if (Int32.TryParse((string)qrEClevelComboBox.SelectedValue, out v)) App.gs1Encoder.QrEClevel = v;
-            }
-            catch (GS1EncoderParameterException E)
-            {
-                errorMessageLabel.Content = "Error: " + E.Message;
-                return;
-            }
-            LoadDataValues();
-        }
-
-        private void dmRowsComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (_disableEvents) return;
-            clearRender();
-            try
-            {
-                int v;                
-                if (Int32.TryParse((string)dmRowsComboBox.SelectedValue, out v)) App.gs1Encoder.DmRows = v;
-            }
-            catch (GS1EncoderParameterException E)
-            {
-                errorMessageLabel.Content = "Error: " + E.Message;
-                return;
-            }
-            LoadDataValues();
-        }
-
-        private void pixMultTextBox_LostFocus(object sender, RoutedEventArgs e)
-        {
-            if (_disableEvents) return;
-            try
-            {
-                int v;
-                if (Int32.TryParse(pixMultTextBox.Text, out v)) App.gs1Encoder.PixMult = v;
-            }
-            catch (GS1EncoderParameterException E)
-            {
-                errorMessageLabel.Content = "Error: " + E.Message;
-                return;
-            }
-            LoadDataValues();
-        }
-
-        private void pixMultTextBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            if (_disableEvents) return;
-            clearRender();
-        }
-
-        private void XundercutTextBox_LostFocus(object sender, RoutedEventArgs e)
-        {
-            if (_disableEvents) return;
-            try
-            {
-                int v;
-                if (Int32.TryParse(XundercutTextBox.Text, out v)) App.gs1Encoder.Xundercut = v;
-            }
-            catch (GS1EncoderParameterException E)
-            {
-                errorMessageLabel.Content = "Error: " + E.Message;
-                return;
-            }
-            LoadDataValues();
-        }
-
-        private void YundercutTextBox_LostFocus(object sender, RoutedEventArgs e)
-        {
-            if (_disableEvents) return;
-            try
-            {
-                int v;
-                if (Int32.TryParse(YundercutTextBox.Text, out v)) App.gs1Encoder.Yundercut = v;
-            }
-            catch (GS1EncoderParameterException E)
-            {
-                errorMessageLabel.Content = "Error: " + E.Message;
-                return;
-            }
-            LoadDataValues();
-        }
-
-        private void linHeightTextBox_LostFocus(object sender, RoutedEventArgs e)
-        {
-            if (_disableEvents) return;
-            try
-            {
-                int v;
-                if (Int32.TryParse(linHeightTextBox.Text, out v)) App.gs1Encoder.GS1_128LinearHeight = v;
-            }
-            catch (GS1EncoderParameterException E)
-            {
-                errorMessageLabel.Content = "Error: " + E.Message;
-                return;
-            }
-            LoadDataValues();
-        }
-
-        private void sepHtTextBox_LostFocus(object sender, RoutedEventArgs e)
-        {
-            if (_disableEvents) return;
-            try
-            {
-                int v;
-                if (Int32.TryParse(sepHtTextBox.Text, out v)) App.gs1Encoder.SepHt = v;
+                if (Int32.TryParse((string)((TextBox)sender).Text, out v))
+                {
+                    if (sender == pixMultTextBox) App.gs1Encoder.PixMult = v;
+                    if (sender == XundercutTextBox) App.gs1Encoder.Xundercut = v;
+                    if (sender == YundercutTextBox) App.gs1Encoder.Yundercut = v;
+                    if (sender == linHeightTextBox) App.gs1Encoder.GS1_128LinearHeight = v;
+                    if (sender == sepHtTextBox) App.gs1Encoder.SepHt = v;
+                }
             }
             catch (GS1EncoderParameterException E)
             {
@@ -974,12 +815,13 @@ namespace gs1encoders_dotnet
         }
 
         private void errorMessageLabel_MouseDown(object sender, MouseButtonEventArgs e)
-        {           
+        {
             string content = (string)errorMessageLabel.Content;
             if (!content.StartsWith("Scan data:"))
                 return;
             content = Regex.Replace(content, ".*:\\s+", "");
             Clipboard.SetText(content);
         }
+
     }
 }

@@ -1,9 +1,9 @@
-﻿<Window x:Class="gs1encoders_dotnet.MainWindow"
+﻿<Window x:Class="GS1.EncodersApp.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:gs1encoders_dotnet"
+        xmlns:local="clr-namespace:GS1.EncodersApp"
         mc:Ignorable="d"
         Title="MainWindow" Height="825" Width="1280" MinWidth="1000" MinHeight="825">
     <Grid Margin="0,0,0,-31">
@@ -15,7 +15,7 @@
         </Grid.ColumnDefinitions>
         <Rectangle Fill="#FFF4F4F5" HorizontalAlignment="Left" Height="197" Margin="14,121,0,0" Stroke="Black" VerticalAlignment="Top" Width="253" Grid.Column="1"/>
 
-        <TextBox x:Name="dataStrTextBox" Height="26" Margin="294,23,213,0" TextWrapping="Wrap" VerticalAlignment="Top" TextChanged="dataStrTextBox_TextChanged"/>
+        <TextBox x:Name="dataStrTextBox" Height="26" Margin="294,23,213,0" TextWrapping="Wrap" VerticalAlignment="Top" TextChanged="genericTextBox_TextChanged"/>
         <Button x:Name="generateButton" Content="Generate Barcode" HorizontalAlignment="Right" Margin="0,23,30,0" VerticalAlignment="Top" Width="155" Click="generateButton_Click" Height="26" Grid.Column="1"/>
         <ComboBox x:Name="symbologyComboBox" HorizontalAlignment="Left" Margin="14,23,0,0" VerticalAlignment="Top" Width="253" Height="26" SelectionChanged="symbologyComboBox_SelectionChanged">
             <ComboBoxItem x:Name="DataBarOmni_ComboBoxItem" Content="GS1 DataBar Omnidirectional" HorizontalAlignment="Left" Width="239"/>
@@ -34,16 +34,16 @@
             <ComboBoxItem x:Name="DM_ComboBoxItem" Content="DataMatrix" HorizontalAlignment="Left" Width="239"/>
             <ComboBoxItem x:Name="ScanData_ComboBoxItem" Content="[Auto-detect from scan data]" HorizontalAlignment="Left" Width="239"/>
         </ComboBox>
-        <TextBox x:Name="pixMultTextBox" HorizontalAlignment="Left" Height="23" Margin="193,330,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="66" Grid.Column="1" LostFocus="pixMultTextBox_LostFocus" TextChanged="pixMultTextBox_TextChanged"/>
+        <TextBox x:Name="pixMultTextBox" HorizontalAlignment="Left" Height="23" Margin="193,330,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="66" Grid.Column="1" LostFocus="genericTextBox_LostFocus" TextChanged="genericTextBox_TextChanged"/>
         <Label x:Name="pixMultLabel" Content="Dots per module" HorizontalAlignment="Left" Margin="18,327,0,0" VerticalAlignment="Top" Width="170" Height="30" FontSize="14" Grid.Column="1"/>
-        <TextBox x:Name="XundercutTextBox" HorizontalAlignment="Left" Height="23" Margin="193,365,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="66" Grid.Column="1" TextChanged="XundercutTextBox_TextChanged" LostFocus="XundercutTextBox_LostFocus"/>
+        <TextBox x:Name="XundercutTextBox" HorizontalAlignment="Left" Height="23" Margin="193,365,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="66" Grid.Column="1" TextChanged="genericTextBox_TextChanged" LostFocus="genericTextBox_LostFocus"/>
         <Label x:Name="XundercutLabel" Content="X-axis undercut (dots)" HorizontalAlignment="Left" Margin="18,362,0,0" VerticalAlignment="Top" Width="163" Height="30" FontSize="14" Grid.Column="1"/>
-        <TextBox x:Name="YundercutTextBox" HorizontalAlignment="Left" Height="23" Margin="193,400,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="66" Grid.Column="1" TextChanged="YundercutTextBox_TextChanged" LostFocus="YundercutTextBox_LostFocus"/>
+        <TextBox x:Name="YundercutTextBox" HorizontalAlignment="Left" Height="23" Margin="193,400,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="66" Grid.Column="1" TextChanged="genericTextBox_TextChanged" LostFocus="genericTextBox_LostFocus"/>
         <Label x:Name="YundercutLabel" Content="Y-axis undercut (dots)" HorizontalAlignment="Left" Margin="18,397,0,0" VerticalAlignment="Top" Width="163" Height="30" FontSize="14" Grid.Column="1"/>
-        <TextBox x:Name="sepHtTextBox" HorizontalAlignment="Left" Height="23" Margin="193,468,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="66" Grid.Column="1" IsEnabled="False" TextChanged="sepHtTextBox_TextChanged" LostFocus="sepHtTextBox_LostFocus"/>
+        <TextBox x:Name="sepHtTextBox" HorizontalAlignment="Left" Height="23" Margin="193,468,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="66" Grid.Column="1" IsEnabled="False" TextChanged="genericTextBox_TextChanged" LostFocus="genericTextBox_LostFocus"/>
         <Label x:Name="sepHtLabel" Content="CC separator height (X)" HorizontalAlignment="Left" Margin="18,465,0,0" VerticalAlignment="Top" Width="163" Height="30" IsEnabled="False" FontSize="14" Grid.Column="1"/>
         <Label x:Name="segWidthLabel" Content="DataBar Exp. segments" HorizontalAlignment="Left" Margin="18,500,0,0" VerticalAlignment="Top" Width="163" Height="30" IsEnabled="False" FontSize="14" Grid.Column="1"/>
-        <TextBox x:Name="linHeightTextBox" HorizontalAlignment="Left" Height="23" Margin="193,435,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="66" Grid.Column="1" IsEnabled="False" TextChanged="linHeightTextBox_TextChanged" LostFocus="linHeightTextBox_LostFocus"/>
+        <TextBox x:Name="linHeightTextBox" HorizontalAlignment="Left" Height="23" Margin="193,435,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="66" Grid.Column="1" IsEnabled="False" TextChanged="genericTextBox_TextChanged" LostFocus="genericTextBox_LostFocus"/>
         <Label x:Name="linHeightLabel" Content="GS1-128 line height (X)" HorizontalAlignment="Left" Margin="18,432,0,0" VerticalAlignment="Top" Width="163" Height="30" IsEnabled="False" FontSize="14" Grid.Column="1"/>
         <Label x:Name="qrVersionLabel" Content="QR Code version" HorizontalAlignment="Left" Margin="18,535,0,0" VerticalAlignment="Top" Width="163" Height="30" IsEnabled="False" FontSize="14" Grid.Column="1"/>
         <Label x:Name="qrEClevelLabel" Content="QR Code EC level" HorizontalAlignment="Left" Margin="18,570,0,0" VerticalAlignment="Top" Width="163" Height="30" IsEnabled="False" FontSize="14" Grid.Column="1"/>
@@ -58,13 +58,13 @@
                 </Image.LayoutTransform>
             </Image>
         </ScrollViewer>
-        <ComboBox x:Name="qrEClevelComboBox" Grid.Column="1" HorizontalAlignment="Left" Margin="193,573,0,0" VerticalAlignment="Top" Width="66" RenderTransformOrigin="0.5,0.5" Height="23" SelectedValuePath="Tag" IsEnabled="False" SelectionChanged="qrEClevelComboBox_SelectionChanged">
+        <ComboBox x:Name="qrEClevelComboBox" Grid.Column="1" HorizontalAlignment="Left" Margin="193,573,0,0" VerticalAlignment="Top" Width="66" RenderTransformOrigin="0.5,0.5" Height="23" SelectedValuePath="Tag" IsEnabled="False" SelectionChanged="genericComboBox_SelectionChanged">
             <ComboBoxItem Content="L" Tag="1"  HorizontalAlignment="Left" Width="66"/>
             <ComboBoxItem Content="M" Tag="2" HorizontalAlignment="Left" Width="66"/>
             <ComboBoxItem Content="Q" Tag="3" HorizontalAlignment="Left" Width="66"/>
             <ComboBoxItem Content="H" Tag="4" HorizontalAlignment="Left" Width="66"/>
         </ComboBox>
-        <ComboBox x:Name="segWidthComboBox" Grid.Column="1" HorizontalAlignment="Left" Margin="193,503,0,0" VerticalAlignment="Top" Width="66" RenderTransformOrigin="0.5,0.5" Height="23" SelectedValuePath="Tag" IsEnabled="False" SelectionChanged="segWidthComboBox_SelectionChanged">
+        <ComboBox x:Name="segWidthComboBox" Grid.Column="1" HorizontalAlignment="Left" Margin="193,503,0,0" VerticalAlignment="Top" Width="66" RenderTransformOrigin="0.5,0.5" Height="23" SelectedValuePath="Tag" IsEnabled="False" SelectionChanged="genericComboBox_SelectionChanged">
             <ComboBoxItem Content="4" Tag="4" HorizontalAlignment="Left" Width="66"/>
             <ComboBoxItem Content="6" Tag="6" HorizontalAlignment="Left" Width="66"/>
             <ComboBoxItem Content="8" Tag="8" HorizontalAlignment="Left" Width="66"/>
@@ -76,7 +76,7 @@
             <ComboBoxItem Content="20" Tag="20" HorizontalAlignment="Left" Width="66"/>
             <ComboBoxItem Content="22" Tag="22" HorizontalAlignment="Left" Width="66"/>
         </ComboBox>
-        <ComboBox x:Name="qrVersionComboBox" Grid.Column="1" HorizontalAlignment="Left" Margin="193,538,0,0" VerticalAlignment="Top" Width="66" RenderTransformOrigin="0.5,0.5" Height="23" SelectedValuePath="Tag" IsEnabled="False" SelectionChanged="qrVersionComboBox_SelectionChanged">
+        <ComboBox x:Name="qrVersionComboBox" Grid.Column="1" HorizontalAlignment="Left" Margin="193,538,0,0" VerticalAlignment="Top" Width="66" RenderTransformOrigin="0.5,0.5" Height="23" SelectedValuePath="Tag" IsEnabled="False" SelectionChanged="genericComboBox_SelectionChanged">
             <ComboBoxItem Content="Auto" Tag="0"  HorizontalAlignment="Left" Width="66"/>
             <ComboBoxItem Content="1" Tag="1"  HorizontalAlignment="Left" Width="66"/>
             <ComboBoxItem Content="2" Tag="2" HorizontalAlignment="Left" Width="66"/>
@@ -119,7 +119,7 @@
             <ComboBoxItem Content="39" Tag="39" HorizontalAlignment="Left" Width="66"/>
             <ComboBoxItem Content="40" Tag="40" HorizontalAlignment="Left" Width="66"/>
         </ComboBox>
-        <ComboBox x:Name="dmRowsComboBox" HorizontalAlignment="Left" Margin="193,608,0,0" VerticalAlignment="Top" Width="66" RenderTransformOrigin="0.5,0.5" Height="23" SelectedValuePath="Tag" IsEnabled="False" SelectionChanged="dmRowsComboBox_SelectionChanged">
+        <ComboBox x:Name="dmRowsComboBox" HorizontalAlignment="Left" Margin="193,608,0,0" VerticalAlignment="Top" Width="66" RenderTransformOrigin="0.5,0.5" Height="23" SelectedValuePath="Tag" IsEnabled="False" SelectionChanged="genericComboBox_SelectionChanged">
             <ComboBoxItem Content="Auto" Tag="0"  HorizontalAlignment="Left" Width="66"/>
             <ComboBoxItem Content="10" Tag="10"  HorizontalAlignment="Left" Width="66"/>
             <ComboBoxItem Content="12" Tag="12" HorizontalAlignment="Left" Width="66"/>
@@ -152,13 +152,13 @@
         <Label x:Name="hriTextLabel" Content="HRI text" HorizontalAlignment="Left" Margin="18,0,0,149" Height="29" VerticalAlignment="Bottom" FontWeight="Bold" Width="68"/>
         <Slider x:Name="ZoomSlider" Ticks="100,200,300,400,500,600,700,800,900,1000,1100,1200,1300,1400,1500,1600,1700,1800,1900,2000" IsSnapToTickEnabled="True" TickPlacement="BottomRight" Margin="0,0,26,48" HorizontalAlignment="Right" Width="180" Minimum="100" Value="300" Maximum="2000" Height="25" VerticalAlignment="Bottom"/>
         <TextBlock x:Name="zoomTextBlock" Margin="0,0,196,48" TextWrapping="Wrap" Text="{Binding Value, ElementName=ZoomSlider, Mode=OneWay, StringFormat=Screen zoom: \{0:N0\}%}" HorizontalAlignment="Right" Width="160" Height="26" VerticalAlignment="Bottom"/>
-        <TextBox x:Name="deviceResolutionTextBox" HorizontalAlignment="Left" Height="23" Margin="193,126,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="66" TextChanged="deviceResolutionTextBox_TextChanged"/>
+        <TextBox x:Name="deviceResolutionTextBox" HorizontalAlignment="Left" Height="23" Margin="193,126,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="66" TextChanged="XdimensionTextBox_TextChanged"/>
         <Label x:Name="deviceResolutionLabel" Content="Device resolution (d/mm)" HorizontalAlignment="Left" Margin="18,123,0,0" VerticalAlignment="Top" Width="170" Height="30" FontSize="14"/>
-        <TextBox x:Name="targetXdimensionTextBox" HorizontalAlignment="Left" Height="23" Margin="193,196,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="66" TextChanged="targetXdimensionTextBox_TextChanged"/>
+        <TextBox x:Name="targetXdimensionTextBox" HorizontalAlignment="Left" Height="23" Margin="193,196,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="66" TextChanged="XdimensionTextBox_TextChanged"/>
         <Label x:Name="targetXdimensionLabel" Content="Target X-dimension (mm)" HorizontalAlignment="Left" Margin="18,193,0,0" VerticalAlignment="Top" Width="170" Height="30" FontSize="14"/>
-        <TextBox x:Name="minXdimensionTextBox" HorizontalAlignment="Left" Height="23" Margin="193,231,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="66" TextChanged="minXdimensionTextBox_TextChanged"/>
+        <TextBox x:Name="minXdimensionTextBox" HorizontalAlignment="Left" Height="23" Margin="193,231,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="66" TextChanged="XdimensionTextBox_TextChanged"/>
         <Label x:Name="minXdimensionTextBox1" Content="Min X-dimension (mm)" HorizontalAlignment="Left" Margin="18,228,0,0" Width="170" FontSize="14" Height="30" VerticalAlignment="Top"/>
-        <TextBox x:Name="maxXdimensionTextBox" HorizontalAlignment="Left" Height="23" Margin="193,266,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="66" TextChanged="maxXdimensionTextBox_TextChanged"/>
+        <TextBox x:Name="maxXdimensionTextBox" HorizontalAlignment="Left" Height="23" Margin="193,266,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="66" TextChanged="XdimensionTextBox_TextChanged"/>
         <Label x:Name="maxXdimensionTextBox1" Content="Max X-dimension (mm)" HorizontalAlignment="Left" Margin="18,263,0,0" VerticalAlignment="Top" Width="170" Height="30" FontSize="14"/>
         <Button x:Name="SaveButton" Content="Save" HorizontalAlignment="Left" Margin="294,0,0,50" Width="75" IsEnabled="False" Click="SaveButton_Click" Height="24" VerticalAlignment="Bottom" RenderTransformOrigin="0.44,1.208"/>
         <Label x:Name="targetXdimensionLabel_Copy" Content="Application" HorizontalAlignment="Left" Margin="18,158,0,0" VerticalAlignment="Top" Width="85" Height="30" FontSize="14"/>
