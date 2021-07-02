@@ -124,22 +124,33 @@ jobs:
       run: |
         7z a gs1encoders-windows-libs.zip gs1encoders.h gs1encoders.lib gs1encoders.dll
 
-    - name: ZIP application
-      working-directory: src/c-lib/build/console-app/x64/Release
-      run: |
-        7z a gs1encoders-windows-app.zip gs1encoders-app.exe gs1encoders.dll
-
     - name: Store Windows development libs
       uses: actions/upload-artifact@v2
       with:
         name: windows-libs
         path: src/c-lib/build/library/x64/Release/gs1encoders-windows-libs.zip
 
-    - name: Store Windows app
+    - name: ZIP console application
+      working-directory: src/c-lib/build/console-app/x64/Release
+      run: |
+        7z a gs1encoders-windows-console-app.zip gs1encoders-app.exe gs1encoders.dll
+
+    - name: Store Windows console app
       uses: actions/upload-artifact@v2
       with:
-        name: windows-app
-        path: src/c-lib/build/console-app/x64/Release/gs1encoders-windows-app.zip
+        name: windows-console-app
+        path: src/c-lib/build/console-app/x64/Release/gs1encoders-windows-console-app.zip
+
+    - name: ZIP GUI application
+      working-directory: src/dotnet-app/bin/Release
+      run: |
+        7z a gs1encoders-windows-gui-app.zip gs1encoders-dotnet.exe gs1encoders.dll
+
+    - name: Store Windows GUI app
+      uses: actions/upload-artifact@v2
+      with:
+        name: windows-gui-app
+        path: src/dotnet-app/bin/Release/gs1encoders-windows-gui-app.zip
 
 
   build-release-linux:
@@ -188,10 +199,15 @@ jobs:
       with:
         name: windows-libs
 
-    - name: Load Windows app
+    - name: Load Windows console app
       uses: actions/download-artifact@v2
       with:
-        name: windows-app
+        name: windows-console-app
+
+    - name: Load Windows GUI app
+      uses: actions/download-artifact@v2
+      with:
+        name: windows-gui-app
 
     - name: Load Linux app
       uses: actions/download-artifact@v2
@@ -225,14 +241,24 @@ jobs:
         asset_name: gs1encoders-windows-libs.zip
         asset_content_type: application/zip
 
-    - name: "Upload asset: Windows application"
+    - name: "Upload asset: Windows console application"
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: gs1encoders-windows-app.zip
-        asset_name: gs1encoders-windows-app.zip
+        asset_path: gs1encoders-windows-console-app.zip
+        asset_name: gs1encoders-windows-console-app.zip
+        asset_content_type: application/zip
+
+    - name: "Upload asset: Windows GUI application"
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: gs1encoders-windows-gui-app.zip
+        asset_name: gs1encoders-windows-gui-app.zip
         asset_content_type: application/zip
 
     - name: "Upload asset: Linux bin"
