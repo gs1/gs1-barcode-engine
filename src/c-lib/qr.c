@@ -383,14 +383,14 @@ static void plotFixtures(uint8_t *mtx, uint8_t *fix, const struct metric *m) {
 			putAlign(i+1, j+1);
 
 	// Reserve the format information modules
-	for (i = 0; i < (int)(sizeof(formatpos) / sizeof(formatpos[0])); i++) {
+	for (i = 0; i < (int)(SIZEOF_ARRAY(formatpos)); i++) {
 		putFixtureModule(formatpos[i][0][0], formatpos[i][0][1], 1);
 		putFixtureModule(formatpos[i][1][0], formatpos[i][1][1], 1);
 	}
 
 	// Reserve the version information modules
 	if (m->size >= 45) {
-		for (i = 0; i < (int)(sizeof(versionpos) / sizeof(versionpos[0])); i++) {
+		for (i = 0; i < (int)(SIZEOF_ARRAY(versionpos)); i++) {
 			putFixtureModule(versionpos[i][0][0], versionpos[i][0][1], 0);
 			putFixtureModule(versionpos[i][1][0], versionpos[i][1][1], 0);
 		}
@@ -630,7 +630,7 @@ static const struct metric* selectVersion(gs1_encoder *ctx, const uint16_t bits_
 	bool okay;
 
 	// Select a suitable symbol
-	for (vers = 1; vers < (int)(sizeof(metrics) / sizeof(metrics[0])); vers++) {
+	for (vers = 1; vers < (int)(SIZEOF_ARRAY(metrics)); vers++) {
 		m = &metrics[vers];
 		ncws = m->modules/8;				// Total number of codewords
 		ecws = m->ecc_cws[ctx->qrEClevel -
@@ -767,7 +767,7 @@ static void createMatrix(gs1_encoder *ctx, uint8_t *mtx, const uint8_t *cws, con
 	assert(k == m->modules);  // Filled the symbol
 
 	// Evaluate the masked symbols to find the most suitable
-	for (k = 0; k < (int)(sizeof(maskfun) / sizeof(maskfun[0])); k++) {
+	for (k = 0; k < (int)(SIZEOF_ARRAY(maskfun)); k++) {
 		applyMask(msk, mtx, maskfun[k], fix, m);
 		score = evalMask(msk, m);
 		if (score < bestScore) {
@@ -790,7 +790,7 @@ static void createMatrix(gs1_encoder *ctx, uint8_t *mtx, const uint8_t *cws, con
 			assert(true);
 			return;
 	}
-	for (i = 0; i < (int)(sizeof(formatpos) / sizeof(formatpos[0])); i++) {
+	for (i = 0; i < (int)(SIZEOF_ARRAY(formatpos)); i++) {
 		putModule(mtx, formatpos[i][0][0], formatpos[i][0][1], (uint8_t)((formatval >> (14-i)) & 1));
 		putModule(mtx, formatpos[i][1][0], formatpos[i][1][1], (uint8_t)((formatval >> (14-i)) & 1));
 	}
@@ -798,7 +798,7 @@ static void createMatrix(gs1_encoder *ctx, uint8_t *mtx, const uint8_t *cws, con
 	// Plot the version information modules
 	if (m->size >= 45) {
 		versionval = versionmap[(m->size-17)/4-7];
-		for (i = 0; i < (int)(sizeof(versionpos) / sizeof(versionpos[0])); i++) {
+		for (i = 0; i < (int)(SIZEOF_ARRAY(versionpos)); i++) {
 			putModule(mtx, versionpos[i][0][0], versionpos[i][0][1], (uint8_t)((versionval >> (17-i)) & 1));
 			putModule(mtx, versionpos[i][1][0], versionpos[i][1][1], (uint8_t)((versionval >> (17-i)) & 1));
 		}

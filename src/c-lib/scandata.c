@@ -257,7 +257,7 @@ bool gs1_processScanData(gs1_encoder* ctx, const char* scanData) {
 	bool aiMode;
 	enum gs1_encoder_symbologies sym;
 	const struct symIdEntry *entry;
-	const size_t symIdTable_len = sizeof(symIdTable) / sizeof(symIdTable[0]);
+	const size_t symIdTable_len = SIZEOF_ARRAY(symIdTable);
 	char *p;
 	const char *q, *cc = NULL;
 	size_t primaryLen;

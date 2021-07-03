@@ -235,7 +235,7 @@ static const struct metric* selectVersion(gs1_encoder *ctx, const uint16_t cwsle
 	int vers;
 
 	// Select a suitable symbol
-	for (vers = 1; vers < (int)(sizeof(metrics) / sizeof(metrics[0])); vers++) {
+	for (vers = 1; vers < (int)(SIZEOF_ARRAY(metrics)); vers++) {
 		m = &metrics[vers];
 		okay = true;
 		if (ctx->dmRows != 0 &&
