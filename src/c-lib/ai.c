@@ -34,12 +34,15 @@
  *  This library stores a compact representation of AI data (FNC1 in first) in
  *  unbracketed format where "#" represents FNC1, i.e. "#..."
  *
- *  Where applicable, ingested data is validated and processed into the
- *  aforementioned form, then a table of extracted AIs is maintained consisting
- *  of a pointer to an AI table entry, a pointer to the data start of the AI
- *  value, and the value's length:
+ *  Ingested AI element strings and Digital Link URI data is parsed then
+ *  processed (validated) into the aforementioned form. Either during parsing
+ *  or processing a table of extracted AIs is populated consisting of a pointer
+ *  to an AI table entry, as well as pointers to the start of the AI and its
+ *  value, as well as their respective lengths:
  *
  *    aiEntry -> aiTable entry
+ *    ai      -> Start of AI in the AI data string
+ *    ailen   : Length of AI
  *    value   -> Start of value in the AI data string
  *    vallen  : Length of value
  *
@@ -675,21 +678,29 @@ static const struct aiEntry ai_table[] = {
 };
 
 
+// AI entry allowing AIs to be processed that are not present in the above table
+static const struct aiEntry unknownAI =
+	AI( ""    , FNC1   , X,1,90,_, __, __, __, __,                    "UNKNOWN"                   );
+
+
 /*
  * Lookup an AI table entry matching a given AI or matching prefix of given
  * data
  *
  * For an exact AI lookup its length is given. Otherwise 0 length will look for
- * an AI matching a prefix of the given data.
+ * an AI in the table that matches a prefix of the given data.
  *
  */
-const struct aiEntry* gs1_lookupAIentry(const char *p, size_t ailen) {
+const struct aiEntry* gs1_lookupAIentry(gs1_encoder *ctx, const char *p, size_t ailen) {
 
 	size_t i;
 	const struct aiEntry *entry;
 	size_t entrylen;
 
 	assert(ailen <= strlen(p));
+
+	if (ailen == 1)		// AI at least length 2, even if unknown AI
+		return NULL;
 
 	// Walk the AI table to find a match, or a prefix match when ailen == 0
 	for (i = 0; i < SIZEOF_ARRAY(ai_table); i++) {
@@ -701,8 +712,14 @@ const struct aiEntry* gs1_lookupAIentry(const char *p, size_t ailen) {
 			break;
 	}
 
-	if (i == SIZEOF_ARRAY(ai_table))		// Not found
-		return NULL;
+	/*
+	 * When we haven't found a matching AI table entry and permitUnknownAIs
+	 * is enabled then we return a pseudo "unknownAI" entry, otherwise we
+	 * return NULL ("not found") to indicate an error.
+	 *
+	 */
+	if (i == SIZEOF_ARRAY(ai_table))
+		return ctx->permitUnknownAIs ? &unknownAI : NULL;
 
 	return entry;
 
@@ -822,7 +839,8 @@ bool gs1_aiValLengthContentCheck(gs1_encoder *ctx, const struct aiEntry *entry, 
 bool gs1_parseAIdata(gs1_encoder *ctx, const char *aiData, char *dataStr) {
 
 	const char *p, *r;
-	char *outval;
+	char *outai, *outval;
+	uint8_t ailen;
 	size_t i;
 	bool fnc1req = true;
 	const struct aiEntry *entry;
@@ -842,21 +860,24 @@ bool gs1_parseAIdata(gs1_encoder *ctx, const char *aiData, char *dataStr) {
 		if (*p++ != '(') goto fail; 			// Expect start of AI
 		if (!(r = strchr(p, ')'))) goto fail;		// Find end of A
 
-		entry = gs1_lookupAIentry(p,(size_t)(r++ - p));	// Advance to start of data after lookup
+		ailen = (uint8_t)(r-p);
+		entry = gs1_lookupAIentry(ctx, p, (size_t)ailen);
 		if (entry == NULL) {
-			sprintf(ctx->errMsg, "Unrecognised AI: %.4s", p);
+			sprintf(ctx->errMsg, "Unrecognised AI: %.*s", ailen, p);
 			goto fail;
 		}
 
 		if (fnc1req)
 			writeDataStr("#");			// Write FNC1, if required
-		writeDataStr(entry->ai);			// Write AI
+		outai = dataStr + strlen(dataStr);		// Record the current start of the output AI
+		nwriteDataStr(p, (size_t)ailen);		// Write AI
 
 		fnc1req = true;					// Determine whether FNC1 required before next AI
 		for (i = 0; i < SIZEOF_ARRAY(fixedAIprefixes); i++)
-			if (strncmp(fixedAIprefixes[i], entry->ai, 2) == 0)
+			if (strncmp(fixedAIprefixes[i], p, 2) == 0)
 				fnc1req = false;
 
+		r++;						// Advance to start of AI value
 		if (!*r) goto fail;				// Fail if message ends after AI and no value
 
 		outval = dataStr + strlen(dataStr);		// Record the current start of the output value
@@ -883,6 +904,8 @@ again:
 		// Update the AI data
 		if (ctx->numAIs < MAX_AIS) {
 			ctx->aiData[ctx->numAIs].aiEntry = entry;
+			ctx->aiData[ctx->numAIs].ai = outai;
+			ctx->aiData[ctx->numAIs].ailen = ailen;
 			ctx->aiData[ctx->numAIs].value = outval;
 			ctx->aiData[ctx->numAIs].vallen = (uint8_t)strlen(outval);
 			ctx->numAIs++;
@@ -913,12 +936,12 @@ fail:
 
 
 /*
- *  Validate regular AI data ("#...") and extract AIs
+ *  Validate regular AI data ("#...") and optionally extract AIs
  *
  */
 bool gs1_processAIdata(gs1_encoder *ctx, const char *dataStr, const bool extractAIs) {
 
-	const char *p, *r;
+	const char *p, *r, *ai;
 	size_t vallen;
 	const struct aiEntry *entry;
 
@@ -947,12 +970,14 @@ bool gs1_processAIdata(gs1_encoder *ctx, const char *dataStr, const bool extract
 	while (*p) {
 
 		// Find AI that matches a prefix of our data
-		if ((entry = gs1_lookupAIentry(p, 0)) == NULL) {
-			sprintf(ctx->errMsg, "Unrecognised AI: %.4s", p);
+		if ((entry = gs1_lookupAIentry(ctx, p, 0)) == NULL) {
+			sprintf(ctx->errMsg, "No known AI is a prefix of: %.4s...", p);
 			ctx->errFlag = true;
 			return false;
 		}
 
+		// Save start of AI for AI data then jump over
+		ai = p;
 		p += strlen(entry->ai);
 
 		// r points to the next FNC1 or end of string...
@@ -963,10 +988,19 @@ bool gs1_processAIdata(gs1_encoder *ctx, const char *dataStr, const bool extract
 		if ((vallen = validate_ai_val(ctx, entry, p, r)) == 0)
 			return false;
 
-		// Add to the aiData
+		/*
+		 * Add to the aiData
+		 *
+		 * We cannot allow unknown AIs when processing a raw data
+		 * string because we are unable to differentiate an AI from
+		 * its value.
+		 *
+		 */
 		if (extractAIs) {
 			if (ctx->numAIs < MAX_AIS) {
 				ctx->aiData[ctx->numAIs].aiEntry = entry;
+				ctx->aiData[ctx->numAIs].ai = ai;
+				ctx->aiData[ctx->numAIs].ailen = (uint8_t)strlen(entry->ai);
 				ctx->aiData[ctx->numAIs].value = p;
 				ctx->aiData[ctx->numAIs].vallen = (uint8_t)vallen;
 				ctx->numAIs++;
@@ -1046,25 +1080,32 @@ bool gs1_allDigits(const uint8_t *str, size_t len) {
 
 void test_ai_lookupAIentry(void) {
 
-	TEST_CHECK(strcmp(gs1_lookupAIentry("01",     2)->ai, "01") == 0);	// Exact lookup, data following
-	TEST_CHECK(strcmp(gs1_lookupAIentry("011234", 2)->ai, "01") == 0);	// Exact lookup, data following
-	TEST_CHECK(strcmp(gs1_lookupAIentry("011234", 0)->ai, "01") == 0);	// Prefix lookup, data following
-	TEST_CHECK(strcmp(gs1_lookupAIentry("8012",   0)->ai, "8012") == 0);	// Prefix lookup, data following
+	gs1_encoder* ctx = gs1_encoder_init(NULL);
 
-	TEST_CHECK(gs1_lookupAIentry("2345XX", 4) == NULL);			// No such AI (2345)
-	TEST_CHECK(gs1_lookupAIentry("234XXX", 3) == NULL);			// No such AI (234)
-	TEST_CHECK(gs1_lookupAIentry("23XXXX", 2) == NULL);			// No such AI (23)
-	TEST_CHECK(gs1_lookupAIentry("2XXXXX", 1) == NULL);			// No such AI (2)
-	TEST_CHECK(gs1_lookupAIentry("XXXXXX", 0) == NULL);			// No matching prefix
-	TEST_CHECK(gs1_lookupAIentry("234567", 0) == NULL);			// No matching prefix
+	TEST_CHECK(strcmp(gs1_lookupAIentry(ctx, "01",     2)->ai, "01") == 0);		// Exact lookup, data following
+	TEST_CHECK(strcmp(gs1_lookupAIentry(ctx, "011234", 2)->ai, "01") == 0);		// Exact lookup, data following
+	TEST_CHECK(strcmp(gs1_lookupAIentry(ctx, "011234", 0)->ai, "01") == 0);		// Prefix lookup, data following
+	TEST_CHECK(strcmp(gs1_lookupAIentry(ctx, "8012",   0)->ai, "8012") == 0);	// Prefix lookup, data following
 
-	TEST_CHECK(strcmp(gs1_lookupAIentry("235XXX", 0)->ai, "235") == 0);	// Matching prefix
-	TEST_CHECK(gs1_lookupAIentry("235XXX", 2) == NULL);			// No such AI (23), even though data starts 235
-	TEST_CHECK(gs1_lookupAIentry("235XXX", 1) == NULL);			// No such AI (2), even though data starts 235
+	TEST_CHECK(gs1_lookupAIentry(ctx, "2345XX", 4) == NULL);			// No such AI (2345)
+	TEST_CHECK(gs1_lookupAIentry(ctx, "234XXX", 3) == NULL);			// No such AI (234)
+	TEST_CHECK(gs1_lookupAIentry(ctx, "23XXXX", 2) == NULL);			// No such AI (23)
+	TEST_CHECK(gs1_lookupAIentry(ctx, "2XXXXX", 1) == NULL);			// No such AI (2)
+	TEST_CHECK(gs1_lookupAIentry(ctx, "XXXXXX", 0) == NULL);			// No matching prefix
+	TEST_CHECK(gs1_lookupAIentry(ctx, "234567", 0) == NULL);			// No matching prefix
 
-	TEST_CHECK(strcmp(gs1_lookupAIentry("37123", 2)->ai, "37") == 0);	// Exact lookup
-	TEST_CHECK(gs1_lookupAIentry("37123", 3) == NULL);			// No such AI (371), even though there is AI (37)
-	TEST_CHECK(gs1_lookupAIentry("37123", 1) == NULL);			// No such AI (3), even though there is AI (37)
+	TEST_CHECK(strcmp(gs1_lookupAIentry(ctx, "235XXX", 0)->ai, "235") == 0);	// Matching prefix
+	TEST_CHECK(gs1_lookupAIentry(ctx, "235XXX", 2) == NULL);			// No such AI (23), even though data starts 235
+	TEST_CHECK(gs1_lookupAIentry(ctx, "235XXX", 1) == NULL);			// No such AI (2), even though data starts 235
+
+	TEST_CHECK(strcmp(gs1_lookupAIentry(ctx, "37123", 2)->ai, "37") == 0);		// Exact lookup
+	TEST_CHECK(gs1_lookupAIentry(ctx, "37123", 3) == NULL);				// No such AI (371), even though there is AI (37)
+	TEST_CHECK(gs1_lookupAIentry(ctx, "37123", 1) == NULL);				// No such AI (3), even though there is AI (37)
+
+	gs1_encoder_setPermitUnknownAIs(ctx, true);
+	TEST_CHECK(gs1_lookupAIentry(ctx, "89", 2) == &unknownAI);			// No such AI (89), but permitting unknown AIs
+
+	gs1_encoder_free(ctx);
 
 }
 

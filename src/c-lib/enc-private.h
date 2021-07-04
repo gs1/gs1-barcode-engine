@@ -75,6 +75,7 @@ struct gs1_encoder {
 	int Xundercut;				// X pixels to undercut
 	int Yundercut;				// Y pixels to undercut
 	bool addCheckDigit;			// For EAN/UPC and RSS-14/Lim, calculated if true, otherwise validated
+	bool permitUnknownAIs;			// Extract AIs that are not in our AI table during AI element string and DL URI parsing
 	int sepHt;				// Separator row height
 	int dataBarExpandedSegmentsWidth;	// Number of segments for RSS Expdanded (Stacked)
 	int gs1_128LinearHeight;		// Height of UCC/EAN-128 in X
@@ -158,6 +159,7 @@ void test_api_dmRowsColumns(void);
 void test_api_qrVersion(void);
 void test_api_qrEClevel(void);
 void test_api_addCheckDigit(void);
+void test_api_permitUnknownAIs(void);
 void test_api_outFile(void);
 void test_api_dataFile(void);
 void test_api_dataStr(void);

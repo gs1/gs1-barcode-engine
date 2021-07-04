@@ -390,6 +390,12 @@ Functions</h2></td></tr>
 <tr class="memitem:a1fb8a0e4eb2719eab1df4310a36a0964"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#a1fb8a0e4eb2719eab1df4310a36a0964">gs1_encoder_setAddCheckDigit</a> (<a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx, bool addCheckDigit)</td></tr>
 <tr class="memdesc:a1fb8a0e4eb2719eab1df4310a36a0964"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable or disable "add check digit" mode for EAN/UPC and GS1 DataBar symbols.  <a href="gs1encoders_8h.html#a1fb8a0e4eb2719eab1df4310a36a0964">More...</a><br /></td></tr>
 <tr class="separator:a1fb8a0e4eb2719eab1df4310a36a0964"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a04e1d67a941627c3848c382c0bee5bbc"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#a04e1d67a941627c3848c382c0bee5bbc">gs1_encoder_getPermitUnknownAIs</a> (<a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx)</td></tr>
+<tr class="memdesc:a04e1d67a941627c3848c382c0bee5bbc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current status of the "permit unknown AIs" mode.  <a href="gs1encoders_8h.html#a04e1d67a941627c3848c382c0bee5bbc">More...</a><br /></td></tr>
+<tr class="separator:a04e1d67a941627c3848c382c0bee5bbc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2bc832a4d200f75f9caca7a873098096"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#a2bc832a4d200f75f9caca7a873098096">gs1_encoder_setPermitUnknownAIs</a> (<a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx, bool permitUnknownAIs)</td></tr>
+<tr class="memdesc:a2bc832a4d200f75f9caca7a873098096"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable or disable "permit unknown AIs" mode for parsing of bracketed AI element strings and Digital Link URIs.  <a href="gs1encoders_8h.html#a2bc832a4d200f75f9caca7a873098096">More...</a><br /></td></tr>
+<tr class="separator:a2bc832a4d200f75f9caca7a873098096"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adb1c9b2423bf5f231ed42dfd0a8c869c"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#adb1c9b2423bf5f231ed42dfd0a8c869c">gs1_encoder_getFileInputFlag</a> (<a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx)</td></tr>
 <tr class="memdesc:adb1c9b2423bf5f231ed42dfd0a8c869c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Indicates whether barcode data input is currently taken from a buffer or a file.  <a href="gs1encoders_8h.html#adb1c9b2423bf5f231ed42dfd0a8c869c">More...</a><br /></td></tr>
 <tr class="separator:adb1c9b2423bf5f231ed42dfd0a8c869c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1666,6 +1672,34 @@ The returned pointer should be checked for NULL which indicates non-AI input dat
 
 </div>
 </div>
+<a id="a04e1d67a941627c3848c382c0bee5bbc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a04e1d67a941627c3848c382c0bee5bbc">&#9670;&nbsp;</a></span>gs1_encoder_getPermitUnknownAIs()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">GS1_ENCODERS_API bool gs1_encoder_getPermitUnknownAIs </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *&#160;</td>
+          <td class="paramname"><em>ctx</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the current status of the "permit unknown AIs" mode. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#a2bc832a4d200f75f9caca7a873098096" title="Enable or disable &quot;permit unknown AIs&quot; mode for parsing of bracketed AI element strings and Digital L...">gs1_encoder_setPermitUnknownAIs()</a></dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">ctx</td><td><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34" title="A gs1_encoder context.">gs1_encoder</a> context </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>current status of the permit unknown AIs mode </dd></dl>
+
+</div>
+</div>
 <a id="af29e8e582397559cc4474d33ddc4c549"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#af29e8e582397559cc4474d33ddc4c549">&#9670;&nbsp;</a></span>gs1_encoder_getPixMult()</h2>
 
@@ -2623,6 +2657,54 @@ The length of the data must be less that the value returned by <a class="el" hre
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true on success, otherwise false and an error message is set </dd></dl>
+
+</div>
+</div>
+<a id="a2bc832a4d200f75f9caca7a873098096"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2bc832a4d200f75f9caca7a873098096">&#9670;&nbsp;</a></span>gs1_encoder_setPermitUnknownAIs()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">GS1_ENCODERS_API bool gs1_encoder_setPermitUnknownAIs </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *&#160;</td>
+          <td class="paramname"><em>ctx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>permitUnknownAIs</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Enable or disable "permit unknown AIs" mode for parsing of bracketed AI element strings and Digital Link URIs. </p>
+<ul>
+<li>If false (default), then all AIs represented by the input data must be known.</li>
+<li>If true, then unknown AIs (those not in this library's static AI table) will not be accepted.</li>
+</ul>
+<dl class="section note"><dt>Note</dt><dd>The option only applies to parsed input data, specifically bracketed AI data supplied with gs1_encoder_setAIdata() and Digital Link URIs supplied with <a class="el" href="gs1encoders_8h.html#a6325f0f12c0a2110939b876aefbdd1d1" title="Sets the raw data in the buffer that is to be directly encoded within a barcode symbol when buffer in...">gs1_encoder_setDataStr()</a>. Unbracketed AI element strings containing unknown AIs cannot be parsed because it is not possible to differentiate the AI from its data value when the length of the AI is uncertain.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#a04e1d67a941627c3848c382c0bee5bbc" title="Get the current status of the &quot;permit unknown AIs&quot; mode.">gs1_encoder_getPermitUnknownAIs()</a> </dd>
+<dd>
+gs1_encoder_setAIdata() </dd>
+<dd>
+<a class="el" href="gs1encoders_8h.html#a6325f0f12c0a2110939b876aefbdd1d1" title="Sets the raw data in the buffer that is to be directly encoded within a barcode symbol when buffer in...">gs1_encoder_setDataStr()</a></dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">ctx</td><td><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34" title="A gs1_encoder context.">gs1_encoder</a> context </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">permitUnknownAIs</td><td>enabled if true; disabled if false </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true on success, otherwise false and an error message is set that can be read using <a class="el" href="gs1encoders_8h.html#aee9e7c8b49fe2a8fa7bd0b21c1e7510b" title="Read an error message generated by the library.">gs1_encoder_getErrMsg()</a> </dd></dl>
 
 </div>
 </div>

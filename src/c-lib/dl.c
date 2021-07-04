@@ -117,14 +117,14 @@ static size_t URIunescape(char *out, size_t maxlen, const char *in, const size_t
  */
 bool gs1_parseDLuri(gs1_encoder *ctx, char *dlData, char *dataStr) {
 
-	char *p, *r, *e, *outval;
+	char *p, *r, *e, *ai, *outai, *outval;
 	char *pi = NULL;	// Path info
 	char *qp = NULL;	// Query params
 	char *fr = NULL;	// Fragment
 	char *dp = NULL;	// DL path info
 	bool ret;
 	size_t i;
-	size_t vallen;
+	size_t ailen, vallen;
 	bool fnc1req = true;
 	const struct aiEntry *entry;
 	char aival[MAX_AI_LEN+1];	// Unescaped AI value
@@ -188,7 +188,7 @@ bool gs1_parseDLuri(gs1_encoder *ctx, char *dlData, char *dataStr) {
 
 		DEBUG_PRINT("      %s\n", p);
 
-		entry = gs1_lookupAIentry(p+1, (size_t)(r-p-1));
+		entry = gs1_lookupAIentry(ctx, p+1, (size_t)(r-p-1));
 		if (!entry)
 			break;
 
@@ -217,15 +217,18 @@ bool gs1_parseDLuri(gs1_encoder *ctx, char *dlData, char *dataStr) {
 		p++;
 		r = strchr(p, '/');
 		assert(r);
-		entry = gs1_lookupAIentry(p, (size_t)(r-p));	// Known to exist
-		assert(entry);
+
+		// AI is known to be valid since we previously walked over it
+		ai = p;
+		ailen = (size_t)(r-p);
+		assert((entry = gs1_lookupAIentry(ctx, ai, ailen)) != NULL);
 
 		if ((p = strchr(++r, '/')) == NULL)
 			p = r + strlen(r);
 
 ;		// Reverse percent encoding
 		if ((vallen = URIunescape(aival, MAX_AI_LEN, r, (size_t)(p-r))) == 0) {
-			sprintf(ctx->errMsg, "Decoded AI (%s) from DL path info too long", entry->ai);
+			sprintf(ctx->errMsg, "Decoded AI (%.*s) from DL path info too long", (int)ailen, ai);
 			goto fail;
 		}
 
@@ -238,11 +241,12 @@ bool gs1_parseDLuri(gs1_encoder *ctx, char *dlData, char *dataStr) {
 			vallen = 14;
 		}
 
-		DEBUG_PRINT("    Extracted: (%s) %.*s\n", entry->ai, (int)vallen, aival);
+		DEBUG_PRINT("    Extracted: (%.*s) %.*s\n", ailen, ai, (int)vallen, aival);
 
 		if (fnc1req)
 			writeDataStr("#");			// Write FNC1, if required
-		writeDataStr(entry->ai);			// Write AI
+		outai = dataStr + strlen(dataStr);		// Save start of AI for AI data
+		nwriteDataStr(ai, ailen);			// Write AI
 		fnc1req = gs1_isFNC1required(entry->ai);	// Record if required before next AI
 
 		outval = dataStr + strlen(dataStr);		// Save start of value for AI data
@@ -256,6 +260,8 @@ bool gs1_parseDLuri(gs1_encoder *ctx, char *dlData, char *dataStr) {
 		// Update the AI data
 		if (ctx->numAIs < MAX_AIS) {
 			ctx->aiData[ctx->numAIs].aiEntry = entry;
+			ctx->aiData[ctx->numAIs].ai = outai;
+			ctx->aiData[ctx->numAIs].ailen = (uint8_t)ailen;
 			ctx->aiData[ctx->numAIs].value = outval;
 			ctx->aiData[ctx->numAIs].vallen = (uint8_t)vallen;
 			ctx->numAIs++;
@@ -280,7 +286,7 @@ bool gs1_parseDLuri(gs1_encoder *ctx, char *dlData, char *dataStr) {
 		if ((r = strchr(p, '&')) == NULL)
 			r = p + strlen(p);			// Value-pair finishes at end of data
 
-		// Discard parameters with no value and unknown AIs
+		// Discard parameters with no value
 		if ((e = memchr(p, '=', (size_t)(r-p))) == NULL) {
 			DEBUG_PRINT("    Skipped singleton:   %.*s\n", (int)(r-p), p);
 			p = r;
@@ -288,9 +294,11 @@ bool gs1_parseDLuri(gs1_encoder *ctx, char *dlData, char *dataStr) {
 		}
 
 		// Numeric-only query parameters not matching an AI aren't allowed
+		ai = p;
+		ailen = (size_t)(e-p);
 		entry = NULL;
-		if (gs1_allDigits((uint8_t*)p, (size_t)(e-p)) && (entry = gs1_lookupAIentry(p, (size_t)(e-p))) == NULL) {
-			sprintf(ctx->errMsg, "Unknown AI (%.*s) in query parameters", (int)(e-p), p);
+		if (gs1_allDigits((uint8_t*)p, ailen) && (entry = gs1_lookupAIentry(ctx, p, ailen)) == NULL) {
+			sprintf(ctx->errMsg, "Unknown AI (%.*s) in query parameters", (int)ailen, p);
 			goto fail;
 		}
 
@@ -317,11 +325,12 @@ bool gs1_parseDLuri(gs1_encoder *ctx, char *dlData, char *dataStr) {
 			vallen = 14;
 		}
 
-		DEBUG_PRINT("    Extracted: (%s) %.*s\n", entry->ai, (int)vallen, aival);
+		DEBUG_PRINT("    Extracted: (%.*s) %.*s\n", ailen, ai, (int)vallen, aival);
 
 		if (fnc1req)
 			writeDataStr("#");			// Write FNC1, if required
-		writeDataStr(entry->ai);			// Write AI
+		outai = dataStr + strlen(dataStr);		// Save start of AI for AI data
+		nwriteDataStr(ai, ailen);			// Write AI
 		fnc1req = gs1_isFNC1required(entry->ai);	// Record if required before next AI
 
 		outval = dataStr + strlen(dataStr);		// Save start of value for AI data
@@ -335,6 +344,8 @@ bool gs1_parseDLuri(gs1_encoder *ctx, char *dlData, char *dataStr) {
 		// Update the AI data
 		if (ctx->numAIs < MAX_AIS) {
 			ctx->aiData[ctx->numAIs].aiEntry = entry;
+			ctx->aiData[ctx->numAIs].ai = outai;
+			ctx->aiData[ctx->numAIs].ailen = (uint8_t)ailen;
 			ctx->aiData[ctx->numAIs].value = outval;
 			ctx->aiData[ctx->numAIs].vallen = (uint8_t)vallen;
 			ctx->numAIs++;
@@ -599,6 +610,27 @@ void test_dl_parseDLuri(void) {
 	test_parseDLuri(ctx, true,
 		"https://example.com/8004/9520614141234567?01=9520123456788",
 		"#80049520614141234567#0109520123456788");
+
+
+	// Examples with unknown AIs, not permitted
+	test_parseDLuri(ctx, false,
+		"https://example.com/01/9520123456788/89/ABC123?99=XYZ",
+		"");
+
+	test_parseDLuri(ctx, false,
+		"https://example.com/01/9520123456788?99=XYZ&89=ABC123",
+		"");
+
+	// Examples with unknown AIs, permitted
+	gs1_encoder_setPermitUnknownAIs(ctx, true);
+
+	test_parseDLuri(ctx, true,
+		"https://example.com/01/9520123456788/89/ABC123?99=XYZ",
+		"#010952012345678889ABC123#99XYZ");
+
+	test_parseDLuri(ctx, true,
+		"https://example.com/01/9520123456788?99=XYZ&89=ABC123",
+		"#010952012345678899XYZ#89ABC123");
 
 	gs1_encoder_free(ctx);
 

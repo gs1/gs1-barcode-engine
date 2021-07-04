@@ -118,6 +118,7 @@ GS1_ENCODERS_API gs1_encoder* gs1_encoder_init(void *mem) {
 	ctx->qrEClevel = gs1_encoder_qrEClevelM;
 	ctx->qrVersion = 0;  // Automatic
 	ctx->addCheckDigit = false;
+	ctx->permitUnknownAIs = false;
 	ctx->format = gs1_encoder_dTIF;
 	strcpy(ctx->dataStr, "");
 	ctx->numAIs = 0;
@@ -546,6 +547,19 @@ GS1_ENCODERS_API bool gs1_encoder_setAddCheckDigit(gs1_encoder *ctx, const bool 
 }
 
 
+GS1_ENCODERS_API bool gs1_encoder_getPermitUnknownAIs(gs1_encoder *ctx) {
+	assert(ctx);
+	reset_error(ctx);
+	return ctx->permitUnknownAIs;
+}
+GS1_ENCODERS_API bool gs1_encoder_setPermitUnknownAIs(gs1_encoder *ctx, const bool permitUnknownAIs) {
+	assert(ctx);
+	reset_error(ctx);
+	ctx->permitUnknownAIs = permitUnknownAIs;
+	return true;
+}
+
+
 GS1_ENCODERS_API int gs1_encoder_getFormat(gs1_encoder *ctx) {
 	assert(ctx);
 	reset_error(ctx);
@@ -734,7 +748,7 @@ GS1_ENCODERS_API char* gs1_encoder_getAIdataStr(gs1_encoder *ctx) {
 	for (i = 0; i < ctx->numAIs; i++) {
 		ai = ctx->aiData[i];
 		if (ai.aiEntry) {
-			p += sprintf(p, "(%s)", ai.aiEntry->ai);
+			p += sprintf(p, "(%.*s)", ai.ailen, ai.ai);
 			for (j = 0; j < ai.vallen; j++) {
 				if (ai.value[j] == '(')		// Escape data "("
 					*p++ = '\\';
@@ -780,7 +794,7 @@ GS1_ENCODERS_API int gs1_encoder_getHRI(gs1_encoder *ctx, char*** out) {
 		if (!ai.aiEntry)
 			continue;
 		ctx->outHRI[j] = p;
-		p += sprintf(p, "(%s) %.*s", ai.aiEntry->ai, ai.vallen, ai.value);
+		p += sprintf(p, "(%.*s) %.*s", ai.ailen, ai.ai, ai.vallen, ai.value);
 		*p++ = '\0';
 		j++;
 	}
@@ -1691,6 +1705,24 @@ void test_api_addCheckDigit(void) {
 }
 
 
+void test_api_permitUnknownAIs(void) {
+
+	gs1_encoder* ctx;
+
+	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+
+	TEST_CHECK(!gs1_encoder_getPermitUnknownAIs(ctx));		// Default
+
+	TEST_CHECK(gs1_encoder_setPermitUnknownAIs(ctx, true));		// Set
+	TEST_CHECK(gs1_encoder_getPermitUnknownAIs(ctx));
+
+	TEST_CHECK(gs1_encoder_setPermitUnknownAIs(ctx, false));	// Reset
+	TEST_CHECK(!gs1_encoder_getPermitUnknownAIs(ctx));
+
+	gs1_encoder_free(ctx);
+
+}
+
 void test_api_segWidth(void) {
 
 	gs1_encoder* ctx;
@@ -1961,6 +1993,25 @@ void test_api_getHRI(void) {
 	TEST_CHECK(strcmp(hri[1], "(22) TESTING") == 0);
 	TEST_CHECK(strcmp(hri[2], "(99) ABC-123") == 0);
 	TEST_CHECK(strcmp(hri[3], "(98) XYZ") == 0);
+
+	// HRI from data with unknown AIs: (88), (89)
+	gs1_encoder_setPermitUnknownAIs(ctx, true);
+
+	strcpy(buf, "(01)12312312312333(89)ABC123|(88)COMPOSITE");
+	TEST_ASSERT(gs1_encoder_setAIdataStr(ctx, buf));
+	TEST_ASSERT((numAIs = gs1_encoder_getHRI(ctx, &hri)) == 3);
+	TEST_ASSERT(hri != NULL);
+	TEST_CHECK(strcmp(hri[0], "(01) 12312312312333") == 0);
+	TEST_CHECK(strcmp(hri[1], "(89) ABC123") == 0);
+	TEST_CHECK(strcmp(hri[2], "(88) COMPOSITE") == 0);
+
+	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "https://a/01/12312312312333/89/TESTING?99=ABC%2d123&88=XYZ"));
+	TEST_ASSERT((numAIs = gs1_encoder_getHRI(ctx, &hri)) == 4);
+	TEST_ASSERT(hri != NULL);
+	TEST_CHECK(strcmp(hri[0], "(01) 12312312312333") == 0);
+	TEST_CHECK(strcmp(hri[1], "(89) TESTING") == 0);
+	TEST_CHECK(strcmp(hri[2], "(99) ABC-123") == 0);
+	TEST_CHECK(strcmp(hri[3], "(88) XYZ") == 0);
 
 	gs1_encoder_free(ctx);
 

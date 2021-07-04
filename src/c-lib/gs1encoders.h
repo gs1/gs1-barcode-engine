@@ -1002,6 +1002,44 @@ GS1_ENCODERS_API bool gs1_encoder_setAddCheckDigit(gs1_encoder *ctx, bool addChe
 
 
 /**
+ * @brief Get the current status of the "permit unknown AIs" mode.
+ *
+ * @see gs1_encoder_setPermitUnknownAIs()
+ *
+ * @param [in,out] ctx ::gs1_encoder context
+ * @return current status of the permit unknown AIs mode
+ */
+GS1_ENCODERS_API bool gs1_encoder_getPermitUnknownAIs(gs1_encoder *ctx);
+
+
+/**
+ * @brief Enable or disable "permit unknown AIs" mode for parsing of bracketed
+ * AI element strings and Digital Link URIs.
+ *
+ *   * If false (default), then all AIs represented by the input data must be
+ *     known.
+ *   * If true, then unknown AIs (those not in this library's static AI table)
+ *     will not be accepted.
+ *
+ * \note
+ * The option only applies to parsed input data, specifically bracketed AI data
+ * supplied with gs1_encoder_setAIdata() and Digital Link URIs supplied with
+ * gs1_encoder_setDataStr(). Unbracketed AI element strings containing unknown
+ * AIs cannot be parsed because it is not possible to differentiate the AI from
+ * its data value when the length of the AI is uncertain.
+ *
+ * @see gs1_encoder_getPermitUnknownAIs()
+ * @see gs1_encoder_setAIdata()
+ * @see gs1_encoder_setDataStr()
+ *
+ * @param [in,out] ctx ::gs1_encoder context
+ * @param [in] permitUnknownAIs enabled if true; disabled if false
+ * @return true on success, otherwise false and an error message is set that can be read using gs1_encoder_getErrMsg()
+ */
+GS1_ENCODERS_API bool gs1_encoder_setPermitUnknownAIs(gs1_encoder *ctx, bool permitUnknownAIs);
+
+
+/**
  * @brief Indicates whether barcode data input is currently taken from a buffer
  * or a file.
  *
