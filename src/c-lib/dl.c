@@ -221,7 +221,8 @@ bool gs1_parseDLuri(gs1_encoder *ctx, char *dlData, char *dataStr) {
 		// AI is known to be valid since we previously walked over it
 		ai = p;
 		ailen = (size_t)(r-p);
-		assert((entry = gs1_lookupAIentry(ctx, ai, ailen)) != NULL);
+		entry = gs1_lookupAIentry(ctx, ai, ailen);
+		assert(entry);
 
 		if ((p = strchr(++r, '/')) == NULL)
 			p = r + strlen(r);

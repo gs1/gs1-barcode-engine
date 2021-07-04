@@ -471,7 +471,15 @@ namespace GS1.Encoders
 
         [DllImport(gs1_dll, EntryPoint = "gs1_encoder_setAddCheckDigit", CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.U1)]
-        private static extern bool gs1_encoder_setAddCheckDigit(IntPtr ctx, bool addCheckDigit);
+        private static extern bool gs1_encoder_setAddCheckDigit(IntPtr ctx, [MarshalAs(UnmanagedType.U1)] bool addCheckDigit);
+
+        [DllImport(gs1_dll, EntryPoint = "gs1_encoder_getPermitUnknownAIs", CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.U1)]
+        private static extern bool gs1_encoder_getPermitUnknownAIs(IntPtr ctx);
+
+        [DllImport(gs1_dll, EntryPoint = "gs1_encoder_setPermitUnknownAIs", CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.U1)]
+        private static extern bool gs1_encoder_setPermitUnknownAIs(IntPtr ctx, [MarshalAs(UnmanagedType.U1)] bool permitUnknownAIs);
 
         [DllImport(gs1_dll, EntryPoint = "gs1_encoder_getFileInputFlag", CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.U1)]
@@ -479,7 +487,7 @@ namespace GS1.Encoders
 
         [DllImport(gs1_dll, EntryPoint = "gs1_encoder_setFileInputFlag", CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.U1)]
-        private static extern bool gs1_encoder_setFileInputFlag(IntPtr ctx, bool fileInputFlag);
+        private static extern bool gs1_encoder_setFileInputFlag(IntPtr ctx, [MarshalAs(UnmanagedType.U1)] bool fileInputFlag);
 
         [DllImport(gs1_dll, EntryPoint = "gs1_encoder_getDataStr", CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr gs1_encoder_getDataStr(IntPtr ctx);
@@ -755,6 +763,28 @@ namespace GS1.Encoders
             set
             {
                 if (!gs1_encoder_setAddCheckDigit(ctx, value))
+                    throw new GS1EncoderParameterException(ErrMsg);
+            }
+        }
+
+        /// <summary>
+        /// Get/set the "permit unknown AIs" mode.
+        /// 
+        /// See the native library documentation for details:
+        /// 
+        ///   - gs1_encoder_getPermitUnknownAIs()
+        ///   - gs1_encoder_setPermitUnknownAIs()
+        ///   
+        /// </summary>
+        public bool PermitUnknownAIs
+        {
+            get
+            {
+                return gs1_encoder_getPermitUnknownAIs(ctx);
+            }
+            set
+            {
+                if (!gs1_encoder_setPermitUnknownAIs(ctx, value))
                     throw new GS1EncoderParameterException(ErrMsg);
             }
         }

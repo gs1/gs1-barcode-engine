@@ -902,5 +902,19 @@ namespace GS1.EncodersApp
             deviceResolutionTextBox.Text = "";
             lookupXdimensionForApplication();
         }
+         
+        private void permitUnknownAIsCheckBox_Click(object sender, RoutedEventArgs e)
+        {
+            if (_disableEvents) return;
+            clearRender();
+            App.gs1Encoder.PermitUnknownAIs = permitUnknownAIsCheckBox.IsChecked ?? false;
+        }
+
+        private void addCheckDigitCheckBox_Click(object sender, RoutedEventArgs e)
+        {
+            if (_disableEvents) return;
+            clearRender();
+            App.gs1Encoder.AddCheckDigit = addCheckDigitCheckBox.IsChecked ?? false;
+        }
     }
 }
