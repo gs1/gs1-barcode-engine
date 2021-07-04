@@ -575,7 +575,7 @@ namespace GS1.EncodersApp
             {
                 dataStrTextBox.Text = App.gs1Encoder.DataStr;
             }
-            
+
             generateButton.RaiseEvent(new RoutedEventArgs(System.Windows.Controls.Button.ClickEvent));
         }
 
@@ -606,10 +606,10 @@ namespace GS1.EncodersApp
                 errorMessageLabel.Content = "Error: " + E.Message;
                 LoadDataValues();
                 return;
-            }      
+            }
 
             try
-            { 
+            {
                 App.gs1Encoder.Encode();
 
                 infoLabel.Content = "";
@@ -641,7 +641,7 @@ namespace GS1.EncodersApp
                 LoadDataValues();
                 return;
             }
-            
+
             using (MemoryStream ms = new MemoryStream(App.gs1Encoder.GetBuffer()))
             {
                 BitmapImage img = new BitmapImage();
@@ -659,7 +659,7 @@ namespace GS1.EncodersApp
             LoadDataValues();
 
         }
-        
+
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
@@ -669,7 +669,7 @@ namespace GS1.EncodersApp
                 BitmapEncoder encoder;
                 if (saveFileDialog.FilterIndex == 0)
                 {
-                    encoder = new BmpBitmapEncoder();                    
+                    encoder = new BmpBitmapEncoder();
                 } else
                 {
                     encoder = new PngBitmapEncoder();
@@ -709,7 +709,6 @@ namespace GS1.EncodersApp
                 {
                     Rect rc = new Rect(0, 0, ((BitmapImage)barcodeImage.Source).PixelWidth, ((BitmapImage)barcodeImage.Source).PixelHeight);
                     dc.DrawImage((BitmapImage)barcodeImage.Source, rc);
-                    
                 }
                 printDialog.PrintVisual(visual, "Barcode");
             }
@@ -723,7 +722,7 @@ namespace GS1.EncodersApp
             if (actualXLabel == null)
                 return;
 
-            actualXLabel.Content = "";            
+            actualXLabel.Content = "";
 
             if (deviceResolutionTextBox.Text == "" &&
                 targetXdimensionTextBox.Text == "" &&
@@ -786,7 +785,7 @@ namespace GS1.EncodersApp
             {
                 return;
             }
-            
+
             generateButton.IsEnabled = false;
 
             // User X-dimensions can only be calculated when device resolution is known
@@ -913,9 +912,8 @@ namespace GS1.EncodersApp
             unitsButton.Content = units;
             deviceResolutionTextBox.Text = "";
             lookupXdimensionForApplication();
-            
         }
-         
+
         private void permitUnknownAIsCheckBox_Click(object sender, RoutedEventArgs e)
         {
             if (_disableEvents) return;

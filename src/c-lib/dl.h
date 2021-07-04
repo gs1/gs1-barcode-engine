@@ -1,5 +1,5 @@
 /**
- * GS1 barcode encoder library
+ * GS1 Barcode Engine
  *
  * @author Copyright (c) 2021 GS1 AISBL.
  *

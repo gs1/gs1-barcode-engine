@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 using GS1.Encoders;
 
 namespace GS1.EncodersApp
-{ 
+{
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
@@ -15,7 +15,7 @@ namespace GS1.EncodersApp
 
         /*
          *  Native functions so that we can write our version information to the console (for CI)
-         * 
+         *
          */
         [DllImport("kernel32.dll", SetLastError = true)]
         static extern bool AttachConsole(uint dwProcessId);
@@ -52,7 +52,7 @@ namespace GS1.EncodersApp
             gs1Encoder.Sym = (int)GS1Encoder.Symbology.DM;
             mw.dataStrTextBox.Text = "(01)02112345678900";
             gs1Encoder.AIdataStr = mw.dataStrTextBox.Text;
-            
+
             mw.LoadDataValues();
 
             mw.generateButton.RaiseEvent(new RoutedEventArgs(System.Windows.Controls.Button.ClickEvent));

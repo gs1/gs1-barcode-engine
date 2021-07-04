@@ -5,7 +5,7 @@ namespace GS1.Encoders
 {
 
     /// <summary>
-    /// Wrapper class for accessing the GS1 Barcode Encoder Library from C#.
+    /// Wrapper class for accessing the GS1 Barcode Engine native library from C#.
     ///
     /// Copyright (c) 2021 GS1 AISBL.
     ///
@@ -28,12 +28,12 @@ namespace GS1.Encoders
 
         /// <summary>
         /// List of symbology types, mirroring the corresponding list in the
-        /// GS1 Barcode Encoder Library.
-        /// 
+        /// C library.
+        ///
         /// See the native library documentation for details:
-        /// 
+        ///
         ///   - enum gs1_encoder_symbologies
-        ///   
+        ///
         /// </summary>
         public enum Symbology
         {
@@ -73,12 +73,12 @@ namespace GS1.Encoders
 
         /// <summary>
         /// List of output format, mirroring the corresponding list in the
-        /// GS1 Barcode Encoder Library.
-        ///         
+        /// C library.
+        ///
         /// See the native library documentation for details:
-        /// 
+        ///
         ///   - enum gs1_encoder_formats
-        ///   
+        ///
         /// </summary>
         public enum Formats
         {
@@ -92,12 +92,12 @@ namespace GS1.Encoders
 
         /// <summary>
         /// List of supported Data Matrix rows sizes, mirroring the
-        /// corresponding list in the GS1 Barcode Encoder Library.
-        ///         
+        /// corresponding list in the C library.
+        ///
         /// See the native library documentation for details:
-        /// 
+        ///
         ///   - enum gs1_encoder_dmRows
-        ///   
+        ///
         /// </summary>
         public enum DMrows
         {
@@ -157,12 +157,12 @@ namespace GS1.Encoders
 
         /// <summary>
         /// List of supported Data Matrix column sizes, mirroring the
-        /// corresponding list in the GS1 Barcode Encoder Library.
-        /// 
+        /// corresponding list in the C library.
+        ///
         /// See the native library documentation for details:
-        /// 
+        ///
         ///   - enum gs1_encoder_dmColumns
-        ///   
+        ///
         /// </summary>
         public enum DMcolumns
         {
@@ -220,12 +220,12 @@ namespace GS1.Encoders
 
         /// <summary>
         /// List of supported QR Code error correction levels, mirroring
-        /// the corresponding list in the GS1 Barcode Encoder Library.
+        /// the corresponding list in the C library.
         ///
         /// See the native library documentation for details:
-        /// 
+        ///
         ///   - enum gs1_encoder_qrEClevel
-        ///   
+        ///
         /// </summary>
         public enum QReclevel
         {
@@ -241,12 +241,12 @@ namespace GS1.Encoders
 
         /// <summary>
         /// List of supported QR Code symbol versions, mirroring the
-        /// corresponding list in the GS1 Barcode Encoder Library.
+        /// corresponding list in the C library.
         ///
         /// See the native library documentation for details:
-        /// 
+        ///
         ///   - enum gs1_encoder_qrVersion
-        ///   
+        ///
         /// </summary>
         public enum QRversion
         {
@@ -335,8 +335,7 @@ namespace GS1.Encoders
         };
 
         /// <summary>
-        /// The expected name of the GS1 Barcode Encoder Library
-        /// dynamic-link library
+        /// The expected name of the GS1 Barcode Engine dynamic-link library
         /// </summary>
         private const String gs1_dll = "gs1encoders.dll";
 
@@ -344,16 +343,16 @@ namespace GS1.Encoders
         /// An opaque pointer used by the native code to represent an
         /// "instance" of the library. It is hidden behind the object
         /// interface that is provided to users of this wrapper.
-        /// 
+        ///
         /// See the native library documentation for details:
-        /// 
-        ///   - typedef struct gs1_encoder     
-        ///   
+        ///
+        ///   - typedef struct gs1_encoder
+        ///
         /// </summary>
-        private readonly IntPtr ctx;        
+        private readonly IntPtr ctx;
 
         /*
-         *  Functions imported from the native GS1 Encoders Library dynamic-link library
+         *  Functions imported from the native GS1 Barcode Engine dynamic-link library
          *
          */
         [DllImport(gs1_dll, EntryPoint = "gs1_encoder_init", CallingConvention = CallingConvention.Cdecl)]
@@ -390,7 +389,7 @@ namespace GS1.Encoders
         [return: MarshalAs(UnmanagedType.U1)]
         private static extern bool gs1_encoder_setXdimension(IntPtr ctx, double min, double target, double max);
 
-        [DllImport(gs1_dll, EntryPoint = "gs1_encoder_getTargetXdimension", CallingConvention = CallingConvention.Cdecl)]        
+        [DllImport(gs1_dll, EntryPoint = "gs1_encoder_getTargetXdimension", CallingConvention = CallingConvention.Cdecl)]
         private static extern double gs1_encoder_getTargetXdimension(IntPtr ctx);
 
         [DllImport(gs1_dll, EntryPoint = "gs1_encoder_getMinXdimension", CallingConvention = CallingConvention.Cdecl)]
@@ -572,26 +571,26 @@ namespace GS1.Encoders
 
         /// <summary>
         /// Constructor that creates an object wrapping an "instance" of the library managed by the native code.
-        /// 
+        ///
         /// See the native library documentation for details:
         ///
         ///   - gs1_encoder_init()
-        /// 
+        ///
         /// </summary>
         public GS1Encoder()
         {
             ctx = gs1_encoder_init(IntPtr.Zero);
             if (ctx == IntPtr.Zero)
-                throw new GS1EncoderGeneralException("Failed to initalise GS1 Encoder library");
+                throw new GS1EncoderGeneralException("Failed to initalise GS1 Barcode Engine");
         }
 
         /// <summary>
         /// Returns the version of the native library.
-        /// 
+        ///
         /// See the native library documentation for details:
-        /// 
+        ///
         ///   - gs1_encoder_getVersion()
-        ///   
+        ///
         /// </summary>
         public string Version
         {
@@ -603,12 +602,12 @@ namespace GS1.Encoders
 
         /// <summary>
         /// Get/set the symbology type.
-        /// 
+        ///
         /// See the native library documentation for details:
-        /// 
+        ///
         ///   - gs1_encoder_getSym()
         ///   - gs1_encoder_setSym()
-        ///   
+        ///
         /// </summary>
         public int Sym
         {
@@ -625,12 +624,12 @@ namespace GS1.Encoders
 
         /// <summary>
         /// Get/set the device dots per module.
-        /// 
+        ///
         /// See the native library documentation for details:
-        /// 
+        ///
         ///   - gs1_encoder_getPixMult()
         ///   - gs1_encoder_setPixMult()
-        ///   
+        ///
         /// </summary>
         public int PixMult
         {
@@ -647,12 +646,12 @@ namespace GS1.Encoders
 
         /// <summary>
         /// Get/set the device resolution.
-        /// 
+        ///
         /// See the native library documentation for details:
         ///
         ///   - gs1_encoder_getDeviceResolution()
         ///   - gs1_encoder_setDeviceResolution()
-        ///   
+        ///
         /// </summary>
         public double DeviceResolution
         {
@@ -669,11 +668,11 @@ namespace GS1.Encoders
 
         /// <summary>
         /// Get the current target X-dimension.
-        /// 
+        ///
         /// See the native library documentation for details:
-        /// 
+        ///
         ///   - gs1_encoder_getTargetXdimension()
-        ///   
+        ///
         /// </summary>
         public double TargetXdimension
         {
@@ -685,11 +684,11 @@ namespace GS1.Encoders
 
         /// <summary>
         /// Get the current minimum permissible X-dimension.
-        /// 
+        ///
         /// See the native library documentation for details:
-        /// 
+        ///
         ///   - gs1_encoder_getMinXdimension()
-        ///   
+        ///
         /// </summary>
         public double MinXdimension
         {
@@ -701,11 +700,11 @@ namespace GS1.Encoders
 
         /// <summary>
         /// Get the current minimum permissible X-dimension.
-        /// 
+        ///
         /// See the native library documentation for details:
-        /// 
+        ///
         ///   - gs1_encoder_getMaxXdimension()
-        ///  
+        ///
         /// </summary>
         public double MaxXdimension
         {
@@ -717,11 +716,11 @@ namespace GS1.Encoders
 
         /// <summary>
         /// Get the actual X-dimension that can be achieved at the current device resolution.
-        /// 
+        ///
         /// See the native library documentation for details:
-        /// 
+        ///
         ///   - gs1_encoder_getActualXdimension()
-        ///    
+        ///
         /// </summary>
         public double ActualXdimension
         {
@@ -733,11 +732,11 @@ namespace GS1.Encoders
 
         /// <summary>
         /// Set the constraints for the X-dimension width.
-        /// 
+        ///
         /// See the native library documentation for details:
-        /// 
+        ///
         ///   - gs1_encoder_setXdimension()
-        /// 
+        ///
         /// </summary>
         public void setXdimension(double min, double target, double max)
         {
@@ -747,12 +746,12 @@ namespace GS1.Encoders
 
         /// <summary>
         /// Get/set the "add check digit" mode for EAN/UPC and GS1 DataBar symbols.
-        /// 
+        ///
         /// See the native library documentation for details:
-        /// 
+        ///
         ///   - gs1_encoder_getAddCheckDigit()
         ///   - gs1_encoder_setAddCheckDigit()
-        ///   
+        ///
         /// </summary>
         public bool AddCheckDigit
         {
@@ -769,12 +768,12 @@ namespace GS1.Encoders
 
         /// <summary>
         /// Get/set the "permit unknown AIs" mode.
-        /// 
+        ///
         /// See the native library documentation for details:
-        /// 
+        ///
         ///   - gs1_encoder_getPermitUnknownAIs()
         ///   - gs1_encoder_setPermitUnknownAIs()
-        ///   
+        ///
         /// </summary>
         public bool PermitUnknownAIs
         {
@@ -791,12 +790,12 @@ namespace GS1.Encoders
 
         /// <summary>
         /// Get/set the X undercut pixels.
-        /// 
+        ///
         /// See the native library documentation for details:
-        /// 
+        ///
         ///   - gs1_encoder_getXundercut()
         ///   - gs1_encoder_setXundercut()
-        ///   
+        ///
         /// </summary>
         public int Xundercut
         {
@@ -813,9 +812,9 @@ namespace GS1.Encoders
 
         /// <summary>
         /// Get/set the Y undercut pixels.
-        /// 
+        ///
         /// See the native library documentation for details:
-        /// 
+        ///
         ///   - gs1_encoder_getXundercut()
         ///   - gs1_encoder_setXundercut()
         ///
@@ -835,12 +834,12 @@ namespace GS1.Encoders
 
         /// <summary>
         /// Get/set the current separator height between linear and 2D components.
-        /// 
+        ///
         /// See the native library documentation for details.
-        /// 
+        ///
         ///   - gs1_encoder_getSepHt()
         ///   - gs1_encoder_setSepHt()
-        ///   
+        ///
         /// </summary>
         public int SepHt
         {
@@ -857,11 +856,11 @@ namespace GS1.Encoders
 
         /// <summary>
         /// Get/set the current number of segments per row for GS1 DataBar Expanded Stacked symbols.
-        /// 
+        ///
         /// See the native library documentation for details:
         ///
         ///   - gs1_encoder_getDataBarExpandedSegmentsWidth()
-        ///   - gs1_encoder_setDataBarExpandedSegmentsWidth()      
+        ///   - gs1_encoder_setDataBarExpandedSegmentsWidth()
         ///
         /// </summary>
         public int DataBarExpandedSegmentsWidth
@@ -877,12 +876,12 @@ namespace GS1.Encoders
 
         /// <summary>
         /// Get/set the height of GS1-128 linear symbols in modules.
-        /// 
+        ///
         /// See the native library documentation for details:
-        /// 
+        ///
         ///   - gs1_encoder_getGS1_128LinearHeight()
         ///   - gs1_encoder_setGS1_128LinearHeight()
-        ///   
+        ///
         /// </summary>
         public int GS1_128LinearHeight
         {
@@ -899,9 +898,9 @@ namespace GS1.Encoders
 
         /// <summary>
         /// Get/set the current fixed version number for QR Code symbols.
-        /// 
+        ///
         /// See the native library documentation for details:
-        /// 
+        ///
         ///   - gs1_encoder_getQrVersion()
         ///   - gs1_encoder_setQrVersion()
         ///
@@ -921,9 +920,9 @@ namespace GS1.Encoders
 
         /// <summary>
         /// Get/set the current error correction level for QR Code symbols.
-        /// 
+        ///
         /// See the native library documentation for details:
-        /// 
+        ///
         ///   - gs1_encoder_getQrEClevel()
         ///   - gs1_encoder_setQrEClevel()
         ///
@@ -942,12 +941,12 @@ namespace GS1.Encoders
 
         /// <summary>
         /// Get/set a fixed number of rows for Data Matrix symbols.
-        /// 
+        ///
         /// See the native library documentation for details:
-        /// 
+        ///
         ///   - gs1_encoder_getDmRows()
         ///   - gs1_encoder_setDmRows()
-        /// 
+        ///
         /// </summary>
         public int DmRows
         {
@@ -964,12 +963,12 @@ namespace GS1.Encoders
 
         /// <summary>
         /// Get/set a fixed number of columns for Data Matrix symbols.
-        /// 
+        ///
         /// See the native library documentation for details:
-        /// 
+        ///
         ///   - gs1_encoder_getDmColumns()
         ///   - gs1_encoder_setDmColumns()
-        ///   
+        ///
         /// </summary>
         public int DmColumns
         {
@@ -986,12 +985,12 @@ namespace GS1.Encoders
 
         /// <summary>
         /// Get/set whether a file or buffer us used for the barcode data input.
-        /// 
+        ///
         /// See the native library documentation for details:
-        /// 
+        ///
         ///   - gs1_encoder_getFileInputFlag()
         ///   - gs1_encoder_setFileInputFlag()
-        /// 
+        ///
         /// </summary>
         public bool FileInputFlag
         {
@@ -1008,12 +1007,12 @@ namespace GS1.Encoders
 
         /// <summary>
         /// Get/set the raw barcode data input buffer.
-        /// 
+        ///
         /// See the native library documentation for details:
-        /// 
+        ///
         ///   - gs1_encoder_getDataStr()
         ///   - gs1_encoder_setDataStr()
-        /// 
+        ///
         /// </summary>
         public string DataStr
         {
@@ -1030,12 +1029,12 @@ namespace GS1.Encoders
 
         /// <summary>
         /// Get/set the barcode data input buffer using GS1 AI syntax.
-        /// 
+        ///
         /// See the native library documentation for details:
-        /// 
+        ///
         ///   - gs1_encoder_getAIdataStr()
         ///   - gs1_encoder_setAIdataStr()
-        /// 
+        ///
         /// </summary>
         public string AIdataStr
         {
@@ -1051,9 +1050,9 @@ namespace GS1.Encoders
 
         /// <summary>
         /// Get/set the barcode data input buffer using barcode scan data format.
-        /// 
+        ///
         /// See the native library documentation for details:
-        /// 
+        ///
         ///   - gs1_encoder_getScanData()
         ///   - gs1_encoder_setScanData()
         ///
@@ -1073,11 +1072,11 @@ namespace GS1.Encoders
 
         /// <summary>
         /// Get the Human-Readable Interpretation ("HRI") text for the current data input buffer as an array of strings.
-        /// 
+        ///
         /// See the native library documentation for details:
-        /// 
+        ///
         ///   - gs1_encoder_getHRI()
-        /// 
+        ///
         /// </summary>
         public string[] HRI
         {
@@ -1088,22 +1087,22 @@ namespace GS1.Encoders
                 IntPtr[] pAI = new IntPtr[numAIs];
                 Marshal.Copy(p, pAI, 0, numAIs);
                 string[] hri = new string[numAIs];
-                for (int i = 0; i < numAIs; i++) 
+                for (int i = 0; i < numAIs; i++)
                 {
                     hri[i] = Marshal.PtrToStringAnsi(pAI[i]);
-                }       
+                }
                 return hri;
             }
         }
 
         /// <summary>
         /// Get/set the filename for a file containing the barcode data when file input is selected.
-        /// 
+        ///
         /// See the native library documentation for details:
-        /// 
+        ///
         ///   - gs1_encoder_getDataFile()
         ///   - gs1_encoder_setDataFile()
-        /// 
+        ///
         /// </summary>
         public string DataFile
         {
@@ -1120,12 +1119,12 @@ namespace GS1.Encoders
 
         /// <summary>
         /// Get/set the current output format type.
-        /// 
+        ///
         /// See the native library documentation for details:
-        /// 
+        ///
         ///   - gs1_encoder_getFormat()
         ///   - gs1_encoder_setFormat()
-        /// 
+        ///
         /// </summary>
         public int Format
         {
@@ -1141,9 +1140,9 @@ namespace GS1.Encoders
 
         /// <summary>
         /// Get/set the current output filename.
-        /// 
+        ///
         /// See the native library documentation for details:
-        /// 
+        ///
         ///   -  gs1_encoder_getOutFile()
         ///   -  gs1_encoder_setOutFile()
         ///
@@ -1163,11 +1162,11 @@ namespace GS1.Encoders
 
         /// <summary>
         /// Generate a barcode symbol representing the given input data.
-        /// 
+        ///
         /// See the native library documentation for details:
-        /// 
+        ///
         ///   - gs1_encoder_encode()
-        /// 
+        ///
         /// </summary>
         public void Encode()
         {
@@ -1177,11 +1176,11 @@ namespace GS1.Encoders
 
         /// <summary>
         /// Get the output buffer.
-        /// 
+        ///
         /// See the native library documentation for details:
-        /// 
+        ///
         ///   - gs1_encoder_getBuffer()
-        /// 
+        ///
         /// </summary>
         public byte[] GetBuffer()
         {
@@ -1198,11 +1197,11 @@ namespace GS1.Encoders
 
         /// <summary>
         /// Get the number of columns in the output buffer image.
-        /// 
+        ///
         /// See the native library documentation for details:
-        /// 
+        ///
         ///   - gs1_encoder_getBufferWidth()
-        /// 
+        ///
         /// </summary>
         public int BufferWidth
         {
@@ -1210,16 +1209,16 @@ namespace GS1.Encoders
             {
                 return gs1_encoder_getBufferWidth(ctx);
             }
-            
+
         }
 
         /// <summary>
         /// Get the number of rows in the output buffer image.
-        /// 
+        ///
         /// See the native library documentation for details:
-        /// 
+        ///
         ///   - gs1_encoder_getBufferHeight()
-        /// 
+        ///
         /// </summary>
         public int BufferHeight
         {
@@ -1232,11 +1231,11 @@ namespace GS1.Encoders
 
         /// <summary>
         /// Return the output buffer represented as an array of strings.
-        /// 
+        ///
         /// See the native library documentation for details:
-        /// 
+        ///
         ///   - gs1_encoder_getBufferStrings()
-        /// 
+        ///
         /// </summary>
         public string[] BufferStrings
         {
@@ -1257,11 +1256,11 @@ namespace GS1.Encoders
 
         /// <summary>
         /// Destructor that will release the resources allocated by the native library.
-        /// 
+        ///
         /// See the native library documentation for details:
-        /// 
+        ///
         ///   - gs1_encoder_free()
-        /// 
+        ///
         /// </summary>
         ~GS1Encoder()
         {
@@ -1272,7 +1271,7 @@ namespace GS1.Encoders
 
     /// <summary>
     /// A custom exception class that is thrown to indicate a general problem
-    /// initialising the library, such as when the GS1 Encoder Library
+    /// initialising the library, such as when the GS1 Barcode Engine
     /// dynamic-link library isn't accessible.
     /// </summary>
     public class GS1EncoderGeneralException : Exception

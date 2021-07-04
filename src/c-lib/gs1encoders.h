@@ -1,5 +1,5 @@
 /**
- * GS1 Barcode Encoder Library
+ * GS1 Barcode Engine
  *
  * @file gs1encoders.h
  * @author GS1 AISBL
@@ -27,8 +27,8 @@
  * Overview
  * --------
  *
- * The GS1 Barcode Encoder Library provides routines to generate GS1 barcode
- * symbols, process GS1 Digital Link and GS1 AI syntax data provided in raw or
+ * The GS1 Barcode Engine provides routines to generate GS1 barcode symbols,
+ * process GS1 Digital Link and GS1 AI syntax data provided in raw or
  * human-friendly formats, and process the scan data received from barcode
  * readers.
  *
