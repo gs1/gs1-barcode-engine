@@ -897,10 +897,23 @@ namespace GS1.EncodersApp
 
         private void unitsButton_Click(object sender, RoutedEventArgs e)
         {
-            units = units == "DPI" ? "d/mm" : "DPI";
+            if (units == "d/mm")
+            {
+                units = "DPI";
+                targetXdimensionLabel.Content = Regex.Replace(targetXdimensionLabel.Content.ToString(), "\\(mm\\)", "(inch)");
+                minXdimensionLabel.Content = Regex.Replace(minXdimensionLabel.Content.ToString(), "\\(mm\\)", "(inch)");
+                maxXdimensionLabel.Content = Regex.Replace(maxXdimensionLabel.Content.ToString(), "\\(mm\\)", "(inch)");
+            } else  // DPI
+            {
+                units = "d/mm";
+                targetXdimensionLabel.Content = Regex.Replace(targetXdimensionLabel.Content.ToString(), "\\(inch\\)", "(mm)");
+                minXdimensionLabel.Content = Regex.Replace(minXdimensionLabel.Content.ToString(), "\\(inch\\)", "(mm)");
+                maxXdimensionLabel.Content = Regex.Replace(maxXdimensionLabel.Content.ToString(), "\\(inch\\)", "(mm)");
+            }
             unitsButton.Content = units;
             deviceResolutionTextBox.Text = "";
             lookupXdimensionForApplication();
+            
         }
          
         private void permitUnknownAIsCheckBox_Click(object sender, RoutedEventArgs e)

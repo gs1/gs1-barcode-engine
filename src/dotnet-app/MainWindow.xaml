@@ -157,9 +157,9 @@
         <TextBox x:Name="targetXdimensionTextBox" HorizontalAlignment="Left" Height="23" Margin="193,196,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="66" TextChanged="XdimensionTextBox_TextChanged"/>
         <Label x:Name="targetXdimensionLabel" Content="Target X-dimension (mm)" HorizontalAlignment="Left" Margin="18,193,0,0" VerticalAlignment="Top" Width="170" Height="30" FontSize="14"/>
         <TextBox x:Name="minXdimensionTextBox" HorizontalAlignment="Left" Height="23" Margin="193,231,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="66" TextChanged="XdimensionTextBox_TextChanged"/>
-        <Label x:Name="minXdimensionTextBox1" Content="Min X-dimension (mm)" HorizontalAlignment="Left" Margin="18,228,0,0" Width="170" FontSize="14" Height="30" VerticalAlignment="Top"/>
+        <Label x:Name="minXdimensionLabel" Content="Min X-dimension (mm)" HorizontalAlignment="Left" Margin="18,228,0,0" Width="170" FontSize="14" Height="30" VerticalAlignment="Top"/>
         <TextBox x:Name="maxXdimensionTextBox" HorizontalAlignment="Left" Height="23" Margin="193,266,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="66" TextChanged="XdimensionTextBox_TextChanged"/>
-        <Label x:Name="maxXdimensionTextBox1" Content="Max X-dimension (mm)" HorizontalAlignment="Left" Margin="18,263,0,0" VerticalAlignment="Top" Width="170" Height="30" FontSize="14"/>
+        <Label x:Name="maxXdimensionLabel" Content="Max X-dimension (mm)" HorizontalAlignment="Left" Margin="18,263,0,0" VerticalAlignment="Top" Width="170" Height="30" FontSize="14"/>
         <Button x:Name="SaveButton" Content="Save" HorizontalAlignment="Left" Margin="294,0,0,50" Width="75" IsEnabled="False" Click="SaveButton_Click" Height="24" VerticalAlignment="Bottom" RenderTransformOrigin="0.44,1.208"/>
         <Label x:Name="targetXdimensionLabel_Copy" Content="Application" HorizontalAlignment="Left" Margin="18,158,0,0" VerticalAlignment="Top" Width="85" Height="30" FontSize="14"/>
         <ComboBox x:Name="applicationComboBox" SelectedIndex="0" HorizontalAlignment="Left" Margin="103,161,0,0" VerticalAlignment="Top" Width="154" SelectedValuePath="Content" SelectionChanged="applicationComboBox_SelectionChanged" FontSize="13" Height="23">
