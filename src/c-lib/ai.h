@@ -86,7 +86,7 @@ const struct aiEntry* gs1_lookupAIentry(const char *p, size_t ailen);
 bool gs1_isFNC1required(const char *ai);
 bool gs1_aiValLengthContentCheck(gs1_encoder *ctx, const struct aiEntry *entry, const char *aiVal, size_t vallen);
 bool gs1_parseAIdata(gs1_encoder *ctx, const char *aiData, char *dataStr);
-bool gs1_processAIdata(gs1_encoder *ctx, const char *dataStr);
+bool gs1_processAIdata(gs1_encoder *ctx, const char *dataStr, bool extractAIs);
 bool gs1_validateParity(uint8_t *str);
 bool gs1_allDigits(const uint8_t *str, size_t len);
 

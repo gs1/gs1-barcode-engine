@@ -880,12 +880,23 @@ again:
 		if (!gs1_aiValLengthContentCheck(ctx, entry, outval, strlen(outval)))
 			goto fail;
 
+		// Update the AI data
+		if (ctx->numAIs < MAX_AIS) {
+			ctx->aiData[ctx->numAIs].aiEntry = entry;
+			ctx->aiData[ctx->numAIs].value = outval;
+			ctx->aiData[ctx->numAIs].vallen = (uint8_t)strlen(outval);
+			ctx->numAIs++;
+		} else {
+			strcpy(ctx->errMsg, "Too many AIs");
+			goto fail;
+		}
+
 	}
 
 	DEBUG_PRINT("Parsing AI data successful: %s\n", dataStr);
 
 	// Now validate the data that we have written
-	return gs1_processAIdata(ctx, dataStr);
+	return gs1_processAIdata(ctx, dataStr, false);
 
 fail:
 
@@ -905,7 +916,7 @@ fail:
  *  Validate regular AI data ("#...") and extract AIs
  *
  */
-bool gs1_processAIdata(gs1_encoder *ctx, const char *dataStr) {
+bool gs1_processAIdata(gs1_encoder *ctx, const char *dataStr, const bool extractAIs) {
 
 	const char *p, *r;
 	size_t vallen;
@@ -953,15 +964,17 @@ bool gs1_processAIdata(gs1_encoder *ctx, const char *dataStr) {
 			return false;
 
 		// Add to the aiData
-		if (ctx->numAIs < MAX_AIS) {
-			ctx->aiData[ctx->numAIs].aiEntry = entry;
-			ctx->aiData[ctx->numAIs].value = p;
-			ctx->aiData[ctx->numAIs].vallen = (uint8_t)vallen;
-			ctx->numAIs++;
-		} else {
-			strcpy(ctx->errMsg, "Too many AIs");
-			ctx->errFlag = true;
-			return false;
+		if (extractAIs) {
+			if (ctx->numAIs < MAX_AIS) {
+				ctx->aiData[ctx->numAIs].aiEntry = entry;
+				ctx->aiData[ctx->numAIs].value = p;
+				ctx->aiData[ctx->numAIs].vallen = (uint8_t)vallen;
+				ctx->numAIs++;
+			} else {
+				strcpy(ctx->errMsg, "Too many AIs");
+				ctx->errFlag = true;
+				return false;
+			}
 		}
 
 		// After AIs requiring FNC1, we expect to find an FNC1 or be at the end
@@ -1117,7 +1130,7 @@ static void test_processAIdata(gs1_encoder *ctx, const bool should_succeed, cons
 	sprintf(casename, "%s", dataStr);
 	TEST_CASE(casename);
 
-	TEST_CHECK(gs1_processAIdata(ctx, dataStr) ^ !should_succeed);
+	TEST_CHECK(gs1_processAIdata(ctx, dataStr, true) ^ !should_succeed);
 	TEST_MSG(ctx->errMsg);
 
 }

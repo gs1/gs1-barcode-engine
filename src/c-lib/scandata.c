@@ -353,7 +353,7 @@ bool gs1_processScanData(gs1_encoder* ctx, const char* scanData) {
 				*p = '#';
 			p++;
 		}
-		if (!gs1_processAIdata(ctx, q))		// Validate AI data
+		if (!gs1_processAIdata(ctx, q, true))	// Validate AI data and extract AIs
 			goto fail;
 
 		return true;

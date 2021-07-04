@@ -643,7 +643,7 @@ GS1_ENCODERS_API bool gs1_encoder_setDataStr(gs1_encoder *ctx, const char* dataS
 	}
 	else if ((cc = strchr(ctx->dataStr, '|')) != NULL) {		// Composite symbol
 		*cc = '\0';						// Delimit end of linear component
-		if (*ctx->dataStr == '#' && !gs1_processAIdata(ctx, ctx->dataStr))
+		if (*ctx->dataStr == '#' && !gs1_processAIdata(ctx, ctx->dataStr, true))
 			goto fail;
 		if (ctx->numAIs >= MAX_AIS) {
 			strcpy(ctx->errMsg, "Too many AIs");
@@ -651,12 +651,12 @@ GS1_ENCODERS_API bool gs1_encoder_setDataStr(gs1_encoder *ctx, const char* dataS
 			goto fail;
 		}
 		ctx->aiData[ctx->numAIs++].aiEntry = NULL;		// Indicate separator in HRI
-		if (!gs1_processAIdata(ctx, cc + 1))
+		if (!gs1_processAIdata(ctx, cc + 1, true))
 			goto fail;
 		*cc = '|';						// Restore orginal "|"
 	}
 	else {								// Linear-only symbol
-		if (*ctx->dataStr == '#' && !gs1_processAIdata(ctx, ctx->dataStr))
+		if (*ctx->dataStr == '#' && !gs1_processAIdata(ctx, ctx->dataStr, true))
 			goto fail;
 	}
 
@@ -1917,11 +1917,36 @@ void test_api_getHRI(void) {
 	gs1_encoder* ctx;
 	int numAIs;
 	char **hri;
+	char buf[256];
 
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
 
-	// HRI from AI data
+	// HRI from linear-only, raw AI data
+	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "#011231231231233310ABC123"));
+	TEST_ASSERT((numAIs = gs1_encoder_getHRI(ctx, &hri)) == 2);
+	TEST_ASSERT(hri != NULL);
+	TEST_CHECK(strcmp(hri[0], "(01) 12312312312333") == 0);
+	TEST_CHECK(strcmp(hri[1], "(10) ABC123") == 0);
+
+	// HRI from composite, raw AI data
 	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "#011231231231233310ABC123|#99COMPOSITE"));
+	TEST_ASSERT((numAIs = gs1_encoder_getHRI(ctx, &hri)) == 3);
+	TEST_ASSERT(hri != NULL);
+	TEST_CHECK(strcmp(hri[0], "(01) 12312312312333") == 0);
+	TEST_CHECK(strcmp(hri[1], "(10) ABC123") == 0);
+	TEST_CHECK(strcmp(hri[2], "(99) COMPOSITE") == 0);
+
+	// HRI from linear-only, bracketed AI data
+	strcpy(buf, "(01)12312312312333(10)ABC123");
+	TEST_ASSERT(gs1_encoder_setAIdataStr(ctx, buf));
+	TEST_ASSERT((numAIs = gs1_encoder_getHRI(ctx, &hri)) == 2);
+	TEST_ASSERT(hri != NULL);
+	TEST_CHECK(strcmp(hri[0], "(01) 12312312312333") == 0);
+	TEST_CHECK(strcmp(hri[1], "(10) ABC123") == 0);
+
+	// HRI from composite, bracketed AI data
+	strcpy(buf, "(01)12312312312333(10)ABC123|(99)COMPOSITE");
+	TEST_ASSERT(gs1_encoder_setAIdataStr(ctx, buf));
 	TEST_ASSERT((numAIs = gs1_encoder_getHRI(ctx, &hri)) == 3);
 	TEST_ASSERT(hri != NULL);
 	TEST_CHECK(strcmp(hri[0], "(01) 12312312312333") == 0);

@@ -117,7 +117,7 @@ static size_t URIunescape(char *out, size_t maxlen, const char *in, const size_t
  */
 bool gs1_parseDLuri(gs1_encoder *ctx, char *dlData, char *dataStr) {
 
-	char *p, *r, *e;
+	char *p, *r, *e, *outval;
 	char *pi = NULL;	// Path info
 	char *qp = NULL;	// Query params
 	char *fr = NULL;	// Fragment
@@ -245,6 +245,7 @@ bool gs1_parseDLuri(gs1_encoder *ctx, char *dlData, char *dataStr) {
 		writeDataStr(entry->ai);			// Write AI
 		fnc1req = gs1_isFNC1required(entry->ai);	// Record if required before next AI
 
+		outval = dataStr + strlen(dataStr);		// Save start of value for AI data
 		nwriteDataStr(aival, vallen);			// Write value
 
 		// Perform certain checks at parse time, before processing the
@@ -252,6 +253,16 @@ bool gs1_parseDLuri(gs1_encoder *ctx, char *dlData, char *dataStr) {
 		if (!gs1_aiValLengthContentCheck(ctx, entry, aival, vallen))
 			goto fail;
 
+		// Update the AI data
+		if (ctx->numAIs < MAX_AIS) {
+			ctx->aiData[ctx->numAIs].aiEntry = entry;
+			ctx->aiData[ctx->numAIs].value = outval;
+			ctx->aiData[ctx->numAIs].vallen = (uint8_t)vallen;
+			ctx->numAIs++;
+		} else {
+			strcpy(ctx->errMsg, "Too many AIs");
+			goto fail;
+		}
 	}
 
 	// Fragment character delimits end of the query parameters
@@ -313,12 +324,24 @@ bool gs1_parseDLuri(gs1_encoder *ctx, char *dlData, char *dataStr) {
 		writeDataStr(entry->ai);			// Write AI
 		fnc1req = gs1_isFNC1required(entry->ai);	// Record if required before next AI
 
+		outval = dataStr + strlen(dataStr);		// Save start of value for AI data
 		nwriteDataStr(aival, vallen);			// Write value
 
 		// Perform certain checks at parse time, before processing the
 		// components with the linters
 		if (!gs1_aiValLengthContentCheck(ctx, entry, aival, vallen))
 			goto fail;
+
+		// Update the AI data
+		if (ctx->numAIs < MAX_AIS) {
+			ctx->aiData[ctx->numAIs].aiEntry = entry;
+			ctx->aiData[ctx->numAIs].value = outval;
+			ctx->aiData[ctx->numAIs].vallen = (uint8_t)vallen;
+			ctx->numAIs++;
+		} else {
+			strcpy(ctx->errMsg, "Too many AIs");
+			goto fail;
+		}
 
 		p = r;
 
@@ -327,7 +350,7 @@ bool gs1_parseDLuri(gs1_encoder *ctx, char *dlData, char *dataStr) {
 	DEBUG_PRINT("Parsing DL data successful: %s\n", dataStr);
 
 	// Now validate the data that we have written
-	ret = gs1_processAIdata(ctx, dataStr);
+	ret = gs1_processAIdata(ctx, dataStr, false);
 
 out:
 
