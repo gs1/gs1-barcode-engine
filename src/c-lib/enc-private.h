@@ -74,7 +74,7 @@ struct gs1_encoder {
 	int pixMult;				// Pixels per X
 	int Xundercut;				// X pixels to undercut
 	int Yundercut;				// Y pixels to undercut
-	int addCheckDigit;			// For EAN/UPC and RSS-14/Lim, calculated if true, otherwise validated
+	bool addCheckDigit;			// For EAN/UPC and RSS-14/Lim, calculated if true, otherwise validated
 	int sepHt;				// Separator row height
 	int dataBarExpandedSegmentsWidth;	// Number of segments for RSS Expdanded (Stacked)
 	int gs1_128LinearHeight;		// Height of UCC/EAN-128 in X
