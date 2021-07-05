@@ -974,8 +974,15 @@ bool gs1_processAIdata(gs1_encoder *ctx, const char *dataStr, const bool extract
 
 	while (*p) {
 
-		// Find AI that matches a prefix of our data
-		if ((entry = gs1_lookupAIentry(ctx, p, 0)) == NULL) {
+		/* Find AI that matches a prefix of our data
+		 *
+		 * We cannot allow unknown AIs when extracting AIs from a raw
+		 * data string because we are unable to differentiate the AI
+		 * from its value without knowing a priori the AI's length.
+		 *
+		 */
+		if ((entry = gs1_lookupAIentry(ctx, p, 0)) == NULL ||
+		    (extractAIs && entry == &unknownAI)) {
 			sprintf(ctx->errMsg, "No known AI is a prefix of: %.4s...", p);
 			ctx->errFlag = true;
 			return false;
@@ -993,14 +1000,7 @@ bool gs1_processAIdata(gs1_encoder *ctx, const char *dataStr, const bool extract
 		if ((vallen = validate_ai_val(ctx, entry, p, r)) == 0)
 			return false;
 
-		/*
-		 * Add to the aiData
-		 *
-		 * We cannot allow unknown AIs when processing a raw data
-		 * string because we are unable to differentiate an AI from
-		 * its value.
-		 *
-		 */
+		// Add to the aiData
 		if (extractAIs) {
 			if (ctx->numAIs < MAX_AIS) {
 				ctx->aiData[ctx->numAIs].aiEntry = entry;
@@ -1177,6 +1177,7 @@ static void test_processAIdata(gs1_encoder *ctx, const bool should_succeed, cons
 	sprintf(casename, "%s", dataStr);
 	TEST_CASE(casename);
 
+	// Process and extract AIs
 	TEST_CHECK(gs1_processAIdata(ctx, dataStr, true) ^ !should_succeed);
 	TEST_MSG(ctx->errMsg);
 
@@ -1245,6 +1246,11 @@ void test_ai_processAIdata(void) {
 	test_processAIdata(ctx, false, "#72301212345678901234567890123456789");		// Too long
 	test_processAIdata(ctx, true,  "#7230123");					// Shortest
 	test_processAIdata(ctx, false, "#723012");					// Too short
+
+	// Unlike parsed data input, we cannot vivify unknown AIs when
+	// extracting AI data from a raw string
+	gs1_encoder_setPermitUnknownAIs(ctx, true);
+	test_processAIdata(ctx, false, "#891234");
 
 	gs1_encoder_free(ctx);
 
