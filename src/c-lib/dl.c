@@ -33,9 +33,6 @@
 #include "dl.h"
 
 
-#define SIZEOF_ARRAY(x) (sizeof(x) / sizeof(x[0]))
-
-
 /*
  *  Set of characters that are permissible in URIs, including percent
  *
