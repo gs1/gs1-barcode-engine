@@ -702,20 +702,25 @@ const struct aiEntry* gs1_lookupAIentry(gs1_encoder *ctx, const char *p, size_t 
 	if (ailen == 1)		// AI at least length 2, even if unknown AI
 		return NULL;
 
-	// Walk the AI table to find a match, or a prefix match when ailen == 0
+	/*
+	 * Walk the AI table to find an entry that matches a prefix, optionally
+	 * ensuring that the AI also has a specified length
+	 *
+	 */
 	for (i = 0; i < SIZEOF_ARRAY(ai_table); i++) {
 		entry = &ai_table[i];
 		entrylen = strlen(entry->ai);
-		if (ailen != 0 && ailen != entrylen)
-			continue;
-		if (strncmp(p, entry->ai, ailen > 0 ? ailen : entrylen) == 0)
-			break;
+		if (strncmp(p, entry->ai, entrylen) == 0) {
+			if (ailen > 0 && entrylen != ailen)
+				return NULL;	// Prefix match, but incorrect length
+			break;			// Found
+		}
 	}
 
 	/*
-	 * When we haven't found a matching AI table entry and permitUnknownAIs
-	 * is enabled then we return a pseudo "unknownAI" entry, otherwise we
-	 * return NULL ("not found") to indicate an error.
+	 * When we haven't found an AI table entry that is a prefix and
+	 * permitUnknownAIs is enabled then we return a pseudo "unknownAI"
+	 * entry, otherwise we return NULL ("not found") to indicate an error.
 	 *
 	 */
 	if (i == SIZEOF_ARRAY(ai_table))
@@ -1103,7 +1108,8 @@ void test_ai_lookupAIentry(void) {
 	TEST_CHECK(gs1_lookupAIentry(ctx, "37123", 1) == NULL);				// No such AI (3), even though there is AI (37)
 
 	gs1_encoder_setPermitUnknownAIs(ctx, true);
-	TEST_CHECK(gs1_lookupAIentry(ctx, "89", 2) == &unknownAI);			// No such AI (89), but permitting unknown AIs
+	TEST_CHECK(gs1_lookupAIentry(ctx, "89", 2) == &unknownAI);			// No such AI (89), but permitting unknown AIs so we vivify it
+	TEST_CHECK(gs1_lookupAIentry(ctx, "011", 3) == NULL);				// Ditto for (011), but we can't vivify it since known (01) is a prefix match
 
 	gs1_encoder_free(ctx);
 
