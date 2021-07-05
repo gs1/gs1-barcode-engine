@@ -28,7 +28,7 @@
     <DocumentationFile>bin\Debug\gs1encoders-dotnet.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x86</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -85,6 +85,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy /y /d "..\..\..\c-lib\build\library\x64\$(Configuration)\gs1encoders.dll" "."</PostBuildEvent>
+    <PostBuildEvent>xcopy /y /d "..\..\..\c-lib\build\library\Win32\$(Configuration)\gs1encoders.dll" "."</PostBuildEvent>
   </PropertyGroup>
 </Project>
