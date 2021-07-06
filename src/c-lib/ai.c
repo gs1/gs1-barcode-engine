@@ -67,7 +67,7 @@
  *  AI prefixes that are defined as not requiring termination by an FNC1 character
  *
  */
-static const char *fixedAIprefixes[22] = {
+static const char *fixedAIprefixes[] = {
 	"00", "01", "02",
 	"03", "04",
 	"11", "12", "13", "14", "15", "16", "17", "18", "19",
@@ -87,6 +87,79 @@ bool gs1_isFNC1required(const char *ai) {
 
 	return true;
 
+}
+
+
+/*
+ *  AI prefixes to AI length mapping. (Not canonical at this time.)
+ *
+ */
+
+struct aiPrefixLength {
+	char *aiPrefix;
+	uint8_t length;
+};
+
+#define PL(a, l) {			\
+		.aiPrefix = a,		\
+		.length = l,		\
+}
+
+static const struct aiPrefixLength AIlengthByPrefix[] = {
+	PL( "00", 2  ),
+	PL( "01", 2  ),
+	PL( "02", 2  ),
+	PL( "10", 2  ),
+	PL( "11", 2  ),
+	PL( "12", 2  ),
+	PL( "13", 2  ),
+	PL( "15", 2  ),
+	PL( "16", 2  ),
+	PL( "17", 2  ),
+	PL( "20", 2  ),
+	PL( "21", 2  ),
+	PL( "22", 2  ),
+	PL( "23", 3  ),
+	PL( "24", 3  ),
+	PL( "25", 3  ),
+	PL( "30", 2  ),
+	PL( "31", 4  ),
+	PL( "32", 4  ),
+	PL( "33", 4  ),
+	PL( "34", 4  ),
+	PL( "35", 4  ),
+	PL( "36", 4  ),
+	PL( "37", 2  ),
+	PL( "39", 4  ),
+	PL( "40", 3  ),
+	PL( "41", 3  ),
+	PL( "42", 3  ),
+	PL( "43", 4  ),
+	PL( "70", 4  ),
+	PL( "71", 3  ),
+	PL( "72", 4  ),
+	PL( "80", 4  ),
+	PL( "81", 4  ),
+	PL( "82", 4  ),
+	PL( "90", 2  ),
+	PL( "91", 2  ),
+	PL( "92", 2  ),
+	PL( "93", 2  ),
+	PL( "94", 2  ),
+	PL( "95", 2  ),
+	PL( "96", 2  ),
+	PL( "97", 2  ),
+	PL( "98", 2  ),
+	PL( "99", 2  ),
+};
+
+uint8_t gs1_aiLengthByPrefix(const char *ai) {
+	size_t i;
+	assert(ai);
+	for (i = 0; i < SIZEOF_ARRAY(AIlengthByPrefix); i++)
+		if (strncmp(AIlengthByPrefix[i].aiPrefix, ai, 2) == 0)
+			return AIlengthByPrefix[i].length;
+	return 0;
 }
 
 
@@ -1118,6 +1191,17 @@ void test_ai_lookupAIentry(void) {
 
 	gs1_encoder_free(ctx);
 
+}
+
+void test_ai_AItableVsPrefixLength(void) {
+	size_t i;
+	struct aiEntry entry;
+	for (i = 0; i < SIZEOF_ARRAY(ai_table); i++) {
+		entry = ai_table[i];
+		TEST_CASE(entry.ai);
+		TEST_CHECK(strlen(entry.ai) == gs1_aiLengthByPrefix(entry.ai));
+		TEST_MSG("Expected %d; Got %d", gs1_aiLengthByPrefix(entry.ai), strlen(entry.ai));
+	}
 }
 
 

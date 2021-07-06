@@ -188,6 +188,7 @@ TEST_LIST = {
      *
      */
     { "ai_lookupAIentry", test_ai_lookupAIentry },
+    { "ai_AItableVsPrefixLength", test_ai_AItableVsPrefixLength },
     { "ai_gs1_parseAIdata", test_ai_parseAIdata },
     { "ai_gs1_processAIdata", test_ai_processAIdata },
     { "ai_validateParity", test_ai_validateParity },
