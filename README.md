@@ -137,6 +137,9 @@ named `gs1encoders-linux.bin`. In the event of issues with antivirus software
 consult the note in the
 [User Guide](https://github.com/gs1/gs1-encoders/wiki/User-Guide).
 
+The pre-built application requires that the Visual C++ Redistributable 2019 (32
+bit) is installed: <https://visualstudio.microsoft.com/downloads/>
+
 
 Installing the Pre-built Demo GUI Application
 ---------------------------------------------
@@ -149,4 +152,7 @@ The most recent version of the GUI application can be
 [downloaded from here](https://github.com/gs1/gs1-encoders/releases/latest).
 
 For Windows systems download the asset named `gs1encoders-windows-gui-app.zip`.
+
+The pre-built application requires that the .NET Core 3.1 Desktop Runtime -
+Windows x86 is installed: <https://dotnet.microsoft.com/download/dotnet/3.1/runtime>
 
