@@ -135,7 +135,7 @@ For Windows systems download the asset named
 `gs1encoders-windows-console-app.zip`. For Linux systems download the asset
 named `gs1encoders-linux.bin`. In the event of issues with antivirus software
 consult the note in the
-[User Guide](https://github.com/gs1/gs1-encoders/wiki/User-Guide).
+[User Guide](https://github.com/gs1/gs1-encoders/wiki/Console-Application-User-Guide).
 
 The pre-built application requires that the Visual C++ Redistributable 2019 (32
 bit) is installed: <https://visualstudio.microsoft.com/downloads/#microsoft-visual-c-redistributable-for-visual-studio-2019>
