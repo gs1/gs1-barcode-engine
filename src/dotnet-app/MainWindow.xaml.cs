@@ -67,6 +67,7 @@ namespace GS1.EncodersApp
             qrEClevelComboBox.IsEnabled = false;
             dmRowsLabel.IsEnabled = false;
             dmRowsComboBox.IsEnabled = false;
+            addCheckDigitCheckBox.IsEnabled = false;
             generateButton.Content = "Generate Barcode";
 
             switch ((GS1Encoder.Symbology)symbologyComboBox.SelectedIndex)
@@ -78,6 +79,7 @@ namespace GS1.EncodersApp
                 case GS1Encoder.Symbology.UPCE:
                     sepHtLabel.IsEnabled = true;
                     sepHtTextBox.IsEnabled = true;
+                    addCheckDigitCheckBox.IsEnabled = true;
                     break;
 
                 case GS1Encoder.Symbology.GS1_128_CCA:
@@ -91,7 +93,9 @@ namespace GS1.EncodersApp
                 case GS1Encoder.Symbology.DataBarExpanded:
                     segWidthLabel.IsEnabled = true;
                     segWidthComboBox.IsEnabled = true;
-                    goto case GS1Encoder.Symbology.DataBarOmni;
+                    sepHtLabel.IsEnabled = true;
+                    sepHtTextBox.IsEnabled = true;                    
+                    break;
 
                 case GS1Encoder.Symbology.DataBarOmni:
                 case GS1Encoder.Symbology.DataBarStacked:
@@ -100,6 +104,7 @@ namespace GS1.EncodersApp
                 case GS1Encoder.Symbology.DataBarLimited:
                     sepHtLabel.IsEnabled = true;
                     sepHtTextBox.IsEnabled = true;
+                    addCheckDigitCheckBox.IsEnabled = true;
                     break;
 
                 case GS1Encoder.Symbology.DM:
