@@ -91,7 +91,7 @@ bool gs1_isFNC1required(const char *ai) {
 
 
 /*
- *  AI prefixes to AI length mapping. (Not canonical at this time.)
+ *  AI prefixes to AI length mapping
  *
  */
 
@@ -754,6 +754,12 @@ static const struct aiEntry ai_table[] = {
 // AI entry allowing AIs to be processed that are not present in the above table
 static const struct aiEntry unknownAI =
 	AI( ""    , FNC1   , X,1,90,_, __, __, __, __,                    "UNKNOWN"                   );
+static const struct aiEntry unknownAI2 =
+	AI( "XX"  , FNC1   , X,1,90,_, __, __, __, __,                    "UNKNOWN"                   );
+static const struct aiEntry unknownAI3 =
+	AI( "XXX" , FNC1   , X,1,90,_, __, __, __, __,                    "UNKNOWN"                   );
+static const struct aiEntry unknownAI4 =
+	AI( "XXXX", FNC1   , X,1,90,_, __, __, __, __,                    "UNKNOWN"                   );
 
 
 /*
@@ -768,7 +774,7 @@ const struct aiEntry* gs1_lookupAIentry(gs1_encoder *ctx, const char *p, size_t 
 
 	size_t i;
 	const struct aiEntry *entry;
-	size_t entrylen;
+	size_t entrylen, lenByPrefix;
 
 	assert(ailen <= strlen(p));
 
@@ -792,17 +798,30 @@ const struct aiEntry* gs1_lookupAIentry(gs1_encoder *ctx, const char *p, size_t 
 			return NULL;	// Don't vivify an AI that is a prefix of a known AI
 	}
 
+	if (i != SIZEOF_ARRAY(ai_table))
+		return entry;
+
+	if (!ctx->permitUnknownAIs)
+		return NULL;
+
 	/*
-	 * When we haven't found an AI table entry that is a prefix and
-	 * permitUnknownAIs is enabled then we vivify the AI by returning a
-	 * pseudo "unknownAI" entry, otherwise we return NULL ("not found") to
-	 * indicate an error.
+	 * If permitUnknownAIs is enabled then we vivify the AI by returning a
+	 * pseudo "unknownAI" entry, but only if the length matches that
+	 * indicated by the prefix where such a length is defined.
+	 *
+	 * Otherwise we return NULL ("not found") to indicate an error.
 	 *
 	 */
-	if (i == SIZEOF_ARRAY(ai_table))
-		return ctx->permitUnknownAIs ? &unknownAI : NULL;
+	lenByPrefix = gs1_aiLengthByPrefix(p);
+	if (ailen != 0 && lenByPrefix != 0 && lenByPrefix != ailen)
+		return NULL;
 
-	return entry;
+	// Return unknownAI indicator for corresponding AI length
+	if (lenByPrefix == 2) return &unknownAI2;
+	if (lenByPrefix == 3) return &unknownAI3;
+	if (lenByPrefix == 4) return &unknownAI4;
+
+	return &unknownAI;	// Unknown length
 
 }
 
@@ -1052,9 +1071,10 @@ bool gs1_processAIdata(gs1_encoder *ctx, const char *dataStr, const bool extract
 
 		/* Find AI that matches a prefix of our data
 		 *
-		 * We cannot allow unknown AIs when extracting AIs from a raw
-		 * data string because we are unable to differentiate the AI
-		 * from its value without knowing a priori the AI's length.
+		 * We cannot allow unknown AIs of *unknown length* when
+		 * extracting AIs from a raw data string because we are unable
+		 * to differentiate the AI from its value without knowing a
+		 * priori the AI's length.
 		 *
 		 */
 		if ((entry = gs1_lookupAIentry(ctx, p, 0)) == NULL ||
@@ -1185,9 +1205,20 @@ void test_ai_lookupAIentry(void) {
 
 	gs1_encoder_setPermitUnknownAIs(ctx, true);
 	TEST_CHECK(gs1_lookupAIentry(ctx, "89", 2) == &unknownAI);			// No such AI (89), but permitting unknown AIs so we vivify it
+
 	TEST_CHECK(gs1_lookupAIentry(ctx, "011", 3) == NULL);				// Ditto for (011), but we can't vivify it since known (01) is a prefix match
-	TEST_CHECK(gs1_lookupAIentry(ctx, "800", 3) == NULL);				// Don't vifiy (800) which is a prefix of existing (8001)
-	TEST_CHECK(gs1_lookupAIentry(ctx, "80", 2) == NULL);				// Nor (80)
+
+	TEST_CHECK(gs1_lookupAIentry(ctx, "800", 3) == NULL);				// Don't vivify (800) which is a prefix of existing (8001)
+	TEST_CHECK(gs1_lookupAIentry(ctx, "80", 2) == NULL);				// Nor (80) for the same reason
+
+	TEST_CHECK(gs1_lookupAIentry(ctx, "399", 3) == NULL);				// Don't vivify (399) since AI prefix "39" is defined as having length 4
+	TEST_CHECK(gs1_lookupAIentry(ctx, "3999", 4) == &unknownAI4);			// So (3999) is okay
+
+	TEST_CHECK(gs1_lookupAIentry(ctx, "399", 3) == NULL);				// Don't vivify (399) since AI prefix "39" is defined as having length 4
+	TEST_CHECK(gs1_lookupAIentry(ctx, "3999", 4) == &unknownAI4);			// So (3999) is okay
+
+	TEST_CHECK(gs1_lookupAIentry(ctx, "2367", 4) == NULL);				// Don't vivify (2367) since AI prefix "23" is defined as having length 3
+	TEST_CHECK(gs1_lookupAIentry(ctx, "236", 3) == &unknownAI3);			// So (236) is okay
 
 	gs1_encoder_free(ctx);
 

@@ -2013,6 +2013,18 @@ void test_api_getHRI(void) {
 	TEST_CHECK(strcmp(hri[2], "(99) ABC-123") == 0);
 	TEST_CHECK(strcmp(hri[3], "(88) XYZ") == 0);
 
+	// HRI from linear-only, raw AI data, with unknown AI with known length 3
+	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "#236ABC123"));
+	TEST_ASSERT((numAIs = gs1_encoder_getHRI(ctx, &hri)) == 1);
+	TEST_ASSERT(hri != NULL);
+	TEST_CHECK(strcmp(hri[0], "(236) ABC123") == 0);
+
+	// HRI from linear-only, raw AI data, with unknown AI with known length 4
+	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "#8299ABC123"));
+	TEST_ASSERT((numAIs = gs1_encoder_getHRI(ctx, &hri)) == 1);
+	TEST_ASSERT(hri != NULL);
+	TEST_CHECK(strcmp(hri[0], "(8299) ABC123") == 0);
+
 	gs1_encoder_free(ctx);
 
 }
