@@ -53,7 +53,8 @@ available online here: <https://gs1.github.io/gs1-encoders/>
 Instructions for getting started with the console application are provided in
 the [Console Application User Guide](https://github.com/gs1/gs1-encoders/wiki/Console-Application-User-Guide).
 
-The GUI application should be intuitive.
+Instructions for getting started with the GUI application are provided in
+the [Desktop Application User Guide](https://github.com/gs1/gs1-encoders/wiki/Desktop-Application-User-Guide).
 
 
 Using the library
@@ -151,8 +152,9 @@ Framework.
 The most recent version of the GUI application can be
 [downloaded from here](https://github.com/gs1/gs1-encoders/releases/latest).
 
-For Windows systems download the asset named `gs1encoders-windows-gui-app.zip`.
+For Windows systems download the asset named `gs1encoders-windows-gui-app.zip`. In
+the event of issues with antivirus software consult the note in the
+[User Guide](https://github.com/gs1/gs1-encoders/wiki/Desktop-Application-User-Guide).
 
 The pre-built application requires that the .NET Core 3.1 Desktop Runtime -
 Windows x86 is installed: <https://dotnet.microsoft.com/download/dotnet/3.1/runtime>
-
