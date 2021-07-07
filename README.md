@@ -3,7 +3,8 @@ GS1 Barcode Engine
 
 The GS1 Barcode Engine is a native C library that supports the generation of
 GS1 barcode symbols and processing of GS1 Application Identifier data. It
-includes bindings for C# .NET and demonstration console and GUI applications.
+includes bindings for C# .NET and demonstration console and desktop
+applications.
 
 The supported symbologies are:
 
@@ -23,7 +24,7 @@ This project includes:
   * The native C library that can be vendored into third-party code or compiled for use as a shared library (Linux / BSD) or dynamic-link library (Windows).
   * An example console application whose code demonstrates how to use the library.
   * C# .NET Wrappers around the native library using Platform Invoke (P/Invoke).
-  * A .NET GUI application using Windows Presentation Foundation (WPF) whose code demonstratess how to use the C# .NET wrappers together with the native library.
+  * A .NET desktop application using Windows Presentation Foundation (WPF) whose code demonstratess how to use the C# .NET wrappers together with the native library.
 
 
 License
@@ -90,7 +91,7 @@ using MSVC.
 The project contains a solution file (.sln) compatible with recent versions of
 Microsoft Visual Studio. In the Visual Studio Installer you will need to ensure
 that MSVC is installed by selecting the "C++ workload" and that a recent .NET
-Framework SDK is available.
+Core SDK is available.
 
 Alternatively, all components can be built from the command line by opening a
 Developer Command Prompt, cloning this repository, changing to the `src`
