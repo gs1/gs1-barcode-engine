@@ -1187,8 +1187,7 @@ GS1_ENCODERS_API char* gs1_encoder_getDataStr(gs1_encoder *ctx);
  * of the symbology, as described below. Some accept "plain" data
  * input such as a 13-character GTIN in the case of EAN-13. Some require AI
  * syntax data such as the GS1 DataBar family. Others accept either an AI
- * string or plain data containing a GS1 Digital Link URI, such as QR Code and
- * Data Matrix.
+ * string or a GS1 Digital Link URI, such as QR Code and Data Matrix.
  *
  * A "#" character at the start of the input indicates that the data is in GS1
  * Application Identifier syntax. In this case, all subsequent instances of the
@@ -1220,18 +1219,21 @@ GS1_ENCODERS_API char* gs1_encoder_getDataStr(gs1_encoder *ctx);
  *   * **GS1 DataBar Truncated**:: 14 digits including check digit
  *   * **GS1 DataBar Stacked**:: 14 digits including check digit
  *   * **GS1 DataBar Stacked Omnidirectional**:: 14 digits including check digit
+ *   * **GS1 DataBar Limited**:: 14 digits beginning "0" or "1" including check digit
  *   * **GS1 DataBar Expanded (Stacked)**:: GS1 AI syntax in raw form, with "#" = FNC1
+ *   * **GS1-128**:: GS1 AI syntax in raw form, with "#" = FNC1
  *   * **GS1 DataMatrix**:: GS1 AI syntax in raw form, with "#" = FNC1
  *   * **GS1 QR Code**:: GS1 AI syntax in raw form, with "#" = FNC1
- *   * **Data Matrix**:: Plain string
- *   * **QR Code**:: Plain string
+ *   * **Data Matrix**:: A Digital Link URI
+ *   * **QR Code**:: A Digital Link URI
  *
  * In the interest of data harmony, the EAN/UPC symbologies will additionally
  * accept a GTIN input, such as (01)00000002345673 for EAN-8.
  *
- * A 2D Component must be specified in AI syntax. It must be separated from the
- * primary linear components with a "|" character and begin with an FNC1 in
- * first position, for example:
+ * EAN/UPC, GS1 DataBar and GS1-128 support a Composite Component. The
+ * Composite Component must be specified in AI syntax. It must be separated
+ * from the primary linear components with a "|" character and begin with an
+ * FNC1 in first position, for example:
  *
  * \code
  * #0112345678901231|#10ABC123#11210630
