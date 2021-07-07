@@ -51,7 +51,7 @@ The C library API is fully documented in the src/c-lib/docs/ directory and is
 available online here: <https://gs1.github.io/gs1-encoders/>
 
 Instructions for getting started with the console application are provided in
-the [Console Application User Guide](https://github.com/gs1/gs1-encoders/wiki/User-Guide).
+the [Console Application User Guide](https://github.com/gs1/gs1-encoders/wiki/Console-Application-User-Guide).
 
 The GUI application should be intuitive.
 
