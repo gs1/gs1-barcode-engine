@@ -94,6 +94,92 @@
  * The example code above should be extended to check the return status of each
  * function when used in production code.
  *
+ * ### Image scaling models
+ *
+ * This library generates bitmaps of barcode symbols ready for users of the
+ * library to render using whatever display or printing technology is available
+ * in their environment.
+ *
+ * This library does not attempt to interface directly with any specific
+ * technology because the number of scenarios is too numerous and the library
+ * is not being provided by GS1 AISBL as a turnkey end-user product.
+ * Furthermore, the intent is to maintain the portability of this library by
+ * avoiding build time and runtime dependancies on other libraries.
+ *
+ * The library provides two image scaling models:
+ *
+ * #### 1. Pixel-based scaling system (no real world dimensions)
+ *
+ * By default, this library creates output that has no regard for real world
+ * dimensions. The "PixMult" property is set to 1, which means that each symbol
+ * module (narrowest bar or smallest square) is represented by one pixel.
+ *
+ * The user can set PixMult to any integer scale factor to increase the size of
+ * the barcode symbol. Note that a pixel is the "atom" of an digital image and
+ * as such there is no realisation of a partial pixel. This has the effect of
+ * increasing the output bitmap in quantums which ensures the stability of the
+ * relative module sizes in the image.
+ *
+ * This scaling system is most useful when the barcode is intended to be
+ * presented on graphical systems where the precise pitch of the display medium
+ * is unknown or cannot be controlled, for example when rendering to multiple
+ * different smartphone displays in open applications.
+ *
+ * @see gs1_encoder_setPixMult()
+ *
+ *
+ * #### 2. Device-dot scaling system (real world dimensions)
+ *
+ * In systems where the end device resolution is known with certainty the
+ * library allows the user to specify this resolution and to provide a target
+ * X-dimension size (including optional minimum and maximum permissible limits)
+ * in terms of real world dimensions such as mm or inches.
+ *
+ * This has the effect of automatically selecting a "PixMult" (bitmap pixels
+ * per module) that would most closely achieve the specified X-dimension within
+ * the provided constraints, when printed at exactly one device dot per bitmap
+ * pixel on a device with the specified resolutions. The library will report
+ * what X-dimension, if any, has actually been achieved to satisfy the given
+ * constraints.
+ *
+ * It is the user's responsiblity to report the device resolution accurately
+ * and to ensure that the integrity of the graphical output from this library
+ * is maintained all the way through to the finished result. Specifically, that
+ * each source pixel is represented uniquely by a single output device dot in
+ * order for the actual X-dimension of the printed image to be correct.
+ *
+ * @see gs1_encoder_setDeviceResolution()
+ * @see gs1_encoder_setXdimension()
+ * @see gs1_encoder_getActualXdimension()
+ *
+ * \note
+ * It is the user's responsiblity to ensure that the integrity of the graphical
+ * output from this library is maintained all the way through to the finished
+ * result.
+ * \note
+ * Graphics software that uses the bitmap output from this library on
+ * pixel/dot-based devices must scale each source pixel exactly to the pixel
+ * pitch of the output device. This is typically one bitmap pixel to exactly
+ * one device dot is chosen for maximum fidelity. Alternatively, the number of
+ * dots comprising each printed module (narrowest bar or smallest square) must
+ * be a fixed and constant integer multiple of the number of source pixels for
+ * such a module. In this case the user should carefully consider what scaling
+ * is in effect when using the real-world X-dimension features of this library.
+ * \note
+ * Real world printed symbols may experience some degree of print gain due to
+ * factors such as ink bleed. This library provides functions to compensate for
+ * this by uniformly shaving down the size of bars and modules to the ultimate
+ * fidelity of the printer when images are printed as recommended such that one
+ * bitmap pixel is rendered by one device dot.
+ *
+ * @see gs1_encoder_setXundercut()
+ * @see gs1_encoder_setYundercut()
+ *
+ * \note
+ * The user should verify the quality of the resulting output and
+ * calibrate the output device and/or this library as necessary to optimise the
+ * grade of the resulting symbol.
+ *
  */
 
 
@@ -1101,8 +1187,7 @@ GS1_ENCODERS_API char* gs1_encoder_getDataStr(gs1_encoder *ctx);
  * of the symbology, as described below. Some accept "plain" data
  * input such as a 13-character GTIN in the case of EAN-13. Some require AI
  * syntax data such as the GS1 DataBar family. Others accept either an AI
- * string or plain data containing a GS1 Digital Link URI, such as QR Code and
- * Data Matrix.
+ * string or a GS1 Digital Link URI, such as QR Code and Data Matrix.
  *
  * A "#" character at the start of the input indicates that the data is in GS1
  * Application Identifier syntax. In this case, all subsequent instances of the
@@ -1134,18 +1219,21 @@ GS1_ENCODERS_API char* gs1_encoder_getDataStr(gs1_encoder *ctx);
  *   * **GS1 DataBar Truncated**:: 14 digits including check digit
  *   * **GS1 DataBar Stacked**:: 14 digits including check digit
  *   * **GS1 DataBar Stacked Omnidirectional**:: 14 digits including check digit
+ *   * **GS1 DataBar Limited**:: 14 digits beginning "0" or "1" including check digit
  *   * **GS1 DataBar Expanded (Stacked)**:: GS1 AI syntax in raw form, with "#" = FNC1
+ *   * **GS1-128**:: GS1 AI syntax in raw form, with "#" = FNC1
  *   * **GS1 DataMatrix**:: GS1 AI syntax in raw form, with "#" = FNC1
  *   * **GS1 QR Code**:: GS1 AI syntax in raw form, with "#" = FNC1
- *   * **Data Matrix**:: Plain string
- *   * **QR Code**:: Plain string
+ *   * **Data Matrix**:: A Digital Link URI
+ *   * **QR Code**:: A Digital Link URI
  *
  * In the interest of data harmony, the EAN/UPC symbologies will additionally
  * accept a GTIN input, such as (01)00000002345673 for EAN-8.
  *
- * A 2D Component must be specified in AI syntax. It must be separated from the
- * primary linear components with a "|" character and begin with an FNC1 in
- * first position, for example:
+ * EAN/UPC, GS1 DataBar and GS1-128 support a Composite Component. The
+ * Composite Component must be specified in AI syntax. It must be separated
+ * from the primary linear components with a "|" character and begin with an
+ * FNC1 in first position, for example:
  *
  * \code
  * #0112345678901231|#10ABC123#11210630

@@ -22,6 +22,20 @@ namespace GS1.Encoders
     /// See the License for the specific language governing permissions and
     /// limitations under the License.
     ///
+    ///
+    /// This class implements a P/Invoke wrapper around the GS1 Barcode Engine
+    /// native C library that presents its functionality in the form of a
+    /// typical C# object interface.
+    ///
+    /// This class is a very lightweight shim around the native library,
+    /// therefore the C# interface is described here in terms of the public
+    /// API functions of the native library that each method or property
+    /// getter/setter invokes.
+    ///
+    /// The API reference for the native C library is available here:
+    ///
+    /// https://gs1.github.io/gs1-encoders/
+    ///
     /// </summary>
     public class GS1Encoder
     {

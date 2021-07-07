@@ -3,7 +3,8 @@ GS1 Barcode Engine
 
 The GS1 Barcode Engine is a native C library that supports the generation of
 GS1 barcode symbols and processing of GS1 Application Identifier data. It
-includes bindings for C# .NET and demonstration console and GUI applications.
+includes bindings for C# .NET and demonstration console and desktop
+applications.
 
 The supported symbologies are:
 
@@ -23,7 +24,7 @@ This project includes:
   * The native C library that can be vendored into third-party code or compiled for use as a shared library (Linux / BSD) or dynamic-link library (Windows).
   * An example console application whose code demonstrates how to use the library.
   * C# .NET Wrappers around the native library using Platform Invoke (P/Invoke).
-  * A .NET GUI application using Windows Presentation Foundation (WPF) whose code demonstratess how to use the C# .NET wrappers together with the native library.
+  * A .NET desktop application using Windows Presentation Foundation (WPF) whose code demonstratess how to use the C# .NET wrappers together with the native library.
 
 
 License
@@ -51,9 +52,10 @@ The C library API is fully documented in the src/c-lib/docs/ directory and is
 available online here: <https://gs1.github.io/gs1-encoders/>
 
 Instructions for getting started with the console application are provided in
-the [Console Application User Guide](https://github.com/gs1/gs1-encoders/wiki/User-Guide).
+the [Console Application User Guide](https://github.com/gs1/gs1-encoders/wiki/Console-Application-User-Guide).
 
-The GUI application should be intuitive.
+Instructions for getting started with the GUI application are provided in
+the [Desktop Application User Guide](https://github.com/gs1/gs1-encoders/wiki/Desktop-Application-User-Guide).
 
 
 Using the library
@@ -89,7 +91,7 @@ using MSVC.
 The project contains a solution file (.sln) compatible with recent versions of
 Microsoft Visual Studio. In the Visual Studio Installer you will need to ensure
 that MSVC is installed by selecting the "C++ workload" and that a recent .NET
-Framework SDK is available.
+Core SDK is available.
 
 Alternatively, all components can be built from the command line by opening a
 Developer Command Prompt, cloning this repository, changing to the `src`
@@ -135,7 +137,7 @@ For Windows systems download the asset named
 `gs1encoders-windows-console-app.zip`. For Linux systems download the asset
 named `gs1encoders-linux.bin`. In the event of issues with antivirus software
 consult the note in the
-[User Guide](https://github.com/gs1/gs1-encoders/wiki/User-Guide).
+[User Guide](https://github.com/gs1/gs1-encoders/wiki/Console-Application-User-Guide).
 
 The pre-built application requires that the Visual C++ Redistributable 2019 (32
 bit) is installed: <https://visualstudio.microsoft.com/downloads/#microsoft-visual-c-redistributable-for-visual-studio-2019>
@@ -151,8 +153,9 @@ Framework.
 The most recent version of the GUI application can be
 [downloaded from here](https://github.com/gs1/gs1-encoders/releases/latest).
 
-For Windows systems download the asset named `gs1encoders-windows-gui-app.zip`.
+For Windows systems download the asset named `gs1encoders-windows-gui-app.zip`. In
+the event of issues with antivirus software consult the note in the
+[User Guide](https://github.com/gs1/gs1-encoders/wiki/Desktop-Application-User-Guide).
 
 The pre-built application requires that the .NET Core 3.1 Desktop Runtime -
 Windows x86 is installed: <https://dotnet.microsoft.com/download/dotnet/3.1/runtime>
-
