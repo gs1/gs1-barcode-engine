@@ -284,7 +284,7 @@ static int enc128(uint8_t data[], uint8_t bars[], const int link)
 	long ckchr;
 
 	for (i = 0; i < (int)strlen((char*)data); i++) {
-		if (data[i] == '#') {
+		if (data[i] == '^') {
 			data[i] = 0201; // convert FNC1 to 201 octal for enc128
 		}
 	}
@@ -374,7 +374,7 @@ void gs1_U128A(gs1_encoder *ctx) {
 
 	DEBUG_PRINT("\nData: %s\n", ctx->dataStr);
 
-	if (*ctx->dataStr != '#') {
+	if (*ctx->dataStr != '^') {
 		strcpy(ctx->errMsg, "primary data must be AI syntax (FNC1 in first position)");
 		ctx->errFlag = true;
 		return;
@@ -492,7 +492,7 @@ void gs1_U128C(gs1_encoder *ctx) {
 
 	DEBUG_PRINT("\nData: %s\n", ctx->dataStr);
 
-	if (*ctx->dataStr != '#') {
+	if (*ctx->dataStr != '^') {
 		strcpy(ctx->errMsg, "primary data must be AI syntax (FNC1 in first position)");
 		ctx->errFlag = true;
 		return;
@@ -646,7 +646,7 @@ void test_ucc_UCC128A_encode(void) {
 "          XX X  XXX  XXXX X XXX XX XX  XX  X  X  XX   XX  XX XX  XXX XX XXX X XXX XX   X    X XX  XX XX XXXX XX  XX XX  XXX XX XXX XX   X X   XXX X XXXX X  XX    X XX   XXX X XX          ",
 NULL
 	};
-	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sGS1_128_CCA, "#00030123456789012340|#99123123", expect));
+	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sGS1_128_CCA, "^00030123456789012340|^99123123", expect));
 
 	gs1_encoder_free(ctx);
 
@@ -703,7 +703,7 @@ void test_ucc_UCC128C_encode(void) {
 "          XX X  XXX  XXXX X XXX XX XX  XX  X  X  XX   XX  XX XX  XXX XX XXX X XXX XX   X    X XX  XX XX XXXX XX  XX XX  XXX XX XXX XX   X X   X XXXX XXX XXX XXXX X XX   XXX X XX          ",
 NULL
 	};
-	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sGS1_128_CCC, "#00030123456789012340|#02130123456789093724#101234567ABCDEFG", expect));
+	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sGS1_128_CCC, "^00030123456789012340|^02130123456789093724^101234567ABCDEFG", expect));
 
 	gs1_encoder_free(ctx);
 

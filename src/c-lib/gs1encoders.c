@@ -657,7 +657,7 @@ GS1_ENCODERS_API bool gs1_encoder_setDataStr(gs1_encoder *ctx, const char* dataS
 	}
 	else if ((cc = strchr(ctx->dataStr, '|')) != NULL) {		// Composite symbol
 		*cc = '\0';						// Delimit end of linear component
-		if (*ctx->dataStr == '#' && !gs1_processAIdata(ctx, ctx->dataStr, true))
+		if (*ctx->dataStr == '^' && !gs1_processAIdata(ctx, ctx->dataStr, true))
 			goto fail;
 		if (ctx->numAIs >= MAX_AIS) {
 			strcpy(ctx->errMsg, "Too many AIs");
@@ -670,7 +670,7 @@ GS1_ENCODERS_API bool gs1_encoder_setDataStr(gs1_encoder *ctx, const char* dataS
 		*cc = '|';						// Restore orginal "|"
 	}
 	else {								// Linear-only symbol
-		if (*ctx->dataStr == '#' && !gs1_processAIdata(ctx, ctx->dataStr, true))
+		if (*ctx->dataStr == '^' && !gs1_processAIdata(ctx, ctx->dataStr, true))
 			goto fail;
 	}
 
@@ -1866,8 +1866,8 @@ void test_api_dataStr(void) {
 	TEST_CHECK(strcmp(gs1_encoder_getDataStr(ctx), "barcode") == 0);
 	TEST_CHECK(gs1_encoder_setDataStr(ctx, ""));
 	TEST_CHECK(gs1_encoder_setDataStr(ctx, "a"));
-	TEST_CHECK(gs1_encoder_setDataStr(ctx, "129912253123000123|#99123123"));
-	TEST_CHECK(gs1_encoder_setDataStr(ctx, "#129912253123000123|#99123123"));
+	TEST_CHECK(gs1_encoder_setDataStr(ctx, "129912253123000123|^99123123"));
+	TEST_CHECK(gs1_encoder_setDataStr(ctx, "^129912253123000123|^99123123"));
 
 	for (i = 0; i <= MAX_DATA; i++) {
 		bigbuffer[i]='a';
@@ -1890,7 +1890,7 @@ void test_api_getAIdataStr(void) {
 
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
 
-	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "#011231231231233310ABC123"));
+	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "^011231231231233310ABC123"));
 	TEST_ASSERT((out = gs1_encoder_getAIdataStr(ctx)) != NULL);
 	TEST_CHECK(strcmp(out, "(01)12312312312333(10)ABC123") == 0);
 
@@ -1898,12 +1898,12 @@ void test_api_getAIdataStr(void) {
 	TEST_CHECK((out = gs1_encoder_getAIdataStr(ctx)) == NULL);
 
 	// Escape data "(" characters
-	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "#10ABC(123"));
+	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "^10ABC(123"));
 	TEST_ASSERT((out = gs1_encoder_getAIdataStr(ctx)) != NULL);
 	TEST_CHECK(strcmp(out, "(10)ABC\\(123") == 0);
 
 	// Composite strings
-	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "#011231231231233310ABC123|#99XYZ(TM)_CORP"));
+	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "^011231231231233310ABC123|^99XYZ(TM)_CORP"));
 	TEST_ASSERT((out = gs1_encoder_getAIdataStr(ctx)) != NULL);
 	TEST_CHECK(strcmp(out, "(01)12312312312333(10)ABC123|(99)XYZ\\(TM)_CORP") == 0);
 
@@ -1920,7 +1920,7 @@ void test_api_getScanData(void) {
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
 
 	TEST_ASSERT(gs1_encoder_setSym(ctx, gs1_encoder_sDataBarExpanded));
-	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "#011231231231233310ABC123#11991225|#98COMPOSITE#97XYZ"));
+	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "^011231231231233310ABC123^11991225|^98COMPOSITE^97XYZ"));
 	TEST_ASSERT((out = gs1_encoder_getScanData(ctx)) != NULL);
 	TEST_CHECK(strcmp(out, "]e0011231231231233310ABC123" "\x1D" "1199122598COMPOSITE" "\x1D" "97XYZ") == 0);
 
@@ -1937,7 +1937,7 @@ void test_api_setScanData(void) {
 
 	TEST_ASSERT(gs1_encoder_setScanData(ctx, "]e0011231231231233310ABC123" "\x1D" "99XYZ"));
 	TEST_CHECK(gs1_encoder_getSym(ctx) == gs1_encoder_sDataBarExpanded);
-	TEST_CHECK(strcmp(gs1_encoder_getDataStr(ctx), "#011231231231233310ABC123#99XYZ") == 0);
+	TEST_CHECK(strcmp(gs1_encoder_getDataStr(ctx), "^011231231231233310ABC123^99XYZ") == 0);
 
 	gs1_encoder_free(ctx);
 
@@ -1954,14 +1954,14 @@ void test_api_getHRI(void) {
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
 
 	// HRI from linear-only, raw AI data
-	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "#011231231231233310ABC123"));
+	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "^011231231231233310ABC123"));
 	TEST_ASSERT((numAIs = gs1_encoder_getHRI(ctx, &hri)) == 2);
 	TEST_ASSERT(hri != NULL);
 	TEST_CHECK(strcmp(hri[0], "(01) 12312312312333") == 0);
 	TEST_CHECK(strcmp(hri[1], "(10) ABC123") == 0);
 
 	// HRI from composite, raw AI data
-	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "#011231231231233310ABC123|#99COMPOSITE"));
+	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "^011231231231233310ABC123|^99COMPOSITE"));
 	TEST_ASSERT((numAIs = gs1_encoder_getHRI(ctx, &hri)) == 3);
 	TEST_ASSERT(hri != NULL);
 	TEST_CHECK(strcmp(hri[0], "(01) 12312312312333") == 0);
@@ -2014,13 +2014,13 @@ void test_api_getHRI(void) {
 	TEST_CHECK(strcmp(hri[3], "(88) XYZ") == 0);
 
 	// HRI from linear-only, raw AI data, with unknown AI with known length 3
-	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "#236ABC123"));
+	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "^236ABC123"));
 	TEST_ASSERT((numAIs = gs1_encoder_getHRI(ctx, &hri)) == 1);
 	TEST_ASSERT(hri != NULL);
 	TEST_CHECK(strcmp(hri[0], "(236) ABC123") == 0);
 
 	// HRI from linear-only, raw AI data, with unknown AI with known length 4
-	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "#8299ABC123"));
+	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "^8299ABC123"));
 	TEST_ASSERT((numAIs = gs1_encoder_getHRI(ctx, &hri)) == 1);
 	TEST_ASSERT(hri != NULL);
 	TEST_CHECK(strcmp(hri[0], "(8299) ABC123") == 0);
@@ -2076,11 +2076,11 @@ void test_api_getBuffer(void) {
 
 	// Check integrity of dataStr after encode
 	TEST_CHECK(gs1_encoder_setSym(ctx, gs1_encoder_sEAN13));
-	TEST_CHECK(gs1_encoder_setDataStr(ctx, "1234567890128|#99123456"));
+	TEST_CHECK(gs1_encoder_setDataStr(ctx, "1234567890128|^99123456"));
 	TEST_CHECK(gs1_encoder_setOutFile(ctx, ""));
 	TEST_CHECK(gs1_encoder_setFormat(ctx, gs1_encoder_dRAW));
 	TEST_CHECK(gs1_encoder_encode(ctx));
-	TEST_CHECK(strcmp(gs1_encoder_getDataStr(ctx), "1234567890128|#99123456") == 0);
+	TEST_CHECK(strcmp(gs1_encoder_getDataStr(ctx), "1234567890128|^99123456") == 0);
 
 	gs1_encoder_free(ctx);
 

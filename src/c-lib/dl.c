@@ -101,7 +101,7 @@ static size_t URIunescape(char *out, size_t maxlen, const char *in, const size_t
 
 
 /*
- * Convert DL data to regular AI data string with # = FNC1
+ * Convert DL data to regular AI data string with ^ = FNC1
  *
  * This performs a lightweight parse, sufficient for extracting the AIs for
  * validation and HRI purposes.
@@ -242,7 +242,7 @@ bool gs1_parseDLuri(gs1_encoder *ctx, char *dlData, char *dataStr) {
 		DEBUG_PRINT("    Extracted: (%.*s) %.*s\n", ailen, ai, (int)vallen, aival);
 
 		if (fnc1req)
-			writeDataStr("#");			// Write FNC1, if required
+			writeDataStr("^");			// Write FNC1, if required
 		outai = dataStr + strlen(dataStr);		// Save start of AI for AI data
 		nwriteDataStr(ai, ailen);			// Write AI
 		fnc1req = gs1_isFNC1required(entry->ai);	// Record if required before next AI
@@ -270,7 +270,7 @@ bool gs1_parseDLuri(gs1_encoder *ctx, char *dlData, char *dataStr) {
 	}
 
 	// Fragment character delimits end of the query parameters
-	if (qp && ((fr = strchr(qp, '#')) != NULL))
+	if (qp && ((fr = strchr(qp, '^')) != NULL))
 		*fr++ = '\0';
 
 	if (qp)
@@ -326,7 +326,7 @@ bool gs1_parseDLuri(gs1_encoder *ctx, char *dlData, char *dataStr) {
 		DEBUG_PRINT("    Extracted: (%.*s) %.*s\n", ailen, ai, (int)vallen, aival);
 
 		if (fnc1req)
-			writeDataStr("#");			// Write FNC1, if required
+			writeDataStr("^");			// Write FNC1, if required
 		outai = dataStr + strlen(dataStr);		// Save start of AI for AI data
 		nwriteDataStr(ai, ailen);			// Write AI
 		fnc1req = gs1_isFNC1required(entry->ai);	// Record if required before next AI
@@ -367,7 +367,7 @@ out:
 		*(qp-1) = '?';
 
 	if (fr)			// Restore original fragment delimieter
-		*(fr-1) = '#';
+		*(fr-1) = '^';
 
 	return ret;
 
@@ -414,7 +414,7 @@ static void test_parseDLuri(gs1_encoder *ctx, bool should_succeed, const char *d
 
 
 /*
- *  Convert a DL URI to a regular AI string "#..."
+ *  Convert a DL URI to a regular AI string "^..."
  *
  */
 void test_dl_parseDLuri(void) {
@@ -430,11 +430,11 @@ void test_dl_parseDLuri(void) {
 
 	test_parseDLuri(ctx, true,					// http
 		"http://a/00/006141411234567890",
-		"#00006141411234567890");
+		"^00006141411234567890");
 
 	test_parseDLuri(ctx, true,					// https
 		"https://a/00/006141411234567890",
-		"#00006141411234567890");
+		"^00006141411234567890");
 
 	test_parseDLuri(ctx, false,					// No domain
 		"https://00/006141411234567890",
@@ -442,96 +442,96 @@ void test_dl_parseDLuri(void) {
 
 	test_parseDLuri(ctx, true,
 		"https://a/stem/00/006141411234567890",
-		"#00006141411234567890");
+		"^00006141411234567890");
 
 	test_parseDLuri(ctx, true,
 		"https://a/more/stem/00/006141411234567890",
-		"#00006141411234567890");
+		"^00006141411234567890");
 
 	test_parseDLuri(ctx, true,					// Fake AI in stem, stop at rightmost key
 		"https://a/00/faux/00/006141411234567890",
-		"#00006141411234567890");
+		"^00006141411234567890");
 
 	test_parseDLuri(ctx, true,
 		"https://a/01/12312312312333",
-		"#0112312312312333");
+		"^0112312312312333");
 
 	test_parseDLuri(ctx, true,					// GTIN-13 -> GTIN-14
 		"https://a/01/2112345678900",
-		"#0102112345678900");
+		"^0102112345678900");
 
 	test_parseDLuri(ctx, true,					// GTIN-12 -> GTIN-14
 		"https://a/01/416000336108",
-		"#0100416000336108");
+		"^0100416000336108");
 
 	test_parseDLuri(ctx, true,					// GTIN-8 -> GTIN-14
 		"https://a/01/02345673",
-		"#0100000002345673");
+		"^0100000002345673");
 
 	test_parseDLuri(ctx, true,
 		"https://a/01/12312312312333/22/TEST/10/ABC/21/XYZ",
-		"#011231231231233322TEST#10ABC#21XYZ");
+		"^011231231231233322TEST^10ABC^21XYZ");
 
 	test_parseDLuri(ctx, true,
 		"https://a/01/12312312312333/235/TEST",
-		"#0112312312312333235TEST");
+		"^0112312312312333235TEST");
 
 	test_parseDLuri(ctx, true,
 		"https://a/253/1231231231232",
-		"#2531231231231232");
+		"^2531231231231232");
 
 	test_parseDLuri(ctx, true,
 		"https://a/253/1231231231232TEST5678901234567",
-		"#2531231231231232TEST5678901234567");
+		"^2531231231231232TEST5678901234567");
 
 	test_parseDLuri(ctx, false,
 		"https://a/253/1231231231232TEST56789012345678", "");	// Too long N13 X0..17
 
 	test_parseDLuri(ctx, true,
 		"https://a/8018/123456789012345675/8019/123",
-		"#8018123456789012345675#8019123");
+		"^8018123456789012345675^8019123");
 
 	test_parseDLuri(ctx, false,
 		"https://a/stem/00/006141411234567890/", ""); 		// Can't end in slash
 
 	test_parseDLuri(ctx, true,
 		"https://a/stem/00/006141411234567890?99=ABC",		// Query params; no FNC1 req after pathinfo
-		 "#0000614141123456789099ABC");
+		 "^0000614141123456789099ABC");
 
 	test_parseDLuri(ctx, true,
 		"https://a/stem/401/12345678?99=ABC",			// Query params; FNC1 req after pathinfo
-		 "#40112345678#99ABC");
+		 "^40112345678^99ABC");
 
 	test_parseDLuri(ctx, true,
 		"https://a/01/12312312312333?99=ABC&98=XYZ",
-		"#011231231231233399ABC#98XYZ");
+		"^011231231231233399ABC^98XYZ");
 
 	test_parseDLuri(ctx, false,
 		"https://a/01/12312312312333?99=ABC&999=faux", "");	// Non-AI, numeric-only query param
 
 	test_parseDLuri(ctx, true,
 		"https://a/01/12312312312333?&&&99=ABC&&&&&&98=XYZ&&&",	// Extraneous query param separators
-		"#011231231231233399ABC#98XYZ");
+		"^011231231231233399ABC^98XYZ");
 
 	test_parseDLuri(ctx, true,
 		"https://a/01/12312312312333?99=ABC&unknown=666&98=XYZ",
-		"#011231231231233399ABC#98XYZ");
+		"^011231231231233399ABC^98XYZ");
 
 	test_parseDLuri(ctx, true,
 		"https://a/01/12312312312333?99=ABC&singleton&98=XYZ",
-		"#011231231231233399ABC#98XYZ");
+		"^011231231231233399ABC^98XYZ");
 
 	test_parseDLuri(ctx, true,
 		"https://a/01/12312312312333?singleton&99=ABC&98=XYZ",
-		"#011231231231233399ABC#98XYZ");
+		"^011231231231233399ABC^98XYZ");
 
 	test_parseDLuri(ctx, true,
 		"https://a/01/12312312312333?99=ABC&98=XYZ&singleton",
-		"#011231231231233399ABC#98XYZ");
+		"^011231231231233399ABC^98XYZ");
 
 	test_parseDLuri(ctx, true,
 		"https://a/01/12312312312333/22/ABC%2d123?99=ABC&98=XYZ%2f987",	// Percent escaped values
-		"#011231231231233322ABC-123#99ABC#98XYZ/987");
+		"^011231231231233322ABC-123^99ABC^98XYZ/987");
 
 
 	/*
@@ -541,73 +541,73 @@ void test_dl_parseDLuri(void) {
 
 	test_parseDLuri(ctx, true,
 		"https://id.gs1.org/01/09520123456788",
-		"#0109520123456788");
+		"^0109520123456788");
 
 	test_parseDLuri(ctx, true,
 		"https://brand.example.com/01/9520123456788",
-		"#0109520123456788");
+		"^0109520123456788");
 
 	test_parseDLuri(ctx, true,
 		"https://brand.example.com/some-extra/pathinfo/01/9520123456788",
-		"#0109520123456788");
+		"^0109520123456788");
 
 	test_parseDLuri(ctx, true,
 		"https://id.gs1.org/01/09520123456788/22/2A",
-		"#0109520123456788222A");
+		"^0109520123456788222A");
 
 	test_parseDLuri(ctx, true,
 		"https://id.gs1.org/01/09520123456788/10/ABC123",
-		"#010952012345678810ABC123");
+		"^010952012345678810ABC123");
 
 	test_parseDLuri(ctx, true,
 		"https://id.gs1.org/01/09520123456788/21/12345",
-		"#01095201234567882112345");
+		"^01095201234567882112345");
 
 	test_parseDLuri(ctx, true,
 		"https://id.gs1.org/01/09520123456788/10/ABC1/21/12345?17=180426",
-		"#010952012345678810ABC1#2112345#17180426");
+		"^010952012345678810ABC1^2112345^17180426");
 	// Specification sorts (17) before (10) and (21):
-	//   "#01095201234567881718042610ABC1#2112345"
+	//   "^01095201234567881718042610ABC1^2112345"
 
 	test_parseDLuri(ctx, true,
 		"https://id.gs1.org/01/09520123456788?3103=000195",
-		"#01095201234567883103000195");
+		"^01095201234567883103000195");
 
 	test_parseDLuri(ctx, true,
 		"https://example.com/01/9520123456788?3103=000195&3922=0299&17=201225",
-		"#0109520123456788310300019539220299#17201225");
+		"^0109520123456788310300019539220299^17201225");
 
 	test_parseDLuri(ctx, true,
 		"https://example.com/01/9520123456788?3103=000195&3922=0299&17=201225",
-		"#0109520123456788310300019539220299#17201225");
+		"^0109520123456788310300019539220299^17201225");
 
 	test_parseDLuri(ctx, true,
 		"https://id.gs1.org/01/9520123456788?3103=000195&3922=0299&17=201225",
-		"#0109520123456788310300019539220299#17201225");
+		"^0109520123456788310300019539220299^17201225");
 
 	test_parseDLuri(ctx, true,
 		"https://id.gs1.org/01/9520123456788?17=201225&3103=000195&3922=0299",
-		"#010952012345678817201225310300019539220299");
+		"^010952012345678817201225310300019539220299");
 
 	test_parseDLuri(ctx, true,
 		"https://id.gs1.org/00/952012345678912345",
-		"#00952012345678912345");
+		"^00952012345678912345");
 
 	test_parseDLuri(ctx, true,
 		"https://id.gs1.org/00/952012345678912345?02=09520123456788&37=25&10=ABC123",
-		"#0095201234567891234502095201234567883725#10ABC123");
+		"^0095201234567891234502095201234567883725^10ABC123");
 
 	test_parseDLuri(ctx, true,
 		"https://id.gs1.org/414/9520123456788",
-		"#4149520123456788");
+		"^4149520123456788");
 
 	test_parseDLuri(ctx, true,
 		"https://id.gs1.org/414/9520123456788/254/32a%2Fb",
-		"#414952012345678825432a/b");
+		"^414952012345678825432a/b");
 
 	test_parseDLuri(ctx, true,
 		"https://example.com/8004/9520614141234567?01=9520123456788",
-		"#80049520614141234567#0109520123456788");
+		"^80049520614141234567^0109520123456788");
 
 
 	// Examples with unknown AIs, not permitted
@@ -624,11 +624,11 @@ void test_dl_parseDLuri(void) {
 
 	test_parseDLuri(ctx, true,
 		"https://example.com/01/9520123456788/89/ABC123?99=XYZ",
-		"#010952012345678889ABC123#99XYZ");
+		"^010952012345678889ABC123^99XYZ");
 
 	test_parseDLuri(ctx, true,
 		"https://example.com/01/9520123456788?99=XYZ&89=ABC123",
-		"#010952012345678899XYZ#89ABC123");
+		"^010952012345678899XYZ^89ABC123");
 
 	gs1_encoder_free(ctx);
 

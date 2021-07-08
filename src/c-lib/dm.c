@@ -190,21 +190,21 @@ static void createCodewords(gs1_encoder *ctx, const uint8_t *string, uint8_t cws
 
 	(void)ctx;
 
-	if (*string == '#') {		// "#..." => GS1 mode
+	if (*string == '^') {		// "^..." => GS1 mode
 		gs1Mode = true;
 	} else {
-		// Unescape leading sequence "\\...#" -> "\...#"
+		// Unescape leading sequence "\\...^" -> "\...^"
 		q = string;
 		while (*q == '\\')
 			q++;
-		if (*q == '#')
+		if (*q == '^')
 			string++;
 	}
 
 	// Encode the message in ASCII mode
 	p = cws;
 	while (*string && p-cws < MAX_DM_DAT_CWS) {
-		if (*string == '#' && gs1Mode) {
+		if (*string == '^' && gs1Mode) {
 			*p++ = 232;
 			string++;
 		} else if (*string >= '0' && *string <= '9') {
@@ -477,14 +477,14 @@ static int DMenc(gs1_encoder *ctx, const uint8_t string[], struct patternLength 
 
 	DEBUG_PRINT("\nData: %s\n", string);
 
-	if (*string == '#' && strchr((char*)string, '|') != NULL) {
+	if (*string == '^' && strchr((char*)string, '|') != NULL) {
 		strcpy(ctx->errMsg, "Composite component is not supported for Data Matrix");
 		ctx->errFlag = true;
 		return 0;
 	}
 
 	// For GS1 purposes we restrict to AI or DL only
-	if (!(*string == '#' ||
+	if (!(*string == '^' ||
 	     (strlen((char*)string) >= 8 && strncmp((char*)string, "https://", 8) == 0) ||
 	     (strlen((char*)string) >= 7 && strncmp((char*)string, "http://",  7) == 0)) ) {
 		strcpy(ctx->errMsg, "Data Matrix input must be either an AI element string or a Digital Link URI");
@@ -641,10 +641,10 @@ NULL
 "                      ",
 NULL
 	};
-	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sDM, "#011234567890123110ABC123#11210630", expect));  // GS1 mode
+	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sDM, "^011234567890123110ABC123^11210630", expect));  // GS1 mode
 
 
-	TEST_CHECK(test_encode(ctx, false, gs1_encoder_sDM, "#0112345678901231|#99ABC", NULL));  // CC is invalid
+	TEST_CHECK(test_encode(ctx, false, gs1_encoder_sDM, "^0112345678901231|^99ABC", NULL));  // CC is invalid
 
 
 	gs1_encoder_free(ctx);

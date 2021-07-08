@@ -50,12 +50,12 @@ static int getVal12(const uint8_t bitString[], const int symNdx) {
 }
 
 
-// looks for '^' (symbol separator) in string and returns char index iff found
+// looks for '#' (symbol separator) in string and returns char index iff found
 static int isSymbolSepatator(const uint8_t string[]) {
 	int i;
 
 	for (i = 0; i < (int)strlen((char*)string); i++) {
-		if (string[i] == '^') {
+		if (string[i] == '#') {  // Symbol separator
 			return(i);
 		}
 	}
@@ -271,7 +271,7 @@ void gs1_RSSExp(gs1_encoder *ctx) {
 
 	DEBUG_PRINT("\nData: %s\n", dataStr);
 
-	if (*dataStr != '#') {
+	if (*dataStr != '^') {
 		strcpy(ctx->errMsg, "primary data must be AI syntax (FNC1 in first position)");
 		ctx->errFlag = true;
 		return;
@@ -510,7 +510,7 @@ void test_rssexp_RSSEXP_encode(void) {
 " X X   X   XXXX   X XXXXXXXX    X X XXX     XX   X XXX   XX   X  XX X XXXX      XXX  X XXX   XXX XXX XXXX X XXXX   XX   XXXXXX    X X   X  X      XX X ",
 NULL
 	};
-	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sDataBarExpanded, "#01950123456789033103000123", expect));
+	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sDataBarExpanded, "^01950123456789033103000123", expect));
 
 	gs1_encoder_setDataBarExpandedSegmentsWidth(ctx, 4);
 	expect = (const char*[]){
@@ -587,7 +587,7 @@ NULL
 "  X XXXX X XXXX   XX   XXXXXX    X X   X  X      XX X                                                 ",
 NULL
 	};
-	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sDataBarExpanded, "#01950123456789033103000123", expect));
+	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sDataBarExpanded, "^01950123456789033103000123", expect));
 
 	gs1_encoder_free(ctx);
 

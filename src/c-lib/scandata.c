@@ -73,25 +73,25 @@ static void scancat(char* out, const char* in) {
 	while (*q)
 		q++;					// Got to end of output
 
-	if (*p == '#') {				// GS1 mode
+	if (*p == '^') {				// GS1 mode
 		p++;					// Skip the leading FNC1 since we are following a symbology identifier
 		while (*p) {
-			if (*p == '#')			// Convert encoded FNC1 to GS
+			if (*p == '^')			// Convert encoded FNC1 to GS
 				*q++ = '\x1D';
 			else
 				*q++ = *p;
 			p++;
 		}
-		if (*(p - 1) == '#')			// Strip any trailing FNC1
+		if (*(p - 1) == '^')			// Strip any trailing FNC1
 			q--;
 	}
 	else {
 
-		// Unescape leading sequence "\\...#" -> "\...#"
+		// Unescape leading sequence "\\...^" -> "\...^"
 		r = p;
 		while (*r == '\\')
 			r++;
-		if (*r == '#')
+		if (*r == '^')
 			p++;
 
 		while (*p)
@@ -126,7 +126,7 @@ char* gs1_generateScanData(gs1_encoder* ctx) {
 		// QR: "]Q1" for plain data; "]Q3" for GS1 data
 		// DM: "]d1" for plain data; "]d2" for GS1 data
 
-		if (*ctx->dataStr == '#') {
+		if (*ctx->dataStr == '^') {
 			strcat(ctx->outStr, ctx->sym == gs1_encoder_sQR ? "]Q3" : "]d2");
 		} else {
 			strcat(ctx->outStr, ctx->sym == gs1_encoder_sQR ? "]Q1" : "]d1");
@@ -141,7 +141,7 @@ char* gs1_generateScanData(gs1_encoder* ctx) {
 
 		if (!cc) {
 			// "]C1" for linear-only GS1-128
-			assert(*ctx->dataStr == '#');
+			assert(*ctx->dataStr == '^');
 			strcat(ctx->outStr, "]C1");
 			scancat(ctx->outStr, ctx->dataStr);
 			break;
@@ -153,12 +153,12 @@ char* gs1_generateScanData(gs1_encoder* ctx) {
 
 		// "]e0" followed by concatenated AI data from linear and CC
 
-		assert(*ctx->dataStr == '#');
+		assert(*ctx->dataStr == '^');
 		strcat(ctx->outStr, "]e0");
 		scancat(ctx->outStr, ctx->dataStr);
 
 		if (cc) {
-			assert(*cc == '#');
+			assert(*cc == '^');
 
 			// Append GS if last AI of linear component isn't fixed-length
 			lastAIfnc1 = false;
@@ -193,7 +193,7 @@ char* gs1_generateScanData(gs1_encoder* ctx) {
 		scancat(ctx->outStr, primaryStr);
 
 		if (cc) {
-			assert(*cc == '#');
+			assert(*cc == '^');
 			scancat(ctx->outStr, cc);
 		}
 
@@ -227,7 +227,7 @@ char* gs1_generateScanData(gs1_encoder* ctx) {
 		strcat(ctx->outStr, prefix);
 		scancat(ctx->outStr, primaryStr);
 		if (cc) {
-			assert(*cc == '#');
+			assert(*cc == '^');
 			strcat(ctx->outStr, "|]e0");		// "|" means start of new message
 			scancat(ctx->outStr, cc);
 		}
@@ -339,18 +339,18 @@ bool gs1_processScanData(gs1_encoder* ctx, const char* scanData) {
 	if (aiMode) {
 
 		q = p;
-		*p++ = '#';
+		*p++ = '^';
 
-		// Forbid data "#" characters at this stage so we don't conflate with FNC1
-		if (strchr(scanData, '#') != NULL) {
-			strcpy(ctx->errMsg, "Scan data contains illegal # character");
+		// Forbid data "^" characters at this stage so we don't conflate with FNC1
+		if (strchr(scanData, '^') != NULL) {
+			strcpy(ctx->errMsg, "Scan data contains illegal ^ character");
 			goto fail;
 		}
 
 		strcpy(p, scanData);
 		while (*p) {
 			if (*p == 0x1D)		// GS character represents FNC1
-				*p = '#';
+				*p = '^';
 			p++;
 		}
 		if (!gs1_processAIdata(ctx, q, true))	// Validate AI data and extract AIs
@@ -362,11 +362,11 @@ bool gs1_processScanData(gs1_encoder* ctx, const char* scanData) {
 
 	// From here plain data
 
-	// Disambiguate from GS1 data: "#" -> "\#" ; "\#" -> "\\#", etc
+	// Disambiguate from GS1 data: "^" -> "\^" ; "\^" -> "\\^", etc
 	q = scanData;
 	while (*q == '\\')
 		q++;
-	if (*q == '#')
+	if (*q == '^')
 		*p++ = '\\';
 	strcpy(p, scanData);
 
@@ -430,71 +430,71 @@ void test_scandata_generateScanData(void) {
 
 	/* QR */
 	test_testGenerateScanData(QR, "TESTING", "]Q1TESTING");
-	test_testGenerateScanData(QR, "\\#TESTING", "]Q1#TESTING");		// Escaped data "#" character
-	test_testGenerateScanData(QR, "\\\\#TESTING", "]Q1\\#TESTING");		// Escaped data "\#" characters
-	test_testGenerateScanData(QR, "#011231231231233310ABC123#99TESTING",
+	test_testGenerateScanData(QR, "\\^TESTING", "]Q1^TESTING");		// Escaped data "^" character
+	test_testGenerateScanData(QR, "\\\\^TESTING", "]Q1\\^TESTING");		// Escaped data "\^" characters
+	test_testGenerateScanData(QR, "^011231231231233310ABC123^99TESTING",
 		"]Q3011231231231233310ABC123" "\x1D" "99TESTING");
 
 	/* DM */
 	test_testGenerateScanData(DM, "TESTING", "]d1TESTING");
-	test_testGenerateScanData(DM, "\\#TESTING", "]d1#TESTING");		// Escaped data "#" character
-	test_testGenerateScanData(DM, "\\\\#TESTING", "]d1\\#TESTING");		// Escaped data "\#" characters
-	test_testGenerateScanData(DM, "#011231231231233310ABC123#99TESTING",
+	test_testGenerateScanData(DM, "\\^TESTING", "]d1^TESTING");		// Escaped data "^" character
+	test_testGenerateScanData(DM, "\\\\^TESTING", "]d1\\^TESTING");		// Escaped data "\^" characters
+	test_testGenerateScanData(DM, "^011231231231233310ABC123^99TESTING",
 		"]d2011231231231233310ABC123" "\x1D" "99TESTING");
-	test_testGenerateScanData(DM, "#011231231231233310ABC123#99TESTING#",
+	test_testGenerateScanData(DM, "^011231231231233310ABC123^99TESTING^",
 		"]d2011231231231233310ABC123" "\x1D" "99TESTING");		// Trailing FNC1 should be stripped
 
 	/* DataBar Expanded */
-	test_testGenerateScanData(DataBarExpanded, "#011231231231233310ABC123#99TESTING",
+	test_testGenerateScanData(DataBarExpanded, "^011231231231233310ABC123^99TESTING",
 		"]e0011231231231233310ABC123" "\x1D" "99TESTING");
 	test_testGenerateScanData(DataBarExpanded, 				// ... Variable-length AI | Composite
-		"#011231231231233310ABC123#99TESTING|#98COMPOSITE#97XYZ",
+		"^011231231231233310ABC123^99TESTING|^98COMPOSITE^97XYZ",
 		"]e0011231231231233310ABC123" "\x1D" "99TESTING" "\x1D" "98COMPOSITE" "\x1D" "97XYZ");
 	test_testGenerateScanData(DataBarExpanded,				// ... Fixed-Length AI | Composite
-		"#011231231231233310ABC123#11991225|#98COMPOSITE#97XYZ",
+		"^011231231231233310ABC123^11991225|^98COMPOSITE^97XYZ",
 		"]e0011231231231233310ABC123" "\x1D" "1199122598COMPOSITE" "\x1D" "97XYZ");
 
 	/* GS1-128 */
-	test_testGenerateScanData(GS1_128_CCA, "#011231231231233310ABC123#99TESTING",
+	test_testGenerateScanData(GS1_128_CCA, "^011231231231233310ABC123^99TESTING",
 		"]C1011231231231233310ABC123" "\x1D" "99TESTING");
 	test_testGenerateScanData(GS1_128_CCA,					// Composite uses ]e0
-		"#011231231231233310ABC123#99TESTING|#98COMPOSITE#97XYZ",
+		"^011231231231233310ABC123^99TESTING|^98COMPOSITE^97XYZ",
 		"]e0011231231231233310ABC123" "\x1D" "99TESTING" "\x1D" "98COMPOSITE" "\x1D" "97XYZ");
 
 	/* DataBar OmniDirectional */
-	test_testGenerateScanData(DataBarOmni, "#0124012345678905|#99COMPOSITE#98XYZ",
+	test_testGenerateScanData(DataBarOmni, "^0124012345678905|^99COMPOSITE^98XYZ",
 		"]e0012401234567890599COMPOSITE" "\x1D" "98XYZ");
-	test_testGenerateScanData(DataBarOmni, "24012345678905|#99COMPOSITE#98XYZ",
+	test_testGenerateScanData(DataBarOmni, "24012345678905|^99COMPOSITE^98XYZ",
 		"]e0012401234567890599COMPOSITE" "\x1D" "98XYZ");
 
 	/* DataBar Limited */
-	test_testGenerateScanData(DataBarLimited, "#0115012345678907|#99COMPOSITE#98XYZ",
+	test_testGenerateScanData(DataBarLimited, "^0115012345678907|^99COMPOSITE^98XYZ",
 		"]e0011501234567890799COMPOSITE" "\x1D" "98XYZ");
-	test_testGenerateScanData(DataBarLimited, "15012345678907|#99COMPOSITE#98XYZ",
+	test_testGenerateScanData(DataBarLimited, "15012345678907|^99COMPOSITE^98XYZ",
 		"]e0011501234567890799COMPOSITE" "\x1D" "98XYZ");
 
 	/* UPC-A */
-	test_testGenerateScanData(UPCA, "#0100416000336108|#99COMPOSITE#98XYZ",
+	test_testGenerateScanData(UPCA, "^0100416000336108|^99COMPOSITE^98XYZ",
 		"]E00416000336108|]e099COMPOSITE" "\x1D" "98XYZ");
-	test_testGenerateScanData(UPCA, "416000336108|#99COMPOSITE#98XYZ",
+	test_testGenerateScanData(UPCA, "416000336108|^99COMPOSITE^98XYZ",
 		"]E00416000336108|]e099COMPOSITE" "\x1D" "98XYZ");
 
 	/* UPC-E */
-	test_testGenerateScanData(UPCE, "#0100001234000057|#99COMPOSITE#98XYZ",
+	test_testGenerateScanData(UPCE, "^0100001234000057|^99COMPOSITE^98XYZ",
 		"]E00001234000057|]e099COMPOSITE" "\x1D" "98XYZ");
-	test_testGenerateScanData(UPCE, "001234000057|#99COMPOSITE#98XYZ",
+	test_testGenerateScanData(UPCE, "001234000057|^99COMPOSITE^98XYZ",
 		"]E00001234000057|]e099COMPOSITE" "\x1D" "98XYZ");
 
 	/* EAN-13 */
-	test_testGenerateScanData(EAN13, "#0102112345678900|#99COMPOSITE#98XYZ",
+	test_testGenerateScanData(EAN13, "^0102112345678900|^99COMPOSITE^98XYZ",
 		"]E02112345678900|]e099COMPOSITE" "\x1D" "98XYZ");
-	test_testGenerateScanData(EAN13, "2112345678900|#99COMPOSITE#98XYZ",
+	test_testGenerateScanData(EAN13, "2112345678900|^99COMPOSITE^98XYZ",
 		"]E02112345678900|]e099COMPOSITE" "\x1D" "98XYZ");
 
 	/* EAN-8 */
-	test_testGenerateScanData(EAN8, "#0100000002345673|#99COMPOSITE#98XYZ",
+	test_testGenerateScanData(EAN8, "^0100000002345673|^99COMPOSITE^98XYZ",
 		"]E402345673|]e099COMPOSITE" "\x1D" "98XYZ");
-	test_testGenerateScanData(EAN8, "02345673|#99COMPOSITE#98XYZ",
+	test_testGenerateScanData(EAN8, "02345673|^99COMPOSITE^98XYZ",
 		"]E402345673|]e099COMPOSITE" "\x1D" "98XYZ");
 
 	gs1_encoder_free(ctx);
@@ -541,44 +541,44 @@ void test_scandata_processScanData(void) {
 	/* QR */
 	test_testProcessScanData(true, "]Q1", QR, "");
 	test_testProcessScanData(true, "]Q1TESTING", QR, "TESTING");
-	test_testProcessScanData(true, "]Q1#TESTING", QR, "\\#TESTING");
-	test_testProcessScanData(true, "]Q1\\#TESTING", QR, "\\\\#TESTING");
+	test_testProcessScanData(true, "]Q1^TESTING", QR, "\\^TESTING");
+	test_testProcessScanData(true, "]Q1\\^TESTING", QR, "\\\\^TESTING");
 	test_testProcessScanData(false, "]Q3", NONE, "");		// Empty GS1 data
 	test_testProcessScanData(true, "]Q3011231231231233310ABC123" "\x1D" "99TESTING",
-		QR, "#011231231231233310ABC123#99TESTING");
+		QR, "^011231231231233310ABC123^99TESTING");
 
 	// Digital Link URI
 	test_testProcessScanData(true, "]Q1https://id.gs1.org/01/12312312312333?99=TEST",
 		QR, "https://id.gs1.org/01/12312312312333?99=TEST");
-	TEST_CHECK(strcmp(ctx->dlAIbuffer, "#011231231231233399TEST") == 0);	// Check AI extraction
+	TEST_CHECK(strcmp(ctx->dlAIbuffer, "^011231231231233399TEST") == 0);	// Check AI extraction
 
 	/* DM */
 	test_testProcessScanData(true, "]d1", DM, "");
 	test_testProcessScanData(true, "]d1TESTING", DM, "TESTING");
-	test_testProcessScanData(true, "]d1#TESTING", DM, "\\#TESTING");
-	test_testProcessScanData(true, "]d1\\#TESTING", DM, "\\\\#TESTING");
+	test_testProcessScanData(true, "]d1^TESTING", DM, "\\^TESTING");
+	test_testProcessScanData(true, "]d1\\^TESTING", DM, "\\\\^TESTING");
 	test_testProcessScanData(false, "]d2", NONE, "");		// Empty GS1 data
 	test_testProcessScanData(true, "]d2011231231231233310ABC123" "\x1D" "99TESTING",
-		DM, "#011231231231233310ABC123#99TESTING");
+		DM, "^011231231231233310ABC123^99TESTING");
 
 	// Digital Link URI
 	test_testProcessScanData(true, "]d1https://id.gs1.org/01/12312312312333?99=TEST",
 		DM, "https://id.gs1.org/01/12312312312333?99=TEST");
-	TEST_CHECK(strcmp(ctx->dlAIbuffer, "#011231231231233399TEST") == 0);	// Check AI extraction
+	TEST_CHECK(strcmp(ctx->dlAIbuffer, "^011231231231233399TEST") == 0);	// Check AI extraction
 
 	/* DataBar Expanded, shared with all DataBar family and UCC-128 Composite */
 	test_testProcessScanData(false, "]e0", NONE, "");		// Empty GS1 data
 	test_testProcessScanData(true, "]e0011231231231233310ABC123" "\x1D" "99TESTING",
-		DataBarExpanded, "#011231231231233310ABC123#99TESTING");
+		DataBarExpanded, "^011231231231233310ABC123^99TESTING");
 	test_testProcessScanData(true, "]e0011231231231233310ABC123" "\x1D" "99TESTING" "\x1D" "98XYZ",
-		DataBarExpanded, "#011231231231233310ABC123#99TESTING#98XYZ");
+		DataBarExpanded, "^011231231231233310ABC123^99TESTING^98XYZ");
 	test_testProcessScanData(true, "]e0011231231231233310ABC123" "\x1D" "1199122598TESTING" "\x1D" "97XYZ",
-		DataBarExpanded, "#011231231231233310ABC123#1199122598TESTING#97XYZ");
+		DataBarExpanded, "^011231231231233310ABC123^1199122598TESTING^97XYZ");
 
 	/* GS1-128 linear-only; composite is ]e0 */
 	test_testProcessScanData(false, "]C1", NONE, "");		// Empty GS1 data
 	test_testProcessScanData(true, "]C1011231231231233310ABC123" "\x1D" "99TESTING",
-		GS1_128_CCA, "#011231231231233310ABC123#99TESTING");
+		GS1_128_CCA, "^011231231231233310ABC123^99TESTING");
 
 	/* EAN/UPC, except EAN-8 */
 	test_testProcessScanData(false, "]E0", NONE, "");
@@ -589,7 +589,7 @@ void test_scandata_processScanData(void) {
 	test_testProcessScanData(true, "]E02112345678900",
 		EAN13, "2112345678900");
 	test_testProcessScanData(true, "]E02112345678900|]e099COMPOSITE" "\x1D" "98XYZ",
-		EAN13, "2112345678900|#99COMPOSITE#98XYZ");
+		EAN13, "2112345678900|^99COMPOSITE^98XYZ");
 
 	/* EAN-8 */
 	test_testProcessScanData(false, "]E4", NONE, "");
@@ -600,7 +600,7 @@ void test_scandata_processScanData(void) {
 	test_testProcessScanData(true, "]E402345673",
 		EAN8, "02345673");
 	test_testProcessScanData(true, "]E402345673|]e099COMPOSITE" "\x1D" "98XYZ",
-		EAN8, "02345673|#99COMPOSITE#98XYZ");
+		EAN8, "02345673|^99COMPOSITE^98XYZ");
 
 	gs1_encoder_free(ctx);
 

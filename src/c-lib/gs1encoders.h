@@ -1189,13 +1189,13 @@ GS1_ENCODERS_API char* gs1_encoder_getDataStr(gs1_encoder *ctx);
  * syntax data such as the GS1 DataBar family. Others accept either an AI
  * string or a GS1 Digital Link URI, such as QR Code and Data Matrix.
  *
- * A "#" character at the start of the input indicates that the data is in GS1
+ * A "^" character at the start of the input indicates that the data is in GS1
  * Application Identifier syntax. In this case, all subsequent instances of the
- * "#" character represent the FNC1 non-data characters that are used to
+ * "^" character represent the FNC1 non-data characters that are used to
  * separate fields that are not specified as being pre-defined length from
  * subsequent fields.
  *
- * Inputs beginning with "#" will be validated against certain data syntax
+ * Inputs beginning with "^" will be validated against certain data syntax
  * rules for GS1 AIs. If the input is invalid then this function will return
  * false and an error message will be set that can be read using
  * gs1_encoder_getErrMsg().
@@ -1220,10 +1220,10 @@ GS1_ENCODERS_API char* gs1_encoder_getDataStr(gs1_encoder *ctx);
  *   * **GS1 DataBar Stacked**:: 14 digits including check digit
  *   * **GS1 DataBar Stacked Omnidirectional**:: 14 digits including check digit
  *   * **GS1 DataBar Limited**:: 14 digits beginning "0" or "1" including check digit
- *   * **GS1 DataBar Expanded (Stacked)**:: GS1 AI syntax in raw form, with "#" = FNC1
- *   * **GS1-128**:: GS1 AI syntax in raw form, with "#" = FNC1
- *   * **GS1 DataMatrix**:: GS1 AI syntax in raw form, with "#" = FNC1
- *   * **GS1 QR Code**:: GS1 AI syntax in raw form, with "#" = FNC1
+ *   * **GS1 DataBar Expanded (Stacked)**:: GS1 AI syntax in raw form, with "^" = FNC1
+ *   * **GS1-128**:: GS1 AI syntax in raw form, with "^" = FNC1
+ *   * **GS1 DataMatrix**:: GS1 AI syntax in raw form, with "^" = FNC1
+ *   * **GS1 QR Code**:: GS1 AI syntax in raw form, with "^" = FNC1
  *   * **Data Matrix**:: A Digital Link URI
  *   * **QR Code**:: A Digital Link URI
  *
@@ -1236,7 +1236,7 @@ GS1_ENCODERS_API char* gs1_encoder_getDataStr(gs1_encoder *ctx);
  * FNC1 in first position, for example:
  *
  * \code
- * #0112345678901231|#10ABC123#11210630
+ * ^0112345678901231|^10ABC123^11210630
  * \endcode
  *
  * The above specifies a linear component representing "(01)12345678901231"
@@ -1324,7 +1324,7 @@ GS1_ENCODERS_API bool gs1_encoder_setAIdataStr(gs1_encoder *ctx, const char *dat
  *
  * For example, if the input data buffer were to contain:
  *
- *     #011231231231233310ABC123|#99XYZ(TM) CORP
+ *     ^011231231231233310ABC123|^99XYZ(TM) CORP
  *
  * Then this function would return:
  *
@@ -1417,13 +1417,13 @@ GS1_ENCODERS_API bool gs1_encoder_setScanData(gs1_encoder* ctx, const char *scan
  * ::gs1_encoder_sEAN13       | 2112345678900                                  | ]E02112345678900
  * ::gs1_encoder_sUPCA        | 416000336108                                   | ]E00416000336108
  * ::gs1_encoder_sEAN8        | 02345673                                       | ]E402345673
- * ::gs1_encoder_sEAN8        | 02345673\|#99COMPOSITE#98XYZ                   | ]E402345673\|]e099COMPOSITE{GS}98XYZ
- * ::gs1_encoder_sGS1_128_CCA | #011231231231233310ABC123#99TESTING            | ]C1011231231231233310ABC123{GS}99TESTING
- * ::gs1_encoder_sGS1_128_CCA | #0112312312312333\|#98COMPOSITE#97XYZ          | ]e00112312312312333{GS}98COMPOSITE{GS}97XYZ
+ * ::gs1_encoder_sEAN8        | 02345673\|^99COMPOSITE^98XYZ                   | ]E402345673\|]e099COMPOSITE{GS}98XYZ
+ * ::gs1_encoder_sGS1_128_CCA | ^011231231231233310ABC123^99TESTING            | ]C1011231231231233310ABC123{GS}99TESTING
+ * ::gs1_encoder_sGS1_128_CCA | ^0112312312312333\|^98COMPOSITE^97XYZ          | ]e00112312312312333{GS}98COMPOSITE{GS}97XYZ
  * ::gs1_encoder_sQR          | https://example.org/01/12312312312333          | ]Q1https://example.org/01/12312312312333
- * ::gs1_encoder_sQR          | #01123123123123338200http://example.com        | ]Q301123123123123338200http://example.com
+ * ::gs1_encoder_sQR          | ^01123123123123338200http://example.com        | ]Q301123123123123338200http://example.com
  * ::gs1_encoder_sDM          | https://example.com/gtin/09506000134352/lot/A1 | ]d1https://example.com/gtin/09506000134352/lot/A1
- * ::gs1_encoder_sDM          | #011231231231233310ABC123#99TESTING            | ]d2011231231231233310ABC123{GS}99TESTING
+ * ::gs1_encoder_sDM          | ^011231231231233310ABC123^99TESTING            | ]d2011231231231233310ABC123{GS}99TESTING
  *
  * The output will be prefixed with the appropriate AIM symbology identifier.
  *
@@ -1473,7 +1473,7 @@ GS1_ENCODERS_API char* gs1_encoder_getScanData(gs1_encoder* ctx);
  *
  * For example, if the input data buffer were to contain:
  *
- *     #011231231231233310ABC123|#99XYZ(TM) CORP
+ *     ^011231231231233310ABC123|^99XYZ(TM) CORP
  *
  * Then this function would return the following array of null-terminated
  * strings:

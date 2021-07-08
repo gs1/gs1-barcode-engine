@@ -606,15 +606,15 @@ static const uint8_t iswhat[256] = { /* byte look up table with IS_XXX bits */
 	/* 32 control characters: */
 		0x80,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-	/* 32 punctuation and numeric characters: (FNC1 = # , symbol separator = ^ ) */
-		8,8,8,0xf,0,8,8,8,8,8,0xc,8,0xc,0xc,0xc,0xc,
+	/* 32 punctuation and numeric characters: (symbol separator = #) */
+		8,8,8,0xd,0,8,8,8,8,8,0xc,8,0xc,0xc,0xc,0xc,
 		0xd,0xd,0xd,0xd,0xd,0xd,0xd,0xd,0xd,0xd,
 		8,8,8,8,8,8,
-	/* 32 upper case and punctuation characters: */
+	/* 32 upper case and punctuation characters: (FNC1 = ^) */
 		0,
 		0xc,0xc,0xc,0xc,0xc,0xc,0xc,0xc,0xc,0xc,0xc,0xc,0xc,
 		0xc,0xc,0xc,0xc,0xc,0xc,0xc,0xc,0xc,0xc,0xc,0xc,0xc,
-		0,0,0,0xc,8,
+		0,0,0,0xf,8,
 	/* 32 lower case and punctuation characters: */
 		0,
 		8,8,8,8,8,8,8,8,8,8,8,8,8,
@@ -709,9 +709,9 @@ static int getUnusedBitCnt(gs1_encoder *ctx, int iBit, int *size) {
 }
 
 
-// input chars FNC1 '#' and SYM_SEP '^' also defined in iswhat array
-#define FNC1 '#'
-#define SYM_SEP 94
+// input chars FNC1 '^' and SYM_SEP '#' also defined in iswhat array
+#define FNC1 '^'
+#define SYM_SEP '#'
 
 #define	NUM_MODE	1
 #define	ALNU_MODE	2
@@ -1269,12 +1269,12 @@ static int doMethods(gs1_encoder *ctx, struct encodeT *encode) {
 		gs1_putBits(ctx, encode->bitField, 2+16, 1,
 				(uint16_t)((encode->str[1] == '1') ? 0 : 1)); // 0/1 bit for AI 11/17
 		if (encode->str[8] == '1' && encode->str[9] == '0' &&
-				encode->str[10] != '#') {
+				encode->str[10] != FNC1) {
 			encode->iStr = 2+6+2; // lot data follows
 			encode->iBit = 2+16+1;
 		}
 		else {
-			encode->str[7] = '#'; // insert FNC1 to indicate no lot
+			encode->str[7] = FNC1; // insert FNC1 to indicate no lot
 			encode->iStr = 2+6-1;
 			encode->iBit = 2+16+1;
 		}
@@ -2107,7 +2107,7 @@ int gs1_CC2enc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][C
 	int size;
 	int i;
 
-	if (*str == '#')
+	if (*str == '^')
 		str++;
 
 	ctx->linFlag = 0;
@@ -2143,7 +2143,7 @@ int gs1_CC3enc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][C
 	int size;
 	int i;
 
-	if (*str == '#')
+	if (*str == '^')
 		str++;
 
 	ctx->linFlag = 0;
@@ -2179,7 +2179,7 @@ int gs1_CC4enc(gs1_encoder *ctx, uint8_t str[], uint8_t pattern[MAX_CCB4_ROWS][C
 	int size;
 	int i;
 
-	if (*str == '#')
+	if (*str == '^')
 		str++;
 
 	ctx->linFlag = 0;
@@ -2213,7 +2213,7 @@ bool gs1_CCCenc(gs1_encoder *ctx, uint8_t str[], uint8_t patCCC[] ) {
 	int byteCnt;
 	int i;
 
-	if (*str == '#')
+	if (*str == '^')
 		str++;
 
 	ctx->linFlag = -1; // CC-C flag value

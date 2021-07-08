@@ -574,15 +574,15 @@ static void createCodewords(gs1_encoder *ctx, const uint8_t *str, uint8_t cws_v[
 
 	(void) ctx;		// Silence compiler
 
-	if (*str == '#') {		// "#..." => GS1 mode
+	if (*str == '^') {		// "^..." => GS1 mode
 		gs1Mode = true;
 		str++;
 	} else {
-		// Unescape leading sequence "\\...#" -> "\...#"
+		// Unescape leading sequence "\\...^" -> "\...^"
 		p = str;
 		while (*p == '\\')
 			p++;
-		if (*p == '#')
+		if (*p == '^')
 			str++;
 	}
 
@@ -609,7 +609,7 @@ static void createCodewords(gs1_encoder *ctx, const uint8_t *str, uint8_t cws_v[
 
 		// Byte per character
 		while (*str) {
-			if (*str == '#' && gs1Mode)
+			if (*str == '^' && gs1Mode)
 				addBits(cws_v[i], &bits_v[i], 8, 0x1d, MAX_QR_DAT_BITS, false);  // FNC1 -> GS
 			else
 				addBits(cws_v[i], &bits_v[i], 8, *str, MAX_QR_DAT_BITS, false);
@@ -819,14 +819,14 @@ static int QRenc(gs1_encoder *ctx, const uint8_t string[], struct patternLength 
 
 	DEBUG_PRINT("\nData: %s\n", string);
 
-	if (*string == '#' && strchr((char *)string, '|') != NULL) {
+	if (*string == '^' && strchr((char *)string, '|') != NULL) {
 		strcpy(ctx->errMsg, "Composite component is not supported for QR Code");
 		ctx->errFlag = true;
 		return 0;
 	}
 
 	// For GS1 purposes we restrict to AI or DL only
-	if (!(*string == '#' ||
+	if (!(*string == '^' ||
 	     (strlen((char*)string) >= 8 && strncmp((char*)string, "https://", 8) == 0) ||
 	     (strlen((char*)string) >= 7 && strncmp((char*)string, "http://",  7) == 0)) ) {
 		strcpy(ctx->errMsg, "QR Code input must be either an AI element string or a Digital Link URI");
@@ -971,7 +971,7 @@ void test_qr_QR_versions(void) {
 
 	gs1_encoder_setFormat(ctx, gs1_encoder_dRAW);
 	gs1_encoder_setSym(ctx, gs1_encoder_sQR);
-	gs1_encoder_setDataStr(ctx, "#99A");
+	gs1_encoder_setDataStr(ctx, "^99A");
 
 	for (v = 1; v <= 40; v++) {
 		for (ec = gs1_encoder_qrEClevelL; ec <= gs1_encoder_qrEClevelH; ec++) {
@@ -1075,10 +1075,10 @@ NULL
 "                                     ",
 NULL
 	};
-	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sQR, "#011234567890123110ABC123#11210630", expect));  // GS1 mode
+	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sQR, "^011234567890123110ABC123^11210630", expect));  // GS1 mode
 
 
-	TEST_CHECK(test_encode(ctx, false, gs1_encoder_sQR, "#0112345678901231|#99ABC", NULL));  // CC is invalid
+	TEST_CHECK(test_encode(ctx, false, gs1_encoder_sQR, "^0112345678901231|^99ABC", NULL));  // CC is invalid
 
 
 	gs1_encoder_free(ctx);

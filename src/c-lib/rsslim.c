@@ -297,7 +297,7 @@ static bool RSSLimEnc(gs1_encoder *ctx, uint8_t string[], uint8_t bars[], const 
 
 bool gs1_normaliseRSSLim(gs1_encoder *ctx, const char *dataStr, char *primaryStr) {
 
-	if (strlen(dataStr) >= 3 && strncmp(dataStr, "#01", 3) == 0)
+	if (strlen(dataStr) >= 3 && strncmp(dataStr, "^01", 3) == 0)
 	dataStr += 3;
 
 	if (!ctx->addCheckDigit) {
@@ -504,7 +504,7 @@ void test_rsslim_RSSLIM_encode(void) {
 " X   XX  XX   XX XX X X  XXX X  X X XX X  XX X  X  X XX   XX XXX  XX  XX X",
 NULL
 	};
-	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sDataBarLimited, "#0115012345678907", expect));
+	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sDataBarLimited, "^0115012345678907", expect));
 	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sDataBarLimited, "15012345678907", expect));
 	gs1_encoder_setAddCheckDigit(ctx, true);
 	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sDataBarLimited, "1501234567890", expect));

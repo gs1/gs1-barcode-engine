@@ -370,7 +370,7 @@ static bool RSS14enc(gs1_encoder *ctx, uint8_t string[], uint8_t bars[], const i
 
 bool gs1_normaliseRSS14(gs1_encoder *ctx, const char *dataStr, char *primaryStr) {
 
-	if (strlen(dataStr) >= 3 && strncmp(dataStr, "#01", 3) == 0)
+	if (strlen(dataStr) >= 3 && strncmp(dataStr, "^01", 3) == 0)
 		dataStr += 3;
 
 	if (!ctx->addCheckDigit) {
@@ -828,7 +828,7 @@ void test_rss14_RSS14_encode(void) {
 " X X    X  X   XXX  XXXXX      X XXXX   X X  XX XX X  X XXXXX  X XXXXX     XXX XX XXXXX X XXXX X",
 NULL
 	};
-	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sDataBarOmni, "#0124012345678905", expect));
+	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sDataBarOmni, "^0124012345678905", expect));
 	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sDataBarOmni, "24012345678905", expect));
 	gs1_encoder_setAddCheckDigit(ctx, true);
 	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sDataBarOmni, "2401234567890", expect));
@@ -860,7 +860,7 @@ void test_rss14_RSS14T_encode(void) {
 " X X    X  X   XXX  XXXXX      X XXXX   X X  XX XX X  X XXXXX  X XXXXX     XXX XX XXXXX X XXXX X",
 NULL
 	};
-	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sDataBarTruncated, "#0124012345678905", expect));
+	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sDataBarTruncated, "^0124012345678905", expect));
 	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sDataBarTruncated, "24012345678905", expect));
 	gs1_encoder_setAddCheckDigit(ctx, true);
 	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sDataBarTruncated, "2401234567890", expect));
@@ -892,7 +892,7 @@ void test_rss14_RSS14S_encode(void) {
 "X XX X  X XXXXX  X XXXXX     XXX XX XXXXX X XXXX X",
 NULL
 	};
-	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sDataBarStacked, "#0124012345678905", expect));
+	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sDataBarStacked, "^0124012345678905", expect));
 	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sDataBarStacked, "24012345678905", expect));
 	gs1_encoder_setAddCheckDigit(ctx, true);
 	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sDataBarStacked, "2401234567890", expect));
@@ -980,7 +980,7 @@ void test_rss14_RSS14SO_encode(void) {
 "X XX X  X XXXXX  X XXXXX     XXX XX XXXXX X XXXX X",
 NULL
 	};
-	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sDataBarStackedOmni, "#0124012345678905", expect));
+	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sDataBarStackedOmni, "^0124012345678905", expect));
 	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sDataBarStackedOmni, "24012345678905", expect));
 	gs1_encoder_setAddCheckDigit(ctx, true);
 	TEST_CHECK(test_encode(ctx, true, gs1_encoder_sDataBarStackedOmni, "2401234567890", expect));
