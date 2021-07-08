@@ -992,7 +992,7 @@ The library is thread-safe provided that each thread operates on its own instanc
 </div><div class="memdoc">
 
 <p>Return the barcode input data buffer in human-friendly AI syntax. </p>
-<p>For example, if the input data buffer were to contain: </p><pre class="fragment">#011231231231233310ABC123|#99XYZ(TM) CORP
+<p>For example, if the input data buffer were to contain: </p><pre class="fragment">^011231231231233310ABC123|^99XYZ(TM) CORP
 </pre><p>Then this function would return: </p><pre class="fragment">(01)12312312312333(10)ABC123|(99)XYZ\(TM) CORP
 </pre><dl class="section note"><dt>Note</dt><dd>The return data does not need to be free()ed and the content should be copied if it must persist in user code after subsequent calls to library functions that modify the input data buffer such as <a class="el" href="gs1encoders_8h.html#a6325f0f12c0a2110939b876aefbdd1d1" title="Sets the raw data in the buffer that is to be directly encoded within a barcode symbol when buffer in...">gs1_encoder_setDataStr()</a>, <a class="el" href="gs1encoders_8h.html#abdce5a9347ff7cbbd153b1a13e3273dd" title="Sets the data in the buffer that is used when buffer input is selected by parsing input provided in G...">gs1_encoder_setAIdataStr()</a> and <a class="el" href="gs1encoders_8h.html#ac137de565a438241f6e8b80598cef464" title="Process scan data received from a barcode reader with reporting of AIM symbology identifiers enabled ...">gs1_encoder_setScanData()</a>.</dd>
 <dd>
@@ -1495,7 +1495,7 @@ The returned pointer should be checked for NULL which indicates non-AI input dat
 </div><div class="memdoc">
 
 <p>Update a given pointer towards an array of strings containing Human-Readable Interpretation ("HRI") text. </p>
-<p>For example, if the input data buffer were to contain: </p><pre class="fragment">#011231231231233310ABC123|#99XYZ(TM) CORP
+<p>For example, if the input data buffer were to contain: </p><pre class="fragment">^011231231231233310ABC123|^99XYZ(TM) CORP
 </pre><p>Then this function would return the following array of null-terminated strings: </p><pre class="fragment">"(01) 12312312312333"
 "(10) ABC123"
 "--"
@@ -1844,19 +1844,19 @@ The returned pointer should be checked for NULL which indicates non-AI input dat
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a class="el" href="gs1encoders_8h.html#a7dab341c6821917b8eddfd1d17de4053ac582b7f1d7e748f14b98a40a9610ae44" title="EAN-8.">gs1_encoder_sEAN8</a> </td><td class="markdownTableBodyNone">02345673 </td><td class="markdownTableBodyNone">]E402345673  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a class="el" href="gs1encoders_8h.html#a7dab341c6821917b8eddfd1d17de4053ac582b7f1d7e748f14b98a40a9610ae44" title="EAN-8.">gs1_encoder_sEAN8</a> </td><td class="markdownTableBodyNone">02345673|#99COMPOSITE#98XYZ </td><td class="markdownTableBodyNone">]E402345673|]e099COMPOSITE{GS}98XYZ  </td></tr>
+<td class="markdownTableBodyNone"><a class="el" href="gs1encoders_8h.html#a7dab341c6821917b8eddfd1d17de4053ac582b7f1d7e748f14b98a40a9610ae44" title="EAN-8.">gs1_encoder_sEAN8</a> </td><td class="markdownTableBodyNone">02345673|^99COMPOSITE^98XYZ </td><td class="markdownTableBodyNone">]E402345673|]e099COMPOSITE{GS}98XYZ  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a class="el" href="gs1encoders_8h.html#a7dab341c6821917b8eddfd1d17de4053a7a6e74c2cad48bb27a00a067947a1c8d" title="GS1-128 with CC-A or CC-B.">gs1_encoder_sGS1_128_CCA</a> </td><td class="markdownTableBodyNone">#011231231231233310ABC123#99TESTING </td><td class="markdownTableBodyNone">]C1011231231231233310ABC123{GS}99TESTING  </td></tr>
+<td class="markdownTableBodyNone"><a class="el" href="gs1encoders_8h.html#a7dab341c6821917b8eddfd1d17de4053a7a6e74c2cad48bb27a00a067947a1c8d" title="GS1-128 with CC-A or CC-B.">gs1_encoder_sGS1_128_CCA</a> </td><td class="markdownTableBodyNone">^011231231231233310ABC123^99TESTING </td><td class="markdownTableBodyNone">]C1011231231231233310ABC123{GS}99TESTING  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a class="el" href="gs1encoders_8h.html#a7dab341c6821917b8eddfd1d17de4053a7a6e74c2cad48bb27a00a067947a1c8d" title="GS1-128 with CC-A or CC-B.">gs1_encoder_sGS1_128_CCA</a> </td><td class="markdownTableBodyNone">#0112312312312333|#98COMPOSITE#97XYZ </td><td class="markdownTableBodyNone">]e00112312312312333{GS}98COMPOSITE{GS}97XYZ  </td></tr>
+<td class="markdownTableBodyNone"><a class="el" href="gs1encoders_8h.html#a7dab341c6821917b8eddfd1d17de4053a7a6e74c2cad48bb27a00a067947a1c8d" title="GS1-128 with CC-A or CC-B.">gs1_encoder_sGS1_128_CCA</a> </td><td class="markdownTableBodyNone">^0112312312312333|^98COMPOSITE^97XYZ </td><td class="markdownTableBodyNone">]e00112312312312333{GS}98COMPOSITE{GS}97XYZ  </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a class="el" href="gs1encoders_8h.html#a7dab341c6821917b8eddfd1d17de4053a2ff3d6b47e141e82f74795d9834560c3" title="(GS1) QR Code">gs1_encoder_sQR</a> </td><td class="markdownTableBodyNone"><a href="https://example.org/01/12312312312333">https://example.org/01/12312312312333</a> </td><td class="markdownTableBodyNone">]Q1https://example.org/01/12312312312333  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a class="el" href="gs1encoders_8h.html#a7dab341c6821917b8eddfd1d17de4053a2ff3d6b47e141e82f74795d9834560c3" title="(GS1) QR Code">gs1_encoder_sQR</a> </td><td class="markdownTableBodyNone">#01123123123123338200<a href="http://example.com">http://example.com</a> </td><td class="markdownTableBodyNone">]Q301123123123123338200http://example.com  </td></tr>
+<td class="markdownTableBodyNone"><a class="el" href="gs1encoders_8h.html#a7dab341c6821917b8eddfd1d17de4053a2ff3d6b47e141e82f74795d9834560c3" title="(GS1) QR Code">gs1_encoder_sQR</a> </td><td class="markdownTableBodyNone">^01123123123123338200http://example.com </td><td class="markdownTableBodyNone">]Q301123123123123338200http://example.com  </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a class="el" href="gs1encoders_8h.html#a7dab341c6821917b8eddfd1d17de4053ae133b476dcbc3d56579df62d6a08ba6d" title="(GS1) Data Matrix">gs1_encoder_sDM</a> </td><td class="markdownTableBodyNone"><a href="https://example.com/gtin/09506000134352/lot/A1">https://example.com/gtin/09506000134352/lot/A1</a> </td><td class="markdownTableBodyNone">]d1https://example.com/gtin/09506000134352/lot/A1  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a class="el" href="gs1encoders_8h.html#a7dab341c6821917b8eddfd1d17de4053ae133b476dcbc3d56579df62d6a08ba6d" title="(GS1) Data Matrix">gs1_encoder_sDM</a> </td><td class="markdownTableBodyNone">#011231231231233310ABC123#99TESTING </td><td class="markdownTableBodyNone">]d2011231231231233310ABC123{GS}99TESTING  </td></tr>
+<td class="markdownTableBodyNone"><a class="el" href="gs1encoders_8h.html#a7dab341c6821917b8eddfd1d17de4053ae133b476dcbc3d56579df62d6a08ba6d" title="(GS1) Data Matrix">gs1_encoder_sDM</a> </td><td class="markdownTableBodyNone">^011231231231233310ABC123^99TESTING </td><td class="markdownTableBodyNone">]d2011231231231233310ABC123{GS}99TESTING  </td></tr>
 </table>
 <p>The output will be prefixed with the appropriate AIM symbology identifier.</p>
 <p>"{GS}" in the scan data output in the above table represents a literal GS character (ASCII 29) that is included in the returned data.</p>
@@ -2336,8 +2336,8 @@ The returned pointer should be checked for NULL which indicates non-AI input dat
 
 <p>Sets the raw data in the buffer that is to be directly encoded within a barcode symbol when buffer input is selected. </p>
 <p>Each encoder accepts input in a format that is specific to the requirements of the symbology, as described below. Some accept "plain" data input such as a 13-character GTIN in the case of EAN-13. Some require AI syntax data such as the GS1 DataBar family. Others accept either an AI string or a GS1 Digital Link URI, such as QR Code and Data Matrix.</p>
-<p>A "#" character at the start of the input indicates that the data is in GS1 Application Identifier syntax. In this case, all subsequent instances of the "#" character represent the FNC1 non-data characters that are used to separate fields that are not specified as being pre-defined length from subsequent fields.</p>
-<p>Inputs beginning with "#" will be validated against certain data syntax rules for GS1 AIs. If the input is invalid then this function will return false and an error message will be set that can be read using <a class="el" href="gs1encoders_8h.html#aee9e7c8b49fe2a8fa7bd0b21c1e7510b" title="Read an error message generated by the library.">gs1_encoder_getErrMsg()</a>.</p>
+<p>A "^" character at the start of the input indicates that the data is in GS1 Application Identifier syntax. In this case, all subsequent instances of the "^" character represent the FNC1 non-data characters that are used to separate fields that are not specified as being pre-defined length from subsequent fields.</p>
+<p>Inputs beginning with "^" will be validated against certain data syntax rules for GS1 AIs. If the input is invalid then this function will return false and an error message will be set that can be read using <a class="el" href="gs1encoders_8h.html#aee9e7c8b49fe2a8fa7bd0b21c1e7510b" title="Read an error message generated by the library.">gs1_encoder_getErrMsg()</a>.</p>
 <p>It is strongly advised that GS1 data input is instead specified using <a class="el" href="gs1encoders_8h.html#abdce5a9347ff7cbbd153b1a13e3273dd" title="Sets the data in the buffer that is used when buffer input is selected by parsing input provided in G...">gs1_encoder_setAIdataStr()</a> which takes care of the AI encoding rules automatically, including insertion of FNC1 characters where required. This can be used for all symbologies that accept GS1 AI syntax data.</p>
 <p>Inputs beginning with "http://" or "https://" will be parsed as a Digital Link URI during which the corresponding AI element string is extracted and validated.</p>
 <p>The acceptable data input varies between symbologies:</p>
@@ -2351,16 +2351,16 @@ The returned pointer should be checked for NULL which indicates non-AI input dat
 <li><b>GS1 DataBar Stacked</b>:: 14 digits including check digit</li>
 <li><b>GS1 DataBar Stacked Omnidirectional</b>:: 14 digits including check digit</li>
 <li><b>GS1 DataBar Limited</b>:: 14 digits beginning "0" or "1" including check digit</li>
-<li><b>GS1 DataBar Expanded (Stacked)</b>:: GS1 AI syntax in raw form, with "#" = FNC1</li>
-<li><b>GS1-128</b>:: GS1 AI syntax in raw form, with "#" = FNC1</li>
-<li><b>GS1 DataMatrix</b>:: GS1 AI syntax in raw form, with "#" = FNC1</li>
-<li><b>GS1 QR Code</b>:: GS1 AI syntax in raw form, with "#" = FNC1</li>
+<li><b>GS1 DataBar Expanded (Stacked)</b>:: GS1 AI syntax in raw form, with "^" = FNC1</li>
+<li><b>GS1-128</b>:: GS1 AI syntax in raw form, with "^" = FNC1</li>
+<li><b>GS1 DataMatrix</b>:: GS1 AI syntax in raw form, with "^" = FNC1</li>
+<li><b>GS1 QR Code</b>:: GS1 AI syntax in raw form, with "^" = FNC1</li>
 <li><b>Data Matrix</b>:: A Digital Link URI</li>
 <li><b>QR Code</b>:: A Digital Link URI</li>
 </ul>
 <p>In the interest of data harmony, the EAN/UPC symbologies will additionally accept a GTIN input, such as (01)00000002345673 for EAN-8.</p>
 <p>EAN/UPC, GS1 DataBar and GS1-128 support a Composite Component. The Composite Component must be specified in AI syntax. It must be separated from the primary linear components with a "|" character and begin with an FNC1 in first position, for example:</p>
-<div class="fragment"><div class="line"><span class="preprocessor">#0112345678901231|#10ABC123#11210630</span></div>
+<div class="fragment"><div class="line">^0112345678901231|^10ABC123^11210630</div>
 </div><!-- fragment --><p>The above specifies a linear component representing "(01)12345678901231" together with a composite component representing "(10)ABC123(11)210630".</p>
 <p><b>Again, for GS1 data it is simpler and less error prone to specify the input in human-friendly GS1 AI syntax using <a class="el" href="gs1encoders_8h.html#abdce5a9347ff7cbbd153b1a13e3273dd" title="Sets the data in the buffer that is used when buffer input is selected by parsing input provided in G...">gs1_encoder_setAIdataStr()</a>.</b></p>
 <dl class="section note"><dt>Note</dt><dd>Plain data inputs (including Digital Link URIs) and AI data inputs that are syntactically valid but unsuitable for the intended symbology will be accepted by this function and this fail when <a class="el" href="gs1encoders_8h.html#ae3ec8ae78be621eab641b03b560eccfc" title="Generate a barcode symbol representing the given input data.">gs1_encoder_encode()</a> is called.</dd>
