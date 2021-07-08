@@ -573,7 +573,7 @@ namespace GS1.EncodersApp
 
             symbologyComboBox.SelectedIndex = App.gs1Encoder.Sym;
 
-            if (App.gs1Encoder.DataStr.StartsWith("#"))
+            if (App.gs1Encoder.DataStr.StartsWith("^"))
             {
                 dataStrTextBox.Text = App.gs1Encoder.AIdataStr;
             } else
@@ -618,12 +618,12 @@ namespace GS1.EncodersApp
                 App.gs1Encoder.Encode();
 
                 infoLabel.Content = "";
-                if (App.gs1Encoder.DataStr.Length > 0 && App.gs1Encoder.DataStr[0] == '#')  // AI data
+                if (App.gs1Encoder.DataStr.Length > 0 && App.gs1Encoder.DataStr[0] == '^')  // AI data
                 {
-                    if (dataStrTextBox.Text.StartsWith("#"))
+                    if (dataStrTextBox.Text.StartsWith("^"))
                         infoLabel.Content = "AI data:   " + App.gs1Encoder.AIdataStr;
                     else if (dataStrTextBox.Text.StartsWith("("))
-                        infoLabel.Content = "Encoded data (FNC1 = \"#\"):   " + App.gs1Encoder.DataStr;
+                        infoLabel.Content = "Encoded data (FNC1 = \"^\"):   " + App.gs1Encoder.DataStr;
                 }
 
                 if (App.gs1Encoder.DataStr.StartsWith("http://") || App.gs1Encoder.DataStr.StartsWith("https://"))
