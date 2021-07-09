@@ -112,13 +112,8 @@ jobs:
     - name: Windows release build
       working-directory: src
       run: |
-        msbuild /t:Restore,Build /p:Configuration=release /p:Platform="x86" gs1encoders.sln
-        msbuild /p:Configuration=release /p:Platform="x86" gs1encoders.sln -target:gs1encoders-dotnet-app:Publish
-
-    - name: Exercise applications
-      run: |
-        src\c-lib\build\console-app\Win32\Release\gs1encoders-app.exe --version
-        src\dotnet-app\bin\Release\netcoreapp3.1\gs1encoders-dotnet-app.exe --version
+        msbuild /t:Restore,Build /p:Configuration=release /p:Platform="x86" /p:RuntimeIdentifier=win-x86 gs1encoders.sln
+        msbuild /p:Configuration=release /p:Platform="x86" /p:PublishSingleFile=True /p:SelfContained=True /p:RuntimeIdentifier=win-x86 /p:PublishDir=bin\Release\netcoreapp3.1\win-x86\publish\ gs1encoders.sln -target:gs1encoders-dotnet-app:Publish
 
     - name: ZIP development libs
       working-directory: src/c-lib/build/library/Win32/Release
@@ -143,15 +138,15 @@ jobs:
         path: src/c-lib/build/console-app/Win32/Release/gs1encoders-windows-console-app.zip
 
     - name: ZIP GUI application
-      working-directory: src/dotnet-app/bin/Release\netcoreapp3.1\publish
+      working-directory: src/dotnet-app/bin/Release\netcoreapp3.1\win-x86\publish
       run: |
-        7z a gs1encoders-windows-gui-app.zip gs1encoders-dotnet-app.* ../gs1encoders.dll
+        7z a gs1encoders-windows-gui-app.zip gs1encoders-dotnet-app.exe ../../gs1encoders.dll
 
     - name: Store Windows GUI app
       uses: actions/upload-artifact@v2
       with:
         name: windows-gui-app
-        path: src/dotnet-app/bin/Release/netcoreapp3.1/publish/gs1encoders-windows-gui-app.zip
+        path: src/dotnet-app/bin/Release/netcoreapp3.1/win-x86/publish/gs1encoders-windows-gui-app.zip
 
 
   build-release-linux:
