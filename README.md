@@ -21,10 +21,10 @@ settings.
 
 This project includes:
 
-  * The native C library that can be vendored into third-party code or compiled for use as a shared library (Linux / BSD) or dynamic-link library (Windows).
-  * An example console application whose code demonstrates how to use the library.
-  * C# .NET Wrappers around the native library using Platform Invoke (P/Invoke).
-  * A .NET desktop application using Windows Presentation Foundation (WPF) whose code demonstratess how to use the C# .NET wrappers together with the native library.
+  * A native C library that can be vendored into third-party code or compiled for use as a shared library (Linux / BSD) or dynamic-link library (Windows).
+  * An example console application whose code demonstrates how to use the native library to generate barcode symbols.
+  * A C# .NET wrapper class that provides an object interface to the native library from managed code, using Platform Invoke (P/Invoke). 
+  * An example .NET desktop application using Windows Presentation Foundation (WPF) that demonstrates how to use the C# .NET wrapper to access the native library.
 
 
 License
@@ -48,7 +48,7 @@ specific language governing permissions and limitations under the License.
 Documentation
 -------------
 
-The C library API is fully documented in the src/c-lib/docs/ directory and is
+The C library API is fully documented in the docs/ directory and is
 available online here: <https://gs1.github.io/gs1-encoders/>
 
 Instructions for getting started with the console application are provided in
