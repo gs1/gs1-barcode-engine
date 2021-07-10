@@ -774,7 +774,7 @@ GS1_ENCODERS_API char* gs1_encoder_getScanData(gs1_encoder* ctx) {
 GS1_ENCODERS_API bool gs1_encoder_setScanData(gs1_encoder* ctx, const char *scanData) {
 	assert(ctx);
 	assert(scanData);
-	return gs1_processScanData(ctx);
+	return gs1_processScanData(ctx, scanData);
 }
 
 
