@@ -189,11 +189,17 @@
 /// \cond
 #include <stdbool.h>
 #include <stddef.h>
+
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
 /// \endcond
 
 
-// Decorator for public API functions that we export from a DLL
-#ifdef _WIN32
+// Decorator for public API functions that we export
+#ifdef __EMSCRIPTEN__
+#  define GS1_ENCODERS_API EMSCRIPTEN_KEEPALIVE
+#elif _WIN32
 #  define GS1_ENCODERS_API __declspec(dllexport)
 #else
 #  define GS1_ENCODERS_API
