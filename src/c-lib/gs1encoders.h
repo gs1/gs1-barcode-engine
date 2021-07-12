@@ -32,7 +32,7 @@
  * human-friendly formats, and process the scan data received from barcode
  * readers.
  *
- * The supported symbologies are:
+ * The symbologies supported by this library are:
  *
  *   * GS1 DataBar family
  *   * GS1-128
@@ -45,11 +45,30 @@
  * applications and do not contain additional features that might be required
  * for more general use.
  *
+ * Within the GS1 Application Identifier system, structured data is represented
+ * in different formats depending upon the context.
+ *
+ * The data formats supported by this library are:
+ *
+ *   * **Bracketed AI element strings**: Human-friendly rendition of an AI element string.
+ *   * **Unbracketed AI element strings**: Rendition of an AI element string that corresponds most directly to encoded barcode data.
+ *   * **Scan data**: The result of scanning a symbol with a barcode reader that has AIM symbologies identifiers enabled.
+ *   * **Human Readable Interpretation (HRI)**: Representation of the AI data contained within a symbol.
+ *   * **Digital Link URIs**
+ *
+ * This following diagram shows how the library can be used for processing and
+ * transformation of GS1 data, indicating which formats are accepted as input,
+ * how barcode message data is generated and AI data extracted from the
+ * provided input data, and how the given data can be output in various
+ * formats.
+ *
+ * | Data transformation: Inputs, outputs and buffers |
+ * | :----------------------------------------------- |
+ * | \image html input_output_buffers.svg             |
+ *
  * The barcode input data can either be received from a string buffer or read
- * from a file as either a raw barcode message or in human-friendly GS1
- * Application Identifier syntax. The barcode symbols be written to a BMP or
- * TIFF file, or accessed by a buffer in either graphical format or as an array
- * of strings.
+ * from a file. The barcode symbols be written to a BMP or TIFF file, or
+ * accessed by a buffer in either graphical format or as an array of strings.
  *
  * This example use of the library shows how to write the generated barcode
  * image directly to a file:
