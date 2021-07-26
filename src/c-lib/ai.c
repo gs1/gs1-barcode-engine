@@ -170,6 +170,28 @@ uint8_t gs1_aiLengthByPrefix(const char *ai) {
 static const char *cset82 = "!\"%&'()*+,-./0123456789:;<=>?ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz";
 
 
+/*
+ *  Set of 32 characters used in alpha check characters
+ *
+ */
+static const char *cset32 = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
+
+
+/*
+ *  Set of prime weights used to derive alpha check characters
+ *
+ *  First 97 since that is the maximum length of any AI is currently 99.
+ *
+ */
+static const uint16_t primes[] = {
+	2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,
+	73,79,83,89,97,101,103,107,109,113,127,131,137,139,149,151,157,163,167,173,
+	179,181,191,193,197,199,211,223,227,229,233,239,241,251,257,263,269,271,277,281,
+	283,293,307,311,313,317,331,337,347,349,353,359,367,373,379,383,389,397,401,409,
+	419,421,431,433,439,443,449,457,461,463,467,479,487,491,499,503,509
+};
+
+
 /* "Linter" functions
  *
  * Used to validate AI components
@@ -210,6 +232,41 @@ static bool lint_csum(gs1_encoder *ctx, const struct aiEntry *entry, char *val) 
 	};
 	DEBUG_PRINT(" success\n");
 	return true;
+}
+
+static bool lint_csumalpha(gs1_encoder *ctx, const struct aiEntry *entry, char *val) {
+	size_t i;
+	uint32_t sum = 0;
+	size_t len = strlen(val);
+	const uint16_t *p;
+
+	DEBUG_PRINT("      csumalpha...");
+	if (len < 2) {
+		sprintf(ctx->errMsg, "AI (%s): Alphanumeric string is too short to check", entry->ai);
+		goto fail;
+	}
+	if (len > SIZEOF_ARRAY(primes)) {
+		sprintf(ctx->errMsg, "AI (%s): Alphanumeric string is too long to check", entry->ai);
+		goto fail;
+	}
+
+	p = primes + len - 3;
+	for (i = 0; i < len - 2; i++)
+		sum += (uint32_t)((strchr(cset82, val[i]) - cset82) * *p--);
+	sum %= 1021;
+	if (val[i] != cset32[sum >> 5] || val[i+1] != cset32[sum & 31]) {
+		sprintf(ctx->errMsg, "AI (%s): Bad alphanumeric check characters", entry->ai);
+		goto fail;
+	}
+
+	DEBUG_PRINT(" success\n");
+	return true;
+
+fail:
+	DEBUG_PRINT(" failed\n");
+	ctx->errFlag = true;
+	return false;
+
 }
 
 
@@ -728,7 +785,7 @@ static const struct aiEntry ai_table[] = {
 	AI( "8010", FNC1   , C,1,30,_, __, __, __, __,                    "CPID"                      ),
 	AI( "8011", FNC1   , N,1,12,_, __, __, __, __,                    "CPID SERIAL"               ),
 	AI( "8012", FNC1   , X,1,20,_, __, __, __, __,                    "VERSION"                   ),
-	AI( "8013", FNC1   , X,1,25,_, __, __, __, __,                    "GMN"                       ),
+	AI( "8013", FNC1   , X,1,25,csumalpha, __, __, __, __,            "GMN"                       ),
 	AI( "8017", FNC1   , N,18,18,csum, __, __, __, __,                "GSRN - PROVIDER"           ),
 	AI( "8018", FNC1   , N,18,18,csum, __, __, __, __,                "GSRN - RECIPIENT"          ),
 	AI( "8019", FNC1   , N,1,10,_, __, __, __, __,                    "SRIN"                      ),
@@ -1263,27 +1320,31 @@ void test_ai_parseAIdata(void) {
 
 	test_parseAIdata(ctx, true,  "(01)12345678901231", "^0112345678901231");
 	test_parseAIdata(ctx, true,  "(10)12345", "^1012345");
-	test_parseAIdata(ctx, true,  "(01)12345678901231(10)12345", "^01123456789012311012345");	// No FNC1 after (01)
-	test_parseAIdata(ctx, true,  "(3100)123456(10)12345", "^31001234561012345");			// No FNC1 after (3100)
-	test_parseAIdata(ctx, true,  "(10)12345(11)991225", "^1012345^11991225");			// FNC1 after (10)
-	test_parseAIdata(ctx, true,  "(3900)12345(11)991225", "^390012345^11991225");			// FNC1 after (3900)
-	test_parseAIdata(ctx, true,  "(10)12345\\(11)991225", "^1012345(11)991225");			// Escaped bracket
-	test_parseAIdata(ctx, true,  "(10)12345\\(", "^1012345(");					// At end if fine
+	test_parseAIdata(ctx, true,  "(01)12345678901231(10)12345", "^01123456789012311012345");		// No FNC1 after (01)
+	test_parseAIdata(ctx, true,  "(3100)123456(10)12345", "^31001234561012345");				// No FNC1 after (3100)
+	test_parseAIdata(ctx, true,  "(10)12345(11)991225", "^1012345^11991225");				// FNC1 after (10)
+	test_parseAIdata(ctx, true,  "(3900)12345(11)991225", "^390012345^11991225");				// FNC1 after (3900)
+	test_parseAIdata(ctx, true,  "(10)12345\\(11)991225", "^1012345(11)991225");				// Escaped bracket
+	test_parseAIdata(ctx, true,  "(10)12345\\(", "^1012345(");						// At end if fine
 
-	test_parseAIdata(ctx, false, "(10)(11)98765", "");						// Value must not be empty
-	test_parseAIdata(ctx, false, "(10)12345(11)", "");						// Value must not be empty
-	test_parseAIdata(ctx, false, "(1A)12345", "");							// AI must be numeric
-	test_parseAIdata(ctx, false, "1(12345", "");							// Must start with AI
-	test_parseAIdata(ctx, false, "12345", "");							// Must start with AI
-	test_parseAIdata(ctx, false, "()12345", "");							// AI too short
-	test_parseAIdata(ctx, false, "(1)12345", "");							// AI too short
-	test_parseAIdata(ctx, false, "(12345)12345", "");						// AI too long
-	test_parseAIdata(ctx, false, "(15", "");							// AI must terminate
-	test_parseAIdata(ctx, false, "(1", "");								// AI must terminate
-	test_parseAIdata(ctx, false, "(", "");								// AI must terminate
-	test_parseAIdata(ctx, false, "(01)123456789012312(10)12345", "");				// Fixed-length AI too long
-	test_parseAIdata(ctx, false, "(10)12345^", "");							// Reject "^": Conflated with FNC1
-	test_parseAIdata(ctx, false, "(17)9(90)217", "");						// Should not parse to ^7990217
+	test_parseAIdata(ctx, false, "(10)(11)98765", "");							// Value must not be empty
+	test_parseAIdata(ctx, false, "(10)12345(11)", "");							// Value must not be empty
+	test_parseAIdata(ctx, false, "(1A)12345", "");								// AI must be numeric
+	test_parseAIdata(ctx, false, "1(12345", "");								// Must start with AI
+	test_parseAIdata(ctx, false, "12345", "");								// Must start with AI
+	test_parseAIdata(ctx, false, "()12345", "");								// AI too short
+	test_parseAIdata(ctx, false, "(1)12345", "");								// AI too short
+	test_parseAIdata(ctx, false, "(12345)12345", "");							// AI too long
+	test_parseAIdata(ctx, false, "(15", "");								// AI must terminate
+	test_parseAIdata(ctx, false, "(1", "");									// AI must terminate
+	test_parseAIdata(ctx, false, "(", "");									// AI must terminate
+	test_parseAIdata(ctx, false, "(01)123456789012312(10)12345", "");					// Fixed-length AI too long
+	test_parseAIdata(ctx, false, "(10)12345^", "");								// Reject "^": Conflated with FNC1
+	test_parseAIdata(ctx, false, "(17)9(90)217", "");							// Should not parse to ^7990217
+
+	// Linter tests
+	test_parseAIdata(ctx, true, "(8013)1987654Ad4X4bL5ttr2310c2K", "^80131987654Ad4X4bL5ttr2310c2K");	// Valid GMN check characters
+	test_parseAIdata(ctx, false, "(8013)1987654Ad4X4bL5ttr2310cXK", "");					// Invalid GMN check characters
 
 	gs1_encoder_free(ctx);
 
@@ -1403,6 +1464,57 @@ void test_ai_validateParity(void) {
 	TEST_CHECK(gs1_validateParity((uint8_t*)good_gtin8));
 	TEST_CHECK(!gs1_validateParity((uint8_t*)bad_gtin8));
 	TEST_CHECK(bad_gtin8[7] == '0');		// Recomputed
+
+}
+
+static void test_csumalpha(gs1_encoder *ctx, const struct aiEntry* entry, const bool should_succeed, char *val) {
+
+	char casename[256];
+
+	strcpy(casename, val);
+	TEST_CASE(casename);
+
+	TEST_CHECK(lint_csumalpha(ctx, entry, val) ^ !should_succeed);;
+
+}
+
+void test_ai_lint_csumalpha(void) {
+
+	gs1_encoder* ctx = gs1_encoder_init(NULL);
+	const struct aiEntry* entry = gs1_lookupAIentry(ctx, "8013", 4);
+
+	test_csumalpha(ctx, entry, true, "1987654Ad4X4bL5ttr2310c2K");
+	test_csumalpha(ctx, entry, false, "1987654Ad4X4bL5ttr2310cXK");
+	test_csumalpha(ctx, entry, false, "1987654Ad4X4bL5ttr2310c2X");
+	test_csumalpha(ctx, entry, true, "12345678901234567890123NT");
+	test_csumalpha(ctx, entry, true, "12345_ABCDEFGHIJKLMCP");
+	test_csumalpha(ctx, entry, true, "12345_NOPQRSTUVWXYZDN");
+	test_csumalpha(ctx, entry, true, "12345_abcdefghijklmN3");
+	test_csumalpha(ctx, entry, true, "12345_nopqrstuvwxyzP2");
+	test_csumalpha(ctx, entry, true, "12345_!\"%&'()*+,-./LC");
+	test_csumalpha(ctx, entry, true, "12345_0123456789:;<=>?62");
+	test_csumalpha(ctx, entry, true, "7907665Bm8v2AB");
+	test_csumalpha(ctx, entry, true, "97850l6KZm0yCD");
+	test_csumalpha(ctx, entry, true, "225803106GSpEF");
+	test_csumalpha(ctx, entry, true, "149512464PM+GH");
+	test_csumalpha(ctx, entry, true, "62577B8fRG7HJK");
+	test_csumalpha(ctx, entry, true, "515942070CYxLM");
+	test_csumalpha(ctx, entry, true, "390800494sP6NP");
+	test_csumalpha(ctx, entry, true, "386830132uO+QR");
+	test_csumalpha(ctx, entry, true, "53395376X1:nST");
+	test_csumalpha(ctx, entry, true, "957813138Sb6UV");
+	test_csumalpha(ctx, entry, true, "530790no0qOgWX");
+	test_csumalpha(ctx, entry, true, "62185314IvwmYZ");
+	test_csumalpha(ctx, entry, true, "23956qk1&dB!23");
+	test_csumalpha(ctx, entry, true, "794394895ic045");
+	test_csumalpha(ctx, entry, true, "57453Uq3qA<H67");
+	test_csumalpha(ctx, entry, true, "62185314IvwmYZ");
+	test_csumalpha(ctx, entry, true, "0881063PhHvY89");
+	test_csumalpha(ctx, entry, true, "00000!HV");
+	test_csumalpha(ctx, entry, true, "99999zzzzzzzzzzzzzzzzzzT2");
+	test_csumalpha(ctx, entry, true, "99999zzzzzzzzzzzzzzzzzzT2");
+
+	gs1_encoder_free(ctx);
 
 }
 

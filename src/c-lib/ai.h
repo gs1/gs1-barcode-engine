@@ -101,6 +101,7 @@ void test_ai_AItableVsPrefixLength(void);
 void test_ai_parseAIdata(void);
 void test_ai_processAIdata(void);
 void test_ai_validateParity(void);
+void test_ai_lint_csumalpha(void);
 
 #endif
 
