@@ -34,7 +34,7 @@ namespace GS1.Encoders
     ///
     /// The API reference for the native C library is available here:
     ///
-    /// https://gs1.github.io/gs1-encoders/
+    /// https://gs1.github.io/gs1-barcode-engine/
     ///
     /// </summary>
     public class GS1Encoder

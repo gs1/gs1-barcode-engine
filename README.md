@@ -23,7 +23,7 @@ This project includes:
 
   * A native C library that can be vendored into third-party code or compiled for use as a shared library (Linux / BSD) or dynamic-link library (Windows).
   * An example console application whose code demonstrates how to use the native library to generate barcode symbols.
-  * A C# .NET wrapper class that provides an object interface to the native library from managed code, using Platform Invoke (P/Invoke). 
+  * A C# .NET wrapper class that provides an object interface to the native library from managed code, using Platform Invoke (P/Invoke).
   * An example .NET desktop application using Windows Presentation Foundation (WPF) that demonstrates how to use the C# .NET wrapper to access the native library.
 
 
@@ -49,13 +49,13 @@ Documentation
 -------------
 
 The C library API is fully documented in the docs/ directory and is
-available online here: <https://gs1.github.io/gs1-encoders/>
+available online here: <https://gs1.github.io/gs1-barcode-engine/>
 
 Instructions for getting started with the console application are provided in
-the [Console Application User Guide](https://github.com/gs1/gs1-encoders/wiki/Console-Application-User-Guide).
+the [Console Application User Guide](https://github.com/gs1/gs1-barcode-engine/wiki/Console-Application-User-Guide).
 
 Instructions for getting started with the GUI application are provided in
-the [Desktop Application User Guide](https://github.com/gs1/gs1-encoders/wiki/Desktop-Application-User-Guide).
+the [Desktop Application User Guide](https://github.com/gs1/gs1-barcode-engine/wiki/Desktop-Application-User-Guide).
 
 
 Using the library
@@ -67,7 +67,7 @@ linker (.lib) files.
 
 Pre-built assets are available here:
 
-<https://github.com/gs1/gs1-encoders/releases/latest>
+<https://github.com/gs1/gs1-barcode-engine/releases/latest>
 
 The license is permissive allowing for the source code to be vendored into an
 application codebase (Open Source or proprietary) or for the pre-built shared
@@ -131,13 +131,13 @@ compatible with 64-bit Linux operating systems. There are no installation
 dependencies and the file can be run from any location on the file system.
 
 The most recent version of the console application can be
-[downloaded from here](https://github.com/gs1/gs1-encoders/releases/latest).
+[downloaded from here](https://github.com/gs1/gs1-barcode-engine/releases/latest).
 
 For Windows systems download the asset named
 `gs1encoders-windows-console-app.zip`. For Linux systems download the asset
 named `gs1encoders-linux.bin`. In the event of issues with antivirus software
 consult the note in the
-[User Guide](https://github.com/gs1/gs1-encoders/wiki/Console-Application-User-Guide).
+[User Guide](https://github.com/gs1/gs1-barcode-engine/wiki/Console-Application-User-Guide).
 
 The pre-built application requires that the Visual C++ Redistributable 2019 (32
 bit) is installed: <https://visualstudio.microsoft.com/downloads/#microsoft-visual-c-redistributable-for-visual-studio-2019>
@@ -151,11 +151,11 @@ compatible with modern 64-bit Windows operating systems and a recent .NET
 Framework.
 
 The most recent version of the GUI application can be
-[downloaded from here](https://github.com/gs1/gs1-encoders/releases/latest).
+[downloaded from here](https://github.com/gs1/gs1-barcode-engine/releases/latest).
 
 For Windows systems download the asset named `gs1encoders-windows-gui-app.zip`. In
 the event of issues with antivirus software consult the note in the
-[User Guide](https://github.com/gs1/gs1-encoders/wiki/Desktop-Application-User-Guide).
+[User Guide](https://github.com/gs1/gs1-barcode-engine/wiki/Desktop-Application-User-Guide).
 
 The pre-built application requires that the .NET Core 3.1 Desktop Runtime -
 Windows x86 is installed: <https://dotnet.microsoft.com/download/dotnet/3.1/runtime>
