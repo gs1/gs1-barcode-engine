@@ -116,6 +116,8 @@ jobs:
       - ci-gcc
       - ci-clang
       - ci-msvc
+      - ci-macos
+      - ci-scan-build
 
     runs-on: windows-latest
 
