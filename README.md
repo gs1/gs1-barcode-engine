@@ -21,7 +21,7 @@ settings.
 
 This project includes:
 
-  * A native C library that can be vendored into third-party code or compiled for use as a shared library (Linux / BSD) or dynamic-link library (Windows).
+  * A native C library that can be vendored into third-party code or compiled for use as a shared library (Linux / MacOS / BSD) or dynamic-link library (Windows).
   * An example console application whose code demonstrates how to use the native library to generate barcode symbols.
   * A C# .NET wrapper class that provides an object interface to the native library from managed code, using Platform Invoke (P/Invoke).
   * An example .NET desktop application using Windows Presentation Foundation (WPF) that demonstrates how to use the C# .NET wrapper to access the native library.
@@ -100,9 +100,9 @@ directory and building the solution using:
     msbuild /p:Configuration=release gs1encoders.sln
 
 
-### Building on Linux
+### Building on Linux or MacOS
 
-The library and demonstration application can be rebuilt on any Linux system
+The library and demonstration application can be rebuilt on any Linux or MacOS system
 that has a C compiler (such as gcc or clang).
 
 To build using the default compiler change into the `src/c-lib` directory and run:
