@@ -62,6 +62,23 @@ jobs:
         c-lib\build\console-app\Win32\Release\gs1encoders-app.exe --version
         dotnet-app\bin\Release\netcoreapp3.1\gs1encoders-dotnet-app.exe --version
 
+  ci-macos:
+
+    runs-on: macos-10.15
+
+    steps:
+
+    - uses: actions/checkout@v2
+
+    - name: clang CI
+      run: |
+        make -C src/c-lib -j `sysctl -n hw.logicalcpu` test SLOW_TESTS=yes
+        make -C src/c-lib -j `sysctl -n hw.logicalcpu` lib
+        make -C src/c-lib -j `sysctl -n hw.logicalcpu` app
+        DYLD_LIBRARY_PATH=src/c-lib/build src/c-lib/build/gs1encoders.bin --version
+        make -C src/c-lib -j `sysctl -n hw.logicalcpu` app-static
+        src/c-lib/build/gs1encoders-linux.bin --version
+
   ci-scan-build:
 
     runs-on: ubuntu-latest
