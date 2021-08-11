@@ -27,7 +27,7 @@ BUILD_DIR = build
 
 
 ifeq ($(MAKECMDGOALS),test)
-BUILD_DIR = test
+BUILD_DIR = build-test
 UNIT_TEST_CFLAGS = -DUNIT_TESTS
 endif
 
@@ -43,7 +43,7 @@ DEBUG_CFLAGS = -DPRNT
 endif
 
 ifeq ($(MAKECMDGOALS),clean-test)
-BUILD_DIR = test
+BUILD_DIR = build-test
 endif
 
 ifeq ($(SANITIZE),yes)
