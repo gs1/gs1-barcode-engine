@@ -24,7 +24,7 @@ This project includes:
   * A native C library that can be vendored into third-party code or compiled for use as a shared library (Linux / MacOS / BSD) or dynamic-link library (Windows).
   * An example console application whose code demonstrates how to use the native library to generate barcode symbols.
   * A C# .NET wrapper class that provides an object interface to the native library from managed code, using Platform Invoke (P/Invoke).
-  * An example .NET desktop application using Windows Presentation Foundation (WPF) that demonstrates how to use the C# .NET wrapper to access the native library.
+  * An example desktop application using Windows Presentation Foundation (WPF) that demonstrates how to use the C# .NET wrapper to access the native library.
 
 
 License
@@ -54,7 +54,7 @@ available online here: <https://gs1.github.io/gs1-barcode-engine/>
 Instructions for getting started with the console application are provided in
 the [Console Application User Guide](https://github.com/gs1/gs1-barcode-engine/wiki/Console-Application-User-Guide).
 
-Instructions for getting started with the GUI application are provided in
+Instructions for getting started with the desktop application are provided in
 the [Desktop Application User Guide](https://github.com/gs1/gs1-barcode-engine/wiki/Desktop-Application-User-Guide).
 
 
@@ -80,12 +80,12 @@ This repository contains:
 | src/c-lib      | Source for the native C library ("The library"), unit tests, fuzzers and demo console application |
 | docs           | Documentation for the public API of the native C library                                          |
 | src/dotnet-lib | C# .NET wrappers that provide a managed code interface to the native library using P/Invoke       |
-| src/dotnet-app | A demo C# .NET application (WPF) that uses the wrappers and native library                        |
+| src/dotnet-app | A demo C# .NET desktop application (WPF) that uses the wrappers and native library                        |
 
 
 ### Building on Windows
 
-The library, wrappers and demonstration applications can be rebuilt on Windows
+The library, wrappers, demonstration console application and demonstration desktop application can be rebuilt on Windows
 using MSVC.
 
 The project contains a solution file (.sln) compatible with recent versions of
@@ -102,8 +102,8 @@ directory and building the solution using:
 
 ### Building on Linux or MacOS
 
-The library and demonstration application can be rebuilt on any Linux or MacOS system
-that has a C compiler (such as gcc or clang).
+The library and demonstration console application can be rebuilt on any Linux or MacOS system
+that has a C compiler (such as GCC or Clang).
 
 To build using the default compiler change into the `src/c-lib` directory and run:
 
@@ -143,14 +143,14 @@ The pre-built application requires that the Visual C++ Redistributable 2019 (32
 bit) is installed: <https://visualstudio.microsoft.com/downloads/#microsoft-visual-c-redistributable-for-visual-studio-2019>
 
 
-Installing the Pre-built Demo GUI Application
----------------------------------------------
+Installing the Pre-built Demo Desktop Application
+-------------------------------------------------
 
-A demonstration GUI application is provided in the form of an .EXE file
+A demonstration desktop application is provided in the form of an .EXE file
 compatible with modern 64-bit Windows operating systems and a recent .NET
 Framework.
 
-The most recent version of the GUI application can be
+The most recent version of the desktop application can be
 [downloaded from here](https://github.com/gs1/gs1-barcode-engine/releases/latest).
 
 For Windows systems download the asset named `gs1encoders-windows-gui-app.zip`. In
