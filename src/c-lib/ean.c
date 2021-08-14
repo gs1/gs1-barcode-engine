@@ -201,7 +201,7 @@ void gs1_EAN13(gs1_encoder *ctx) {
 
 		DEBUG_PRINT_PATTERNS("CC pattern", (uint8_t*)(*ccPattern), CCB4_ELMNTS, rows);
 
-		gs1_driverInit(ctx, ctx->pixMult*EAN13_W, ctx->pixMult*(rows*2 + 6 + EAN13_H));
+		gs1_driverInit(ctx, (long)ctx->pixMult*EAN13_W, (long)ctx->pixMult*(rows*2 + 6 + EAN13_H));
 
 		// Composite Component
 		prints.elmCnt = CCB4_ELMNTS;
@@ -232,7 +232,7 @@ void gs1_EAN13(gs1_encoder *ctx) {
 
 	}
 	else { // primary only
-		gs1_driverInit(ctx, ctx->pixMult*EAN13_W, ctx->pixMult*EAN13_H);
+		gs1_driverInit(ctx, (long)ctx->pixMult*EAN13_W, (long)ctx->pixMult*EAN13_H);
 
 		// EAN-13
 		gs1_driverAddRow(ctx, &prints);
@@ -418,7 +418,7 @@ void gs1_EAN8(gs1_encoder *ctx) {
 
 		DEBUG_PRINT_PATTERNS("CC pattern", (uint8_t*)(*ccPattern), elmntsCC, rows);
 
-		gs1_driverInit(ctx, ctx->pixMult*(EAN8_W+lpadEAN), ctx->pixMult*(rows*2 + 6 + EAN8_H));
+		gs1_driverInit(ctx, (long)ctx->pixMult*(EAN8_W+lpadEAN), (long)ctx->pixMult*(rows*2 + 6 + EAN8_H));
 
 		// Composite Component
 		prints.elmCnt = elmntsCC;
@@ -448,7 +448,7 @@ void gs1_EAN8(gs1_encoder *ctx) {
 		gs1_driverFinalise(ctx);
 	}
 	else { // primary only
-		gs1_driverInit(ctx, ctx->pixMult*EAN8_W, ctx->pixMult*EAN8_H);
+		gs1_driverInit(ctx, (long)ctx->pixMult*EAN8_W, (long)ctx->pixMult*EAN8_H);
 
 		// EAN-8
 		gs1_driverAddRow(ctx, &prints);
@@ -687,7 +687,7 @@ void gs1_UPCE(gs1_encoder *ctx) {
 
 		DEBUG_PRINT_PATTERNS("CC pattern", (uint8_t*)(*ccPattern), CCB2_ELMNTS, rows);
 
-		gs1_driverInit(ctx, ctx->pixMult*UPCE_W, ctx->pixMult*(rows*2 + 6 + UPCE_H));
+		gs1_driverInit(ctx, (long)ctx->pixMult*UPCE_W, (long)ctx->pixMult*(rows*2 + 6 + UPCE_H));
 
 		// Composite Component
 		prints.elmCnt = CCB2_ELMNTS;
@@ -717,7 +717,7 @@ void gs1_UPCE(gs1_encoder *ctx) {
 		gs1_driverFinalise(ctx);
 	}
 	else { // primary only
-		gs1_driverInit(ctx, ctx->pixMult*UPCE_W, ctx->pixMult*UPCE_H);
+		gs1_driverInit(ctx, (long)ctx->pixMult*UPCE_W, (long)ctx->pixMult*UPCE_H);
 
 		// UPC-E
 		gs1_driverAddRow(ctx, &prints);

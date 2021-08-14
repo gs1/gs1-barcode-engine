@@ -466,8 +466,8 @@ void gs1_RSS14(gs1_encoder *ctx) {
 
 		DEBUG_PRINT_PATTERNS("CC pattern", (uint8_t*)(*ccPattern), CCB4_ELMNTS, rows);
 
-		gs1_driverInit(ctx, ctx->pixMult*CCB4_WIDTH,
-				ctx->pixMult*(rows*2+symHt) + ctx->sepHt);
+		gs1_driverInit(ctx, (long)ctx->pixMult*CCB4_WIDTH,
+				(long)ctx->pixMult*(rows*2+symHt) + ctx->sepHt);
 
 		// Composite Component
 		prints.elmCnt = CCB4_ELMNTS;
@@ -494,7 +494,7 @@ void gs1_RSS14(gs1_encoder *ctx) {
 		gs1_driverFinalise(ctx);
 	}
 	else { // primary only
-		gs1_driverInit(ctx, ctx->pixMult*RSS14_SYM_W, ctx->pixMult*symHt);
+		gs1_driverInit(ctx, (long)ctx->pixMult*RSS14_SYM_W, (long)ctx->pixMult*symHt);
 
 		// RSS-14
 		gs1_driverAddRow(ctx, &prints);
@@ -562,8 +562,8 @@ void gs1_RSS14S(gs1_encoder *ctx) {
 
 		DEBUG_PRINT_PATTERNS("CC pattern", (uint8_t*)(*ccPattern), CCB2_ELMNTS, rows);
 
-		gs1_driverInit(ctx, ctx->pixMult*(CCB2_WIDTH),
-				ctx->pixMult*(rows*2+RSS14_ROWS1_H+RSS14_ROWS2_H) + 2*ctx->sepHt);
+		gs1_driverInit(ctx, (long)ctx->pixMult*(CCB2_WIDTH),
+				(long)ctx->pixMult*(rows*2+RSS14_ROWS1_H+RSS14_ROWS2_H) + 2*ctx->sepHt);
 
 		// Composite Component
 		prints.elmCnt = CCB2_ELMNTS;
@@ -599,8 +599,8 @@ void gs1_RSS14S(gs1_encoder *ctx) {
 		gs1_driverFinalise(ctx);
 	}
 	else { // primary only
-		gs1_driverInit(ctx, ctx->pixMult*(RSS14_SYM_W/2+2),
-				ctx->pixMult*(RSS14_ROWS1_H+RSS14_ROWS2_H) + ctx->sepHt);
+		gs1_driverInit(ctx, (long)ctx->pixMult*(RSS14_SYM_W/2+2),
+				(long)ctx->pixMult*(RSS14_ROWS1_H+RSS14_ROWS2_H) + ctx->sepHt);
 
 		// RSS14S upper row
 		prints.pattern = linPattern;
@@ -695,8 +695,8 @@ void gs1_RSS14SO(gs1_encoder *ctx) {
 
 		DEBUG_PRINT_PATTERNS("CC pattern", (uint8_t*)(*ccPattern), CCB2_ELMNTS, rows);
 
-		gs1_driverInit(ctx, ctx->pixMult*(CCB2_WIDTH),
-			ctx->pixMult*(rows*2+RSS14_SYM_H*2) + 4*ctx->sepHt);
+		gs1_driverInit(ctx, (long)ctx->pixMult*(CCB2_WIDTH),
+			(long)ctx->pixMult*(rows*2+RSS14_SYM_H*2) + 4*ctx->sepHt);
 
 		// Composite Component
 		prints.elmCnt = CCB2_ELMNTS;
@@ -739,8 +739,8 @@ void gs1_RSS14SO(gs1_encoder *ctx) {
 		gs1_driverFinalise(ctx);
 	}
 	else { // primary only
-		gs1_driverInit(ctx, ctx->pixMult*(RSS14_SYM_W/2+2),
-			ctx->pixMult*(RSS14_SYM_H*2) + 3*ctx->sepHt);
+		gs1_driverInit(ctx, (long)ctx->pixMult*(RSS14_SYM_W/2+2),
+			(long)ctx->pixMult*(RSS14_SYM_H*2) + 3*ctx->sepHt);
 
 		// RSS14SO upper row
 		prints.pattern = linPattern;

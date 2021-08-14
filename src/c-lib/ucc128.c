@@ -428,8 +428,8 @@ void gs1_U128A(gs1_encoder *ctx) {
 		ccRpad = 10+2 + ((symChars-9)/2)*11;
 		ccLpad = symWidth - (CCB4_WIDTH + ccRpad);
 
-		gs1_driverInit(ctx, ctx->pixMult*symWidth,
-				ctx->pixMult*(rows*2+ctx->gs1_128LinearHeight) + ctx->sepHt);
+		gs1_driverInit(ctx, (long)ctx->pixMult*symWidth,
+				(long)ctx->pixMult*(rows*2+ctx->gs1_128LinearHeight) + ctx->sepHt);
 
 		// CC-C
 		prints.elmCnt = CCB4_ELMNTS;
@@ -460,7 +460,7 @@ void gs1_U128A(gs1_encoder *ctx) {
 		gs1_driverFinalise(ctx);
 	}
 	else { // primary only
-		gs1_driverInit(ctx, ctx->pixMult*(symChars*11+22), ctx->pixMult*ctx->gs1_128LinearHeight);
+		gs1_driverInit(ctx, (long)ctx->pixMult*(symChars*11+22), (long)ctx->pixMult*ctx->gs1_128LinearHeight);
 
 		// UCC-128
 		gs1_driverAddRow(ctx, &prints);
@@ -547,8 +547,8 @@ void gs1_U128C(gs1_encoder *ctx) {
 		symWidth = symChars*11+22;
 		ccRpad = symWidth - UCC128_L_PAD - ((ctx->colCnt+4)*17+5);
 
-		gs1_driverInit(ctx, ctx->pixMult*symWidth,
-				ctx->pixMult*(ctx->rowCnt*3+ctx->gs1_128LinearHeight) + ctx->sepHt);
+		gs1_driverInit(ctx, (long)ctx->pixMult*symWidth,
+				(long)ctx->pixMult*(ctx->rowCnt*3+ctx->gs1_128LinearHeight) + ctx->sepHt);
 
 		// CC-C
 		prints.elmCnt = (ctx->colCnt+4)*8+3;
@@ -579,7 +579,7 @@ void gs1_U128C(gs1_encoder *ctx) {
 		gs1_driverFinalise(ctx);
 	}
 	else { // primary only
-		gs1_driverInit(ctx, ctx->pixMult*(symChars*11+22), ctx->pixMult*ctx->gs1_128LinearHeight);
+		gs1_driverInit(ctx, (long)ctx->pixMult*(symChars*11+22), (long)ctx->pixMult*ctx->gs1_128LinearHeight);
 
 		// UCC-128
 		gs1_driverAddRow(ctx, &prints);

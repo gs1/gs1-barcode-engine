@@ -902,7 +902,7 @@ void gs1_QR(gs1_encoder *ctx) {
 	for (i = 0; i < pats[0].length; i++)
 		cols += pats[0].pattern[i];
 
-	gs1_driverInit(ctx, ctx->pixMult*cols, ctx->pixMult*rows);
+	gs1_driverInit(ctx, (long)ctx->pixMult*cols, (long)ctx->pixMult*rows);
 
 	ctx->line1 = true; // so first line is not Y undercut
 	prints.height = ctx->pixMult;
