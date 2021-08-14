@@ -49,7 +49,8 @@ uint8_t gs1_mtxGetModule(const uint8_t *mtx, const int cols, const int x, const 
 // Runlength encode the matrix to a set of patterns
 void gs1_mtxToPatterns(const uint8_t* mtx, const int cols, const int rows, struct patternLength *pats) {
 
-	uint8_t r, c, patPos, last;
+	uint8_t patPos, last;
+	int r, c;
 
 	for (r = 0; r < rows; r++) {
 		patPos = 0;
