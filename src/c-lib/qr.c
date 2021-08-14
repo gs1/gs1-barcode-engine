@@ -516,7 +516,7 @@ static uint32_t evalMask(const uint8_t *mtx, const struct metric *m) {
 			last = now;
 		}
 		if (k > 1)
-			for (int i = size-1; i>=0; i--)
+			for (i = size-1; i>=0; i--)
 				if (((thispairs[i] + lastpairs[i]) & 3) == 0)
 					n2 += 3;
 	}
