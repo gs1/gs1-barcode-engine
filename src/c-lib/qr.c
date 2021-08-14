@@ -411,7 +411,7 @@ static void applyMask(uint8_t *dest, const uint8_t *src,
 	for (i = 1; i <= m->size; i++) {
 		for (j = 1; j <= m->size; j++) {
 			putModule(dest, i, j, (uint8_t)(getModule(src, i, j) ^ (
-				(!getModule(fix, i, j)) &
+				(~getModule(fix, i, j)) &
 				((*maskfun) ((uint8_t)(i-1), (uint8_t)(j-1))))
 			));
 		}
