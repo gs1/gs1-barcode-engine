@@ -74,7 +74,7 @@
  * image directly to a file:
  *
  * \code
- * #import "gs1encoders.h"
+ * #include "gs1encoders.h"
  *
  * gs1_encoder *ctx = gs1_encoder_init(NULL);           // Create a new instance of the library
  * gs1_encoder_setFormat(ctx, gs1_encoder_dBMP);        // Select BMP output
@@ -90,7 +90,7 @@
  * image as a set of strings that can be processed by the application:
  *
  * \code
- * #import "gs1encoders.h"
+ * #include "gs1encoders.h"
  *
  * gs1_encoder *ctx = gs1_encoder_init(NULL);           // Create a new instance of the library
  * gs1_encoder_setFormat(ctx, gs1_encoder_dRAW);        // Select RAW output (no graphical header)
@@ -1400,8 +1400,8 @@ GS1_ENCODERS_API char* gs1_encoder_getAIdataStr(gs1_encoder *ctx);
  * in human-friendly format.
  *
  * \code
- * #import <stdio.h>
- * #import "gs1encoders.h"
+ * #include <stdio.h>
+ * #include "gs1encoders.h"
  *
  * gs1_encoder *ctx = gs1_encoder_init(NULL);                  // Create a new instance of the library
  * if (!gs1_encoder_setScanData(ctx,                           // Process the scan data, setting dataStr and Sym)
@@ -1464,8 +1464,8 @@ GS1_ENCODERS_API bool gs1_encoder_setScanData(gs1_encoder* ctx, const char *scan
  * should provide when reading a certain symbol:
  *
  * \code
- * #import <stdio.h>
- * #import "gs1encoders.h"
+ * #include <stdio.h>
+ * #include "gs1encoders.h"
  *
  * gs1_encoder *ctx = gs1_encoder_init(NULL);               // Create a new instance of the library
  * gs1_encoder_setSym(ctx, gs1_encoder_sDataBarExpanded);   // Choose the symbology
