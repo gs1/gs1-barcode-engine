@@ -169,6 +169,7 @@ void test_api_setScanData(void);
 void test_api_getHRI(void);
 void test_api_format(void);
 void test_api_getBuffer(void);
+void test_api_copyOutputBuffer(void);
 
 #endif
 

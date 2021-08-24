@@ -952,6 +952,37 @@ GS1_ENCODERS_API size_t gs1_encoder_getBuffer(gs1_encoder *ctx, void** out) {
 }
 
 
+GS1_ENCODERS_API size_t gs1_encoder_getBufferSize(gs1_encoder *ctx) {
+	assert(ctx);
+
+	if (!ctx->buffer) {
+		assert(ctx->bufferSize == 0);
+		return 0;
+	}
+
+	return ctx->bufferSize;
+}
+
+
+GS1_ENCODERS_API size_t gs1_encoder_copyOutputBuffer(gs1_encoder *ctx, void *buf, size_t max) {
+	assert(ctx);
+
+	if (!ctx->buffer) {
+		assert(ctx->bufferSize == 0);
+		return 0;
+	}
+
+	if (max < ctx->bufferSize) {
+		return 0;
+	}
+
+	memcpy(buf, ctx->buffer, ctx->bufferSize);
+
+	return ctx->bufferSize;
+
+}
+
+
 GS1_ENCODERS_API size_t gs1_encoder_getBufferStrings(gs1_encoder *ctx, char*** out) {
 
 	uint8_t *buf;
@@ -2081,6 +2112,37 @@ void test_api_getBuffer(void) {
 	TEST_CHECK(gs1_encoder_setFormat(ctx, gs1_encoder_dRAW));
 	TEST_CHECK(gs1_encoder_encode(ctx));
 	TEST_CHECK(strcmp(gs1_encoder_getDataStr(ctx), "1234567890128|^99123456") == 0);
+
+	gs1_encoder_free(ctx);
+
+}
+
+
+void test_api_copyOutputBuffer(void) {
+
+	gs1_encoder* ctx;
+	uint8_t buf[2048];
+	size_t needed;
+	uint8_t test_tif[] = { 0x49, 0x49, 0x2A, 0x00 };
+
+	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+
+	// No output buffer should return 0
+	TEST_CHECK(gs1_encoder_copyOutputBuffer(ctx, (void*)buf, sizeof(buf)) == 0);
+
+	// Normal case, getting required size via gs1_encoder_getBuffer
+	TEST_CHECK(gs1_encoder_setSym(ctx, gs1_encoder_sEAN13));
+	TEST_CHECK(gs1_encoder_setDataStr(ctx, "1234567890128"));
+	TEST_CHECK(gs1_encoder_setOutFile(ctx, ""));
+	TEST_CHECK(gs1_encoder_setFormat(ctx, gs1_encoder_dTIF));
+	TEST_CHECK(gs1_encoder_encode(ctx));
+	TEST_CHECK((needed = gs1_encoder_getBufferSize(ctx)) == 1234);
+	TEST_ASSERT(needed <= sizeof(buf));
+	TEST_CHECK((gs1_encoder_copyOutputBuffer(ctx, buf, needed)) == needed);
+	TEST_CHECK(memcmp(buf, test_tif, sizeof(test_tif)) == 0);
+
+	// Check buffer too short returns 0
+	TEST_CHECK(gs1_encoder_copyOutputBuffer(ctx, buf, 500) == 0);
 
 	gs1_encoder_free(ctx);
 

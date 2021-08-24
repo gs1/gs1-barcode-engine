@@ -1673,6 +1673,43 @@ GS1_ENCODERS_API size_t gs1_encoder_getBuffer(gs1_encoder *ctx, void **buffer);
 
 
 /**
+ * @brief Get the output buffer size.
+ *
+ * @see gs1_encoder_copyOutputBuffer()
+ *
+ * \note
+ * This function is useful when used in tandem with
+ * gs1_encoder_copyOutputBuffer() to determine the size of the user-provided
+ * buffer to pre-allocate.
+ *
+ * @param [in,out] ctx ::gs1_encoder context
+ * @return length of the buffer
+ */
+GS1_ENCODERS_API size_t gs1_encoder_getBufferSize(gs1_encoder *ctx);
+
+
+/**
+ * @brief Copy the output buffer to a user-provided buffer.
+ *
+ * The buffer into which the output buffer is copied must be preallocated with
+ * at least the size returned by gs1_encoder_getBufferSize().
+ *
+ * @see gs1_encoder_getBufferSize()
+ *
+ * \note
+ * This function exists mainly for environments where it is difficult to access
+ * library-allocated buffers via a pointer modified in function parameters,
+ * as it the case with Emscripten.
+ *
+ * @param [in,out] ctx ::gs1_encoder context
+ * @param [out] buffer a pointer to a buffer into which the output buffer is copied
+ * @param [in] max the maximum number of bytes that may be copied into the provided buffer
+ * @return number of bytes copied, or 0 if the provided buffer is insufficient for the entire output
+ */
+GS1_ENCODERS_API size_t gs1_encoder_copyOutputBuffer(gs1_encoder *ctx, void *buffer, size_t max);
+
+
+/**
  * @brief Get the number of columns in the output buffer image.
  *
  * @see gs1_encoder_getBuffer()
