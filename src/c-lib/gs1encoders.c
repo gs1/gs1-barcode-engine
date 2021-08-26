@@ -836,7 +836,7 @@ GS1_ENCODERS_API void gs1_encoder_copyHRI(gs1_encoder *ctx, void *buf, size_t ma
 	p = buf;
 	*p = '\0';
 	for (i = 0; i < numhri; i++) {
-		rem -= strlen(hri[i]) + 1;
+		rem -= (int)strlen(hri[i]) + 1;
 		if (rem < 0) {
 			*p = '\0';
 			return;
