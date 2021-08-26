@@ -596,6 +596,8 @@ static void createCodewords(gs1_encoder *ctx, const uint8_t *str, uint8_t cws_v[
 	 */
 	for (i = 0; i < 3; i++) {
 
+		p = str;
+
 		// 0101 FNC1 in first
 		if (gs1Mode)
 			addBits(cws_v[i], &bits_v[i], 4, 0x05, MAX_QR_DAT_BITS, false);
@@ -605,15 +607,15 @@ static void createCodewords(gs1_encoder *ctx, const uint8_t *str, uint8_t cws_v[
 
 		// Character count indicator
 		addBits(cws_v[i], &bits_v[i], cclens[i][2],
-			(uint16_t)strlen((char *)str), MAX_QR_DAT_BITS, false);
+			(uint16_t)strlen((char *)p), MAX_QR_DAT_BITS, false);
 
 		// Byte per character
-		while (*str) {
-			if (*str == '^' && gs1Mode)
+		while (*p) {
+			if (*p == '^' && gs1Mode)
 				addBits(cws_v[i], &bits_v[i], 8, 0x1d, MAX_QR_DAT_BITS, false);  // FNC1 -> GS
 			else
-				addBits(cws_v[i], &bits_v[i], 8, *str, MAX_QR_DAT_BITS, false);
-			str++;
+				addBits(cws_v[i], &bits_v[i], 8, *p, MAX_QR_DAT_BITS, false);
+			p++;
 		}
 
 	}
