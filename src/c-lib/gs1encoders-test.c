@@ -182,6 +182,7 @@ TEST_LIST = {
     { "api_format", test_api_format },
     { "api_getBuffer", test_api_getBuffer },
     { "api_copyOutputBuffer", test_api_copyOutputBuffer },
+    { "api_copyHRI", test_api_copyHRI },
 
 
     /*

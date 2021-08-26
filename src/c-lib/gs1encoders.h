@@ -1523,6 +1523,42 @@ GS1_ENCODERS_API char* gs1_encoder_getScanData(gs1_encoder* ctx);
  */
 GS1_ENCODERS_API int gs1_encoder_getHRI(gs1_encoder* ctx, char ***hri);
 
+
+/**
+ * @brief Get the require HRI buffer size.
+ *
+ * @see gs1_encoder_copyHRI()
+ *
+ * \note
+ * This function is useful when used in tandem with gs1_encoder_copyHRI() to
+ * determine the size of the user-provided buffer to pre-allocate.
+ *
+ * @param [in,out] ctx ::gs1_encoder context
+ * @return required length of the buffer
+ */
+GS1_ENCODERS_API size_t gs1_encoder_getHRIsize(gs1_encoder *ctx);
+
+
+/**
+ * @brief Copy the HRI to a user-provided buffer in the form of a "|"-separated string.
+ *
+ * The buffer into which the output buffer is copied must be preallocated with
+ * at least the size returned by gs1_encoder_getHRIsize().
+ *
+ * @see gs1_encoder_getHRIsize()
+ *
+ * \note
+ * This function exists mainly for environments where it is difficult to access
+ * library-allocated buffers via a pointer modified in function parameters,
+ * as it the case with Emscripten.
+ *
+ * @param [in,out] ctx ::gs1_encoder context
+ * @param [out] buf a pointer to a buffer into which the formatted HRI text is copied
+ * @param [in] max the maximum number of bytes that may be copied into the provided buffer
+ */
+GS1_ENCODERS_API void gs1_encoder_copyHRI(gs1_encoder *ctx, void *buf, size_t max);
+
+
 /**
  * @brief Gets the filename for a file containing the barcode data when file
  * input is selected.
@@ -1673,7 +1709,7 @@ GS1_ENCODERS_API size_t gs1_encoder_getBuffer(gs1_encoder *ctx, void **buffer);
 
 
 /**
- * @brief Get the output buffer size.
+ * @brief Get the required output buffer size.
  *
  * @see gs1_encoder_copyOutputBuffer()
  *
@@ -1683,7 +1719,7 @@ GS1_ENCODERS_API size_t gs1_encoder_getBuffer(gs1_encoder *ctx, void **buffer);
  * buffer to pre-allocate.
  *
  * @param [in,out] ctx ::gs1_encoder context
- * @return length of the buffer
+ * @return required length of the buffer
  */
 GS1_ENCODERS_API size_t gs1_encoder_getBufferSize(gs1_encoder *ctx);
 

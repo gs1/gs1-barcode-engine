@@ -805,6 +805,52 @@ GS1_ENCODERS_API int gs1_encoder_getHRI(gs1_encoder *ctx, char*** out) {
 }
 
 
+GS1_ENCODERS_API size_t gs1_encoder_getHRIsize(gs1_encoder *ctx) {
+
+	size_t sz = 0;
+	int numhri, i;
+	char **hri;
+
+	numhri = gs1_encoder_getHRI(ctx, &hri);
+
+	for (i = 0; i < numhri; i++)
+		sz += strlen(hri[i]) + 1;  // Includes "|" or NULL terminator
+
+	return sz;
+
+}
+
+
+GS1_ENCODERS_API void gs1_encoder_copyHRI(gs1_encoder *ctx, void *buf, size_t max) {
+
+	char *p;
+	char **hri;
+	int i, numhri;
+	int rem = (int)max;
+
+	assert(ctx);
+	reset_error(ctx);
+
+	numhri = gs1_encoder_getHRI(ctx, &hri);
+
+	p = buf;
+	*p = '\0';
+	for (i = 0; i < numhri; i++) {
+		rem -= strlen(hri[i]) + 1;
+		if (rem < 0) {
+			*p = '\0';
+			return;
+		}
+		if (i != 0)
+			strcat(p, "|");
+		strcat(p, hri[i]);
+	}
+
+	return;
+
+}
+
+
 GS1_ENCODERS_API char* gs1_encoder_getDataFile(gs1_encoder *ctx) {
 	assert(ctx);
 	reset_error(ctx);
@@ -2055,6 +2101,39 @@ void test_api_getHRI(void) {
 	TEST_ASSERT((numAIs = gs1_encoder_getHRI(ctx, &hri)) == 1);
 	TEST_ASSERT(hri != NULL);
 	TEST_CHECK(strcmp(hri[0], "(8299) ABC123") == 0);
+
+	gs1_encoder_free(ctx);
+
+}
+
+
+void test_api_copyHRI(void) {
+
+	gs1_encoder* ctx;
+	char buf[64];
+	size_t needed;
+
+	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+
+	// No HRI should return empty string
+	gs1_encoder_copyHRI(ctx, (void*)buf, sizeof(buf));
+	TEST_CHECK(buf[0] == '\0');
+
+	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "https://a/01/12312312312333/22/TESTING?99=ABC%2d123&98=XYZ"));
+	TEST_CHECK((needed = gs1_encoder_getHRIsize(ctx)) == 55);
+	gs1_encoder_copyHRI(ctx, (void*)buf, sizeof(buf));
+	TEST_CHECK(strcmp(buf, "(01) 12312312312333|(22) TESTING|(99) ABC-123|(98) XYZ") == 0);
+	TEST_CHECK(strlen(buf) == needed - 1);
+
+	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "^011231231231233310ABC123|^99COMPOSITE"));
+	TEST_CHECK((needed = gs1_encoder_getHRIsize(ctx)) == 47);
+	gs1_encoder_copyHRI(ctx, (void*)buf, sizeof(buf));
+	TEST_CHECK(strcmp(buf, "(01) 12312312312333|(10) ABC123|(99) COMPOSITE") == 0);
+	TEST_CHECK(strlen(buf) == needed - 1);
+
+	// Check buffer too short returns empty string
+	gs1_encoder_copyHRI(ctx, (void*)buf, needed - 1);
+	TEST_CHECK(buf[0] == '\0');
 
 	gs1_encoder_free(ctx);
 
