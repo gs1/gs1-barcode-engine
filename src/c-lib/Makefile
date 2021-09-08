@@ -61,10 +61,12 @@ ifneq ($(shell uname -s),Darwin)
 LDFLAGS = -Wl,--as-needed -Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,-z,now $(SAN_LDFLAGS)
 LDFLAGS_SO = -shared -Wl,-soname,lib$(NAME).so.$(MAJOR)
 CFLAGS_FORTIFY = -D_FORTIFY_SOURCE=2
+NPROC = nproc
 else
-LDFLAGS = $(SAN_LDFLAGS)
+LDFLAGS =
 LDFLAGS_SO = -shared -Wl,-install_name,lib$(NAME).so.$(MAJOR)
 CFLAGS_FORTIFY =
+NPROC = sysctl -n hw.ncpu
 endif
 
 LDLIBS = -lc
@@ -206,7 +208,7 @@ fuzzer: $(FUZZER_BINS) | $(FUZZER_CORPUSES)
 	@echo Start fuzzing as follows:
 	@echo
 	@for sym in $^ ; do \
-		echo '$(SAN_ENV)' $$sym -jobs=`nproc` -workers=`nproc` $(FUZZER_CORPUS_PREFIX)$${sym##*-} ; echo ; \
+		echo '$(SAN_ENV)' $$sym -jobs=`$(NPROC)` -workers=`$(NPROC)` $(FUZZER_CORPUS_PREFIX)$${sym##*-} ; echo ; \
 	done
 	@echo
 
