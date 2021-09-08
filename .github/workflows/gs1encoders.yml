@@ -72,11 +72,11 @@ jobs:
 
     - name: clang CI
       run: |
-        make -C src/c-lib -j `sysctl -n hw.logicalcpu` test SLOW_TESTS=yes
-        make -C src/c-lib -j `sysctl -n hw.logicalcpu` lib
-        make -C src/c-lib -j `sysctl -n hw.logicalcpu` app
+        make -C src/c-lib -j `sysctl -n hw.logicalcpu` test SANITIZE=noleak SLOW_TESTS=yes
+        make -C src/c-lib -j `sysctl -n hw.logicalcpu` lib SANITIZE=noleak
+        make -C src/c-lib -j `sysctl -n hw.logicalcpu` app SANITIZE=noleak
         DYLD_LIBRARY_PATH=src/c-lib/build src/c-lib/build/gs1encoders.bin --version
-        make -C src/c-lib -j `sysctl -n hw.logicalcpu` app-static
+        make -C src/c-lib -j `sysctl -n hw.logicalcpu` app-static SANITIZE=noleak
         src/c-lib/build/gs1encoders-linux.bin --version
 
   ci-scan-build:
