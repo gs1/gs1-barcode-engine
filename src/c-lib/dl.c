@@ -162,6 +162,10 @@ bool gs1_parseDLuri(gs1_encoder *ctx, char *dlData, char *dataStr) {
 
 	pi = p = r;					// Skip the domain name
 
+	// Fragment character delimits end of data
+	if ((fr = strchr(pi, '#')) != NULL)
+		*fr++ = '\0';
+
 	// Query parameter marker delimits end of path info
 	if ((qp = strchr(pi, '?')) != NULL)
 		*qp++ = '\0';
@@ -269,10 +273,6 @@ bool gs1_parseDLuri(gs1_encoder *ctx, char *dlData, char *dataStr) {
 		}
 	}
 
-	// Fragment character delimits end of the query parameters
-	if (qp && ((fr = strchr(qp, '#')) != NULL))
-		*fr++ = '\0';
-
 	if (qp)
 		DEBUG_PRINT("  Query params: %s\n", qp);
 
@@ -356,6 +356,9 @@ bool gs1_parseDLuri(gs1_encoder *ctx, char *dlData, char *dataStr) {
 
 	}
 
+	if (fr)
+		DEBUG_PRINT("  Fragment: %s\n", fr);
+
 	DEBUG_PRINT("Parsing DL data successful: %s\n", dataStr);
 
 	// Now validate the data that we have written
@@ -409,6 +412,9 @@ static void test_parseDLuri(gs1_encoder *ctx, bool should_succeed, const char *d
 	if (should_succeed)
 		TEST_CHECK(strcmp(out, expect) == 0);
 	TEST_MSG("Given: %s; Got: %s; Expected: %s; Err: %s", dlData, out, expect, ctx->errMsg);
+
+	TEST_CHECK(strcmp(dlData, in) == 0);
+	TEST_MSG("Input data was erroneously clobbered: %s", in);
 
 }
 
@@ -532,6 +538,14 @@ void test_dl_parseDLuri(void) {
 	test_parseDLuri(ctx, true,
 		"https://a/01/12312312312333/22/ABC%2d123?99=ABC&98=XYZ%2f987",	// Percent escaped values
 		"^011231231231233322ABC-123^99ABC^98XYZ/987");
+
+	test_parseDLuri(ctx, true,					// Ignore fragment after path info
+		"https://a/01/12312312312333/22/test/10/abc/21/xyz#fragment",
+		"^011231231231233322test^10abc^21xyz");
+
+	test_parseDLuri(ctx, true,					// Ignore fragment after query info
+		"https://a/stem/00/006141411234567890?99=ABC#fragment",
+		"^0000614141123456789099ABC");
 
 
 	/*
