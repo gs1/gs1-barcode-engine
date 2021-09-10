@@ -270,7 +270,7 @@ bool gs1_parseDLuri(gs1_encoder *ctx, char *dlData, char *dataStr) {
 	}
 
 	// Fragment character delimits end of the query parameters
-	if (qp && ((fr = strchr(qp, '^')) != NULL))
+	if (qp && ((fr = strchr(qp, '#')) != NULL))
 		*fr++ = '\0';
 
 	if (qp)
@@ -367,7 +367,7 @@ out:
 		*(qp-1) = '?';
 
 	if (fr)			// Restore original fragment delimieter
-		*(fr-1) = '^';
+		*(fr-1) = '#';
 
 	return ret;
 
