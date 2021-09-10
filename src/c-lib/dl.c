@@ -239,7 +239,7 @@ bool gs1_parseDLuri(gs1_encoder *ctx, char *dlData, char *dataStr) {
 			vallen = 14;
 		}
 
-		DEBUG_PRINT("    Extracted: (%.*s) %.*s\n", ailen, ai, (int)vallen, aival);
+		DEBUG_PRINT("    Extracted: (%.*s) %.*s\n", (int)ailen, ai, (int)vallen, aival);
 
 		if (fnc1req)
 			writeDataStr("^");			// Write FNC1, if required
@@ -323,7 +323,7 @@ bool gs1_parseDLuri(gs1_encoder *ctx, char *dlData, char *dataStr) {
 			vallen = 14;
 		}
 
-		DEBUG_PRINT("    Extracted: (%.*s) %.*s\n", ailen, ai, (int)vallen, aival);
+		DEBUG_PRINT("    Extracted: (%.*s) %.*s\n", (int)ailen, ai, (int)vallen, aival);
 
 		if (fnc1req)
 			writeDataStr("^");			// Write FNC1, if required
