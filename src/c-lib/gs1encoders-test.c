@@ -29,12 +29,18 @@
 #pragma GCC diagnostic ignored "-Wconversion"
 #pragma GCC diagnostic ignored "-Wsign-conversion"
 #pragma GCC diagnostic ignored "-Wdeclaration-after-statement"
+#elif defined(_MSC_VER)
+#include <CodeAnalysis/warnings.h>
+#pragma warning(push)
+#pragma warning(disable: ALL_CODE_ANALYSIS_WARNINGS)
 #endif
 #include "acutest.h"
 #if defined(__clang__)
-#pragma clang diagnostic push
+#pragma clang diagnostic pop
 #elif defined(__GNUC__)
-#pragma GCC diagnostic push
+#pragma GCC diagnostic pop
+#elif defined(_MSC_VER)
+#pragma warning(pop)
 #endif
 
 #include <assert.h>
