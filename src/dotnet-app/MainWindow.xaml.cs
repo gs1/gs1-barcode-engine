@@ -28,7 +28,7 @@ namespace GS1.EncodersApp
             InitializeComponent();
         }
 
-        private void clearRender()
+        private void ClearRender()
         {
             infoLabel.Content = "";
             errorMessageLabel.Content = "";
@@ -53,7 +53,7 @@ namespace GS1.EncodersApp
             _disableEvents = false;
         }
 
-        private void symbologyComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void SymbologyComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             linHeightLabel.IsEnabled = false;
             linHeightTextBox.IsEnabled = false;
@@ -126,11 +126,11 @@ namespace GS1.EncodersApp
 
             }
 
-            clearRender();
+            ClearRender();
 
         }
 
-        private void lookupXdimensionForApplication()
+        private void LookupXdimensionForApplication()
         {
             double minX = 0, maxX = 0, targetX = 0;
             double minXi = 0, maxXi = 0, targetXi = 0;
@@ -549,17 +549,17 @@ namespace GS1.EncodersApp
 
             _disableEvents = false;
 
-            recalculateXdimension();
+            RecalculateXdimension();
         }
 
-        private void applicationComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void ApplicationComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (_disableEvents) return;
-            clearRender();
-            lookupXdimensionForApplication();
+            ClearRender();
+            LookupXdimensionForApplication();
         }
 
-        private void processScanData()
+        private void ProcessScanData()
         {
             try
             {
@@ -584,13 +584,13 @@ namespace GS1.EncodersApp
             generateButton.RaiseEvent(new RoutedEventArgs(System.Windows.Controls.Button.ClickEvent));
         }
 
-        private void generateButton_Click(object sender, RoutedEventArgs e)
+        private void GenerateButton_Click(object sender, RoutedEventArgs e)
         {
 
-            clearRender();
+            ClearRender();
 
             if ((GS1Encoder.Symbology)symbologyComboBox.SelectedIndex == GS1Encoder.Symbology.NUMSYMS) {
-                processScanData();
+                ProcessScanData();
                 return;
             }
 
@@ -667,8 +667,10 @@ namespace GS1.EncodersApp
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.Filter = "Bitmap Image (*.bmp)|*.bmp|Portable Network Graphic (*.png)|*.png";
+            SaveFileDialog saveFileDialog = new SaveFileDialog
+            {
+                Filter = "Bitmap Image (*.bmp)|*.bmp|Portable Network Graphic (*.png)|*.png"
+            };
             if (saveFileDialog.ShowDialog() == true)
             {
                 BitmapEncoder encoder;
@@ -680,10 +682,8 @@ namespace GS1.EncodersApp
                     encoder = new PngBitmapEncoder();
                 }
                 encoder.Frames.Add(BitmapFrame.Create((BitmapSource)barcodeImage.Source));
-                using (var fileStream = new System.IO.FileStream(saveFileDialog.FileName, System.IO.FileMode.Create))
-                {
-                    encoder.Save(fileStream);
-                }
+                using var fileStream = new System.IO.FileStream(saveFileDialog.FileName, System.IO.FileMode.Create);
+                encoder.Save(fileStream);
             }
         }
 
@@ -692,12 +692,12 @@ namespace GS1.EncodersApp
             Clipboard.SetImage(barcodeImage.Source as BitmapSource);
         }
 
-        private void hriTextBox_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        private void HRITextBox_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             Clipboard.SetText(hriTextBox.Text);
         }
 
-        private void infoLabel_MouseDown(object sender, MouseButtonEventArgs e)
+        private void InfoLabel_MouseDown(object sender, MouseButtonEventArgs e)
         {
             string content = (string)infoLabel.Content;
             content = Regex.Replace(content, ".*:\\s+", "");
@@ -719,9 +719,7 @@ namespace GS1.EncodersApp
             }
         }
 
-        private void recalculateXdimension() {
-
-            double res, minX, targetX, maxX;
+        private void RecalculateXdimension() {
 
             // Not initialised yet
             if (actualXLabel == null)
@@ -742,7 +740,7 @@ namespace GS1.EncodersApp
                 generateButton.IsEnabled = false;
             }
 
-            if (!Double.TryParse(deviceResolutionTextBox.Text, out res))
+            if (!Double.TryParse(deviceResolutionTextBox.Text, out double res))
             {
                 if (deviceResolutionTextBox.Text == "")
                     res = 0;
@@ -752,7 +750,7 @@ namespace GS1.EncodersApp
                 }
             }
 
-            if (!Double.TryParse(targetXdimensionTextBox.Text, out targetX))
+            if (!Double.TryParse(targetXdimensionTextBox.Text, out double targetX))
             {
                 if (targetXdimensionTextBox.Text == "")
                     targetX = 0;
@@ -763,7 +761,7 @@ namespace GS1.EncodersApp
                 }
             }
 
-            if (!Double.TryParse(minXdimensionTextBox.Text, out minX))
+            if (!Double.TryParse(minXdimensionTextBox.Text, out double minX))
             {
                 if (minXdimensionTextBox.Text == "")
                     minX = 0;
@@ -774,7 +772,7 @@ namespace GS1.EncodersApp
                 }
             }
 
-            if (!Double.TryParse(maxXdimensionTextBox.Text, out maxX))
+            if (!Double.TryParse(maxXdimensionTextBox.Text, out double maxX))
             {
                 if (maxXdimensionTextBox.Text == "")
                     maxX = 0;
@@ -803,7 +801,7 @@ namespace GS1.EncodersApp
             try
             {
                 App.gs1Encoder.DeviceResolution = res;
-                App.gs1Encoder.setXdimension(minX, targetX, maxX);
+                App.gs1Encoder.SetXdimension(minX, targetX, maxX);
                 if (units == "d/mm") {
                     actualXLabel.Content = String.Format("Achieved X = {0:N3}mm ({1:N0}% target)",
                         App.gs1Encoder.ActualXdimension,
@@ -831,26 +829,25 @@ namespace GS1.EncodersApp
 
         }
 
-        private void genericTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        private void GenericTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (_disableEvents) return;
-            clearRender();
+            ClearRender();
         }
 
         private void XdimensionTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            genericTextBox_TextChanged(sender, e);
-            recalculateXdimension();
+            GenericTextBox_TextChanged(sender, e);
+            RecalculateXdimension();
         }
 
-        private void genericComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void GenericComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (_disableEvents) return;
-            clearRender();
+            ClearRender();
             try
             {
-                int v;
-                if (Int32.TryParse((string)((ComboBox)sender).SelectedValue, out v))
+                if (Int32.TryParse((string)((ComboBox)sender).SelectedValue, out int v))
                 {
                     if (sender == segWidthComboBox) App.gs1Encoder.DataBarExpandedSegmentsWidth = v;
                     if (sender == qrVersionComboBox) App.gs1Encoder.QrVersion = v;
@@ -866,14 +863,13 @@ namespace GS1.EncodersApp
             LoadDataValues();
         }
 
-        private void genericTextBox_LostFocus(object sender, RoutedEventArgs e)
+        private void GenericTextBox_LostFocus(object sender, RoutedEventArgs e)
         {
             if (_disableEvents) return;
-            clearRender();
+            ClearRender();
             try
             {
-                int v;
-                if (Int32.TryParse((string)((TextBox)sender).Text, out v))
+                if (Int32.TryParse((string)((TextBox)sender).Text, out int v))
                 {
                     if (sender == pixMultTextBox) App.gs1Encoder.PixMult = v;
                     if (sender == XundercutTextBox) App.gs1Encoder.Xundercut = v;
@@ -890,7 +886,7 @@ namespace GS1.EncodersApp
             LoadDataValues();
         }
 
-        private void errorMessageLabel_MouseDown(object sender, MouseButtonEventArgs e)
+        private void ErrorMessageLabel_MouseDown(object sender, MouseButtonEventArgs e)
         {
             string content = (string)errorMessageLabel.Content;
             if (!content.StartsWith("Scan data:"))
@@ -899,7 +895,7 @@ namespace GS1.EncodersApp
             Clipboard.SetText(content);
         }
 
-        private void unitsButton_Click(object sender, RoutedEventArgs e)
+        private void UnitsButton_Click(object sender, RoutedEventArgs e)
         {
             if (units == "d/mm")
             {
@@ -916,20 +912,20 @@ namespace GS1.EncodersApp
             }
             unitsButton.Content = units;
             deviceResolutionTextBox.Text = "";
-            lookupXdimensionForApplication();
+            LookupXdimensionForApplication();
         }
 
-        private void permitUnknownAIsCheckBox_Click(object sender, RoutedEventArgs e)
+        private void PermitUnknownAIsCheckBox_Click(object sender, RoutedEventArgs e)
         {
             if (_disableEvents) return;
-            clearRender();
+            ClearRender();
             App.gs1Encoder.PermitUnknownAIs = permitUnknownAIsCheckBox.IsChecked ?? false;
         }
 
-        private void addCheckDigitCheckBox_Click(object sender, RoutedEventArgs e)
+        private void AddCheckDigitCheckBox_Click(object sender, RoutedEventArgs e)
         {
             if (_disableEvents) return;
-            clearRender();
+            ClearRender();
             App.gs1Encoder.AddCheckDigit = addCheckDigitCheckBox.IsChecked ?? false;
         }
     }

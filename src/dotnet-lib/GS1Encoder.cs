@@ -752,7 +752,7 @@ namespace GS1.Encoders
         ///   - gs1_encoder_setXdimension()
         ///
         /// </summary>
-        public void setXdimension(double min, double target, double max)
+        public void SetXdimension(double min, double target, double max)
         {
             if (!gs1_encoder_setXdimension(ctx, min, target, max))
                 throw new GS1EncoderParameterException(ErrMsg);
