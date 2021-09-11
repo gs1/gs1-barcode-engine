@@ -51,8 +51,11 @@ static void free_bufferStrings(gs1_encoder *ctx) {
 	int i = 0;
 	assert(ctx);
 	if (ctx->bufferStrings) {
-		while (ctx->bufferStrings[i])
-			free(ctx->bufferStrings[i++]);
+		while (ctx->bufferStrings[i]) {		
+			free(ctx->bufferStrings[i]);
+			ctx->bufferStrings[i] = NULL;
+			i++;
+		}
 		free(ctx->bufferStrings);
 		ctx->bufferStrings = NULL;
 	}
