@@ -529,6 +529,7 @@ void test_scandata_processScanData(void) {
 	gs1_encoder* ctx;
 
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	assert(ctx);											// Satisfy analyzer
 
 	test_testProcessScanData(false, "", NONE, "");			// No data
 	test_testProcessScanData(false, "ABC", NONE, "");		// No symbology identifier
