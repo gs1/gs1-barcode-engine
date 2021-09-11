@@ -407,7 +407,7 @@ int main(int argc, char *argv[]) {
 
 	gs1_encoder* ctx;
 
-	inpStr = malloc((size_t)(gs1_encoder_getMaxDataStrLength()+1));
+	inpStr = malloc((size_t)gs1_encoder_getMaxDataStrLength()+1);
 	if (inpStr == NULL) {
 		printf("Failed to allocate the input buffer!\n");
 		return 1;
