@@ -1093,6 +1093,8 @@ GS1_ENCODERS_API int gs1_encoder_getBufferHeight(gs1_encoder *ctx) {
 #define TEST_NO_MAIN
 #include "acutest.h"
 
+// Used to test compile-time buffer allocation for the gs1encoder instance
+static uint8_t static_buf[sizeof(gs1_encoder)];
 
 // Sizable buffer on the heap so that we don't exhaust the stack
 char bigbuffer[MAX_DATA+2];
@@ -1135,7 +1137,6 @@ void test_api_init(void) {
 	gs1_encoder* ctx;
 	void *heap;
 	size_t mem;
-	uint8_t stack[sizeof(gs1_encoder)];
 
 	// Mallocs its own memory
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
@@ -1144,7 +1145,7 @@ void test_api_init(void) {
 	TEST_CHECK(strcmp(gs1_encoder_getOutFile(ctx), DEFAULT_TIF_FILE) == 0);
 	gs1_encoder_free(ctx);
 
-	// We malloc the storage on the heap and pass it in
+	// We malloc the storage on the heap at run-time and pass it in
 	TEST_ASSERT((mem = gs1_encoder_instanceSize()) > 0);
 	TEST_ASSERT((heap = malloc(mem)) != NULL);
 	TEST_ASSERT((ctx = gs1_encoder_init(heap)) == heap);
@@ -1153,8 +1154,8 @@ void test_api_init(void) {
 	TEST_CHECK(strcmp(gs1_encoder_getOutFile(ctx), DEFAULT_TIF_FILE) == 0);
 	gs1_encoder_free(ctx);
 
-	// We malloc the storage on the stack and pass it in
-	TEST_ASSERT((ctx = gs1_encoder_init(&stack)) != NULL);
+	// We allocate at compile-time and pass it in
+	TEST_ASSERT((ctx = gs1_encoder_init(&static_buf)) != NULL);
 	TEST_CHECK(gs1_encoder_getSym(ctx) == gs1_encoder_sNONE);
 	TEST_CHECK(gs1_encoder_getFormat(ctx) == gs1_encoder_dTIF);
 	TEST_CHECK(strcmp(gs1_encoder_getOutFile(ctx), DEFAULT_TIF_FILE) == 0);
