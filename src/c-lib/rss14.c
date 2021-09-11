@@ -415,7 +415,7 @@ bool gs1_normaliseRSS14(gs1_encoder *ctx, const char *dataStr, char *primaryStr)
 
 void gs1_RSS14(gs1_encoder *ctx) {
 
-	struct sPrints prints;
+	struct sPrints prints = { 0 };
 	struct sPrints *prntCnv;
 
 	uint8_t linPattern[RSS14_ELMNTS];
@@ -514,7 +514,7 @@ out:
 
 void gs1_RSS14S(gs1_encoder *ctx) {
 
-	struct sPrints prints;
+	struct sPrints prints = { 0 };
 	struct sPrints *prntCnv;
 
 	uint8_t linPattern[RSS14_ELMNTS];
@@ -632,12 +632,12 @@ out:
 
 void gs1_RSS14SO(gs1_encoder *ctx) {
 
-	struct sPrints prints;
-	struct sPrints chexPrnts;
+	struct sPrints prints = { 0 };
+	struct sPrints chexPrnts = { 0 };
 	struct sPrints *prntCnv;
 
 	uint8_t linPattern[RSS14_ELMNTS];
-	uint8_t chexPattern[RSS14_SYM_W/2+2];
+	uint8_t chexPattern[RSS14_SYM_W / 2 + 2] = { 0 };
 
 	uint8_t (*ccPattern)[CCB4_ELMNTS] = ctx->ccPattern;
 

@@ -1513,7 +1513,7 @@ static int doLinMethods(gs1_encoder *ctx, uint8_t str[], int *iStr, uint8_t bitF
 
 int gs1_pack(gs1_encoder *ctx, uint8_t str[], uint8_t bitField[]) {
 
-	struct encodeT encode;
+	struct encodeT encode = { 0 };
 
 	encode.str = str;
 	encode.bitField = bitField;
@@ -1595,7 +1595,7 @@ static void encode900(uint8_t byteArr[], uint16_t codeWords[], int byteLng) {
 					{0,0,20,641,316}, {0,5,802,385,796}, {1,608,221,686,376}  };
 
 	int i, j, bCnt, cwNdx;
-	uint32_t cw, t, carry, cwArr[5];
+	uint32_t cw, t, carry, cwArr[5] = { 0 };
 
 	for (cwNdx = bCnt = 0; bCnt < byteLng-5; cwNdx += 5, bCnt += 6) {
 		// init cwArr to 6th byte
@@ -1928,7 +1928,7 @@ static void imgCCC(gs1_encoder *ctx, uint16_t codeWords[], uint8_t patCCC[]) {
 	static const uint8_t leftPtn[9] = { 2,8,1,1,1,1,1,1,3 }; // qz + start
 	static const uint8_t rightPtn[10] = { 7,1,1,3,1,1,1,2,1,2 }; // stop + qz
 
-	int leftRowBase[3]; // right row is (left index+2) mod 3
+	int leftRowBase[3] = { 0 }; // right row is (left index+2) mod 3
 
 	uint32_t bars;
 	int cluster, errLvl, rowFactor;

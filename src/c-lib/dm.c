@@ -534,7 +534,7 @@ static int DMenc(gs1_encoder *ctx, const uint8_t string[], struct patternLength 
 
 void gs1_DM(gs1_encoder *ctx) {
 
-	struct sPrints prints;
+	struct sPrints prints = { 0 };
 	struct patternLength *pats;
 	char* dataStr = ctx->dataStr;
 	int rows, cols, i;

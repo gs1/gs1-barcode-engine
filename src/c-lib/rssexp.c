@@ -246,12 +246,12 @@ static int RSS14Eenc(gs1_encoder *ctx, uint8_t string[], uint8_t bars[RSSEXP_MAX
 
 void gs1_RSSExp(gs1_encoder *ctx) {
 
-	struct sPrints prints;
-	struct sPrints chexPrnts;
+	struct sPrints prints = { 0 };
+	struct sPrints chexPrnts = { 0 };
 	struct sPrints *prntCnv;
 
-	uint8_t linPattern[RSSEXP_MAX_DBL_SEGS*RSSEXP_ELMNTS+4];
-	uint8_t chexPattern[RSSEXP_MAX_DBL_SEGS*RSSEXP_SYM_W+2];
+	uint8_t linPattern[RSSEXP_MAX_DBL_SEGS * RSSEXP_ELMNTS + 4] = { 0 };
+	uint8_t chexPattern[RSSEXP_MAX_DBL_SEGS * RSSEXP_SYM_W + 2] = { 0 };
 	uint8_t dblPattern[RSSEXP_MAX_DBL_SEGS][RSSEXP_ELMNTS];
 
 	uint8_t (*ccPattern)[CCB4_ELMNTS] = ctx->ccPattern;

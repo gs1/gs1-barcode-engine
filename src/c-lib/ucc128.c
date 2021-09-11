@@ -280,7 +280,7 @@ static int enc128(uint8_t data[], uint8_t bars[], const int link)
 
 	static const int linkChar[3][2] = { { 100,99 }, { 99,101 }, { 101,100 } };
 	int si, di, i, code;
-	int symchr[UCC128_SYMMAX+1];
+	int symchr[UCC128_SYMMAX + 1] = { 0 };
 	long ckchr;
 
 	for (i = 0; i < (int)strlen((char*)data); i++) {
@@ -359,9 +359,9 @@ static int enc128(uint8_t data[], uint8_t bars[], const int link)
 }
 
 
-void gs1_U128A(gs1_encoder *ctx) {
+void gs1_U128A(gs1_encoder* ctx) {
 
-	struct sPrints prints;
+	struct sPrints prints = { 0 };
 
 	uint8_t linPattern[(UCC128_SYMMAX*6)+3];
 
@@ -369,7 +369,7 @@ void gs1_U128A(gs1_encoder *ctx) {
 
 	int i;
 	int rows, ccFlag, symChars, symWidth, ccLpad, ccRpad;
-	char primaryStr[49+1];
+	char primaryStr[49 + 1] = { 0 };
 	char *ccStr;
 
 	DEBUG_PRINT("\nData: %s\n", ctx->dataStr);
@@ -480,14 +480,14 @@ out:
 
 void gs1_U128C(gs1_encoder *ctx) {
 
-	struct sPrints prints;
+	struct sPrints prints = { 0 };
 	uint8_t *patCCC = ctx->ucc128_patCCC;
 
 	uint8_t linPattern[(UCC128_SYMMAX*6)+3];
 
 	int i;
 	int ccFlag, symChars, symWidth, ccRpad;
-	char primaryStr[49+1];
+	char primaryStr[49 + 1] = { 0 };
 	char *ccStr;
 
 	DEBUG_PRINT("\nData: %s\n", ctx->dataStr);

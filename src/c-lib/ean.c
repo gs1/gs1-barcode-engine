@@ -139,8 +139,8 @@ bool gs1_normaliseEAN13(gs1_encoder *ctx, const char *dataStr, char *primaryStr)
 
 void gs1_EAN13(gs1_encoder *ctx) {
 
-	struct sPrints prints;
-	struct sPrints sepPrnt;
+	struct sPrints prints = { 0 };
+	struct sPrints sepPrnt = { 0 };
 
 	uint8_t linPattern[EAN13_ELMNTS];
 	uint8_t sepPat1[5] = { 7,1,EAN13_W-16,1,7 }; // separator pattern 1
@@ -344,8 +344,8 @@ bool gs1_normaliseEAN8(gs1_encoder *ctx, const char* dataStr, char* primaryStr) 
 
 void gs1_EAN8(gs1_encoder *ctx) {
 
-	struct sPrints prints;
-	struct sPrints sepPrnt;
+	struct sPrints prints = { 0 };
+	struct sPrints sepPrnt = { 0 };
 
 	uint8_t linPattern[EAN8_ELMNTS];
 	uint8_t sepPat1[5] = { 7,1,EAN8_W-16,1,7 }; // separator pattern 1
@@ -617,8 +617,8 @@ bool gs1_normaliseUPCE(gs1_encoder *ctx, const char *dataStr, char *primaryStr) 
 
 void gs1_UPCE(gs1_encoder *ctx) {
 
-	struct sPrints prints;
-	struct sPrints sepPrnt;
+	struct sPrints prints = { 0 };
+	struct sPrints sepPrnt = { 0 };
 
 	uint8_t linPattern[UPCE_ELMNTS];
 	uint8_t sepPat1[5] = { 7,1,UPCE_W-16,1,7 }; // separator pattern 1

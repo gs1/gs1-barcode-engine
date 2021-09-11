@@ -461,8 +461,8 @@ static uint32_t evalMask(const uint8_t *mtx, const struct metric *m) {
 
 	int i, j, k, p;
 	uint8_t size = m->size;
-	uint8_t pairsa[MAX_QR_SIZE], pairsb[MAX_QR_SIZE];
-	uint8_t rlec[MAX_QR_SIZE], rler[MAX_QR_SIZE];
+	uint8_t pairsa[MAX_QR_SIZE] = { 0 }, pairsb[MAX_QR_SIZE] = { 0 };
+	uint8_t rlec[MAX_QR_SIZE] = { 0 }, rler[MAX_QR_SIZE] = { 0 };
 	uint8_t lastc, lastr, qc, qr;
 	int now, last;
 	int n1n3 = 0, n2 = 0, n4 = 0;
@@ -890,7 +890,7 @@ static int QRenc(gs1_encoder *ctx, const uint8_t string[], struct patternLength 
 
 void gs1_QR(gs1_encoder *ctx) {
 
-	struct sPrints prints;
+	struct sPrints prints = { 0 };
 	struct patternLength *pats;
 	char* dataStr = ctx->dataStr;
 	int rows, cols, i;
