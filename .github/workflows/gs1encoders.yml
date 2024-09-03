@@ -212,22 +212,22 @@ jobs:
     steps:
 
     - name: Load Windows libs
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v4.1.7
       with:
         name: windows-libs
 
     - name: Load Windows console app
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v4.1.7
       with:
         name: windows-console-app
 
     - name: Load Windows GUI app
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v4.1.7
       with:
         name: windows-gui-app
 
     - name: Load Linux app
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v4.1.7
       with:
         name: linux-app
 
