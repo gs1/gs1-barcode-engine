@@ -1,6 +1,11 @@
 GS1 Barcode Engine
 ==================
 
+> [!WARNING]
+>This repository is not actively maintained. It has been superseded by the following repositories:
+>* [GS1 Barcode Syntax Dictionary and Linters](https://github.com/gs1/gs1-syntax-dictionary) 
+>* [GS1 Barcode Syntax Engine](https://github.com/gs1/gs1-syntax-engine)
+
 The GS1 Barcode Engine is a native C library that supports the generation of
 GS1 barcode symbols and processing of GS1 Application Identifier data. It
 includes bindings for C# .NET and demonstration console and desktop
